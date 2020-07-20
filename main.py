@@ -13,9 +13,9 @@ COOKIES_FILENAME = "./twitch-cookies.pkl"
 driver: HiddenChromeWebDriver
 twitch_streamer: str
 is_online = None
+current_channel_points = -1
 
 
-# 1) ждать стрима 2) проверять url на изменения 3) Loaded! Press ctrl+c to exit
 def main():
     global twitch_streamer
     twitch_streamer = input("Enter the streamer name: ")
@@ -30,7 +30,10 @@ def main():
     while True:
         try:
             start_watching_stream()
-        except (RaidRedirectException, NoSuchElementException):
+        except NoSuchElementException:
+            set_online(False)
+        except RaidRedirectException:
+            print("You have followed the raid!")
             set_online(False)
         sleep(30)
 
@@ -44,7 +47,7 @@ def start_watching_stream():
         check_for_raid_redirect()
         check_for_channel_points_update()
         check_for_bonus()
-        sleep(10)
+        sleep(5)
 
 
 def create_webdriver(headless):
@@ -61,7 +64,7 @@ def create_webdriver(headless):
     if headless:
         url = get_streamer_url()
     else:
-        url = "https://www.twitch.com"
+        url = "https://www.twitch.tv"
     driver.get(url)
     load_cookies()
     sleep(PAGE_LOAD_WAIT_SECONDS)
@@ -69,7 +72,7 @@ def create_webdriver(headless):
 
 
 def get_streamer_url():
-    return f"https://www.twitch.com/{twitch_streamer}"
+    return f"https://www.twitch.tv/{twitch_streamer}"
 
 
 def check_login():
@@ -159,15 +162,12 @@ def check_for_bonus():
         print("Clicked the bonus button!")
 
 
-current_channel_points = -1
-
-
 def check_for_channel_points_update():
     global current_channel_points
     new_channel_points = get_channel_points()
     if new_channel_points != current_channel_points:
         current_channel_points = new_channel_points
-        print(f"Now you have {current_channel_points} channel_points!")
+        print(f"Now you have {current_channel_points} channel points!")
 
 
 def get_channel_points():
