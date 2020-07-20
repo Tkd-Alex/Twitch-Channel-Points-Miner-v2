@@ -13,7 +13,6 @@ PAGE_LOAD_WAIT_SECONDS = 3
 COOKIES_FILENAME = "./twitch-cookies.pkl"
 
 
-# проверка что чел стримит
 def main():
     global twitch_streamer
     twitch_streamer = input("Enter the streamer name: ")
