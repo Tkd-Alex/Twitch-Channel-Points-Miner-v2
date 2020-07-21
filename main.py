@@ -3,7 +3,7 @@ import os
 import pickle
 import re
 from time import sleep
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import *
 from selenium.webdriver.chrome.options import Options
 from hidden_chrome_driver import HiddenChromeWebDriver
 
@@ -11,6 +11,7 @@ PAGE_LOAD_WAIT_SECONDS = 3
 COOKIES_FILENAME = "./twitch-cookies.pkl"
 
 driver: HiddenChromeWebDriver
+is_fullscreen = False
 twitch_streamer: str
 is_online = None
 current_channel_points = -1
@@ -30,19 +31,24 @@ def main():
     while True:
         try:
             start_watching_stream()
-        except NoSuchElementException:
+        except (NoSuchElementException, StaleElementReferenceException):
             set_online(False)
         except RaidRedirectException:
-            print("You have followed the raid!")
-            set_online(False)
-        sleep(30)
+            pass
+        sleep(90)
 
 
 def start_watching_stream():
+    load_url(get_streamer_url())
+
     check_mature_content()
     set_lowest_quality()
-    go_fullscreen()
+    if not is_fullscreen:
+        toggle_fullscreen()
+
+    get_channel_points()  # throws NoSuchElementException when streamer is offline
     set_online(True)
+
     while True:
         check_for_raid_redirect()
         check_for_channel_points_update()
@@ -51,11 +57,12 @@ def start_watching_stream():
 
 
 def create_webdriver(headless):
-    global driver
+    global driver, is_fullscreen
 
     chrome_options = Options()
     if headless:
         chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--window-size=1280,800")
     chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     chrome_options.add_argument("--mute-audio")
@@ -66,9 +73,18 @@ def create_webdriver(headless):
     else:
         url = "https://www.twitch.tv"
     driver.get(url)
+    is_fullscreen = False
     load_cookies()
     sleep(PAGE_LOAD_WAIT_SECONDS)
     return driver
+
+
+def load_url(url):
+    global is_fullscreen
+    if driver.current_url != url:
+        driver.get(url)
+        is_fullscreen = False
+        sleep(PAGE_LOAD_WAIT_SECONDS)
 
 
 def get_streamer_url():
@@ -129,9 +145,11 @@ def set_lowest_quality():
     qualities[-1].click()
 
 
-def go_fullscreen():
+def toggle_fullscreen():
+    global is_fullscreen
     fullscreen_button = driver.find_element_by_css_selector("button[data-a-target='player-fullscreen-button']")
     fullscreen_button.click()
+    is_fullscreen = not is_fullscreen
 
 
 def set_online(new_online):
@@ -143,14 +161,19 @@ def set_online(new_online):
         else:
             print("The streamer is offline currently.")
             print("Wait for him to go live, or close the program by pressing Ctrl+C.")
+            load_url("about:blank")
 
 
 def check_for_raid_redirect():
     if driver.current_url != get_streamer_url():
-        driver.get(get_streamer_url())
+        print("You have followed the raid!")
         sleep(30)  # pretend we're following the raid
+        driver.get(get_streamer_url())
         raise RaidRedirectException
 
+
+class RaidRedirectException(Exception):
+    pass
 
 
 def check_for_bonus():
@@ -177,14 +200,16 @@ def get_channel_points():
     # remove spaces
     balance_text = re.sub(r"\s+", "", balance_text, flags=re.UNICODE)
     if len(balance_text) == 0:
-        return -1
+        raise NoSuchElementException
     else:
         return int(balance_text)
 
 
 def quit_driver():
-    driver.close()
+    global driver
     driver.quit()
+    driver.service.stop()
+    del driver
 
 
 @atexit.register
@@ -192,10 +217,11 @@ def exit_handler():
     if "driver" in globals():
         print("Closing the webdriver...")
         quit_driver()
-
-
-class RaidRedirectException(Exception):
-    pass
+        if os.name == "nt":
+            print("Because of a bug in chromedriver, there are still chrome.exe processes occupying the memory.")
+            should_kill_chrome = input("Kill them? This will close ALL of Chrome instances! y/n: ")
+            if should_kill_chrome.lower() == "y":
+                os.system("taskkill /im chrome.exe /f")
 
 
 if __name__ == "__main__":
