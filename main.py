@@ -83,8 +83,10 @@ def load_url(url):
     global is_fullscreen
     if driver.current_url != url:
         driver.get(url)
-        is_fullscreen = False
-        sleep(PAGE_LOAD_WAIT_SECONDS)
+    else:
+        driver.refresh()
+    is_fullscreen = False
+    sleep(PAGE_LOAD_WAIT_SECONDS)
 
 
 def get_streamer_url():
