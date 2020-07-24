@@ -9,7 +9,7 @@ To run it, you first have to:
 
 1) [Download Python](https://www.python.org/downloads/).
 2) Run `pip install selenium` in the command line
-3) [Download the ChromeDriver](https://chromedriver.chromium.org/downloads). Unzip the it to the directory with the source code.
+3) [Download the ChromeDriver](https://chromedriver.chromium.org/downloads). Unzip it to the directory with the source code.
 
 Then you can run `main.py`
 
