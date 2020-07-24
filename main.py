@@ -2,7 +2,7 @@ import atexit
 import os
 import pickle
 import re
-from time import sleep
+import time
 from selenium.common.exceptions import *
 from selenium.webdriver.chrome.options import Options
 from hidden_chrome_driver import HiddenChromeWebDriver
@@ -83,10 +83,8 @@ def load_url(url):
     global is_fullscreen
     if driver.current_url != url:
         driver.get(url)
-    else:
-        driver.refresh()
-    is_fullscreen = False
-    sleep(PAGE_LOAD_WAIT_SECONDS)
+        is_fullscreen = False
+        sleep(PAGE_LOAD_WAIT_SECONDS)
 
 
 def get_streamer_url():
@@ -163,7 +161,9 @@ def set_online(new_online):
         else:
             print("The streamer is offline currently.")
             print("Wait for him to go live, or close the program by pressing Ctrl+C.")
-            load_url("about:blank")
+
+    if not is_online:
+        load_url("about:blank")
 
 
 def check_for_raid_redirect():
@@ -224,6 +224,13 @@ def exit_handler():
             should_kill_chrome = input("Kill them? This will close ALL of Chrome instances! y/n: ")
             if should_kill_chrome.lower() == "y":
                 os.system("taskkill /im chrome.exe /f")
+
+
+def sleep(t):  # workaround so that sleep doesn't block keyboard interrupt
+    while t >= 1:
+        time.sleep(1)
+        t -= 1
+    time.sleep(t)
 
 
 if __name__ == "__main__":
