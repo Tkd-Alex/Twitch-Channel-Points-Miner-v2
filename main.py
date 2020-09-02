@@ -135,6 +135,8 @@ def check_mature_content():
 
 
 def set_lowest_quality():
+    close_discount_balloon()
+
     settings_button = driver.find_element_by_css_selector("button[data-a-target='player-settings-button']")
     settings_button.click()
     sleep(0.1)
@@ -143,6 +145,15 @@ def set_lowest_quality():
 
     qualities = driver.find_elements_by_css_selector("div[data-a-target='player-settings-submenu-quality-option']")
     qualities[-1].click()
+
+
+# Sometimes Twitch will show a SUBtember discount, which will overlay the settings button
+def close_discount_balloon():
+    close_button_div_search = driver.find_elements_by_css_selector(
+        "div[class='tw-absolute tw-pd-1 tw-right-0 tw-top-0']")
+    if close_button_div_search:
+        close_button = close_button_div_search[0].find_element_by_css_selector("button")
+        close_button.click()
 
 
 def toggle_fullscreen():
