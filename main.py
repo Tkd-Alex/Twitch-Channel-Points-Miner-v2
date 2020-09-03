@@ -46,7 +46,7 @@ def start_watching_stream():
     if not is_fullscreen:
         toggle_fullscreen()
 
-    get_channel_points()  # throws NoSuchElementException when streamer is offline
+    get_channel_points()  # throws NoSuchElementException when the streamer is offline
     set_online(True)
 
     while True:
@@ -210,8 +210,8 @@ def get_channel_points():
     balance_div = driver.find_element_by_css_selector("div[data-test-selector='balance-string']")
     balance_text_span = balance_div.find_element_by_class_name("tw-animated-number")
     balance_text = balance_text_span.text
-    # remove spaces
-    balance_text = re.sub(r"\s+", "", balance_text, flags=re.UNICODE)
+    # remove any non-numeric characters
+    balance_text = re.sub("[^0-9]", "", balance_text, flags=re.UNICODE)
     if len(balance_text) == 0:
         raise NoSuchElementException
     else:
