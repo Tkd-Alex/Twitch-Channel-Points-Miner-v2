@@ -171,7 +171,7 @@ def set_online(new_online):
             print("The streamer is live!")
         else:
             print("The streamer is offline currently.")
-            print("Wait for him to go live, or close the program by pressing Ctrl+C.")
+            print("Wait for them to go live, or close the program by pressing Ctrl+C.")
 
     if not is_online:
         load_url("about:blank")
