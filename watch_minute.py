@@ -7,7 +7,7 @@ from twitch_data import *
 from twitch_data import get_streamer_url, USER_AGENT
 
 
-# Twitch client sends some statistics in as base64-encoded json
+# Twitch client sends some statistics as base64-encoded json
 # This API is presumably called Spade (https://github.com/twitchscience/spade)
 # "minute-watched" requests are what Twitch uses to know if you're watching a stream, and to grant you channel points.
 
