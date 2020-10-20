@@ -10,7 +10,7 @@ from twitch_data import get_auth_token, get_channel_id, USER_AGENT, get_client_i
 
 
 def claim_channel_points_bonus(streamer_login, claim_id):
-    print("Claiming the bonus!")
+    print(f"Claiming the bonus for {streamer_login}!")
     json_data = {"operationName": "ClaimCommunityPoints",
                  "variables": {"input": {"channelID": get_channel_id(streamer_login), "claimID": claim_id}},
                  "extensions": {"persistedQuery": {"version": 1, "sha256Hash": "46aaeebe02c99afdf4fc97c7c0cba964124bf6b0af229395f1f6d1feed05b3d0"}}}
