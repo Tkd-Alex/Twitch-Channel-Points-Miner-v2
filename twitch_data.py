@@ -1,3 +1,4 @@
+import time
 import requests
 from cookies import get_cookie_value
 from exceptions import StreamerIsOfflineException, StreamerDoesNotExistException
@@ -8,6 +9,7 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 
 streamer_logins = []
 _is_online = {}  # streamer login -> are they online
+last_offline_time = {}  # the time when a streamer went offline
 
 
 # specify the streamers we'll be watching
@@ -31,6 +33,11 @@ def do_for_each_streamer(function, args=None):
 
 
 def check_online(streamer_login, print_offline_message=False):
+    # Twitch API has a delay for querying channels. If a query is made right after the streamer went offline,
+    # it will cause a false "streamer is live" event.
+    if time.time() < last_offline_time.get(streamer_login, 0) + 60:
+        return
+
     if not is_online(streamer_login):
         _is_online[streamer_login] = True
         try:
@@ -48,6 +55,7 @@ def check_online(streamer_login, print_offline_message=False):
 def set_offline(streamer_login):
     if is_online(streamer_login):
         _is_online[streamer_login] = False
+        last_offline_time[streamer_login] = time.time()
         print(f"{streamer_login} is offline currently.")
 
 
