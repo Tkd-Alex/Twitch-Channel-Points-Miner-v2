@@ -35,7 +35,7 @@ def get_needed_topics():
     topics = [PubsubTopic("community-points-user-v1")]
     for streamer_login in get_streamer_logins():
         topics.append(PubsubTopic("video-playback-by-id", streamer_login))
-        topics.append(PubsubTopic("raid", streamer_login))
+        # topics.append(PubsubTopic("raid", streamer_login))
     return topics
 
 
@@ -58,7 +58,7 @@ def on_message(ws, message):
     response = json.loads(message)
 
     if response["type"] == "MESSAGE":
-        print("Received message: ", response)
+        # print("Received message: ", response)
         data = response["data"]
         topic, topic_user = data["topic"].split(".")
         message = json.loads(data["message"])
