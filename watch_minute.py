@@ -30,15 +30,11 @@ def send_minute_watched_events():
         for streamer_login in streamers:
             next_iteration = time.time() + 60 / len(streamers)
             if is_online(streamer_login):
-                # print(f"Watching minute for {streamer_login}")
                 request_info = minute_watched_requests[streamer_login]
                 try:
                     requests.post(request_info.url, data=request_info.payload, headers=headers)
                 except requests.exceptions.ConnectionError as e:
                     print("Error while trying to watch a minute:", str(e))
-            elif minutes_passed % 5 == 0:
-                # checking whether the streamer is online every 5 minutes
-                check_online(streamer_login)
 
             time.sleep(max(next_iteration - time.time(), 0))
 
