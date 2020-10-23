@@ -4,6 +4,7 @@ import time
 from random import randrange
 import websocket  # pip install websocket-client
 from claim_bonus import claim_channel_points_bonus
+from raid import set_raid, follow_raid, Raid
 from twitch_data import *
 
 
@@ -35,7 +36,7 @@ def get_needed_topics():
     topics = [PubsubTopic("community-points-user-v1")]
     for streamer_login in get_streamer_logins():
         topics.append(PubsubTopic("video-playback-by-id", streamer_login))
-        # topics.append(PubsubTopic("raid", streamer_login))
+        topics.append(PubsubTopic("raid", streamer_login))
     return topics
 
 
@@ -80,12 +81,21 @@ def on_message(ws, message):
                     claim_channel_points_bonus(streamer_login, claim_id)
 
         elif topic == "video-playback-by-id":
-            channel_id = topic_user
-            channel_login = get_login_by_channel_id(channel_id)
+            channel_login = get_login_by_channel_id(topic_user)
             if message["type"] == "stream-down":
                 set_offline(channel_login)
             elif message["type"] == "viewcount":
                 check_online(channel_login)
+
+        elif topic == "raid":
+            channel_login = get_login_by_channel_id(topic_user)
+            if message["type"] == "raid_update_v2":
+                raid_info = message["raid"]
+                raid = Raid(raid_info["id"], raid_info["target_login"])
+                set_raid(channel_login, raid)
+
+            elif message["type"] == "raid_go_v2":
+                follow_raid(channel_login)
 
     elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
         raise RuntimeError(f"Error while trying to listen for a topic: {response}")
