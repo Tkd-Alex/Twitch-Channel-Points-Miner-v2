@@ -4,7 +4,7 @@ import time
 from random import randrange
 import websocket  # pip install websocket-client
 from claim_bonus import claim_channel_points_bonus
-from raid import update_raid, follow_raid, Raid
+from raid import update_raid, Raid
 from twitch_data import *
 
 
