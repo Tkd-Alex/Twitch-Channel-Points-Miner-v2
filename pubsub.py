@@ -4,7 +4,7 @@ import time
 from random import randrange
 import websocket  # pip install websocket-client
 from claim_bonus import claim_channel_points_bonus
-from raid import set_raid, follow_raid, Raid
+from raid import update_raid, follow_raid, Raid
 from twitch_data import *
 
 
@@ -90,12 +90,10 @@ def on_message(ws, message):
         elif topic == "raid":
             channel_login = get_login_by_channel_id(topic_user)
             if message["type"] == "raid_update_v2":
+                # streamer_login is going to raid someone
                 raid_info = message["raid"]
                 raid = Raid(raid_info["id"], raid_info["target_login"])
-                set_raid(channel_login, raid)
-
-            elif message["type"] == "raid_go_v2":
-                follow_raid(channel_login)
+                update_raid(channel_login, raid)
 
     elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
         raise RuntimeError(f"Error while trying to listen for a topic: {response}")
