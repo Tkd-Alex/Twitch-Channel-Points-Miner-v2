@@ -3,7 +3,7 @@ import threading
 from claim_bonus import load_channel_points_context
 from exceptions import StreamerDoesNotExistException
 from login import check_login
-from track_balance import listen_for_channel_points
+from pubsub import listen_for_channel_points
 from twitch_data import set_streamer_logins, get_channel_id, do_for_each_streamer
 from watch_minute import send_minute_watched_events
 
