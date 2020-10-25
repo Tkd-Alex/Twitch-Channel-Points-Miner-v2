@@ -7,7 +7,10 @@ class Raid:
         self.target_login = target_login
 
     def __eq__(self, other):
-        return self.raid_id == other.raid_id
+        if isinstance(other, self.__class__):
+            return self.raid_id == other.raid_id
+        else:
+            return False
 
 
 raid_id_for_streamer = {}
