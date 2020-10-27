@@ -26,7 +26,8 @@ def main():
 def read_streamer_logins():
     user_input = []
     if len(sys.argv) <= 1:  # no command-line args (the first is always source file name)
-        twitch_streamers = input("Enter the streamer name (or several separated by commas): ")
+        print("Enter the streamer name (or several separated by commas). More important streamers go first.")
+        twitch_streamers = input("Streamer names: ")
         user_input = twitch_streamers.split(",")
     else:
         for i in range(1, len(sys.argv)):

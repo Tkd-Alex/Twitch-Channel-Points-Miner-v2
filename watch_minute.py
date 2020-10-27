@@ -24,11 +24,13 @@ minute_watched_requests = {}
 
 def send_minute_watched_events():
     headers = {"user-agent": USER_AGENT}
-    streamers = get_streamer_logins()
     minutes_passed = 0
     while True:
-        for streamer_login in streamers:
-            next_iteration = time.time() + 60 / len(streamers)
+        # Twitch has a limit - you can't watch more than 2 channels at one time.
+        # We take the first two streamers from the list as they have the highest priority.
+        streamers_watching = online_streamers[:2]
+        for streamer_login in streamers_watching:
+            next_iteration = time.time() + 60 / len(streamers_watching)
             if is_online(streamer_login):
                 request_info = minute_watched_requests[streamer_login]
                 try:
