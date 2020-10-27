@@ -40,6 +40,8 @@ def send_minute_watched_events():
 
             time.sleep(max(next_iteration - time.time(), 0))
 
+        if not streamers_watching:
+            time.sleep(60)
         minutes_passed += 1
 
 
