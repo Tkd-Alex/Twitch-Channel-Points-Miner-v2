@@ -13,7 +13,8 @@ from twitch_data import *
 
 def listen_for_channel_points():
     ws = websocket.WebSocketApp("wss://pubsub-edge.twitch.tv/v1",
-                                on_message=on_message, on_open=on_open)
+                                on_message=on_message, on_open=on_open, on_close=reconnect)
+    ws.is_closed = False
     ws.run_forever()
 
 
@@ -48,7 +49,7 @@ def on_open(ws):
         for topic in all_topics:
             listen_for_topic(ws, topic)
 
-        while True:
+        while not ws.is_closed:
             ping(ws)
             time.sleep(30)
 
@@ -99,10 +100,7 @@ def on_message(ws, message):
         raise RuntimeError(f"Error while trying to listen for a topic: {response}")
 
     elif response["type"] == "RECONNECT":
-        print("Reconnecting to Twitch PubSub server...")
-        ws.close()
-        time.sleep(30)
-        listen_for_channel_points()
+        reconnect(ws)
 
 
 def listen_for_topic(ws, topic):
@@ -116,6 +114,14 @@ def listen_for_topic(ws, topic):
 
 def ping(ws):
     send(ws, {"type": "PING"})
+
+
+def reconnect(ws):
+    ws.close()
+    ws.is_closed = True
+    print("Reconnecting to Twitch PubSub server in 30 seconds")
+    time.sleep(30)
+    listen_for_channel_points()
 
 
 def send(ws, request):
