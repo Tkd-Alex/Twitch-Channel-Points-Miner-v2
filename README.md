@@ -9,9 +9,9 @@ To run it, you first have to:
 
 1) [Download Python](https://www.python.org/downloads/).
 2) Install the dependencies. Run these three lines in the command line:<br>
-`pip install requests`<br>
-`pip install websocket-client`<br>
-`pip install browser_cookie3`<br>
+`pip3 install requests`<br>
+`pip3 install websocket-client`<br>
+`pip3 install browser_cookie3`<br>
 
 Then you can run `main.py`
 
