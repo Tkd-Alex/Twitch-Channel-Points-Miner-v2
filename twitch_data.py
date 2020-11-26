@@ -119,7 +119,3 @@ def get_auth_token():
 
 def get_client_id():
     return TWITCH_CLIENT_ID
-
-
-def get_reason_name(code):
-    return code.replace("_", " ").replace("CLAIM", "bonus").lower()

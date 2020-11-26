@@ -71,11 +71,10 @@ def on_message(ws, message):
             if message["type"] == "points-earned":
                 channel_id = message_data["channel_id"]
                 if channel_id in get_streamer_ids():
-                    reason_name = get_reason_name(message_data["point_gain"]["reason_code"])
-                    total_points = message_data["point_gain"]["total_points"]
                     new_balance = message_data["balance"]["balance"]
                     channel_login = get_login_by_channel_id(channel_id)
-                    print(f"Earned {total_points} {reason_name} points for {channel_login}, balance is {new_balance}!")
+                    reason_name = get_reason_name(message_data["point_gain"]["reason_code"])
+                    print(f"{new_balance} channel points for {channel_login}! Reason: {reason_name}.")
             elif message["type"] == "claim-available":
                 channel_id = message_data["claim"]["channel_id"]
                 if channel_id in get_streamer_ids():
@@ -103,6 +102,10 @@ def on_message(ws, message):
 
     elif response["type"] == "RECONNECT":
         reconnect(ws)
+
+
+def get_reason_name(code):
+    return code.replace("_", " ").replace("CLAIM", "bonus claimed").lower()
 
 
 def listen_for_topic(ws, topic):
