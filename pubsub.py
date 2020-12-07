@@ -56,11 +56,21 @@ def on_open(ws):
     threading.Thread(target=run).start()
 
 
+last_message_time = 0
+
+
 def on_message(ws, message):
+    global last_message_time
     response = json.loads(message)
 
     if response["type"] == "MESSAGE":
         # print("Received message: ", response)
+        # If we have more than one PubSub connection, messages may be duplicated
+        if time.time() - last_message_time < 0.1:
+            last_message_time = time.time()
+            return
+        last_message_time = time.time()
+
         data = response["data"]
         topic, topic_user = data["topic"].split(".")
         message = json.loads(data["message"])
