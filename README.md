@@ -8,10 +8,9 @@ and it will follow raids (_+250 points_).
 To run it, you first have to:
 
 1) [Download Python](https://www.python.org/downloads/).
-2) Install the dependencies. Run these three lines in the command line:<br>
-`pip3 install requests`<br>
-`pip3 install websocket-client`<br>
-`pip3 install browser_cookie3`<br>
+2) Install the dependencies. Run this command in the command line:<br>
+`pip3 install -r requirements.txt`<br>
+
 
 Then you can run `main.py`
 
