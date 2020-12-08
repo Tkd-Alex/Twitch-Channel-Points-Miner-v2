@@ -41,35 +41,37 @@ def on_open(ws):
 
 
 last_message_time = 0
+last_message_type = None
 
 
 def on_message(ws, message):
-    global last_message_time
+    global last_message_time, last_message_type
     response = json.loads(message)
 
     if response["type"] == "MESSAGE":
         # print("Received message: ", response)
-        # If we have more than one PubSub connection, messages may be duplicated
-        if time.time() - last_message_time < 0.1:
-            last_message_time = time.time()
-            return
-        last_message_time = time.time()
-
         data = response["data"]
         topic, topic_user = data["topic"].split(".")
         message = json.loads(data["message"])
+        message_type = message["type"]
+        message_data = message["data"]
+
+        # If we have more than one PubSub connection, messages may be duplicated
+        if time.time() - last_message_time < 0.1 and last_message_type == message_type:
+            last_message_time = time.time()
+            return
+        last_message_time = time.time()
+        last_message_type = message_type
 
         if topic == "community-points-user-v1":
-            message_data = message["data"]
-
-            if message["type"] == "points-earned":
+            if message_type == "points-earned":
                 channel_id = message_data["channel_id"]
                 if channel_id in get_streamer_ids():
                     new_balance = message_data["balance"]["balance"]
                     channel_login = get_login_by_channel_id(channel_id)
                     reason_name = get_reason_name(message_data["point_gain"]["reason_code"])
                     print(f"{new_balance} channel points for {channel_login}! Reason: {reason_name}.")
-            elif message["type"] == "claim-available":
+            elif message_type == "claim-available":
                 channel_id = message_data["claim"]["channel_id"]
                 if channel_id in get_streamer_ids():
                     claim_id = message_data["claim"]["id"]
@@ -78,14 +80,14 @@ def on_message(ws, message):
 
         elif topic == "video-playback-by-id":
             channel_login = get_login_by_channel_id(topic_user)
-            if message["type"] == "stream-down":
+            if message_type == "stream-down":
                 set_offline(channel_login)
-            elif message["type"] == "viewcount":
+            elif message_type == "viewcount":
                 check_online(channel_login)
 
         elif topic == "raid":
             channel_login = get_login_by_channel_id(topic_user)
-            if message["type"] == "raid_update_v2":
+            if message_type == "raid_update_v2":
                 # streamer_login is going to raid someone
                 raid_info = message["raid"]
                 raid = Raid(raid_info["id"], raid_info["target_login"])
