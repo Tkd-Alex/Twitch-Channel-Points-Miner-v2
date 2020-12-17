@@ -49,12 +49,14 @@ def on_message(ws, message):
     response = json.loads(message)
 
     if response["type"] == "MESSAGE":
-        # print("Received message: ", response)
+        print("Received message: ", response)
         data = response["data"]
         topic, topic_user = data["topic"].split(".")
         message = json.loads(data["message"])
         message_type = message["type"]
-        message_data = message["data"]
+        message_data = None
+        if "data" in message:
+            message_data = message["data"]
 
         # If we have more than one PubSub connection, messages may be duplicated
         if time.time() - last_message_time < 0.1 and last_message_type == message_type:
@@ -84,6 +86,7 @@ def on_message(ws, message):
                 set_offline(channel_login)
             elif message_type == "viewcount":
                 check_online(channel_login)
+            # there is stream-up message type, but it's sent earlier than the API updates
 
         elif topic == "raid":
             channel_login = get_login_by_channel_id(topic_user)
