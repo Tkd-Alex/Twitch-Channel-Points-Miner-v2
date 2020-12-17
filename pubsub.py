@@ -49,7 +49,7 @@ def on_message(ws, message):
     response = json.loads(message)
 
     if response["type"] == "MESSAGE":
-        print("Received message: ", response)
+        # print("Received message: ", response)
         data = response["data"]
         topic, topic_user = data["topic"].split(".")
         message = json.loads(data["message"])
