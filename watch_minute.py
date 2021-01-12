@@ -12,10 +12,6 @@ from twitch_data import get_streamer_url, USER_AGENT
 # "minute-watched" requests are what Twitch uses to know if you're watching a stream, and to grant you channel points.
 
 
-class RequestInfo:
-    def __init__(self, url, payload):
-        self.url = url
-        self.payload = payload
 
 
 # "minute-watched" request for each streamer
