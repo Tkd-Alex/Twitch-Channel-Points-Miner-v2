@@ -1,6 +1,7 @@
 import time
 
-class Streamer():
+
+class Streamer:
     def __init__(
         self,
         username,
@@ -19,7 +20,7 @@ class Streamer():
         self.char_url = f"https://www.twitch.tv/popout/{self.username}/chat?popout="
 
     def __repr__(self):
-        return f'Streamer(username={self.username}, channel_id={self.channel_id}, is_online={self.is_online}, online_at={self.online_at}, offline_at={self.offline_at}, channel_points={self.channel_points})'
+        return f"Streamer(username={self.username}, channel_id={self.channel_id}, is_online={self.is_online}, online_at={self.online_at}, offline_at={self.offline_at}, channel_points={self.channel_points})"
 
     def set_offline(self):
         self.offline_at = time.time()

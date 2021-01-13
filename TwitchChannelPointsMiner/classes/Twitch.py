@@ -16,7 +16,10 @@ from pathlib import Path
 
 from TwitchChannelPointsMiner.classes.RequestInfo import RequestInfo
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
-from TwitchChannelPointsMiner.classes.Exceptions import StreamerIsOfflineException, StreamerDoesNotExistException
+from TwitchChannelPointsMiner.classes.Exceptions import (
+    StreamerIsOfflineException,
+    StreamerDoesNotExistException,
+)
 
 TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36"
@@ -24,7 +27,7 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 logger = logging.getLogger(__name__)
 
 
-class Twitch():
+class Twitch:
     def __init__(self, username):
         cookies_path = os.path.join(Path().absolute(), "cookies")
         Path(cookies_path).mkdir(parents=True, exist_ok=True)
@@ -48,7 +51,8 @@ class Twitch():
         minute_watched = [{"event": "minute-watched", "properties": event_properties}]
         json_event = json.dumps(minute_watched, separators=(",", ":"))
         streamer.minute_watched_requests = RequestInfo(
-            self.get_minute_watched_request_url(streamer), {"data": (b64encode(json_event.encode("utf-8"))).decode("utf-8")}
+            self.get_minute_watched_request_url(streamer),
+            {"data": (b64encode(json_event.encode("utf-8"))).decode("utf-8")},
         )
 
     def get_minute_watched_request_url(self, streamer):
@@ -141,25 +145,37 @@ class Twitch():
         response = self.post_gql_request(json_data)
         if response["data"]["community"] is None:
             raise StreamerDoesNotExistException
-        community_points = response["data"]["community"]["channel"]["self"]["communityPoints"]
-        streamer.channel_points = community_points['balance']
-        logger.info(f"{community_points['balance']} channel points for {streamer.username}!")
+        community_points = response["data"]["community"]["channel"]["self"][
+            "communityPoints"
+        ]
+        streamer.channel_points = community_points["balance"]
+        logger.info(
+            f"{community_points['balance']} channel points for {streamer.username}!"
+        )
         if community_points["availableClaim"] is not None:
-            self.claim_channel_points_bonus(streamer.username, community_points["availableClaim"]["id"])
+            self.claim_channel_points_bonus(
+                streamer.username, community_points["availableClaim"]["id"]
+            )
 
     def send_minute_watched_events(self, streamers):
         headers = {"user-agent": USER_AGENT}
         while True:
             # Twitch has a limit - you can't watch more than 2 channels at one time.
             # We take the first two streamers from the list as they have the highest priority.
-            streamers_watching = [streamer for streamer in streamers if streamer.is_online][:2]
+            streamers_watching = [
+                streamer for streamer in streamers if streamer.is_online
+            ][:2]
             for streamer in streamers_watching:
                 next_iteration = time.time() + 60 / len(streamers_watching)
                 try:
                     response = requests.post(
-                        streamer.minute_watched_requests.url, data=streamer.minute_watched_requests.payload, headers=headers
+                        streamer.minute_watched_requests.url,
+                        data=streamer.minute_watched_requests.payload,
+                        headers=headers,
                     )
-                    logger.debug(f"Send minute watched request for streamer {streamer.username} ({streamer.channel_id}) - Status code: {response.status_code}")
+                    logger.debug(
+                        f"Send minute watched request for streamer {streamer.username} ({streamer.channel_id}) - Status code: {response.status_code}"
+                    )
                 except requests.exceptions.ConnectionError as e:
                     logger.error(f"Error while trying to watch a minute: {e}")
 
@@ -169,9 +185,13 @@ class Twitch():
                 time.sleep(60)
 
     def get_channel_id(self, streamer_username):
-        response = requests.get(f"https://api.twitch.tv/helix/users?login={streamer_username}",
-                        headers={"Authorization": f"Bearer {self.twitch_login.get_auth_token()}",
-                                "Client-Id": TWITCH_CLIENT_ID})
+        response = requests.get(
+            f"https://api.twitch.tv/helix/users?login={streamer_username}",
+            headers={
+                "Authorization": f"Bearer {self.twitch_login.get_auth_token()}",
+                "Client-Id": TWITCH_CLIENT_ID,
+            },
+        )
         data = response.json()["data"]
         if len(data) >= 1:
             return data[0]["id"]
@@ -182,8 +202,18 @@ class Twitch():
         if streamer.raid != raid:
             streamer.raid = raid
             self.post_gql_request(
-                {"operationName": "JoinRaid",
-                "variables": {"input": {"raidID": raid.raid_id}},
-                "extensions": {"persistedQuery": {"version": 1, "sha256Hash": "c6a332a86d1087fbbb1a8623aa01bd1313d2386e7c63be60fdb2d1901f01a4ae"}}})
+                {
+                    "operationName": "JoinRaid",
+                    "variables": {"input": {"raidID": raid.raid_id}},
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": "c6a332a86d1087fbbb1a8623aa01bd1313d2386e7c63be60fdb2d1901f01a4ae",
+                        }
+                    },
+                }
+            )
 
-            logger.info(f"Joining raid from {streamer.username} to {raid.target_login}!")
+            logger.info(
+                f"Joining raid from {streamer.username} to {raid.target_login}!"
+            )

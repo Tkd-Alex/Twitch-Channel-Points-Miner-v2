@@ -12,8 +12,15 @@ from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistExce
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class TwitchChannelPointsMiner:
-    def __init__(self, username: str, password: str = None, predictions: bool = True, raid: bool = True):
+    def __init__(
+        self,
+        username: str,
+        password: str = None,
+        predictions: bool = True,
+        raid: bool = True,
+    ):
         self.twitch = Twitch(username)
         self.predictions = predictions
         self.raid = raid
@@ -28,10 +35,7 @@ class TwitchChannelPointsMiner:
             streamer_username.lower().strip()
             try:
                 channel_id = self.twitch.get_channel_id(streamer_username)
-                streamer = Streamer(
-                    streamer_username,
-                    channel_id
-                )
+                streamer = Streamer(streamer_username, channel_id)
                 self.twitch.check_streamer_online(streamer)
                 self.twitch.load_channel_points_context(streamer)
                 self.streamers.append(streamer)
@@ -41,16 +45,16 @@ class TwitchChannelPointsMiner:
                 logger.info(f"Streamer {streamer_username} does not exist")
 
         self.minute_watcher_thread = threading.Thread(
-            target=self.twitch.send_minute_watched_events,
-            args=(self.streamers,)
+            target=self.twitch.send_minute_watched_events, args=(self.streamers,)
         )
         self.minute_watcher_thread.start()
 
-        self.ws_pool = WebSocketsPool(
-            twitch=self.twitch,
-            streamers=self.streamers
-        )
-        topics = [PubsubTopic("video-playback-by-id", user_id=self.twitch.twitch_login.get_user_id())]
+        self.ws_pool = WebSocketsPool(twitch=self.twitch, streamers=self.streamers)
+        topics = [
+            PubsubTopic(
+                "video-playback-by-id", user_id=self.twitch.twitch_login.get_user_id()
+            )
+        ]
         for streamer in self.streamers:
             topics.append(PubsubTopic("video-playback-by-id", streamer=streamer))
 
@@ -62,4 +66,3 @@ class TwitchChannelPointsMiner:
 
         for topic in topics:
             self.ws_pool.submit(topic)
-

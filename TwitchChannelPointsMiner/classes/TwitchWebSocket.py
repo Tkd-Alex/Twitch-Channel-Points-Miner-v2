@@ -12,11 +12,11 @@ def create_nonce(length=30):
     for i in range(length):
         char_index = randrange(0, 10 + 26 + 26)
         if char_index < 10:
-            char = chr(ord('0') + char_index)
+            char = chr(ord("0") + char_index)
         elif char_index < 10 + 26:
-            char = chr(ord('a') + char_index - 10)
+            char = chr(ord("a") + char_index - 10)
         else:
-            char = chr(ord('A') + char_index - 26 - 10)
+            char = chr(ord("A") + char_index - 26 - 10)
         nonce += char
     return nonce
 
@@ -34,6 +34,6 @@ class TwitchWebSocket(WebSocketApp):
         self.send({"type": "PING"})
 
     def send(self, request):
-        request_str = json.dumps(request, separators=(',', ':'))
+        request_str = json.dumps(request, separators=(",", ":"))
         logger.info(f"Send: {request_str}")
         super().send(request_str)
