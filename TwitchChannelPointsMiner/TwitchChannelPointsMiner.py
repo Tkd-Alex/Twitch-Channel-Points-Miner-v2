@@ -37,6 +37,7 @@ class TwitchChannelPointsMiner:
         make_predictions: bool = True,
         follow_raid: bool = True,
         save_logs: bool = True,
+        browser: Browser = Browser.FIREFOX,
         show_browser: bool = False,
         do_browser_screenshot: bool = False,
         bet_strategy: Strategy = Strategy.SMART,
@@ -52,6 +53,7 @@ class TwitchChannelPointsMiner:
         self.ws_pool = None
 
         self.make_predictions = make_predictions
+        self.browser = browser
         self.show_browser = show_browser
         self.do_browser_screenshot = do_browser_screenshot
 
@@ -125,7 +127,7 @@ class TwitchChannelPointsMiner:
                     do_screenshot=self.do_browser_screenshot,
                 )
                 self.twitch_browser.init(
-                    show=self.show_browser, browser=Browser.FIREFOX
+                    show=self.show_browser, browser=self.browser
                 )
 
             self.minute_watcher_thread = threading.Thread(

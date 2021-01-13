@@ -16,10 +16,10 @@ Read more here: https://help.twitch.tv/s/article/channel-points-guide?language=e
 - Improve the logging
 - Final report with all the datas
 - Rewrite the entire code using classe instead of module with global variables
-- Place the bet / make prediction and won or lose (good luck) your channel points!  
+- Place the bet / make prediction and won or lose (good luck) your channel points!
 **CURRENTLY IN BETA / VERY UNSTABLE**
 
-For the bet system the script use Selenium (Chrome implemented but not tested as well). Could be usefull how to MakePrediction usign a [POST] request. I've write a [poc](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/TwitchChannelPointsMiner/classes/Twitch.py#L160) but I don't know how to calculate/create the transactionID. Any helps are welcome
+For the bet system the script use Selenium (Chrome implemented but not tested as well). Could be usefull how to MakePrediction usign a [POST] request. I've also write a [poc](/TwitchChannelPointsMiner/classes/Twitch.py#L160) but I don't know how to calculate/create the transactionID. Any helps are welcome
 
 ## How to use:
 1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
@@ -28,12 +28,14 @@ For the bet system the script use Selenium (Chrome implemented but not tested as
 ```python
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.classes.Bet import Strategy
+from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
     make_predictions=True,  # If you want to Bet / Make prediction
     follow_raid=True,  # Follow raid to obtain more points
     save_logs=True,  # Save logs in file
+    browser=Browser.FIREFOX,  # Choose if you want to use Chrome or Firefox as browser
     show_browser=False,  # Show the browser during bet
     do_browser_screenshot=False,  # Do screenshot during the bet
     bet_strategy=Strategy.SMART,  # Choose you strategy!
@@ -42,6 +44,12 @@ twitch_miner = TwitchChannelPointsMiner(
     bet_max_points=50000,  # If the x percetage of your channel points is gt bet_max_points set this value
 )
 
+twitch_miner.mine(["streamer1", "streamer2"])  # Array of streamers
+```
+You can also use all the default values except for your username obv. Short version:
+```python
+from TwitchChannelPointsMiner import TwitchChannelPointsMiner
+twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
 twitch_miner.mine(["streamer1", "streamer2"])  # Array of streamers
 ```
 4. Start mining! `python run.py`

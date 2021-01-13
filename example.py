@@ -1,11 +1,13 @@
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.classes.Bet import Strategy
+from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
     make_predictions=True,  # If you want to Bet / Make prediction
     follow_raid=True,  # Follow raid to obtain more points
     save_logs=True,  # Save logs in file
+    browser=Browser.FIREFOX,  # Choose if you want to use Chrome or Firefox as browser
     show_browser=False,  # Show the browser during bet
     do_browser_screenshot=False,  # Do screenshot during the bet
     bet_strategy=Strategy.SMART,  # Choose you strategy!
