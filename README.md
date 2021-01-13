@@ -18,7 +18,7 @@ Read more here: https://help.twitch.tv/s/article/channel-points-guide?language=e
 - Place the bet / make - prediction and won or lose (good luck) your channel points!
 
 ## How to use:
-1. Clone or download this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner`
+1. Clone or download this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
 2. Install all the requirements `pip install -r requirements.txt`
 3. Create your `run.py` file start from [example.py](/example.py)
 ```python
