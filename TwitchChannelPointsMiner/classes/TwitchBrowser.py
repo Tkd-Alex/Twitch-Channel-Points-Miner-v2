@@ -14,13 +14,17 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 
-TWITCH_URL = 'https://www.twitch.tv/'
+TWITCH_URL = "https://www.twitch.tv/"
 
 cookiePolicyQuery = 'button[data-a-target="consent-banner-accept"]'
 streamCoinsMenu = '//div[@data-test-selector="community-points-summary"]//button'
 streamBetTitleInBet = '[data-test-selector="predictions-list-item__title"]'
-streamBetCustomVote = '[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]'
-streamBetVoteInput = "(//input[contains(@class,'tw-block tw-border-bottom-left-radius-medium')])"
+streamBetCustomVote = (
+    '[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]'
+)
+streamBetVoteInput = (
+    "(//input[contains(@class,'tw-block tw-border-bottom-left-radius-medium')])"
+)
 streamBetVoteButton = "(//div[@id='channel-points-reward-center-body']//button)"
 
 logger = logging.getLogger(__name__)
@@ -32,11 +36,7 @@ class Browser(Enum):
 
 
 class TwitchBrowser:
-    def __init__(
-        self,
-        auth_token: str,
-        timeout: float = 5.0
-    ):
+    def __init__(self, auth_token: str, timeout: float = 5.0):
         self.auth_token = auth_token
         self.timeout = timeout
         self.currently_is_betting = False
@@ -67,7 +67,7 @@ class TwitchBrowser:
             "session": False,
             "storeId": "0",
             "id": 1,
-            "value": self.auth_token
+            "value": self.auth_token,
         }
         self.browser.get(TWITCH_URL)
         self.browser.add_cookie(cookie)
@@ -76,13 +76,15 @@ class TwitchBrowser:
         time.sleep(1.5)
 
         # Edit value in localStorage for dark theme, point consent etc.
-        self.browser.execute_script("""
+        self.browser.execute_script(
+            """
             window.localStorage.setItem("volume", 0);
             window.localStorage.setItem("channelPointsOnboardingDismissed", true);
             window.localStorage.setItem("twilight.theme", 1);
             window.localStorage.setItem("mature", true);
             window.localStorage.setItem("rebrand-notice-dismissed", true);
-        """)
+        """
+        )
         time.sleep(1.5)
         self.__blank()
 
@@ -93,17 +95,17 @@ class TwitchBrowser:
     def __init_chrome(self, show):
         logger.info("⚙️  Init Chrome browser")
         options = webdriver.ChromeOptions()
-        options.add_argument('--mute-audio')
+        options.add_argument("--mute-audio")
         if not show:
-            options.add_argument('headless')
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('--disable-accelerated-2d-canvas')
-        options.add_argument('--no-first-run')
-        options.add_argument('--no-zygote')
-        options.add_argument('--disable-gpu')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-setuid-sandbox')
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+            options.add_argument("headless")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-accelerated-2d-canvas")
+        options.add_argument("--no-first-run")
+        options.add_argument("--no-zygote")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-setuid-sandbox")
+        options.add_experimental_option("excludeSwitches", ["enable-logging"])
         self.browser = webdriver.Chrome(options=options)
 
     # Private method __ - We can instantiate webdriver only with init_browser
@@ -114,10 +116,10 @@ class TwitchBrowser:
             options.headless = True
 
         fp = webdriver.FirefoxProfile()
-        fp.set_preference('permissions.default.image', 2)
+        fp.set_preference("permissions.default.image", 2)
         fp.set_preference("permissions.default.stylesheet", 2)
-        fp.set_preference('dom.ipc.plugins.enabled.libflashplayer.so', 'false')
-        fp.set_preference('media.volume_scale', '0.0')
+        fp.set_preference("dom.ipc.plugins.enabled.libflashplayer.so", "false")
+        fp.set_preference("media.volume_scale", "0.0")
         fp.set_preference("browser.startup.homepage", "about:blank")
         fp.set_preference("startup.homepage_welcome_url", "about:blank")
         fp.set_preference("startup.homepage_welcome_url.additional", "about:blank")
@@ -131,11 +133,11 @@ class TwitchBrowser:
             image = Image.open(fname)
             draw = ImageDraw.Draw(image)
 
-            font = ImageFont.truetype('./Roboto/Roboto-Bold.ttf', size=35)
+            font = ImageFont.truetype("./Roboto/Roboto-Bold.ttf", size=35)
             (x, y) = (15, image.height // 3)
-            datetime_text = datetime.now().strftime('%d/%m %H:%M:%S.%f')
+            datetime_text = datetime.now().strftime("%d/%m %H:%M:%S.%f")
 
-            shadowcolor = 'rgb(0, 0, 0)'  # black color
+            shadowcolor = "rgb(0, 0, 0)"  # black color
             # Thin border
             draw.text((x - 1, y), datetime_text, font=font, fill=shadowcolor)
             draw.text((x + 1, y), datetime_text, font=font, fill=shadowcolor)
@@ -148,13 +150,15 @@ class TwitchBrowser:
             draw.text((x - 1, y + 1), datetime_text, font=font, fill=shadowcolor)
             draw.text((x + 1, y + 1), datetime_text, font=font, fill=shadowcolor)
 
-            color = 'rgb(255, 255, 255)'  # white color
+            color = "rgb(255, 255, 255)"  # white color
             draw.text((x, y), datetime_text, font=font, fill=color)
             image.save(fname, optimize=True, quality=20)
 
     def __click_when_exist(self, selector, by: By = By.CSS_SELECTOR):
         try:
-            element = WebDriverWait(self.browser, self.timeout).until(expected_conditions.element_to_be_clickable((by, selector)))
+            element = WebDriverWait(self.browser, self.timeout).until(
+                expected_conditions.element_to_be_clickable((by, selector))
+            )
             ActionChains(self.browser).move_to_element(element).click().perform()
             return element
         except Exception:
@@ -164,8 +168,12 @@ class TwitchBrowser:
 
     def __send_text(self, selector, text, by: By = By.CSS_SELECTOR):
         try:
-            element = WebDriverWait(self.browser, self.timeout).until(expected_conditions.element_to_be_clickable((By.XPATH, selector)))
-            ActionChains(self.browser, self.timeout).move_to_element(element).click().send_keys(text).perform()
+            element = WebDriverWait(self.browser, self.timeout).until(
+                expected_conditions.element_to_be_clickable((By.XPATH, selector))
+            )
+            ActionChains(self.browser, self.timeout).move_to_element(
+                element
+            ).click().send_keys(text).perform()
             return element
         except Exception:
             logger.error(f"Exception raised with: {selector}", exc_info=True)
@@ -174,9 +182,13 @@ class TwitchBrowser:
 
     def start_bet(self, event: EventPrediction):
         if self.currently_is_betting:
-            logger.info("Sorry, unable to start the bet. The browser it's currently betting another event")
+            logger.info(
+                "Sorry, unable to start the bet. The browser it's currently betting another event"
+            )
         else:
-            logger.info(f"⚙️  Start betting at {event.streamer.chat_url} for event: {event}")
+            logger.info(
+                f"⚙️  Start betting at {event.streamer.chat_url} for event: {event}"
+            )
             self.browser.get(event.streamer.chat_url)
             time.sleep(random.uniform(4, 6))
             self.__open_coins_menu(event)
@@ -185,22 +197,36 @@ class TwitchBrowser:
             return self.currently_is_betting
 
     def complete_bet(self, event: EventPrediction):
-        logger.info(f"⚙️  Going to complete bet for event {event}. Current url page: {self.browser.current_url}")
+        logger.info(
+            f"⚙️  Going to complete bet for event {event}. Current url page: {self.browser.current_url}"
+        )
         if event.box_fillable and self.currently_is_betting:
             decision = event.bet.calculate(event.streamer.channel_points)
             if decision["choice"]:
                 selector_index = "[1]" if decision["choice"] == "A" else "[2]"
 
                 try:
-                    logger.info(f"⚙️  Going to write: {decision['amount']} on input {decision['choice']}")
-                    self.__send_text(streamBetVoteInput + selector_index, decision["amount"], By.XPATH)
+                    logger.info(
+                        f"⚙️  Going to write: {decision['amount']} on input {decision['choice']}"
+                    )
+                    self.__send_text(
+                        streamBetVoteInput + selector_index,
+                        decision["amount"],
+                        By.XPATH,
+                    )
                     if self.do_screenshot:
-                        self.screenshot("./tmp/{}_TEXT_WRITE.png".format(event.event_id))
+                        self.screenshot(
+                            "./tmp/{}_TEXT_WRITE.png".format(event.event_id)
+                        )
 
                     logger.info("Going to place the bet")
-                    self.__click_when_exist(streamBetVoteButton + selector_index, By.XPATH)
+                    self.__click_when_exist(
+                        streamBetVoteButton + selector_index, By.XPATH
+                    )
                     if self.do_screenshot:
-                        self.screenshot("./tmp/{}_CLICK_ON_VOTE.png".format(event.event_id))
+                        self.screenshot(
+                            "./tmp/{}_CLICK_ON_VOTE.png".format(event.event_id)
+                        )
 
                     time.sleep(random.uniform(15, 25))
                     event.bet_completed = True
@@ -215,7 +241,9 @@ class TwitchBrowser:
                     self.currently_is_betting = False
 
         else:
-            logger.info(f"Sorry, unable to complete the bet. Event box fillable: {event.box_fillable}, the browser is betting: {self.currently_is_betting}")
+            logger.info(
+                f"Sorry, unable to complete the bet. Event box fillable: {event.box_fillable}, the browser is betting: {self.currently_is_betting}"
+            )
 
     def __open_coins_menu(self, event: EventPrediction):
         logger.info(f"⚙️  Open coins menu for event: {event}")
@@ -241,4 +269,6 @@ class TwitchBrowser:
             event.box_fillable = True
             self.currently_is_betting = True
         else:
-            logger.info("Something whent wrong unable to continue with betting - Fillable box not avaible")
+            logger.info(
+                "Something whent wrong unable to continue with betting - Fillable box not avaible"
+            )

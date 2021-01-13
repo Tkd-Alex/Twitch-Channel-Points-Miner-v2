@@ -9,7 +9,8 @@ from TwitchChannelPointsMiner.classes.TwitchBrowser import TwitchBrowser, Browse
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 
 logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s", datefmt="%d/%m/%y %H:%M:%S",
+    format="%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s",
+    datefmt="%d/%m/%y %H:%M:%S",
     level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
@@ -51,7 +52,9 @@ class TwitchChannelPointsMiner:
             # logger.info(streamer)
 
         if self.predictions is True:  # We need a browser to make predictions / bet
-            self.twitch_browser = TwitchBrowser(self.twitch.twitch_login.get_auth_token())
+            self.twitch_browser = TwitchBrowser(
+                self.twitch.twitch_login.get_auth_token()
+            )
             self.twitch_browser.init(show=True, browser=Browser.FIREFOX)
 
         self.minute_watcher_thread = threading.Thread(
@@ -59,14 +62,24 @@ class TwitchChannelPointsMiner:
         )
         self.minute_watcher_thread.start()
 
-        self.ws_pool = WebSocketsPool(twitch=self.twitch, twitch_browser=self.twitch_browser, streamers=self.streamers)
+        self.ws_pool = WebSocketsPool(
+            twitch=self.twitch,
+            twitch_browser=self.twitch_browser,
+            streamers=self.streamers,
+        )
         topics = [
             PubsubTopic(
-                "community-points-user-v1", user_id=self.twitch.twitch_login.get_user_id()
+                "community-points-user-v1",
+                user_id=self.twitch.twitch_login.get_user_id(),
             )
         ]
         if self.predictions is True:
-            topics.append(PubsubTopic("predictions-user-v1", user_id=self.twitch.twitch_login.get_user_id()))
+            topics.append(
+                PubsubTopic(
+                    "predictions-user-v1",
+                    user_id=self.twitch.twitch_login.get_user_id(),
+                )
+            )
 
         for streamer in self.streamers:
             topics.append(PubsubTopic("video-playback-by-id", streamer=streamer))

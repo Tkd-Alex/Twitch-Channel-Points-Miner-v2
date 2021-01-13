@@ -13,11 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_streamer_index(streamers, channel_id):
-    return next(
-        i
-        for i, x in enumerate(streamers)
-        if x.channel_id == channel_id
-    )
+    return next(i for i, x in enumerate(streamers) if x.channel_id == channel_id)
 
 
 # You can't listen for more than 50 topics at once
@@ -116,14 +112,20 @@ class WebSocketsPool:
 
             if topic == "community-points-user-v1":
                 if message_type == "points-earned":
-                    streamer_index = get_streamer_index(ws.streamers, message_data["channel_id"])
+                    streamer_index = get_streamer_index(
+                        ws.streamers, message_data["channel_id"]
+                    )
                     earned = message_data["point_gain"]["total_points"]
-                    ws.streamers[streamer_index].channel_points = message_data["balance"]["balance"]
+                    ws.streamers[streamer_index].channel_points = message_data[
+                        "balance"
+                    ]["balance"]
                     logger.info(
                         f"🚀  +{earned} → {ws.streamers[streamer_index]} - Reason: {message_data['point_gain']['reason_code']}."
                     )
                 elif message_type == "claim-available":
-                    streamer_index = get_streamer_index(ws.streamers, message_data["claim"]["channel_id"])
+                    streamer_index = get_streamer_index(
+                        ws.streamers, message_data["claim"]["channel_id"]
+                    )
                     ws.twitch.claim_channel_points_bonus(
                         ws.streamers[streamer_index], message_data["claim"]["id"]
                     )
@@ -143,7 +145,9 @@ class WebSocketsPool:
                     ws.twitch.update_raid(ws.streamers[streamer_index], raid)
 
             elif topic == "predictions-channel-v1":
-                streamer_index = get_streamer_index(ws.streamers, topic_user)  # message_data["event"]["channel_id"]
+                streamer_index = get_streamer_index(
+                    ws.streamers, topic_user
+                )  # message_data["event"]["channel_id"]
 
                 event_id = message_data["event"]["id"]
                 event_status = message_data["event"]["status"]
@@ -156,31 +160,47 @@ class WebSocketsPool:
                             ws.streamers[streamer_index],
                             event_id,
                             parser.parse(message_data["event"]["created_at"]),
-                            float(message_data["event"]["prediction_window_seconds"]) - 20,
+                            float(message_data["event"]["prediction_window_seconds"])
+                            - 20,
                             event_status,
-                            message_data["event"]["outcomes"]
+                            message_data["event"]["outcomes"],
                         )
                         if event.closing_bet_after(current_timestamp) > 0:
                             ws.events_predictions[event_id] = event
                             if ws.twitch_browser.currently_is_betting is False:
-                                if ws.twitch_browser.start_bet(ws.events_predictions[event_id]):
-                                    complete_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch_browser.complete_bet, (ws.events_predictions[event_id],))
+                                if ws.twitch_browser.start_bet(
+                                    ws.events_predictions[event_id]
+                                ):
+                                    complete_bet_thread = threading.Timer(
+                                        event.closing_bet_after(current_timestamp),
+                                        ws.twitch_browser.complete_bet,
+                                        (ws.events_predictions[event_id],),
+                                    )
                                     complete_bet_thread.start()
 
                                     # complete_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
                                     # complete_bet_thread.start()
 
-                                    logger.info(f"⏰  A thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}")
+                                    logger.info(
+                                        f"⏰  A thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}"
+                                    )
 
                 else:
                     ws.events_predictions[event_id].status = event_status
-                    ws.events_predictions[event_id].bet.update_outcomes(message_data["event"]["outcomes"])
+                    ws.events_predictions[event_id].bet.update_outcomes(
+                        message_data["event"]["outcomes"]
+                    )
 
             elif topic == "predictions-user-v1":
-                if message_type == "prediction-result" and message_data["event"]["result"]:
+                if (
+                    message_type == "prediction-result"
+                    and message_data["event"]["result"]
+                ):
                     event_id = message_data["event"]["id"]
                     if event_id in ws.events_predictions:
-                        logger.info(f"📊  {ws.events_predictions[event_id]} - Result: {message_data['event']['result']['type']}, Points won: {message_data['event']['result']['type'] if message_data['event']['result']['type'] else 0}")
+                        logger.info(
+                            f"📊  {ws.events_predictions[event_id]} - Result: {message_data['event']['result']['type']}, Points won: {message_data['event']['result']['type'] if message_data['event']['result']['type'] else 0}"
+                        )
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")

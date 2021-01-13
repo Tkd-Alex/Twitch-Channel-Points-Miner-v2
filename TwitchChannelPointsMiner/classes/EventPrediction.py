@@ -3,7 +3,16 @@ from TwitchChannelPointsMiner.classes.Streamer import Streamer
 
 
 class EventPrediction:
-    def __init__(self, streamer: Streamer, event_id, title, created_at, prediction_window_seconds, status, outcomes):
+    def __init__(
+        self,
+        streamer: Streamer,
+        event_id,
+        title,
+        created_at,
+        prediction_window_seconds,
+        status,
+        outcomes,
+    ):
         self.streamer = streamer
 
         self.event_id = event_id
