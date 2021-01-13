@@ -5,6 +5,7 @@ import sys
 import time
 import os
 
+from datetime import datetime
 from pathlib import Path
 
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
@@ -40,12 +41,15 @@ class TwitchChannelPointsMiner:
         self.ws_pool = None
 
         if save_logs is True:
+            root_logger = logging.getLogger()
+            root_logger.setLevel(logging.INFO)
+
             logs_path = os.path.join(Path().absolute(), "logs")
             Path(logs_path).mkdir(parents=True, exist_ok=True)
-            file_handler = logging.FileHandler(os.path.join(logs_path, f"{username}.log"))
+            file_handler = logging.FileHandler(os.path.join(logs_path, f"{username}.{datetime.now().strftime('%d-%m-%Y-%H:%M:%S')}.log"))
             formatter = logging.Formatter(logging_format)
             file_handler.setFormatter(formatter)
-            logger.addHandler(file_handler)
+            root_logger.addHandler(file_handler)
 
         signal.signal(signal.SIGINT, self.end)
         signal.signal(signal.SIGSEGV, self.end)
@@ -113,9 +117,9 @@ class TwitchChannelPointsMiner:
         for topic in topics:
             self.ws_pool.submit(topic)
 
-    def end(self):
+    def end(self, signum, frame):
         if self.twitch_browser is not None:
-            self.twitch_browser.browser.close()
+            self.twitch_browser.browser.quit()
 
         time.sleep(1.5)
         sys.exit(0)
