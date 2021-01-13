@@ -42,11 +42,11 @@ class Bet:
     def __clear_outcomes(self):
         for index in range(0, len(self.outcomes)):
             for key in self.outcomes[index]:
-                if key not in ["total_users", "total_points", "percentage_users", "cote", "title", "color"]:
+                if key not in ["total_users", "total_points", "percentage_users", "cote", "title", "color", "id"]:
                     del self.outcomes[index][key]
 
     def calculate(self, balance: int, strategy: Strategy = Strategy.SMART, percentage=5, percentage_gap=20, max_points=50000):
-        output = {"choice": "", "amount": 0}
+        output = {"choice": "", "amount": 0, "id": None}
 
         if strategy == Strategy.MOST_VOTED:
             output['choice'] = "A" if self.outcomes[0]["total_users"] > self.outcomes[1]["total_users"] else "B"
@@ -59,5 +59,7 @@ class Bet:
             else:
                 output['choice'] = "A" if self.outcomes[0]["total_users"] > self.outcomes[1]["total_users"] else "B"   # Follow other users
 
-        output['amount'] = min(round(balance * (percentage / 100)), max_points)
+        if output['choice']:
+            output['id'] = self.outcomes[0]["id"] if output['choice'] == "A" else self.outcomes[1]["id"]
+            output['amount'] = min(round(balance * (percentage / 100)), max_points)
         return output

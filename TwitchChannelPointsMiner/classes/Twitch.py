@@ -154,6 +154,26 @@ class Twitch:
                 streamer, community_points["availableClaim"]["id"]
             )
 
+    def make_predictions(self, event):
+        decision = event.bet.calculate(event.streamer.channel_points)
+        return self.post_gql_request({
+            "operationName": "MakePrediction",
+            "variables": {
+                "input": {
+                    "eventID": event.event_id,
+                    "outcomeID": decision["id"],
+                    "points": decision["amount"],
+                    "transactionID": "412118d3********79ac856"  # How we can calculate this?
+                }
+            },
+            "extensions": {
+                "persistedQuery": {
+                    "version": 1,
+                    "sha256Hash": "b44682ecc88358817009f20e69d75081b1e58825bb40aa53d5dbadcc17c881d8"
+                }
+            }
+        })
+
     def send_minute_watched_events(self, streamers):
         headers = {"user-agent": USER_AGENT}
         while True:

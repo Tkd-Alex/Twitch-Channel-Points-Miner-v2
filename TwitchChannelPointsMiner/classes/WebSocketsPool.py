@@ -166,6 +166,10 @@ class WebSocketsPool:
                                 if ws.twitch_browser.start_bet(ws.events_predictions[event_id]):
                                     complete_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch_browser.complete_bet, (ws.events_predictions[event_id],))
                                     complete_bet_thread.start()
+
+                                    # complete_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
+                                    # complete_bet_thread.start()
+
                                     logger.info(f"⏰  A thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}")
 
                 else:
