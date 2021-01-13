@@ -14,8 +14,9 @@ Read more here: https://help.twitch.tv/s/article/channel-points-guide?language=e
 ## Main difference from the original repository:
 
 - Improve the logging
+- Final report with all the datas
 - Rewrite the entire code using classe instead of module with global variables
-- Place the bet / make - prediction and won or lose (good luck) your channel points!
+- Place the bet / make prediction and won or lose (good luck) your channel points!
 
 ## How to use:
 1. Clone or download this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
@@ -47,7 +48,7 @@ twitch_miner.mine(["streamer1", "streamer2"])  # Array of streamers
 - **HIGH_COTE**: Select the option with the highest cote
 - **SMART**: If the majority in percent chose an option then follow the other users, otherwise choose the option with the highest cote
 
-## Migrating from old repository:
+## Migrating from old repository (the original on):
 If you already have a `twitch-cookies.pkl` and you don't want to login again please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
 ```
 .
