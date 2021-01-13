@@ -91,7 +91,7 @@ class TwitchLogin:
                         use_backup_flow = True
                         break
                     else:
-                        logger.info(f"Unknown error: {login_response}")
+                        logger.error(f"Unknown error: {login_response}")
                         raise NotImplementedError(
                             f"Unknown TwitchAPI error code: {err_code}"
                         )

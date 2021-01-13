@@ -6,6 +6,7 @@ from websocket import WebSocketApp
 
 logger = logging.getLogger(__name__)
 
+
 # https://en.wikipedia.org/wiki/Cryptographic_nonce
 def create_nonce(length=30):
     nonce = ""
@@ -24,7 +25,7 @@ def create_nonce(length=30):
 class TwitchWebSocket(WebSocketApp):
     def listen(self, topic, auth_token=None):
         data = {"topics": [str(topic)]}
-        if topic.is_user_topic and auth_token is None:
+        if topic.is_user_topic and auth_token is not None:
             data["auth_token"] = auth_token
 
         nonce = create_nonce()
@@ -35,5 +36,5 @@ class TwitchWebSocket(WebSocketApp):
 
     def send(self, request):
         request_str = json.dumps(request, separators=(",", ":"))
-        logger.info(f"Send: {request_str}")
+        logger.debug(f"Send: {request_str}")
         super().send(request_str)

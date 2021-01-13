@@ -1,4 +1,3 @@
-import os
 import logging
 import threading
 
@@ -6,10 +5,12 @@ from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.Streamer import Streamer
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
-from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s", datefmt="%d/%m/%y %H:%M:%S",
+    level=logging.INFO,
+)
 logger = logging.getLogger(__name__)
 
 
@@ -27,6 +28,9 @@ class TwitchChannelPointsMiner:
         self.streamers = []
         self.minute_watcher_thread = None
         self.ws_pool = None
+
+    def mine(self, streamers: list = []):
+        self.run(streamers)
 
     def run(self, streamers: list = []):
         self.twitch.login()
@@ -52,7 +56,7 @@ class TwitchChannelPointsMiner:
         self.ws_pool = WebSocketsPool(twitch=self.twitch, streamers=self.streamers)
         topics = [
             PubsubTopic(
-                "video-playback-by-id", user_id=self.twitch.twitch_login.get_user_id()
+                "community-points-user-v1", user_id=self.twitch.twitch_login.get_user_id()
             )
         ]
         for streamer in self.streamers:

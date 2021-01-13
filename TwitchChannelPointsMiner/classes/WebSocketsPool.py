@@ -1,6 +1,5 @@
 import logging
 import threading
-import websocket  # pip install websocket-client
 import time
 import json
 
@@ -8,6 +7,15 @@ from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 
 logger = logging.getLogger(__name__)
+
+
+def get_streamer_index(streamers, channel_id):
+    return next(
+        i
+        for i, x in enumerate(streamers)
+        if x.channel_id == channel_id
+    )
+
 
 # You can't listen for more than 50 topics at once
 class WebSocketsPool:
@@ -75,7 +83,7 @@ class WebSocketsPool:
 
     @staticmethod
     def on_message(ws, message):
-        logger.info(f"Received: {message.strip()}")
+        logger.debug(f"Received: {message.strip()}")
         response = json.loads(message)
 
         if response["type"] == "MESSAGE":
@@ -102,35 +110,20 @@ class WebSocketsPool:
 
             if topic == "community-points-user-v1":
                 if message_type == "points-earned":
-                    channel_id = message_data["channel_id"]
-                    streamer_index = next(
-                        i
-                        for i, x in enumerate(ws.streamers)
-                        if x.channel_id == channel_id
-                    )
-                    streamer = ws.streamers[streamer_index]
-
-                    new_balance = message_data["balance"]["balance"]
+                    streamer_index = get_streamer_index(ws.streamers, message_data["channel_id"])
+                    earned = message_data["point_gain"]["total_points"]
+                    balance = message_data["balance"]["balance"]
                     logger.info(
-                        f"{new_balance} channel points for {streamer}! Reason: {message_data['point_gain']['reason_code']}."
+                        f"+{earned} → {balance} channel points for {ws.streamers[streamer_index]}! Reason: {message_data['point_gain']['reason_code']}."
                     )
                 elif message_type == "claim-available":
-                    channel_id = message_data["claim"]["channel_id"]
-                    streamer_index = next(
-                        i
-                        for i, x in enumerate(ws.streamers)
-                        if x.channel_id == channel_id
-                    )
-                    streamer = ws.streamers[streamer_index]
-
+                    streamer_index = get_streamer_index(ws.streamers, message_data["claim"]["channel_id"])
                     ws.twitch.claim_channel_points_bonus(
-                        streamer.username, message_data["claim"]["id"]
+                        ws.streamers[streamer_index].username, message_data["claim"]["id"]
                     )
 
             elif topic == "video-playback-by-id":
-                streamer_index = next(
-                    i for i, x in enumerate(ws.streamers) if x.channel_id == topic_user
-                )
+                streamer_index = get_streamer_index(ws.streamers, topic_user)
                 if message_type == "stream-down":
                     ws.streamers[streamer_index].set_offline()
                 elif message_type == "viewcount":
@@ -138,9 +131,7 @@ class WebSocketsPool:
                 # There is stream-up message type, but it's sent earlier than the API updates
 
             elif topic == "raid":
-                streamer_index = next(
-                    i for i, x in enumerate(ws.streamers) if x.channel_id == topic_user
-                )
+                streamer_index = get_streamer_index(ws.streamers, topic_user)
                 if message_type == "raid_update_v2":
                     raid = Raid(message["raid"]["id"], message["raid"]["target_login"])
                     ws.twitch.update_raid(ws.streamers[streamer_index], raid)
