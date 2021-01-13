@@ -16,7 +16,10 @@ Read more here: https://help.twitch.tv/s/article/channel-points-guide?language=e
 - Improve the logging
 - Final report with all the datas
 - Rewrite the entire code using classe instead of module with global variables
-- Place the bet / make prediction and won or lose (good luck) your channel points! **CURRENTLY IN BETA / VERY UNSTABLE**
+- Place the bet / make prediction and won or lose (good luck) your channel points!  
+**CURRENTLY IN BETA / VERY UNSTABLE**
+
+For the bet system the script use Selenium (Chrome implemented but not tested as well). Could be usefull how to MakePrediction usign a [POST] request. I've write a [poc](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/TwitchChannelPointsMiner/classes/Twitch.py#L160) but I don't know how to calculate/create the transactionID. Any helps are welcome
 
 ## How to use:
 1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
