@@ -139,3 +139,4 @@ cython_debug/
 
 run.py
 cookies/
+logs/
