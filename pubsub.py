@@ -7,39 +7,10 @@ from claim_bonus import claim_channel_points_bonus
 from raid import update_raid, Raid
 from twitch_data import *
 
-from classes.WebsocketsPool import WebsocketsPool
-from classes.PubsubTopic import PubsubTopic
+from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
+from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
 
 # For documentation on Twitch PubSub API, see https://dev.twitch.tv/docs/pubsub
-
-
-def listen_for_channel_points():
-    ws_pool = WebsocketsPool()
-    for topic in get_needed_topics():
-        ws_pool.submit(topic)
-
-
-def get_needed_topics():
-    topics = [PubsubTopic("community-points-user-v1")]
-    for streamer_login in get_streamer_logins():
-        topics.append(PubsubTopic("video-playback-by-id", streamer_login))
-        topics.append(PubsubTopic("raid", streamer_login))
-    return topics
-
-
-def on_open(ws):
-    def run():
-        ping(ws)
-
-        all_topics = get_needed_topics()
-        for topic in all_topics:
-            listen_for_topic(ws, topic)
-
-        while not ws.is_closed:
-            ping(ws)
-            time.sleep(30)
-
-    threading.Thread(target=run).start()
 
 
 last_message_time = 0
@@ -102,7 +73,7 @@ def on_message(ws, message):
         raise RuntimeError(f"Error while trying to listen for a topic: {response}")
 
     elif response["type"] == "RECONNECT":
-        WebsocketsPool.handle_websocket_reconnection(ws)
+        WebSocketsPool.handle_websocket_reconnection(ws)
 
 
 def get_reason_name(code):

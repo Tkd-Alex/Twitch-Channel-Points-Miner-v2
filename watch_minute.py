@@ -6,12 +6,11 @@ import requests
 from twitch_data import *
 from twitch_data import get_streamer_url, USER_AGENT
 
+from TwitchChannelPointsMiner.classes.RequestInfo import RequestInfo
 
 # Twitch client sends some statistics as base64-encoded json
 # This API is presumably called Spade (https://github.com/twitchscience/spade)
 # "minute-watched" requests are what Twitch uses to know if you're watching a stream, and to grant you channel points.
-
-
 
 
 # "minute-watched" request for each streamer
@@ -30,7 +29,9 @@ def send_minute_watched_events():
             if is_online(streamer_login):
                 request_info = minute_watched_requests[streamer_login]
                 try:
-                    requests.post(request_info.url, data=request_info.payload, headers=headers)
+                    requests.post(
+                        request_info.url, data=request_info.payload, headers=headers
+                    )
                 except requests.exceptions.ConnectionError as e:
                     print("Error while trying to watch a minute:", str(e))
 
@@ -49,20 +50,21 @@ def update_minute_watched_event_request(streamer_login):
         "user_id": get_user_id(),
     }
     minute_watched = [{"event": "minute-watched", "properties": event_properties}]
-    json_event = json.dumps(minute_watched, separators=(',', ':'))
+    json_event = json.dumps(minute_watched, separators=(",", ":"))
     after_base64 = (b64encode(json_event.encode("utf-8"))).decode("utf-8")
     payload = {"data": after_base64}
     url = get_minute_watched_request_url(streamer_login)
     minute_watched_requests[streamer_login] = RequestInfo(url, payload)
 
 
-def get_minute_watched_request_url(streamer_login):
-    main_page_request = requests.get(get_streamer_url(streamer_login),
-                                     headers={"User-Agent": USER_AGENT})
+def get_minute_watched_request_url(streamer_url, user_agent):
+    main_page_request = requests.get(streamer_url, headers={"User-Agent": user_agent})
     response = main_page_request.text
-    settings_url = re.search("(https://static.twitchcdn.net/config/settings.*?js)", response).group(1)
+    settings_url = re.search(
+        "(https://static.twitchcdn.net/config/settings.*?js)", response
+    ).group(1)
 
-    settings_request = requests.get(settings_url, headers={"User-Agent": USER_AGENT})
+    settings_request = requests.get(settings_url, headers={"User-Agent": user_agent})
     response = settings_request.text
     minute_watched_request_url = re.search('"spade_url":"(.*?)"', response).group(1)
     return minute_watched_request_url
