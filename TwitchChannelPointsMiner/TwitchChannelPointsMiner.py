@@ -6,6 +6,7 @@ import time
 import os
 import uuid
 import copy
+import emoji
 
 from datetime import datetime
 from pathlib import Path
@@ -91,7 +92,7 @@ class TwitchChannelPointsMiner:
         if self.running:
             logger.error("You can't start multiple session of this istance!")
         else:
-            logger.info(f"Start session: {self.session_id}")
+            logger.info(emoji.emojize(f":bomb:  Start session: {self.session_id}", use_aliases=True))
             self.running = True
             self.start_datetime = datetime.now()
 
@@ -104,7 +105,7 @@ class TwitchChannelPointsMiner:
                     streamer = Streamer(streamer_username, channel_id)
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:
-                    logger.info(f"😞  Streamer {streamer_username} does not exist")
+                    logger.info(emoji.emojize(f":cry:  Streamer {streamer_username} does not exist", use_aliases=True))
 
             for streamer in self.streamers:
                 self.twitch.load_channel_points_context(streamer)
@@ -180,17 +181,17 @@ class TwitchChannelPointsMiner:
     def __print_report(self):
         print("\n")
         logger.info(
-            f"🔌  End session '{self.session_id}' at: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
+            emoji.emojize(f":electric_plug:  End session '{self.session_id}' at: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}", use_aliases=True)
         )
-        logger.info(f"⌛  Duration {datetime.now() - self.start_datetime}")
+        logger.info(emoji.emojize(f":hourglass:  Duration {datetime.now() - self.start_datetime}", use_aliases=True))
 
         if self.make_predictions:
             logger.info(
-                f"📊  Bet settings: Strategy={self.bet_strategy}, Percentage={self.bet_percentage}, Percentage Gap={self.bet_percentage_gap}, Max points={self.bet_max_points}"
+                emoji.emojize(f":bar_chart:  Bet settings: Strategy={self.bet_strategy}, Percentage={self.bet_percentage}, Percentage Gap={self.bet_percentage_gap}, Max points={self.bet_max_points}", use_aliases=True)
             )
             print('')
 
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
-                f"📽️  {self.streamers[streamer_index]} - Gained: {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}, Bonus claimed: {self.streamers[streamer_index].bonus_claimed}"
+                emoji.emojize(f":movie_camera:  {self.streamers[streamer_index]} - Gained: {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}, Bonus claimed: {self.streamers[streamer_index].bonus_claimed}", use_aliases=True)
             )

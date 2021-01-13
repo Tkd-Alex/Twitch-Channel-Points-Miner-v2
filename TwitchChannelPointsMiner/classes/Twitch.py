@@ -10,6 +10,7 @@ import re
 import os
 import time
 import logging
+import emoji
 
 from base64 import b64encode
 from pathlib import Path
@@ -114,7 +115,7 @@ class Twitch:
                 streamer.set_online()
 
     def claim_channel_points_bonus(self, streamer, claim_id):
-        logger.info(f"🎁  Claiming the bonus for {streamer}!")
+        logger.info(emoji.emojize(f":gift:  Claiming the bonus for {streamer}!", use_aliases=True))
         json_data = {
             "operationName": "ClaimCommunityPoints",
             "variables": {
@@ -235,5 +236,5 @@ class Twitch:
             )
 
             logger.info(
-                f"⚔️  Joining raid from {streamer.username} to {raid.target_login}!"
+                emoji.emojize(f":crossed_swords:  Joining raid from {streamer.username} to {raid.target_login}!", use_aliases=True)
             )

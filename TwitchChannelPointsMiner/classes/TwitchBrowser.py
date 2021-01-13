@@ -2,6 +2,7 @@ import time
 import logging
 import random
 import os
+import emoji
 
 from pathlib import Path
 from datetime import datetime
@@ -74,7 +75,7 @@ class TwitchBrowser:
         self.__init_twitch()
 
     def __init_twitch(self):
-        logger.info("⚙️  Init Twitch page - Cookie - LocalStorage items")
+        logger.info(emoji.emojize(":wrench:  Init Twitch page - Cookie - LocalStorage items", use_aliases=True))
         cookie = {
             "domain": ".twitch.tv",
             "hostOnly": False,
@@ -112,7 +113,7 @@ class TwitchBrowser:
 
     # Private method __ - We can instantiate webdriver only with init_browser
     def __init_chrome(self, show):
-        logger.info("⚙️  Init Chrome browser")
+        logger.info(emoji.emojize(":wrench:  Init Chrome browser", use_aliases=True))
         options = webdriver.ChromeOptions()
         options.add_argument("--mute-audio")
         if not show:
@@ -129,7 +130,7 @@ class TwitchBrowser:
 
     # Private method __ - We can instantiate webdriver only with init_browser
     def __init_firefox(self, show):
-        logger.info("⚙️  Init Firefox browser")
+        logger.info(emoji.emojize(":wrench:  Init Firefox browser", use_aliases=True))
         options = webdriver.FirefoxOptions()
         if not show:
             options.headless = True
@@ -212,7 +213,7 @@ class TwitchBrowser:
             )
         else:
             logger.info(
-                f"⚙️  Start betting at {event.streamer.chat_url} for event: {event}"
+                emoji.emojize(f":wrench:  Start betting at {event.streamer.chat_url} for event: {event}", use_aliases=True)
             )
             self.browser.get(event.streamer.chat_url)
             time.sleep(random.uniform(4, 6))
@@ -223,7 +224,7 @@ class TwitchBrowser:
 
     def complete_bet(self, event: EventPrediction):
         logger.info(
-            f"⚙️  Going to complete bet for event {event}. Current url page: {self.browser.current_url}"
+            emoji.emojize(f":wrench:  Going to complete bet for event {event}. Current url page: {self.browser.current_url}", use_aliases=True)
         )
         if event.box_fillable and self.currently_is_betting:
             decision = event.bet.calculate(
@@ -238,7 +239,7 @@ class TwitchBrowser:
 
                 try:
                     logger.info(
-                        f"⚙️  Going to write: {decision['amount']} on input {decision['choice']}"
+                        emoji.emojize(f":wrench:  Going to write: {decision['amount']} on input {decision['choice']}", use_aliases=True)
                     )
                     self.__send_text(
                         streamBetVoteInput + selector_index,
@@ -277,21 +278,21 @@ class TwitchBrowser:
             )
 
     def __open_coins_menu(self, event: EventPrediction):
-        logger.info(f"⚙️  Open coins menu for event: {event}")
+        logger.info(emoji.emojize(f":wrench:  Open coins menu for event: {event}", use_aliases=True))
         self.__click_when_exist(streamCoinsMenu, By.XPATH)
         time.sleep(random.uniform(0.05, 0.1))
         if self.do_screenshot:
             self.screenshot(f"{event.event_id}___open_coins_menu.png".format)
 
     def __click_on_bet(self, event):
-        logger.info(f"⚙️  Click on the bet for event: {event}")
+        logger.info(emoji.emojize(f":wrench:  Click on the bet for event: {event}", use_aliases=True))
         self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR)
         time.sleep(random.uniform(0.05, 0.1))
         if self.do_screenshot:
             self.screenshot(f"{event.event_id}___click_on_bet.png".format)
 
     def __enable_custom_bet_value(self, event):
-        logger.info(f"⚙️  Enable input of custom value for event: {event}")
+        logger.info(emoji.emojize(f":wrench:  Enable input of custom value for event: {event}", use_aliases=True))
         if self.__click_when_exist(streamBetCustomVote, By.CSS_SELECTOR) is not None:
             time.sleep(random.uniform(0.05, 0.1))
             if self.do_screenshot:

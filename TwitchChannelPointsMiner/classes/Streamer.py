@@ -1,5 +1,6 @@
 import time
 import logging
+import emoji
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +30,9 @@ class Streamer:
     def set_offline(self):
         self.offline_at = time.time()
         self.is_online = False
-        logger.info(f"😴  {self} is Offline!")
+        logger.info(emoji.emojize(f":sleeping:  {self} is Offline!", use_aliases=True))
 
     def set_online(self):
         self.online_at = time.time()
         self.is_online = True
-        logger.info(f"🥳  {self} is Online!")
+        logger.info(emoji.emojize(f":partying_face:  {self} is Online!", use_aliases=True))
