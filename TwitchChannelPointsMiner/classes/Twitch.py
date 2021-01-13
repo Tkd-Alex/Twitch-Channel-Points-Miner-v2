@@ -177,9 +177,9 @@ class Twitch:
             }
         )
 
-    def send_minute_watched_events(self, streamers):
+    def send_minute_watched_events(self, streamers, running):
         headers = {"user-agent": USER_AGENT}
-        while True:
+        while running:
             # Twitch has a limit - you can't watch more than 2 channels at one time.
             # We take the first two streamers from the list as they have the highest priority.
             streamers_watching = [

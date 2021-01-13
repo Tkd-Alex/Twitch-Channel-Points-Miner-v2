@@ -18,6 +18,8 @@ from TwitchChannelPointsMiner.classes.Bet import Strategy
 from TwitchChannelPointsMiner.classes.TwitchBrowser import TwitchBrowser, Browser
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 
+logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)  # Suppress warning for urllib3.connectionpool
+
 logging_format = "%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s"
 logging.basicConfig(
     format=logging_format,
@@ -125,7 +127,7 @@ class TwitchChannelPointsMiner:
                 )
 
             self.minute_watcher_thread = threading.Thread(
-                target=self.twitch.send_minute_watched_events, args=(self.streamers,)
+                target=self.twitch.send_minute_watched_events, args=(self.streamers, self.running, )
             )
             self.minute_watcher_thread.start()
 
@@ -163,28 +165,31 @@ class TwitchChannelPointsMiner:
                 self.ws_pool.submit(topic)
 
     def end(self, signum, frame):
-        self.__print_report()
-
+        self.running = False
+        self.ws_pool.end()
+        self.minute_watcher_thread.join()
         if self.twitch_browser is not None:
             self.twitch_browser.browser.quit()
 
+        self.__print_report()
         time.sleep(1.5)
+
         sys.exit(0)
 
     def __print_report(self):
-        logger.info(
-            f"End session '{self.session_id}' at: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
-        )
-        logger.info(f"Duration {datetime.now() - self.start_datetime}")
-
         print("\n")
+        logger.info(
+            f"🔌  End session '{self.session_id}' at: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
+        )
+        logger.info(f"⌛  Duration {datetime.now() - self.start_datetime}")
+
         if self.make_predictions:
             logger.info(
-                f"Bet settings: Strategy={self.bet_strategy}, Percentage={self.bet_percentage}, Percentage Gap={self.bet_percentage_gap}, Max points={self.bet_max_points}"
+                f"📊  Bet settings: Strategy={self.bet_strategy}, Percentage={self.bet_percentage}, Percentage Gap={self.bet_percentage_gap}, Max points={self.bet_max_points}"
             )
-            print("\n")
+            print('')
 
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
-                f"{self.streamers[streamer_index]} - Gained: {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}, Bonus claimed: {self.streamers[streamer_index].bonus_claimed}"
+                f"📽️  {self.streamers[streamer_index]} - Gained: {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}, Bonus claimed: {self.streamers[streamer_index].bonus_claimed}"
             )

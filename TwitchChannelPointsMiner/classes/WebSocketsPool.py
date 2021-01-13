@@ -43,6 +43,7 @@ class WebSocketsPool:
             on_close=WebSocketsPool.handle_websocket_reconnection,
         )
         self.ws.parent_pool = self
+        self.ws.keep_running = True
         self.ws.is_closed = False
         self.ws.is_opened = False
         self.ws.topics = []
@@ -56,7 +57,13 @@ class WebSocketsPool:
         self.ws.last_message_time = 0
         self.ws.last_message_type = None
 
-        threading.Thread(target=lambda: self.ws.run_forever()).start()
+        self.thread_ws = threading.Thread(target=lambda: self.ws.run_forever())
+        self.thread_ws.start()
+
+    def end(self):
+        self.ws.keep_running = False
+        self.ws.close()
+        self.thread_ws.join()
 
     @staticmethod
     def on_open(ws):
