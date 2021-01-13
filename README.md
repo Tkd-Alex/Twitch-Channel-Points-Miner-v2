@@ -16,7 +16,7 @@ Read more here: https://help.twitch.tv/s/article/channel-points-guide?language=e
 - Improve the logging
 - Final report with all the datas
 - Rewrite the entire code using classe instead of module with global variables
-- Place the bet / make prediction and won or lose (good luck) your channel points!
+- Place the bet / make prediction and won or lose (good luck) your channel points! **CURRENTLY IN BETA / VERY UNSTABLE**
 
 ## How to use:
 1. Clone or download this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
