@@ -116,6 +116,7 @@ class TwitchChannelPointsMiner:
             ):  # We need a browser to make predictions / bet
                 self.twitch_browser = TwitchBrowser(
                     self.twitch.twitch_login.get_auth_token(),
+                    self.session_id,
                     bet_strategy=self.bet_strategy,
                     bet_percentage=self.bet_percentage,
                     bet_percentage_gap=self.bet_percentage_gap,

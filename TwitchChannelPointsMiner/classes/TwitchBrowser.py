@@ -1,7 +1,9 @@
 import time
 import logging
 import random
+import os
 
+from pathlib import Path
 from datetime import datetime
 from enum import Enum, auto
 from PIL import Image, ImageDraw, ImageFont
@@ -40,6 +42,7 @@ class TwitchBrowser:
     def __init__(
         self,
         auth_token: str,
+        session_id: str,
         timeout: float = 5.0,
         bet_strategy: Strategy = Strategy.SMART,
         bet_percentage: int = 5,
@@ -48,6 +51,7 @@ class TwitchBrowser:
         do_screenshot: bool = False,
     ):
         self.auth_token = auth_token
+        self.session_id = session_id
         self.timeout = timeout
         self.currently_is_betting = False
         self.browser = None
@@ -142,13 +146,19 @@ class TwitchBrowser:
         self.browser = webdriver.Firefox(options=options, firefox_profile=fp)
 
     def screenshot(self, fname, write_timestamp=True):
+        screenshots_path = os.path.join(Path().absolute(), "screenshots")
+        Path(screenshots_path).mkdir(parents=True, exist_ok=True)
+        Path(os.path.join(screenshots_path, self.session_id)).mkdir(parents=True, exist_ok=True)
+
+        fname = f"{fname}.png" if not fname.endswith(".png") else fname
+        fname = os.path.join(screenshots_path, self.session_id, fname)
         self.browser.save_screenshot(fname)
 
         if write_timestamp is True:
             image = Image.open(fname)
             draw = ImageDraw.Draw(image)
 
-            font = ImageFont.truetype("./Roboto/Roboto-Bold.ttf", size=35)
+            font = ImageFont.truetype(os.path.join(Path().absolute(), "Roboto-Bold.ttf"), size=35)
             (x, y) = (15, image.height // 3)
             datetime_text = datetime.now().strftime("%d/%m %H:%M:%S.%f")
 
@@ -237,7 +247,7 @@ class TwitchBrowser:
                     )
                     if self.do_screenshot:
                         self.screenshot(
-                            "./tmp/{}_TEXT_WRITE.png".format(event.event_id)
+                            f"{event.event_id}___send_text.png"
                         )
 
                     logger.info("Going to place the bet")
@@ -246,7 +256,7 @@ class TwitchBrowser:
                     )
                     if self.do_screenshot:
                         self.screenshot(
-                            "./tmp/{}_CLICK_ON_VOTE.png".format(event.event_id)
+                            f"{event.event_id}___click_on_vote.png"
                         )
 
                     time.sleep(random.uniform(15, 25))
@@ -271,21 +281,21 @@ class TwitchBrowser:
         self.__click_when_exist(streamCoinsMenu, By.XPATH)
         time.sleep(random.uniform(0.05, 0.1))
         if self.do_screenshot:
-            self.screenshot("./tmp/{}_OPEN_COINS.png".format(event.event_id))
+            self.screenshot(f"{event.event_id}___open_coins_menu.png".format)
 
     def __click_on_bet(self, event):
         logger.info(f"⚙️  Click on the bet for event: {event}")
         self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR)
         time.sleep(random.uniform(0.05, 0.1))
         if self.do_screenshot:
-            self.screenshot("./tmp/{}_CLICK_ON_BET.png".format(event.event_id))
+            self.screenshot(f"{event.event_id}___click_on_bet.png".format)
 
     def __enable_custom_bet_value(self, event):
         logger.info(f"⚙️  Enable input of custom value for event: {event}")
         if self.__click_when_exist(streamBetCustomVote, By.CSS_SELECTOR) is not None:
             time.sleep(random.uniform(0.05, 0.1))
             if self.do_screenshot:
-                self.screenshot("./tmp/{}_INPUT_ENABLE.png".format(event.event_id))
+                self.screenshot(f"{event.event_id}___enable_custom_bet_value.png".format)
 
             event.box_fillable = True
             self.currently_is_betting = True
