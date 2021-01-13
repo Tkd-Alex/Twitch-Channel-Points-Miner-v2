@@ -34,6 +34,7 @@ class Twitch:
         Path(cookies_path).mkdir(parents=True, exist_ok=True)
         self.cookies_file = os.path.join(cookies_path, f"{username}.pkl")
         self.twitch_login = TwitchLogin(TWITCH_CLIENT_ID, username)
+        self.running = True
 
     def login(self):
         if os.path.isfile(self.cookies_file) is False:
@@ -178,9 +179,9 @@ class Twitch:
             }
         )
 
-    def send_minute_watched_events(self, streamers, running):
+    def send_minute_watched_events(self, streamers):
         headers = {"user-agent": USER_AGENT}
-        while running:
+        while self.running:
             # Twitch has a limit - you can't watch more than 2 channels at one time.
             # We take the first two streamers from the list as they have the highest priority.
             streamers_watching = [

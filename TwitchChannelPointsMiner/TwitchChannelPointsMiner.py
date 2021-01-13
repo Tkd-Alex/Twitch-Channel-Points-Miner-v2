@@ -19,7 +19,7 @@ from TwitchChannelPointsMiner.classes.Bet import Strategy
 from TwitchChannelPointsMiner.classes.TwitchBrowser import TwitchBrowser, Browser
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 
-logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)  # Suppress warning for urllib3.connectionpool
+logging.getLogger("urllib3").setLevel(logging.ERROR)  # Suppress warning for urllib3.connectionpool (selenium close connection)
 
 logging_format = "%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s"
 logging.basicConfig(
@@ -129,8 +129,9 @@ class TwitchChannelPointsMiner:
                 )
 
             self.minute_watcher_thread = threading.Thread(
-                target=self.twitch.send_minute_watched_events, args=(self.streamers, self.running, )
+                target=self.twitch.send_minute_watched_events, args=(self.streamers, )
             )
+            self.minute_watcher_thread.daemon = True
             self.minute_watcher_thread.start()
 
             self.ws_pool = WebSocketsPool(
@@ -166,22 +167,26 @@ class TwitchChannelPointsMiner:
             for topic in topics:
                 self.ws_pool.submit(topic)
 
+            while self.running:
+                time.sleep(1.5)
+
     def end(self, signum, frame):
-        self.running = False
-        self.ws_pool.end()
-        self.minute_watcher_thread.join()
+        # logger.info("Please wait, this operation can take a while ...")
         if self.twitch_browser is not None:
             self.twitch_browser.browser.quit()
 
+        self.running = self.twitch.running = False
+        self.ws_pool.end()
+
         self.__print_report()
-        time.sleep(1.5)
+        time.sleep(3.5)  # Do sleep for ending browser and threads
 
         sys.exit(0)
 
     def __print_report(self):
-        print("\n")
+        print("")
         logger.info(
-            emoji.emojize(f":electric_plug:  End session '{self.session_id}' at: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}", use_aliases=True)
+            emoji.emojize(f":electric_plug:  End session '{self.session_id}'", use_aliases=True)
         )
         logger.info(emoji.emojize(f":hourglass:  Duration {datetime.now() - self.start_datetime}", use_aliases=True))
 

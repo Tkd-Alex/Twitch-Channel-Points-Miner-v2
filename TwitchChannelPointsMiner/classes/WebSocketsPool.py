@@ -59,12 +59,12 @@ class WebSocketsPool:
         self.ws.last_message_type = None
 
         self.thread_ws = threading.Thread(target=lambda: self.ws.run_forever())
+        self.thread_ws.daemon = True
         self.thread_ws.start()
 
     def end(self):
         self.ws.keep_running = False
         self.ws.close()
-        self.thread_ws.join()
 
     @staticmethod
     def on_open(ws):
@@ -78,10 +78,13 @@ class WebSocketsPool:
                 ws.ping()
                 time.sleep(30)
 
-        threading.Thread(target=run).start()
+        thread_ws = threading.Thread(target=run)
+        thread_ws.daemon = True
+        thread_ws.start()
 
     @staticmethod
     def handle_websocket_reconnection(ws):
+        ws.is_closed = True
         if ws.keep_running:
             ws.is_closed = True
             logger.info("Reconnecting to Twitch PubSub server in 30 seconds")
@@ -185,18 +188,17 @@ class WebSocketsPool:
                                 if ws.twitch_browser.start_bet(
                                     ws.events_predictions[event_id]
                                 ):
+                                    # complete_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
                                     complete_bet_thread = threading.Timer(
                                         event.closing_bet_after(current_timestamp),
                                         ws.twitch_browser.complete_bet,
                                         (ws.events_predictions[event_id],),
                                     )
+                                    complete_bet_thread.daemon = True
                                     complete_bet_thread.start()
 
-                                    # complete_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                    # complete_bet_thread.start()
-
                                     logger.info(
-                                        emoji.emojize(f":alarm_clock:  A thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}", use_aliases=True)
+                                        emoji.emojize(f":alarm_clock:  Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}", use_aliases=True)
                                     )
 
                 else:
