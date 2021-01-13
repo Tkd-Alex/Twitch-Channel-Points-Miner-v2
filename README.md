@@ -9,6 +9,8 @@ I've also take some piece of code - and idea to use Selenium fo do bet from: htt
 
 Read more here: https://help.twitch.tv/s/article/channel-points-guide?language=en_US
 
+![Screenshot](./screenshot.png)
+
 ## Main difference from the original repository:
 
 - Improve the logging
