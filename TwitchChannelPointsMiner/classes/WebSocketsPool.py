@@ -3,6 +3,9 @@ import threading
 import time
 import json
 
+from dateutil import parser
+
+from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 
@@ -19,9 +22,10 @@ def get_streamer_index(streamers, channel_id):
 
 # You can't listen for more than 50 topics at once
 class WebSocketsPool:
-    def __init__(self, twitch, streamers):
+    def __init__(self, twitch, twitch_browser, streamers):
         self.ws = None
         self.twitch = twitch
+        self.twitch_browser = twitch_browser
         self.streamers = streamers
 
     def submit(self, topic):
@@ -49,7 +53,9 @@ class WebSocketsPool:
         self.ws.pending_topics = []
 
         self.ws.twitch = self.twitch
+        self.ws.twitch_browser = self.twitch_browser
         self.ws.streamers = self.streamers
+        self.ws.events_predictions = {}
 
         self.ws.last_message_time = 0
         self.ws.last_message_type = None
@@ -135,6 +141,36 @@ class WebSocketsPool:
                 if message_type == "raid_update_v2":
                     raid = Raid(message["raid"]["id"], message["raid"]["target_login"])
                     ws.twitch.update_raid(ws.streamers[streamer_index], raid)
+
+            elif topic == "predictions-channel-v1":
+                streamer_index = get_streamer_index(ws.streamers, topic_user)  # message_data["event"]["channel_id"]
+
+                event_id = message_data["event"]["id"]
+                event_status = message_data["event"]["status"]
+
+                current_timestamp = parser.parse(message_data["timestamp"])
+
+                if event_id not in ws.events_predictions:
+                    if event_status == "ACTIVE":
+                        event = EventPrediction(
+                            ws.streamers[streamer_index],
+                            event_id,
+                            parser.parse(message_data["event"]["created_at"]),
+                            float(message_data["event"]["prediction_window_seconds"]) - 20,
+                            event_status,
+                            message_data["event"]["outcomes"]
+                        )
+                        if event.closing_bet_after(current_timestamp) > 0:
+                            ws.events_predictions[event_id] = event
+                            if ws.twitch_browser.currently_is_betting is False:
+                                if ws.twitch_browser.start_bet(ws.events_predictions[event_id]):
+                                    complete_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch_browser.complete_bet, (ws.events_predictions[event_id],))
+                                    complete_bet_thread.start()
+                                    logger.info(f"⏰  A thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}")
+
+                else:
+                    ws.events_predictions[event_id].status = event_status
+                    ws.events_predictions[event_id].bet.update_outcomes(message_data["event"]["outcomes"])
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")

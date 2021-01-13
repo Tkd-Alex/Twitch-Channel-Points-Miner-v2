@@ -20,7 +20,7 @@ class Streamer:
         self.raid = None
 
         self.streamer_url = f"https://www.twitch.tv/{self.username}"
-        self.char_url = f"https://www.twitch.tv/popout/{self.username}/chat?popout="
+        self.chat_url = f"https://www.twitch.tv/popout/{self.username}/chat?popout="
 
     def __repr__(self):
         return f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={self.channel_points})"

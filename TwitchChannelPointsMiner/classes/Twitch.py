@@ -114,7 +114,7 @@ class Twitch:
                 streamer.set_online()
 
     def claim_channel_points_bonus(self, streamer, claim_id):
-        logger.info(f"🎁  Claiming the bonus for {streamer.username}!")
+        logger.info(f"🎁  Claiming the bonus for {streamer}!")
         json_data = {
             "operationName": "ClaimCommunityPoints",
             "variables": {
