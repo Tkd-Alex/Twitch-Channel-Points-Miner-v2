@@ -13,6 +13,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
+from TwitchChannelPointsMiner.classes.Bet import Strategy
 
 TWITCH_URL = "https://www.twitch.tv/"
 
@@ -36,11 +37,25 @@ class Browser(Enum):
 
 
 class TwitchBrowser:
-    def __init__(self, auth_token: str, timeout: float = 5.0):
+    def __init__(
+        self,
+        auth_token: str,
+        timeout: float = 5.0,
+        bet_strategy: Strategy = Strategy.SMART,
+        bet_percentage: int = 5,
+        bet_percentage_gap: int = 20,
+        bet_max_points: int = 50000,
+        do_screenshot: bool = False,
+    ):
         self.auth_token = auth_token
         self.timeout = timeout
         self.currently_is_betting = False
         self.browser = None
+        self.do_screenshot = do_screenshot
+        self.bet_strategy = bet_strategy
+        self.bet_percentage = bet_percentage
+        self.bet_percentage_gap = bet_percentage_gap
+        self.bet_max_points = bet_max_points
 
     def init(self, show: bool = True, browser: Browser = Browser.FIREFOX):
         if browser == Browser.FIREFOX:
@@ -201,7 +216,13 @@ class TwitchBrowser:
             f"⚙️  Going to complete bet for event {event}. Current url page: {self.browser.current_url}"
         )
         if event.box_fillable and self.currently_is_betting:
-            decision = event.bet.calculate(event.streamer.channel_points)
+            decision = event.bet.calculate(
+                event.streamer.channel_points,
+                self.bet_strategy,
+                self.bet_percentage,
+                self.bet_percentage_gap,
+                self.bet_max_points,
+            )
             if decision["choice"]:
                 selector_index = "[1]" if decision["choice"] == "A" else "[2]"
 

@@ -161,9 +161,14 @@ class WebSocketsPool:
                             event_id,
                             message_data["event"]["title"],
                             parser.parse(message_data["event"]["created_at"]),
-                            (float(message_data["event"]["prediction_window_seconds"]) - 20),
+                            (
+                                float(
+                                    message_data["event"]["prediction_window_seconds"]
+                                )
+                                - 20
+                            ),
                             event_status,
-                            message_data["event"]["outcomes"]
+                            message_data["event"]["outcomes"],
                         )
                         if event.closing_bet_after(current_timestamp) > 0:
                             ws.events_predictions[event_id] = event

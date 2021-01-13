@@ -128,6 +128,7 @@ class Twitch:
             },
         }
         self.post_gql_request(json_data)
+        streamer.bonus_claimed += 1
 
     # Load the amount of current points for a channel, check if a bonus is available
     def load_channel_points_context(self, streamer):

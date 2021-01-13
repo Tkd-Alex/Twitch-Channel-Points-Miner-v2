@@ -16,6 +16,7 @@ class Streamer:
         self.online_at = 0
         self.offline_at = 0
         self.channel_points = 0
+        self.bonus_claimed = 0
         self.minute_watched_requests = None
         self.raid = None
 
