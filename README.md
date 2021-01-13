@@ -24,6 +24,7 @@ Read more here: https://help.twitch.tv/s/article/channel-points-guide?language=e
 3. Create your `run.py` file start from [example.py](/example.py)
 ```python
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
+from TwitchChannelPointsMiner.classes.Bet import Strategy
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
