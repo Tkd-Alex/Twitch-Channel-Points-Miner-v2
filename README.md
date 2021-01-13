@@ -29,11 +29,23 @@ twitch_miner = TwitchChannelPointsMiner(
     make_predictions=True,  # If you want to Bet / Make prediction
     follow_raid=True,  # Follow raid to obtain more points
     save_logs=True,  # Save logs in file
+    show_browser=False,  # Show the browser during bet
+    do_browser_screenshot=False,  # Do screenshot during the bet
+    bet_strategy=Strategy.SMART,  # Choose you strategy!
+    bet_percentage=5,  # Place the x% of your channel points
+    bet_percentage_gap=20,  # Gap difference between outcomesA and outcomesB (for SMART stragegy)
+    bet_max_points=50000,  # If the x percetage of your channel points is gt bet_max_points set this value
 )
 
 twitch_miner.mine(["streamer1", "streamer2"])  # Array of streamers
 ```
 4. Start mining! `python run.py`
+
+### Bet strategy
+
+- **MOST_VOTED**: Select the option most voted based on users count
+- **HIGH_COTE**: Select the option with the highest cote
+- **SMART**: If the majority in percent chose an option then follow the other users, otherwise choose the option with the highest cote
 
 ## Migrating from old repository:
 If you already have a `twitch-cookies.pkl` and you don't want to login again please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
