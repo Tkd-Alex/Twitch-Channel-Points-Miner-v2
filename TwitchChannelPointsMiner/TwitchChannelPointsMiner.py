@@ -65,6 +65,9 @@ class TwitchChannelPointsMiner:
                 "community-points-user-v1", user_id=self.twitch.twitch_login.get_user_id()
             )
         ]
+        if self.predictions is True:
+            topics.append(PubsubTopic("predictions-user-v1", user_id=self.twitch.twitch_login.get_user_id()))
+
         for streamer in self.streamers:
             topics.append(PubsubTopic("video-playback-by-id", streamer=streamer))
 

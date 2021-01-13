@@ -176,6 +176,12 @@ class WebSocketsPool:
                     ws.events_predictions[event_id].status = event_status
                     ws.events_predictions[event_id].bet.update_outcomes(message_data["event"]["outcomes"])
 
+            elif topic == "predictions-user-v1":
+                if message_type == "prediction-result" and message_data["event"]["result"]:
+                    event_id = message_data["event"]["id"]
+                    if event_id in ws.events_predictions:
+                        logger.info(f"📊  {ws.events_predictions[event_id]} - Result: {message_data['event']['result']['type']}, Points won: {message_data['event']['result']['type'] if message_data['event']['result']['type'] else 0}")
+
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")
 
