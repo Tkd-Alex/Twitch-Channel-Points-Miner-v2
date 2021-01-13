@@ -1,4 +1,7 @@
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Streamer:
@@ -20,12 +23,14 @@ class Streamer:
         self.char_url = f"https://www.twitch.tv/popout/{self.username}/chat?popout="
 
     def __repr__(self):
-        return f"Streamer(username={self.username}, channel_id={self.channel_id}, is_online={self.is_online}, online_at={self.online_at}, offline_at={self.offline_at}, channel_points={self.channel_points})"
+        return f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={self.channel_points})"
 
     def set_offline(self):
         self.offline_at = time.time()
         self.is_online = False
+        logger.info(f"😴  {self} is Offline!")
 
     def set_online(self):
         self.online_at = time.time()
         self.is_online = True
+        logger.info(f"🥳  {self} is Online!")

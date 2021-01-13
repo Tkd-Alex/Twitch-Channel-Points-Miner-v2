@@ -108,14 +108,13 @@ class Twitch:
         if streamer.is_online is False:
             try:
                 self.update_minute_watched_event_request(streamer)
-                streamer.set_online()
             except StreamerIsOfflineException:
                 streamer.set_offline()
             else:
-                logger.info(f"{streamer.username} is live!")
+                streamer.set_online()
 
     def claim_channel_points_bonus(self, streamer, claim_id):
-        logger.info(f"Claiming the bonus for {streamer.username}!")
+        logger.info(f"🎁  Claiming the bonus for {streamer.username}!")
         json_data = {
             "operationName": "ClaimCommunityPoints",
             "variables": {
@@ -149,12 +148,10 @@ class Twitch:
             "communityPoints"
         ]
         streamer.channel_points = community_points["balance"]
-        logger.info(
-            f"{community_points['balance']} channel points for {streamer.username}!"
-        )
+        # logger.info(f"{streamer.channel_points} channel points for {streamer.username}!")
         if community_points["availableClaim"] is not None:
             self.claim_channel_points_bonus(
-                streamer.username, community_points["availableClaim"]["id"]
+                streamer, community_points["availableClaim"]["id"]
             )
 
     def send_minute_watched_events(self, streamers):
@@ -215,5 +212,5 @@ class Twitch:
             )
 
             logger.info(
-                f"Joining raid from {streamer.username} to {raid.target_login}!"
+                f"⚔️  Joining raid from {streamer.username} to {raid.target_login}!"
             )

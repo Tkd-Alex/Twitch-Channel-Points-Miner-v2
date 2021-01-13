@@ -18,7 +18,6 @@ class TwitchChannelPointsMiner:
     def __init__(
         self,
         username: str,
-        password: str = None,
         predictions: bool = True,
         raid: bool = True,
     ):
@@ -40,13 +39,14 @@ class TwitchChannelPointsMiner:
             try:
                 channel_id = self.twitch.get_channel_id(streamer_username)
                 streamer = Streamer(streamer_username, channel_id)
-                self.twitch.check_streamer_online(streamer)
-                self.twitch.load_channel_points_context(streamer)
                 self.streamers.append(streamer)
-
-                logger.info(streamer.__repr__())
             except StreamerDoesNotExistException:
-                logger.info(f"Streamer {streamer_username} does not exist")
+                logger.info(f"😞  Streamer {streamer_username} does not exist")
+
+        for streamer in self.streamers:
+            self.twitch.load_channel_points_context(streamer)
+            self.twitch.check_streamer_online(streamer)
+            # logger.info(streamer)
 
         self.minute_watcher_thread = threading.Thread(
             target=self.twitch.send_minute_watched_events, args=(self.streamers,)

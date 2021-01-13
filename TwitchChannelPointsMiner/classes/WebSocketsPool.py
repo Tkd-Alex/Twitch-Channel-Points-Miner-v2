@@ -112,14 +112,14 @@ class WebSocketsPool:
                 if message_type == "points-earned":
                     streamer_index = get_streamer_index(ws.streamers, message_data["channel_id"])
                     earned = message_data["point_gain"]["total_points"]
-                    balance = message_data["balance"]["balance"]
+                    ws.streamers[streamer_index].channel_points = message_data["balance"]["balance"]
                     logger.info(
-                        f"+{earned} → {balance} channel points for {ws.streamers[streamer_index]}! Reason: {message_data['point_gain']['reason_code']}."
+                        f"🚀  +{earned} → {ws.streamers[streamer_index]} - Reason: {message_data['point_gain']['reason_code']}."
                     )
                 elif message_type == "claim-available":
                     streamer_index = get_streamer_index(ws.streamers, message_data["claim"]["channel_id"])
                     ws.twitch.claim_channel_points_bonus(
-                        ws.streamers[streamer_index].username, message_data["claim"]["id"]
+                        ws.streamers[streamer_index], message_data["claim"]["id"]
                     )
 
             elif topic == "video-playback-by-id":
