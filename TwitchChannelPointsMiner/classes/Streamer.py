@@ -35,4 +35,6 @@ class Streamer:
     def set_online(self):
         self.online_at = time.time()
         self.is_online = True
-        logger.info(emoji.emojize(f":partying_face:  {self} is Online!", use_aliases=True))
+        logger.info(
+            emoji.emojize(f":partying_face:  {self} is Online!", use_aliases=True)
+        )

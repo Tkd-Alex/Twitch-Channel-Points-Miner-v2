@@ -116,7 +116,11 @@ class Twitch:
                 streamer.set_online()
 
     def claim_channel_points_bonus(self, streamer, claim_id):
-        logger.info(emoji.emojize(f":gift:  Claiming the bonus for {streamer}!", use_aliases=True))
+        logger.info(
+            emoji.emojize(
+                f":gift:  Claiming the bonus for {streamer}!", use_aliases=True
+            )
+        )
         json_data = {
             "operationName": "ClaimCommunityPoints",
             "variables": {
@@ -237,5 +241,8 @@ class Twitch:
             )
 
             logger.info(
-                emoji.emojize(f":crossed_swords:  Joining raid from {streamer.username} to {raid.target_login}!", use_aliases=True)
+                emoji.emojize(
+                    f":crossed_swords:  Joining raid from {streamer.username} to {raid.target_login}!",
+                    use_aliases=True,
+                )
             )

@@ -75,7 +75,12 @@ class TwitchBrowser:
         self.__init_twitch()
 
     def __init_twitch(self):
-        logger.info(emoji.emojize(":wrench:  Init Twitch page - Cookie - LocalStorage items", use_aliases=True))
+        logger.info(
+            emoji.emojize(
+                ":wrench:  Init Twitch page - Cookie - LocalStorage items",
+                use_aliases=True,
+            )
+        )
         cookie = {
             "domain": ".twitch.tv",
             "hostOnly": False,
@@ -149,7 +154,9 @@ class TwitchBrowser:
     def screenshot(self, fname, write_timestamp=True):
         screenshots_path = os.path.join(Path().absolute(), "screenshots")
         Path(screenshots_path).mkdir(parents=True, exist_ok=True)
-        Path(os.path.join(screenshots_path, self.session_id)).mkdir(parents=True, exist_ok=True)
+        Path(os.path.join(screenshots_path, self.session_id)).mkdir(
+            parents=True, exist_ok=True
+        )
 
         fname = f"{fname}.png" if not fname.endswith(".png") else fname
         fname = os.path.join(screenshots_path, self.session_id, fname)
@@ -159,7 +166,9 @@ class TwitchBrowser:
             image = Image.open(fname)
             draw = ImageDraw.Draw(image)
 
-            font = ImageFont.truetype(os.path.join(Path().absolute(), "Roboto-Bold.ttf"), size=35)
+            font = ImageFont.truetype(
+                os.path.join(Path().absolute(), "Roboto-Bold.ttf"), size=35
+            )
             (x, y) = (15, image.height // 3)
             datetime_text = datetime.now().strftime("%d/%m %H:%M:%S.%f")
 
@@ -213,7 +222,10 @@ class TwitchBrowser:
             )
         else:
             logger.info(
-                emoji.emojize(f":wrench:  Start betting at {event.streamer.chat_url} for event: {event}", use_aliases=True)
+                emoji.emojize(
+                    f":wrench:  Start betting at {event.streamer.chat_url} for event: {event}",
+                    use_aliases=True,
+                )
             )
             self.browser.get(event.streamer.chat_url)
             time.sleep(random.uniform(4, 6))
@@ -224,7 +236,10 @@ class TwitchBrowser:
 
     def complete_bet(self, event: EventPrediction):
         logger.info(
-            emoji.emojize(f":wrench:  Going to complete bet for event {event}. Current url page: {self.browser.current_url}", use_aliases=True)
+            emoji.emojize(
+                f":wrench:  Going to complete bet for event {event}. Current url page: {self.browser.current_url}",
+                use_aliases=True,
+            )
         )
         if event.box_fillable and self.currently_is_betting:
             decision = event.bet.calculate(
@@ -239,7 +254,10 @@ class TwitchBrowser:
 
                 try:
                     logger.info(
-                        emoji.emojize(f":wrench:  Going to write: {decision['amount']} on input {decision['choice']}", use_aliases=True)
+                        emoji.emojize(
+                            f":wrench:  Going to write: {decision['amount']} on input {decision['choice']}",
+                            use_aliases=True,
+                        )
                     )
                     self.__send_text(
                         streamBetVoteInput + selector_index,
@@ -247,18 +265,14 @@ class TwitchBrowser:
                         By.XPATH,
                     )
                     if self.do_screenshot:
-                        self.screenshot(
-                            f"{event.event_id}___send_text.png"
-                        )
+                        self.screenshot(f"{event.event_id}___send_text.png")
 
                     logger.info("Going to place the bet")
                     self.__click_when_exist(
                         streamBetVoteButton + selector_index, By.XPATH
                     )
                     if self.do_screenshot:
-                        self.screenshot(
-                            f"{event.event_id}___click_on_vote.png"
-                        )
+                        self.screenshot(f"{event.event_id}___click_on_vote.png")
 
                     time.sleep(random.uniform(15, 25))
                     event.bet_completed = True
@@ -278,25 +292,40 @@ class TwitchBrowser:
             )
 
     def __open_coins_menu(self, event: EventPrediction):
-        logger.info(emoji.emojize(f":wrench:  Open coins menu for event: {event}", use_aliases=True))
+        logger.info(
+            emoji.emojize(
+                f":wrench:  Open coins menu for event: {event}", use_aliases=True
+            )
+        )
         self.__click_when_exist(streamCoinsMenu, By.XPATH)
         time.sleep(random.uniform(0.05, 0.1))
         if self.do_screenshot:
             self.screenshot(f"{event.event_id}___open_coins_menu.png".format)
 
     def __click_on_bet(self, event):
-        logger.info(emoji.emojize(f":wrench:  Click on the bet for event: {event}", use_aliases=True))
+        logger.info(
+            emoji.emojize(
+                f":wrench:  Click on the bet for event: {event}", use_aliases=True
+            )
+        )
         self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR)
         time.sleep(random.uniform(0.05, 0.1))
         if self.do_screenshot:
             self.screenshot(f"{event.event_id}___click_on_bet.png".format)
 
     def __enable_custom_bet_value(self, event):
-        logger.info(emoji.emojize(f":wrench:  Enable input of custom value for event: {event}", use_aliases=True))
+        logger.info(
+            emoji.emojize(
+                f":wrench:  Enable input of custom value for event: {event}",
+                use_aliases=True,
+            )
+        )
         if self.__click_when_exist(streamBetCustomVote, By.CSS_SELECTOR) is not None:
             time.sleep(random.uniform(0.05, 0.1))
             if self.do_screenshot:
-                self.screenshot(f"{event.event_id}___enable_custom_bet_value.png".format)
+                self.screenshot(
+                    f"{event.event_id}___enable_custom_bet_value.png".format
+                )
 
             event.box_fillable = True
             self.currently_is_betting = True

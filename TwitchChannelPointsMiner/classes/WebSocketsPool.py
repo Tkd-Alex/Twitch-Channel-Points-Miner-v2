@@ -132,7 +132,10 @@ class WebSocketsPool:
                         "balance"
                     ]["balance"]
                     logger.info(
-                        emoji.emojize(f":rocket:  +{earned} → {ws.streamers[streamer_index]} - Reason: {message_data['point_gain']['reason_code']}.", use_aliases=True)
+                        emoji.emojize(
+                            f":rocket:  +{earned} → {ws.streamers[streamer_index]} - Reason: {message_data['point_gain']['reason_code']}.",
+                            use_aliases=True,
+                        )
                     )
                 elif message_type == "claim-available":
                     streamer_index = get_streamer_index(
@@ -198,7 +201,10 @@ class WebSocketsPool:
                                     complete_bet_thread.start()
 
                                     logger.info(
-                                        emoji.emojize(f":alarm_clock:  Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}", use_aliases=True)
+                                        emoji.emojize(
+                                            f":alarm_clock:  Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}",
+                                            use_aliases=True,
+                                        )
                                     )
 
                 else:
@@ -215,7 +221,10 @@ class WebSocketsPool:
                     event_id = message_data["event"]["id"]
                     if event_id in ws.events_predictions:
                         logger.info(
-                            emoji.emojize(f":bar_chart:  {ws.events_predictions[event_id]} - Result: {message_data['event']['result']['type']}, Points won: {message_data['event']['result']['type'] if message_data['event']['result']['type'] else 0}", use_aliases=True)
+                            emoji.emojize(
+                                f":bar_chart:  {ws.events_predictions[event_id]} - Result: {message_data['event']['result']['type']}, Points won: {message_data['event']['result']['type'] if message_data['event']['result']['type'] else 0}",
+                                use_aliases=True,
+                            )
                         )
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
