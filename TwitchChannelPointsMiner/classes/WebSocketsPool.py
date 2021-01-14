@@ -220,13 +220,18 @@ class WebSocketsPool:
                     and message_data["event"]["result"]
                 ):
                     event_id = message_data["event"]["id"]
+                    event_result = message_data['event']['result']
                     if event_id in ws.events_predictions:
                         logger.info(
                             emoji.emojize(
-                                f":bar_chart:  {ws.events_predictions[event_id]} - Result: {message_data['event']['result']['type']}, Points won: {message_data['event']['result']['type'] if message_data['event']['result']['type'] else 0}",
+                                f":bar_chart:  {ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
                                 use_aliases=True,
                             )
                         )
+                        ws.events_predictions[event_id].final_result = {
+                            "type": event_result['type'],
+                            "won": event_result['points_won'] if event_result['points_won'] else 0
+                        }
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")

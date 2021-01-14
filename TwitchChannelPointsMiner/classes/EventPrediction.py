@@ -21,6 +21,7 @@ class EventPrediction:
         self.created_at = created_at
         self.prediction_window_seconds = prediction_window_seconds
         self.status = status
+        self.final_result = {}
 
         self.box_fillable = False
         self.bet_placed = False
@@ -34,3 +35,6 @@ class EventPrediction:
 
     def closing_bet_after(self, timestamp):
         return round(float(self.prediction_window_seconds - self.elapsed(timestamp)), 2)
+
+    def print_recap(self):
+        return f"{self} - {self.bet} - {self.final_result}"

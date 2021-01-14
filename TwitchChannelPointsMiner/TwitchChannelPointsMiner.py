@@ -201,6 +201,13 @@ class TwitchChannelPointsMiner:
                     use_aliases=True,
                 )
             )
+            for event_id in self.ws_pool.ws.events_predictions:
+                logger.info(
+                    emoji.emojize(
+                        f":bar_chart:  {self.ws_pool.ws.events_predictions[event_id].print_recap()}",
+                        use_aliases=True,
+                    )
+                )
             print("")
 
         for streamer_index in range(0, len(self.streamers)):
