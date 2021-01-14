@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 class Strategy(Enum):
     MOST_VOTED = auto()
-    HIGH_COTE = auto()
+    HIGH_ODDS = auto()
     SMART = auto()
 
 
@@ -43,10 +43,10 @@ class Bet:
                 float((100 * self.outcomes[1]["total_users"]) / self.total_users), 2
             )
 
-            self.outcomes[0]["cote"] = round(
+            self.outcomes[0]["odds"] = round(
                 float(self.total_points / self.outcomes[0]["total_points"]), 2
             )
-            self.outcomes[1]["cote"] = round(
+            self.outcomes[1]["odds"] = round(
                 float(self.total_points / self.outcomes[1]["total_points"]), 2
             )
 
@@ -62,7 +62,7 @@ class Bet:
                     "total_users",
                     "total_points",
                     "percentage_users",
-                    "cote",
+                    "odds",
                     "title",
                     "color",
                     "id",
@@ -85,9 +85,9 @@ class Bet:
                 if self.outcomes[0]["total_users"] > self.outcomes[1]["total_users"]
                 else "B"
             )
-        elif strategy == Strategy.HIGH_COTE:
+        elif strategy == Strategy.HIGH_ODDS:
             output["choice"] = (
-                "A" if self.outcomes[0]["cote"] > self.outcomes[1]["cote"] else "B"
+                "A" if self.outcomes[0]["odds"] > self.outcomes[1]["odds"] else "B"
             )
         elif strategy == Strategy.SMART:
             difference_percentage = (
@@ -104,7 +104,7 @@ class Bet:
             )
             if difference_percentage < percentage_gap:
                 output["choice"] = (
-                    "A" if self.outcomes[0]["cote"] > self.outcomes[1]["cote"] else "B"
+                    "A" if self.outcomes[0]["odds"] > self.outcomes[1]["odds"] else "B"
                 )
             else:
                 output["choice"] = (
