@@ -89,7 +89,7 @@ class TwitchBrowser:
         self.__init_twitch()
 
     def __init_twitch(self):
-        logger.info(
+        logger.debug(
             emoji.emojize(
                 ":wrench:  Init Twitch page - Cookie - LocalStorage items",
                 use_aliases=True,
@@ -133,7 +133,7 @@ class TwitchBrowser:
 
     # Private method __ - We can instantiate webdriver only with init_browser
     def __init_chrome(self):
-        logger.info(emoji.emojize(":wrench:  Init Chrome browser", use_aliases=True))
+        logger.debug(emoji.emojize(":wrench:  Init Chrome browser", use_aliases=True))
         options = webdriver.ChromeOptions()
         options.add_argument("--mute-audio")
         if not self.settings.show:
@@ -160,7 +160,7 @@ class TwitchBrowser:
 
     # Private method __ - We can instantiate webdriver only with init_browser
     def __init_firefox(self):
-        logger.info(emoji.emojize(":wrench:  Init Firefox browser", use_aliases=True))
+        logger.debug(emoji.emojize(":wrench:  Init Firefox browser", use_aliases=True))
         options = webdriver.FirefoxOptions()
         if not self.settings.show:
             options.headless = True

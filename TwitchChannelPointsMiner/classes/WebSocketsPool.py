@@ -163,84 +163,89 @@ class WebSocketsPool:
                     ws.twitch.update_raid(ws.streamers[streamer_index], raid)
 
             elif topic == "predictions-channel-v1":
-                streamer_index = get_streamer_index(
-                    ws.streamers, topic_user
-                )  # message_data["event"]["channel_id"]
+                try:
+                    # message_data["event"]["channel_id"]
+                    streamer_index = get_streamer_index(ws.streamers, topic_user)
 
-                event_dict = message_data["event"]
-                event_id = event_dict["id"]
-                event_status = event_dict["status"]
+                    event_dict = message_data["event"]
+                    event_id = event_dict["id"]
+                    event_status = event_dict["status"]
 
-                current_timestamp = parser.parse(message_data["timestamp"])
+                    current_timestamp = parser.parse(message_data["timestamp"])
 
-                if event_id not in ws.events_predictions:
-                    if event_status == "ACTIVE":
-                        prediction_window_seconds = (
-                            float(event_dict["prediction_window_seconds"]) - 20
-                        )
-                        event = EventPrediction(
-                            ws.streamers[streamer_index],
-                            event_id,
-                            event_dict["title"],
-                            parser.parse(event_dict["created_at"]),
-                            prediction_window_seconds,
-                            event_status,
-                            event_dict["outcomes"],
-                            bet_settings=ws.bet_settings,
-                        )
-                        if event.closing_bet_after(current_timestamp) > 0:
-                            ws.events_predictions[event_id] = event
-                            if ws.twitch_browser.currently_is_betting is False:
-                                if ws.twitch_browser.start_bet(
-                                    ws.events_predictions[event_id]
-                                ):
-                                    # place_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                    place_bet_thread = threading.Timer(
-                                        event.closing_bet_after(current_timestamp),
-                                        ws.twitch_browser.place_bet,
-                                        (ws.events_predictions[event_id],),
-                                    )
-                                    place_bet_thread.daemon = True
-                                    place_bet_thread.start()
-
-                                    logger.info(
-                                        emoji.emojize(
-                                            f":alarm_clock:  Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}",
-                                            use_aliases=True,
+                    if event_id not in ws.events_predictions:
+                        if event_status == "ACTIVE":
+                            prediction_window_seconds = (
+                                float(event_dict["prediction_window_seconds"]) - 20
+                            )
+                            event = EventPrediction(
+                                ws.streamers[streamer_index],
+                                event_id,
+                                event_dict["title"],
+                                parser.parse(event_dict["created_at"]),
+                                prediction_window_seconds,
+                                event_status,
+                                event_dict["outcomes"],
+                                bet_settings=ws.bet_settings,
+                            )
+                            if event.closing_bet_after(current_timestamp) > 0:
+                                ws.events_predictions[event_id] = event
+                                if ws.twitch_browser.currently_is_betting is False:
+                                    if ws.twitch_browser.start_bet(
+                                        ws.events_predictions[event_id]
+                                    ):
+                                        # place_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
+                                        place_bet_thread = threading.Timer(
+                                            event.closing_bet_after(current_timestamp),
+                                            ws.twitch_browser.place_bet,
+                                            (ws.events_predictions[event_id],),
                                         )
-                                    )
+                                        place_bet_thread.daemon = True
+                                        place_bet_thread.start()
 
-                else:
-                    ws.events_predictions[event_id].status = event_status
-                    # Game over we can't update anymore the values... The bet was placed!
-                    if (
-                        ws.events_predictions[event_id].bet_placed is False
-                        and ws.events_predictions[event_id].bet.decision is None
-                    ):
-                        ws.events_predictions[event_id].bet.update_outcomes(
-                            event_dict["outcomes"]
-                        )
+                                        logger.info(
+                                            emoji.emojize(
+                                                f":alarm_clock:  Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}",
+                                                use_aliases=True,
+                                            )
+                                        )
+
+                    else:
+                        ws.events_predictions[event_id].status = event_status
+                        # Game over we can't update anymore the values... The bet was placed!
+                        if (
+                            ws.events_predictions[event_id].bet_placed is False
+                            and ws.events_predictions[event_id].bet.decision is None
+                        ):
+                            ws.events_predictions[event_id].bet.update_outcomes(
+                                event_dict["outcomes"]
+                            )
+                except Exception:
+                    logger.error(f"Exception raised for topic {topic}", exc_info=True)
 
             elif topic == "predictions-user-v1":
-                if (
-                    message_type == "prediction-result"
-                    and message_data["event"]["result"]
-                ):
-                    event_id = message_data["event"]["id"]
-                    event_result = message_data["event"]["result"]
-                    if event_id in ws.events_predictions:
-                        logger.info(
-                            emoji.emojize(
-                                f":bar_chart:  {ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
-                                use_aliases=True,
+                try:
+                    if (
+                        message_type == "prediction-result"
+                        and message_data["event"]["result"]
+                    ):
+                        event_id = message_data["event"]["id"]
+                        event_result = message_data["event"]["result"]
+                        if event_id in ws.events_predictions:
+                            logger.info(
+                                emoji.emojize(
+                                    f":bar_chart:  {ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
+                                    use_aliases=True,
+                                )
                             )
-                        )
-                        ws.events_predictions[event_id].final_result = {
-                            "type": event_result["type"],
-                            "won": event_result["points_won"]
-                            if event_result["points_won"]
-                            else 0,
-                        }
+                            ws.events_predictions[event_id].final_result = {
+                                "type": event_result["type"],
+                                "won": event_result["points_won"]
+                                if event_result["points_won"]
+                                else 0,
+                            }
+                except Exception:
+                    logger.error(f"Exception raised for topic {topic}", exc_info=True)
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")

@@ -202,7 +202,12 @@ class Twitch:
                 except requests.exceptions.ConnectionError as e:
                     logger.error(f"Error while trying to watch a minute: {e}")
 
-                time.sleep(max(next_iteration - time.time(), 0))
+                # Create chunk of sleep of speed-up the break loop after CTRL+C
+                sleep_time = max(next_iteration - time.time(), 0) / 3
+                for i in range(0, 3):
+                    time.sleep(sleep_time)
+                    if self.running is False:
+                        break
 
             if not streamers_watching:
                 time.sleep(60)

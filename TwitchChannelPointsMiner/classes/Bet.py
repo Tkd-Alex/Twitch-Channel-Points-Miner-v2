@@ -1,4 +1,5 @@
 import logging
+import copy
 
 from enum import Enum, auto
 
@@ -76,7 +77,8 @@ class Bet:
 
     def __clear_outcomes(self):
         for index in range(0, len(self.outcomes)):
-            for key in self.outcomes[index]:
+            keys = copy.deepcopy(list(self.outcomes[index].keys()))
+            for key in keys:
                 if key not in [
                     "total_users",
                     "total_points",

@@ -6,6 +6,7 @@ import time
 import os
 import uuid
 import copy
+import random
 import emoji
 
 from datetime import datetime
@@ -23,11 +24,12 @@ from TwitchChannelPointsMiner.classes.TwitchBrowser import (
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 
 # Suppress warning for urllib3.connectionpool (selenium close connection)
+# Suppress also the selenium logger please
 logging.getLogger("urllib3").setLevel(logging.ERROR)
+logging.getLogger("selenium").setLevel(logging.ERROR)
 
-logging_format = "%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s"
 logging.basicConfig(
-    format=logging_format,
+    format="%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s",
     datefmt="%d/%m/%y %H:%M:%S",
     level=logging.INFO,
 )
@@ -67,15 +69,15 @@ class TwitchChannelPointsMiner:
 
             logs_path = os.path.join(Path().absolute(), "logs")
             Path(logs_path).mkdir(parents=True, exist_ok=True)
-            file_handler = logging.FileHandler(
-                os.path.join(
-                    logs_path,
-                    f"{username}.{datetime.now().strftime('%d-%m-%Y-%H:%M:%S')}.log",
-                )
+            self.logs_file = os.path.join(
+                logs_path,
+                f"{username}.{datetime.now().strftime('%d-%m-%Y-%H:%M:%S')}.log",
             )
-            formatter = logging.Formatter(logging_format)
-            file_handler.setFormatter(formatter)
+            file_handler = logging.FileHandler(self.logs_file)
+            file_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s"))
             root_logger.addHandler(file_handler)
+        else:
+            self.logs_file = None
 
         signal.signal(signal.SIGINT, self.end)
         signal.signal(signal.SIGSEGV, self.end)
@@ -90,7 +92,7 @@ class TwitchChannelPointsMiner:
         else:
             logger.info(
                 emoji.emojize(
-                    f":bomb:  Start session: {self.session_id}", use_aliases=True
+                    f":bomb:  Start session: '{self.session_id}'", use_aliases=True
                 )
             )
             self.running = True
@@ -99,6 +101,7 @@ class TwitchChannelPointsMiner:
             self.twitch.login()
 
             for streamer_username in streamers:
+                time.sleep(random.uniform(0.3, 0.7))
                 streamer_username.lower().strip()
                 try:
                     channel_id = self.twitch.get_channel_id(streamer_username)
@@ -113,6 +116,7 @@ class TwitchChannelPointsMiner:
                     )
 
             for streamer in self.streamers:
+                time.sleep(random.uniform(0.3, 0.7))
                 self.twitch.load_channel_points_context(streamer)
                 self.twitch.check_streamer_online(streamer)
             self.original_streamers = copy.deepcopy(self.streamers)
@@ -187,7 +191,7 @@ class TwitchChannelPointsMiner:
         print("\n")
         logger.info(
             emoji.emojize(
-                f":stop_sign:  End session '{self.session_id}'", use_aliases=True
+                f":stop_sign:  End session '{self.session_id}' - Logs file: {self.logs_file}", use_aliases=True
             )
         )
         logger.info(
@@ -228,4 +232,4 @@ class TwitchChannelPointsMiner:
                         use_aliases=True,
                     )
                 )
-                print("")
+                # print("")
