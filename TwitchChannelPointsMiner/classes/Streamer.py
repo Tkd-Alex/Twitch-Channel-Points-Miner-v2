@@ -17,9 +17,9 @@ class Streamer:
         self.online_at = 0
         self.offline_at = 0
         self.channel_points = 0
-        self.bonus_claimed = 0
         self.minute_watched_requests = None
         self.raid = None
+        self.history = {}
 
         self.streamer_url = f"https://www.twitch.tv/{self.username}"
         self.chat_url = f"https://www.twitch.tv/popout/{self.username}/chat?popout="
@@ -38,3 +38,12 @@ class Streamer:
         logger.info(
             emoji.emojize(f":partying_face:  {self} is Online!", use_aliases=True)
         )
+
+    def print_history(self):
+        return ", ".join([f"{key}({self.history[key]['counter']} times, {self.history[key]['amount']})" for key in self.history])
+
+    def update_history(self, reason_code, earned):
+        if reason_code not in self.history:
+            self.history[reason_code] = {'counter': 0, 'amount': 0}
+        self.history[reason_code]['counter'] += 1
+        self.history[reason_code]['amount'] += earned

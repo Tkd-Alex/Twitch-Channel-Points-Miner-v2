@@ -130,15 +130,16 @@ class WebSocketsPool:
                         ws.streamers, message_data["channel_id"]
                     )
                     earned = message_data["point_gain"]["total_points"]
-                    ws.streamers[streamer_index].channel_points = message_data[
-                        "balance"
-                    ]["balance"]
+                    reason_code = message_data['point_gain']['reason_code']
+                    balance = message_data["balance"]["balance"]
+                    ws.streamers[streamer_index].channel_points = balance
                     logger.info(
                         emoji.emojize(
-                            f":rocket:  +{earned} → {ws.streamers[streamer_index]} - Reason: {message_data['point_gain']['reason_code']}.",
+                            f":rocket:  +{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
                             use_aliases=True,
                         )
                     )
+                    ws.streamers[streamer_index].update_history(reason_code, earned)
                 elif message_type == "claim-available":
                     streamer_index = get_streamer_index(
                         ws.streamers, message_data["claim"]["channel_id"]

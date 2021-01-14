@@ -19,11 +19,10 @@ from TwitchChannelPointsMiner.classes.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.TwitchBrowser import TwitchBrowser, BrowserSettings
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 
-logging.getLogger("urllib3").setLevel(
-    logging.ERROR
-)  # Suppress warning for urllib3.connectionpool (selenium close connection)
+# Suppress warning for urllib3.connectionpool (selenium close connection)
+logging.getLogger("urllib3").setLevel(logging.ERROR)
 
-logging_format = "%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s"
+logging_format = "%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s"
 logging.basicConfig(
     format=logging_format,
     datefmt="%d/%m/%y %H:%M:%S",
@@ -198,7 +197,7 @@ class TwitchChannelPointsMiner:
         if self.make_predictions:
             logger.info(
                 emoji.emojize(
-                    f":bar_chart:  Bet settings: Strategy={self.bet_settings.strategy}, Percentage={self.bet_settings.percentage}, Percentage Gap={self.bet_settings.percentage_gap}, Max points={self.bet_settings.max_points}",
+                    f":bar_chart:  {self.bet_settings}",
                     use_aliases=True,
                 )
             )
@@ -207,7 +206,10 @@ class TwitchChannelPointsMiner:
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
                 emoji.emojize(
-                    f":movie_camera:  {self.streamers[streamer_index]} - Gained: {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}, Bonus claimed: {self.streamers[streamer_index].bonus_claimed}",
+                    f":nerd_face:  {self.streamers[streamer_index]} - Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
                     use_aliases=True,
                 )
             )
+            if self.streamers[streamer_index] != {}:
+                logger.info(f"{self.streamers[streamer_index].print_history()}")
+                print("")

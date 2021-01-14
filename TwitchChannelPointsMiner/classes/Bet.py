@@ -18,6 +18,9 @@ class BetSettings:
         self.percentage_gap = percentage_gap
         self.max_points = max_points
 
+    def __repr__(self):
+        return f"BetSettings(Strategy={self.strategy}, Percentage={self.percentage}, PercentageGap={self.percentage_gap}, MaxPoints={self.max_points}"
+
 
 class Bet:
     def __init__(self, outcomes: list, settings: BetSettings):
