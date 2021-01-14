@@ -107,6 +107,7 @@ class TwitchBrowser:
             window.localStorage.setItem("twilight.theme", 1);
             window.localStorage.setItem("mature", true);
             window.localStorage.setItem("rebrand-notice-dismissed", true);
+            window.localStorage.setItem("emoteAnimationsEnabled", false);
         """
         )
         time.sleep(1.5)

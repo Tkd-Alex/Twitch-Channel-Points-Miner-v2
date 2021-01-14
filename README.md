@@ -36,7 +36,7 @@ twitch_miner = TwitchChannelPointsMiner(
         show=False,  # Show the browser during bet
         do_screenshot=False,  # Do screenshot during the bet
     ),
-    bet_strategy=BetSettings(
+    bet_settings=BetSettings(
         strategy=Strategy.SMART,  # Choose you strategy!
         percentage=5,  # Place the x% of your channel points
         percentage_gap=20,  # Gap difference between outcomesA and outcomesB (for SMART stragegy)

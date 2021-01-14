@@ -123,7 +123,7 @@ class TwitchChannelPointsMiner:
                     self.session_id,
                     settings=self.browser_settings
                 )
-                self.twitch_browser.init(show=self.show_browser, browser=self.browser)
+                self.twitch_browser.init()
 
             self.minute_watcher_thread = threading.Thread(
                 target=self.twitch.send_minute_watched_events, args=(self.streamers,)
@@ -198,7 +198,7 @@ class TwitchChannelPointsMiner:
         if self.make_predictions:
             logger.info(
                 emoji.emojize(
-                    f":bar_chart:  Bet settings: Strategy={self.bet_strategy}, Percentage={self.bet_percentage}, Percentage Gap={self.bet_percentage_gap}, Max points={self.bet_max_points}",
+                    f":bar_chart:  Bet settings: Strategy={self.bet_settings.strategy}, Percentage={self.bet_settings.percentage}, Percentage Gap={self.bet_settings.percentage_gap}, Max points={self.bet_settings.max_points}",
                     use_aliases=True,
                 )
             )
