@@ -11,12 +11,22 @@ class Strategy(Enum):
     SMART = auto()
 
 
+class BetSettings:
+    def __init__(self, strategy: Strategy = Strategy.SMAR, percentage: int = 5, percentage_gap: int = 2, max_points: int = 50000):
+        self.strategy = strategy
+        self.percentage = percentage
+        self.percentage_gap = percentage_gap
+        self.max_points = max_points
+
+
 class Bet:
-    def __init__(self, outcomes):
+    def __init__(self, outcomes: list, settings: BetSettings):
         self.outcomes = outcomes
         self.__clear_outcomes()
+        self.decision = None
         self.total_users = 0
         self.total_points = 0
+        self.settings = settings
 
     def update_outcomes(self, outcomes):
         self.outcomes[0]["total_users"] = int(outcomes[0]["total_users"])
@@ -71,53 +81,36 @@ class Bet:
 
     def calculate(
         self,
-        balance: int,
-        strategy: Strategy = Strategy.SMART,
-        percentage=5,
-        percentage_gap=20,
-        max_points=50000,
+        balance: int
     ):
-        output = {"choice": "", "amount": 0, "id": None}
-
-        if strategy == Strategy.MOST_VOTED:
-            output["choice"] = (
+        self.decision = {"choice": "", "amount": 0, "id": None}
+        if self.settings.strategy == Strategy.MOST_VOTED:
+            self.decision["choice"] = (
                 "A"
                 if self.outcomes[0]["total_users"] > self.outcomes[1]["total_users"]
                 else "B"
             )
-        elif strategy == Strategy.HIGH_ODDS:
-            output["choice"] = (
+        elif self.settings.strategy == Strategy.HIGH_ODDS:
+            self.decision["choice"] = (
                 "A" if self.outcomes[0]["odds"] > self.outcomes[1]["odds"] else "B"
             )
-        elif strategy == Strategy.SMART:
-            difference_percentage = (
-                (
-                    self.outcomes[0]["percentage_users"]
-                    - self.outcomes[1]["percentage_users"]
-                )
-                if self.outcomes[0]["percentage_users"]
-                > self.outcomes[1]["percentage_users"]
-                else (
-                    self.outcomes[1]["percentage_users"]
-                    - self.outcomes[0]["percentage_users"]
-                )
-            )
-            if difference_percentage < percentage_gap:
-                output["choice"] = (
+        elif self.settings.strategy == Strategy.SMART:
+            if abs(self.outcomes[0]["percentage_users"] - self.outcomes[1]["percentage_users"]) < self.settings.percentage_gap:
+                self.decision["choice"] = (
                     "A" if self.outcomes[0]["odds"] > self.outcomes[1]["odds"] else "B"
                 )
             else:
-                output["choice"] = (
+                self.decision["choice"] = (
                     "A"
                     if self.outcomes[0]["total_users"] > self.outcomes[1]["total_users"]
                     else "B"
                 )  # Follow other users
 
-        if output["choice"]:
-            output["id"] = (
+        if self.decision["choice"]:
+            self.decision["id"] = (
                 self.outcomes[0]["id"]
-                if output["choice"] == "A"
+                if self.decision["choice"] == "A"
                 else self.outcomes[1]["id"]
             )
-            output["amount"] = min(round(balance * (percentage / 100)), max_points)
-        return output
+            self.decision["amount"] = min(round(balance * (self.settings.percentage / 100)), self.settings.max_points)
+        return self.decision

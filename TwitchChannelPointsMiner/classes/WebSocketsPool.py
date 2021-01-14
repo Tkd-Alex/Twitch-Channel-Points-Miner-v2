@@ -19,11 +19,12 @@ def get_streamer_index(streamers, channel_id):
 
 # You can't listen for more than 50 topics at once
 class WebSocketsPool:
-    def __init__(self, twitch, twitch_browser, streamers):
+    def __init__(self, twitch, twitch_browser, streamers, bet_settings):
         self.ws = None
         self.twitch = twitch
         self.twitch_browser = twitch_browser
         self.streamers = streamers
+        self.bet_settings = bet_settings
 
     def submit(self, topic):
         if self.ws is None or len(self.ws.topics) >= 50:
@@ -53,6 +54,7 @@ class WebSocketsPool:
         self.ws.twitch = self.twitch
         self.ws.twitch_browser = self.twitch_browser
         self.ws.streamers = self.streamers
+        self.ws.bet_settings = self.bet_settings
         self.ws.events_predictions = {}
 
         self.ws.last_message_time = 0
@@ -164,26 +166,24 @@ class WebSocketsPool:
                     ws.streamers, topic_user
                 )  # message_data["event"]["channel_id"]
 
-                event_id = message_data["event"]["id"]
-                event_status = message_data["event"]["status"]
+                event_dict = message_data["event"]
+                event_id = event_dict["id"]
+                event_status = event_dict["status"]
 
                 current_timestamp = parser.parse(message_data["timestamp"])
 
                 if event_id not in ws.events_predictions:
                     if event_status == "ACTIVE":
+                        prediction_window_seconds = (float(event_dict["prediction_window_seconds"]) - 20)
                         event = EventPrediction(
                             ws.streamers[streamer_index],
                             event_id,
-                            message_data["event"]["title"],
-                            parser.parse(message_data["event"]["created_at"]),
-                            (
-                                float(
-                                    message_data["event"]["prediction_window_seconds"]
-                                )
-                                - 20
-                            ),
+                            event_dict["title"],
+                            parser.parse(event_dict["created_at"]),
+                            prediction_window_seconds,
                             event_status,
-                            message_data["event"]["outcomes"],
+                            event_dict["outcomes"],
+                            bet_settings=ws.bet_settings
                         )
                         if event.closing_bet_after(current_timestamp) > 0:
                             ws.events_predictions[event_id] = event
@@ -191,14 +191,14 @@ class WebSocketsPool:
                                 if ws.twitch_browser.start_bet(
                                     ws.events_predictions[event_id]
                                 ):
-                                    # complete_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                    complete_bet_thread = threading.Timer(
+                                    # place_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
+                                    place_bet_thread = threading.Timer(
                                         event.closing_bet_after(current_timestamp),
-                                        ws.twitch_browser.complete_bet,
+                                        ws.twitch_browser.place_bet,
                                         (ws.events_predictions[event_id],),
                                     )
-                                    complete_bet_thread.daemon = True
-                                    complete_bet_thread.start()
+                                    place_bet_thread.daemon = True
+                                    place_bet_thread.start()
 
                                     logger.info(
                                         emoji.emojize(
@@ -209,9 +209,9 @@ class WebSocketsPool:
 
                 else:
                     ws.events_predictions[event_id].status = event_status
-                    ws.events_predictions[event_id].bet.update_outcomes(
-                        message_data["event"]["outcomes"]
-                    )
+                    # Game over we can't update anymore the values... The bet was placed!
+                    if ws.events_predictions[event_id].bet_placed is False and ws.events_predictions[event_id].bet.decision is None:
+                        ws.events_predictions[event_id].bet.update_outcomes(event_dict["outcomes"])
 
             elif topic == "predictions-user-v1":
                 if (

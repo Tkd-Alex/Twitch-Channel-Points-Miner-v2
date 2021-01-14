@@ -1,4 +1,4 @@
-from TwitchChannelPointsMiner.classes.Bet import Bet
+from TwitchChannelPointsMiner.classes.Bet import Bet, BetSettings
 from TwitchChannelPointsMiner.classes.Streamer import Streamer
 
 
@@ -12,6 +12,7 @@ class EventPrediction:
         prediction_window_seconds,
         status,
         outcomes,
+        bet_settings: BetSettings = BetSettings()
     ):
         self.streamer = streamer
 
@@ -22,7 +23,8 @@ class EventPrediction:
         self.status = status
 
         self.box_fillable = False
-        self.bet = Bet(outcomes)
+        self.bet_placed = False
+        self.bet = Bet(outcomes, bet_settings)
 
     def __repr__(self):
         return f"EventPrediction(event_id={self.event_id}, title={self.title})"

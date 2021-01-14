@@ -15,8 +15,8 @@ from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.Streamer import Streamer
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
-from TwitchChannelPointsMiner.classes.Bet import Strategy
-from TwitchChannelPointsMiner.classes.TwitchBrowser import TwitchBrowser, Browser
+from TwitchChannelPointsMiner.classes.Bet import BetSettings
+from TwitchChannelPointsMiner.classes.TwitchBrowser import TwitchBrowser, BrowserSettings
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 
 logging.getLogger("urllib3").setLevel(
@@ -39,30 +39,20 @@ class TwitchChannelPointsMiner:
         make_predictions: bool = True,
         follow_raid: bool = True,
         save_logs: bool = True,
-        browser: Browser = Browser.FIREFOX,
-        show_browser: bool = False,
-        do_browser_screenshot: bool = False,
-        bet_strategy: Strategy = Strategy.SMART,
-        bet_percentage: int = 5,
-        bet_percentage_gap: int = 20,
-        bet_max_points: int = 50000,
+        browser_settings: BrowserSettings = BrowserSettings(),
+        bet_settings: BetSettings = BetSettings()
     ):
         self.twitch = Twitch(username)
-        self.twitch_browser = False
+        self.twitch_browser = None
         self.follow_raid = follow_raid
         self.streamers = []
         self.minute_watcher_thread = None
         self.ws_pool = None
 
         self.make_predictions = make_predictions
-        self.browser = browser
-        self.show_browser = show_browser
-        self.do_browser_screenshot = do_browser_screenshot
 
-        self.bet_strategy = bet_strategy
-        self.bet_percentage = bet_percentage
-        self.bet_percentage_gap = bet_percentage_gap
-        self.bet_max_points = bet_max_points
+        self.browser_settings = browser_settings
+        self.bet_settings = bet_settings
 
         self.session_id = str(uuid.uuid4())
         self.running = False
@@ -131,11 +121,7 @@ class TwitchChannelPointsMiner:
                 self.twitch_browser = TwitchBrowser(
                     self.twitch.twitch_login.get_auth_token(),
                     self.session_id,
-                    bet_strategy=self.bet_strategy,
-                    bet_percentage=self.bet_percentage,
-                    bet_percentage_gap=self.bet_percentage_gap,
-                    bet_max_points=self.bet_max_points,
-                    do_screenshot=self.do_browser_screenshot,
+                    settings=self.browser_settings
                 )
                 self.twitch_browser.init(show=self.show_browser, browser=self.browser)
 
@@ -149,6 +135,7 @@ class TwitchChannelPointsMiner:
                 twitch=self.twitch,
                 twitch_browser=self.twitch_browser,
                 streamers=self.streamers,
+                bet_settings=self.bet_settings
             )
             topics = [
                 PubsubTopic(

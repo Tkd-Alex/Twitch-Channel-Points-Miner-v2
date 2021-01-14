@@ -39,34 +39,33 @@ class Browser(Enum):
     FIREFOX = auto()
 
 
+class BrowserSettings:
+    def __init__(self, timeout: float = 5.0, do_screenshot: bool = False, show: bool = True, browser: Browser = Browser.FIREFOX):
+        self.timeout = timeout
+        self.do_screenshot = do_screenshot
+        self.show = show
+        self.browser = browser
+
+
 class TwitchBrowser:
     def __init__(
         self,
         auth_token: str,
         session_id: str,
-        timeout: float = 5.0,
-        bet_strategy: Strategy = Strategy.SMART,
-        bet_percentage: int = 5,
-        bet_percentage_gap: int = 20,
-        bet_max_points: int = 50000,
-        do_screenshot: bool = False,
+        settings: BrowserSettings = BrowserSettings()
     ):
         self.auth_token = auth_token
         self.session_id = session_id
-        self.timeout = timeout
+        self.settings = settings
+
         self.currently_is_betting = False
         self.browser = None
-        self.do_screenshot = do_screenshot
-        self.bet_strategy = bet_strategy
-        self.bet_percentage = bet_percentage
-        self.bet_percentage_gap = bet_percentage_gap
-        self.bet_max_points = bet_max_points
 
-    def init(self, show: bool = True, browser: Browser = Browser.FIREFOX):
-        if browser == Browser.FIREFOX:
-            self.__init_firefox(show)
-        elif browser == Browser.CHROME:
-            self.__init_chrome(show)
+    def init(self):
+        if self.settings.browser == Browser.FIREFOX:
+            self.__init_firefox()
+        elif self.settings.browser == Browser.CHROME:
+            self.__init_chrome()
 
         if self.browser is not None:
             self.browser.set_window_size(250, 900)
@@ -117,11 +116,11 @@ class TwitchBrowser:
         self.browser.get("about:blank")
 
     # Private method __ - We can instantiate webdriver only with init_browser
-    def __init_chrome(self, show):
+    def __init_chrome(self):
         logger.info(emoji.emojize(":wrench:  Init Chrome browser", use_aliases=True))
         options = webdriver.ChromeOptions()
         options.add_argument("--mute-audio")
-        if not show:
+        if not self.settings.show:
             options.add_argument("headless")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-accelerated-2d-canvas")
@@ -134,10 +133,10 @@ class TwitchBrowser:
         self.browser = webdriver.Chrome(options=options)
 
     # Private method __ - We can instantiate webdriver only with init_browser
-    def __init_firefox(self, show):
+    def __init_firefox(self):
         logger.info(emoji.emojize(":wrench:  Init Firefox browser", use_aliases=True))
         options = webdriver.FirefoxOptions()
-        if not show:
+        if not self.settings.show:
             options.headless = True
 
         fp = webdriver.FirefoxProfile()
@@ -191,7 +190,7 @@ class TwitchBrowser:
 
     def __click_when_exist(self, selector, by: By = By.CSS_SELECTOR):
         try:
-            element = WebDriverWait(self.browser, self.timeout).until(
+            element = WebDriverWait(self.browser, self.settings.timeout).until(
                 expected_conditions.element_to_be_clickable((by, selector))
             )
             ActionChains(self.browser).move_to_element(element).click().perform()
@@ -203,10 +202,10 @@ class TwitchBrowser:
 
     def __send_text(self, selector, text, by: By = By.CSS_SELECTOR):
         try:
-            element = WebDriverWait(self.browser, self.timeout).until(
+            element = WebDriverWait(self.browser, self.settings.timeout).until(
                 expected_conditions.element_to_be_clickable((By.XPATH, selector))
             )
-            ActionChains(self.browser, self.timeout).move_to_element(
+            ActionChains(self.browser, self.settings.timeout).move_to_element(
                 element
             ).click().send_keys(text).perform()
             return element
@@ -234,7 +233,7 @@ class TwitchBrowser:
             self.__enable_custom_bet_value(event)
             return self.currently_is_betting
 
-    def complete_bet(self, event: EventPrediction):
+    def place_bet(self, event: EventPrediction):
         logger.info(
             emoji.emojize(
                 f":wrench:  Going to complete bet for event {event}. Current url page: {self.browser.current_url}",
@@ -242,13 +241,7 @@ class TwitchBrowser:
             )
         )
         if event.box_fillable and self.currently_is_betting:
-            decision = event.bet.calculate(
-                event.streamer.channel_points,
-                self.bet_strategy,
-                self.bet_percentage,
-                self.bet_percentage_gap,
-                self.bet_max_points,
-            )
+            decision = event.bet.calculate(event.streamer.channel_points)
             if decision["choice"]:
                 selector_index = "[1]" if decision["choice"] == "A" else "[2]"
 
@@ -275,7 +268,7 @@ class TwitchBrowser:
                         self.screenshot(f"{event.event_id}___click_on_vote.png")
 
                     time.sleep(random.uniform(15, 25))
-                    event.bet_completed = True
+                    event.bet_placed = True
 
                     self.browser.get("about:blank")
                     self.currently_is_betting = False
