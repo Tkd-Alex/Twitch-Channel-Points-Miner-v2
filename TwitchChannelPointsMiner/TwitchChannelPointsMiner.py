@@ -71,7 +71,7 @@ class TwitchChannelPointsMiner:
             Path(logs_path).mkdir(parents=True, exist_ok=True)
             self.logs_file = os.path.join(
                 logs_path,
-                f"{username}.{datetime.now().strftime('%d-%m-%Y-%H:%M:%S')}.log",
+                f"{username}.{datetime.now().strftime('%d%m%Y-%H%M%S')}.log",
             )
             file_handler = logging.FileHandler(self.logs_file)
             file_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s"))
