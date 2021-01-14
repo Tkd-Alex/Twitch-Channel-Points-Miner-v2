@@ -12,7 +12,7 @@ class Strategy(Enum):
 
 
 class BetSettings:
-    def __init__(self, strategy: Strategy = Strategy.SMAR, percentage: int = 5, percentage_gap: int = 2, max_points: int = 50000):
+    def __init__(self, strategy: Strategy = Strategy.SMART, percentage: int = 5, percentage_gap: int = 2, max_points: int = 50000):
         self.strategy = strategy
         self.percentage = percentage
         self.percentage_gap = percentage_gap
