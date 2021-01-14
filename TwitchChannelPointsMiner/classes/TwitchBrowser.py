@@ -183,36 +183,42 @@ class TwitchBrowser:
             parents=True, exist_ok=True
         )
 
-        fname = f"{fname}.png" if not fname.endswith(".png") else fname
+        fname = f"{fname}.png" if fname.endswith(".png") is False else fname
         fname = os.path.join(screenshots_path, self.session_id, fname)
+        # Little pause prevent effect/css animations in browser delayed
+        time.sleep(0.2)
         self.browser.save_screenshot(fname)
 
-        if write_timestamp is True:
-            image = Image.open(fname)
-            draw = ImageDraw.Draw(image)
+        try:
+            if write_timestamp is True:
+                time.sleep(0.5)
+                image = Image.open(fname)
+                draw = ImageDraw.Draw(image)
 
-            font = ImageFont.truetype(
-                os.path.join(Path().absolute(), "Roboto-Bold.ttf"), size=35
-            )
-            (x, y) = (15, image.height // 3)
-            datetime_text = datetime.now().strftime("%d/%m %H:%M:%S.%f")
+                font = ImageFont.truetype(
+                    os.path.join(Path().absolute(), "Roboto-Bold.ttf"), size=35
+                )
+                (x, y) = (15, image.height // 3)
+                datetime_text = datetime.now().strftime("%d/%m %H:%M:%S.%f")
 
-            shadowcolor = "rgb(0, 0, 0)"  # black color
-            # Thin border
-            draw.text((x - 1, y), datetime_text, font=font, fill=shadowcolor)
-            draw.text((x + 1, y), datetime_text, font=font, fill=shadowcolor)
-            draw.text((x, y - 1), datetime_text, font=font, fill=shadowcolor)
-            draw.text((x, y + 1), datetime_text, font=font, fill=shadowcolor)
+                shadowcolor = "rgb(0, 0, 0)"  # black color
+                # Thin border
+                draw.text((x - 1, y), datetime_text, font=font, fill=shadowcolor)
+                draw.text((x + 1, y), datetime_text, font=font, fill=shadowcolor)
+                draw.text((x, y - 1), datetime_text, font=font, fill=shadowcolor)
+                draw.text((x, y + 1), datetime_text, font=font, fill=shadowcolor)
 
-            # Thicker border
-            draw.text((x - 1, y - 1), datetime_text, font=font, fill=shadowcolor)
-            draw.text((x + 1, y - 1), datetime_text, font=font, fill=shadowcolor)
-            draw.text((x - 1, y + 1), datetime_text, font=font, fill=shadowcolor)
-            draw.text((x + 1, y + 1), datetime_text, font=font, fill=shadowcolor)
+                # Thicker border
+                draw.text((x - 1, y - 1), datetime_text, font=font, fill=shadowcolor)
+                draw.text((x + 1, y - 1), datetime_text, font=font, fill=shadowcolor)
+                draw.text((x - 1, y + 1), datetime_text, font=font, fill=shadowcolor)
+                draw.text((x + 1, y + 1), datetime_text, font=font, fill=shadowcolor)
 
-            color = "rgb(255, 255, 255)"  # white color
-            draw.text((x, y), datetime_text, font=font, fill=color)
-            image.save(fname, optimize=True, quality=20)
+                color = "rgb(255, 255, 255)"  # white color
+                draw.text((x, y), datetime_text, font=font, fill=color)
+                image.save(fname, optimize=True, quality=20)
+        except Exception:
+            logger.error(f"Exception raised during screenshot file {fname}", exc_info=True)
 
     def __click_when_exist(self, selector, by: By = By.CSS_SELECTOR):
         try:
@@ -283,14 +289,14 @@ class TwitchBrowser:
                         decision["amount"],
                         By.XPATH,
                     )
-                    if self.do_screenshot:
+                    if self.settings.do_screenshot:
                         self.screenshot(f"{event.event_id}___send_text.png")
 
                     logger.info("Going to place the bet")
                     self.__click_when_exist(
                         streamBetVoteButton + selector_index, By.XPATH
                     )
-                    if self.do_screenshot:
+                    if self.settings.do_screenshot:
                         self.screenshot(f"{event.event_id}___click_on_vote.png")
 
                     time.sleep(random.uniform(15, 25))
@@ -318,8 +324,8 @@ class TwitchBrowser:
         )
         self.__click_when_exist(streamCoinsMenu, By.XPATH)
         time.sleep(random.uniform(0.05, 0.1))
-        if self.do_screenshot:
-            self.screenshot(f"{event.event_id}___open_coins_menu.png".format)
+        if self.settings.do_screenshot:
+            self.screenshot(f"{event.event_id}___open_coins_menu.png")
 
     def __click_on_bet(self, event):
         logger.info(
@@ -329,8 +335,8 @@ class TwitchBrowser:
         )
         self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR)
         time.sleep(random.uniform(0.05, 0.1))
-        if self.do_screenshot:
-            self.screenshot(f"{event.event_id}___click_on_bet.png".format)
+        if self.settings.do_screenshot:
+            self.screenshot(f"{event.event_id}___click_on_bet.png")
 
     def __enable_custom_bet_value(self, event):
         logger.info(
@@ -341,9 +347,9 @@ class TwitchBrowser:
         )
         if self.__click_when_exist(streamBetCustomVote, By.CSS_SELECTOR) is not None:
             time.sleep(random.uniform(0.05, 0.1))
-            if self.do_screenshot:
+            if self.settings.do_screenshot:
                 self.screenshot(
-                    f"{event.event_id}___enable_custom_bet_value.png".format
+                    f"{event.event_id}___enable_custom_bet_value.png"
                 )
 
             event.box_fillable = True
