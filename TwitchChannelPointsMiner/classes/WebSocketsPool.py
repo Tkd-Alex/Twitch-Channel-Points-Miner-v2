@@ -144,7 +144,7 @@ class WebSocketsPool:
                     streamer_index = get_streamer_index(
                         ws.streamers, message_data["claim"]["channel_id"]
                     )
-                    ws.twitch.claim_channel_points_bonus(
+                    ws.twitch.claim_bonus(
                         ws.streamers[streamer_index], message_data["claim"]["id"]
                     )
 

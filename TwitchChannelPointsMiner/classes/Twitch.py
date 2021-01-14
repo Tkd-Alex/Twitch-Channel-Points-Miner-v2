@@ -115,7 +115,7 @@ class Twitch:
             else:
                 streamer.set_online()
 
-    def claim_channel_points_bonus(self, streamer, claim_id):
+    def claim_bonus(self, streamer, claim_id):
         logger.info(
             emoji.emojize(
                 f":gift:  Claiming the bonus for {streamer}!", use_aliases=True
@@ -156,9 +156,7 @@ class Twitch:
         streamer.channel_points = community_points["balance"]
         # logger.info(f"{streamer.channel_points} channel points for {streamer.username}!")
         if community_points["availableClaim"] is not None:
-            self.claim_channel_points_bonus(
-                streamer, community_points["availableClaim"]["id"]
-            )
+            self.claim_bonus(streamer, community_points["availableClaim"]["id"])
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)

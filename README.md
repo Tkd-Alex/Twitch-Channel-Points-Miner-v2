@@ -72,3 +72,14 @@ If you already have a `twitch-cookies.pkl` and you don't want to login again ple
 +-- cookies
 |   +-- your-twitch-username.pkl
 ```
+
+## Use Chrome instead Firefox
+If you prefer Chrome instead Firefox please download the WebDriver matching with your Chrome version and OS from this link: https://chromedriver.chromium.org/downloads.
+Extract the archivie, copy the chromedriver file in this project folder.
+Edit your run.py file and the browser_settings should something like this:
+```python
+browser_settings=BrowserSettings(
+    browser=Browser.CHROME,
+    chrome_path="/path/of/your/chromedriver"  # If no path was provided the script will try to search automatically
+),
+```

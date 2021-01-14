@@ -224,7 +224,7 @@ class TwitchChannelPointsMiner:
             if self.streamers[streamer_index].history != {}:
                 logger.info(
                     emoji.emojize(
-                        f":coin:  {self.streamers[streamer_index].print_history()}",
+                        f":moneybag:  {self.streamers[streamer_index].print_history()}",
                         use_aliases=True,
                     )
                 )

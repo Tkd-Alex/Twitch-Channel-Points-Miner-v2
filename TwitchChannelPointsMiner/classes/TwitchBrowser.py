@@ -3,6 +3,7 @@ import logging
 import random
 import os
 import emoji
+import platform
 
 from pathlib import Path
 from datetime import datetime
@@ -16,7 +17,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
-from TwitchChannelPointsMiner.classes.Bet import Strategy
 
 TWITCH_URL = "https://www.twitch.tv/"
 
@@ -46,11 +46,20 @@ class BrowserSettings:
         do_screenshot: bool = False,
         show: bool = True,
         browser: Browser = Browser.FIREFOX,
+        chrome_path: str = None,
     ):
         self.timeout = timeout
         self.do_screenshot = do_screenshot
         self.show = show
         self.browser = browser
+        self.chrome_path = (
+            chrome_path
+            if chrome_path is not None
+            else os.path.join(
+                Path().absolute(),
+                ("chromedriver" + (".exe" if platform.system() == "Windows" else "")),
+            )
+        )
 
 
 class TwitchBrowser:
@@ -137,7 +146,17 @@ class TwitchBrowser:
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-setuid-sandbox")
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
-        self.browser = webdriver.Chrome(options=options)
+
+        if os.path.isfile(self.settings.chrome_path) is True:
+            self.browser = webdriver.Chrome(self.settings.chrome_path, options=options)
+        else:
+            logger.warning(
+                emoji.emojize(
+                    f":wrench:  The path {self.settings.chrome_path} is not valid",
+                    use_aliases=True,
+                )
+            )
+            self.browser = webdriver.Chrome(options=options)
 
     # Private method __ - We can instantiate webdriver only with init_browser
     def __init_firefox(self):
