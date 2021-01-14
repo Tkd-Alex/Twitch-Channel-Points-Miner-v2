@@ -40,10 +40,15 @@ class Streamer:
         )
 
     def print_history(self):
-        return ", ".join([f"{key}({self.history[key]['counter']} times, {self.history[key]['amount']})" for key in self.history])
+        return ", ".join(
+            [
+                f"{key}({self.history[key]['counter']} times, {self.history[key]['amount']} gained)"
+                for key in self.history
+            ]
+        )
 
     def update_history(self, reason_code, earned):
         if reason_code not in self.history:
-            self.history[reason_code] = {'counter': 0, 'amount': 0}
-        self.history[reason_code]['counter'] += 1
-        self.history[reason_code]['amount'] += earned
+            self.history[reason_code] = {"counter": 0, "amount": 0}
+        self.history[reason_code]["counter"] += 1
+        self.history[reason_code]["amount"] += earned

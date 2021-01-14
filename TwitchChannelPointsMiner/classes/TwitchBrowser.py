@@ -40,7 +40,13 @@ class Browser(Enum):
 
 
 class BrowserSettings:
-    def __init__(self, timeout: float = 5.0, do_screenshot: bool = False, show: bool = True, browser: Browser = Browser.FIREFOX):
+    def __init__(
+        self,
+        timeout: float = 5.0,
+        do_screenshot: bool = False,
+        show: bool = True,
+        browser: Browser = Browser.FIREFOX,
+    ):
         self.timeout = timeout
         self.do_screenshot = do_screenshot
         self.show = show
@@ -52,7 +58,7 @@ class TwitchBrowser:
         self,
         auth_token: str,
         session_id: str,
-        settings: BrowserSettings = BrowserSettings()
+        settings: BrowserSettings = BrowserSettings(),
     ):
         self.auth_token = auth_token
         self.session_id = session_id

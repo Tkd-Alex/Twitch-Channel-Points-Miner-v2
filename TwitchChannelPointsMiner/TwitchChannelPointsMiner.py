@@ -16,7 +16,10 @@ from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.Streamer import Streamer
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
 from TwitchChannelPointsMiner.classes.Bet import BetSettings
-from TwitchChannelPointsMiner.classes.TwitchBrowser import TwitchBrowser, BrowserSettings
+from TwitchChannelPointsMiner.classes.TwitchBrowser import (
+    TwitchBrowser,
+    BrowserSettings,
+)
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 
 # Suppress warning for urllib3.connectionpool (selenium close connection)
@@ -39,7 +42,7 @@ class TwitchChannelPointsMiner:
         follow_raid: bool = True,
         save_logs: bool = True,
         browser_settings: BrowserSettings = BrowserSettings(),
-        bet_settings: BetSettings = BetSettings()
+        bet_settings: BetSettings = BetSettings(),
     ):
         self.twitch = Twitch(username)
         self.twitch_browser = None
@@ -120,7 +123,7 @@ class TwitchChannelPointsMiner:
                 self.twitch_browser = TwitchBrowser(
                     self.twitch.twitch_login.get_auth_token(),
                     self.session_id,
-                    settings=self.browser_settings
+                    settings=self.browser_settings,
                 )
                 self.twitch_browser.init()
 
@@ -134,7 +137,7 @@ class TwitchChannelPointsMiner:
                 twitch=self.twitch,
                 twitch_browser=self.twitch_browser,
                 streamers=self.streamers,
-                bet_settings=self.bet_settings
+                bet_settings=self.bet_settings,
             )
             topics = [
                 PubsubTopic(
@@ -181,10 +184,10 @@ class TwitchChannelPointsMiner:
         sys.exit(0)
 
     def __print_report(self):
-        print("")
+        print("\n")
         logger.info(
             emoji.emojize(
-                f":electric_plug:  End session '{self.session_id}'", use_aliases=True
+                f":stop_sign:  End session '{self.session_id}'", use_aliases=True
             )
         )
         logger.info(
@@ -195,6 +198,7 @@ class TwitchChannelPointsMiner:
         )
 
         if self.make_predictions:
+            print("")
             logger.info(
                 emoji.emojize(
                     f":bar_chart:  {self.bet_settings}",
@@ -213,10 +217,15 @@ class TwitchChannelPointsMiner:
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
                 emoji.emojize(
-                    f":nerd_face:  {self.streamers[streamer_index]} - Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
+                    f":nerd_face:  {self.streamers[streamer_index]}, Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
                     use_aliases=True,
                 )
             )
-            if self.streamers[streamer_index] != {}:
-                logger.info(f"{self.streamers[streamer_index].print_history()}")
+            if self.streamers[streamer_index].history != {}:
+                logger.info(
+                    emoji.emojize(
+                        f":coin:  {self.streamers[streamer_index].print_history()}",
+                        use_aliases=True,
+                    )
+                )
                 print("")

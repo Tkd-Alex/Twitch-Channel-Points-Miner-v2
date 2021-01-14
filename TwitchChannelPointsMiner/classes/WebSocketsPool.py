@@ -130,7 +130,7 @@ class WebSocketsPool:
                         ws.streamers, message_data["channel_id"]
                     )
                     earned = message_data["point_gain"]["total_points"]
-                    reason_code = message_data['point_gain']['reason_code']
+                    reason_code = message_data["point_gain"]["reason_code"]
                     balance = message_data["balance"]["balance"]
                     ws.streamers[streamer_index].channel_points = balance
                     logger.info(
@@ -175,7 +175,9 @@ class WebSocketsPool:
 
                 if event_id not in ws.events_predictions:
                     if event_status == "ACTIVE":
-                        prediction_window_seconds = (float(event_dict["prediction_window_seconds"]) - 20)
+                        prediction_window_seconds = (
+                            float(event_dict["prediction_window_seconds"]) - 20
+                        )
                         event = EventPrediction(
                             ws.streamers[streamer_index],
                             event_id,
@@ -184,7 +186,7 @@ class WebSocketsPool:
                             prediction_window_seconds,
                             event_status,
                             event_dict["outcomes"],
-                            bet_settings=ws.bet_settings
+                            bet_settings=ws.bet_settings,
                         )
                         if event.closing_bet_after(current_timestamp) > 0:
                             ws.events_predictions[event_id] = event
@@ -211,8 +213,13 @@ class WebSocketsPool:
                 else:
                     ws.events_predictions[event_id].status = event_status
                     # Game over we can't update anymore the values... The bet was placed!
-                    if ws.events_predictions[event_id].bet_placed is False and ws.events_predictions[event_id].bet.decision is None:
-                        ws.events_predictions[event_id].bet.update_outcomes(event_dict["outcomes"])
+                    if (
+                        ws.events_predictions[event_id].bet_placed is False
+                        and ws.events_predictions[event_id].bet.decision is None
+                    ):
+                        ws.events_predictions[event_id].bet.update_outcomes(
+                            event_dict["outcomes"]
+                        )
 
             elif topic == "predictions-user-v1":
                 if (
@@ -220,7 +227,7 @@ class WebSocketsPool:
                     and message_data["event"]["result"]
                 ):
                     event_id = message_data["event"]["id"]
-                    event_result = message_data['event']['result']
+                    event_result = message_data["event"]["result"]
                     if event_id in ws.events_predictions:
                         logger.info(
                             emoji.emojize(
@@ -229,8 +236,10 @@ class WebSocketsPool:
                             )
                         )
                         ws.events_predictions[event_id].final_result = {
-                            "type": event_result['type'],
-                            "won": event_result['points_won'] if event_result['points_won'] else 0
+                            "type": event_result["type"],
+                            "won": event_result["points_won"]
+                            if event_result["points_won"]
+                            else 0,
                         }
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:

@@ -12,7 +12,13 @@ class Strategy(Enum):
 
 
 class BetSettings:
-    def __init__(self, strategy: Strategy = Strategy.SMART, percentage: int = 5, percentage_gap: int = 2, max_points: int = 50000):
+    def __init__(
+        self,
+        strategy: Strategy = Strategy.SMART,
+        percentage: int = 5,
+        percentage_gap: int = 2,
+        max_points: int = 50000,
+    ):
         self.strategy = strategy
         self.percentage = percentage
         self.percentage_gap = percentage_gap
@@ -82,10 +88,7 @@ class Bet:
                 ]:
                     del self.outcomes[index][key]
 
-    def calculate(
-        self,
-        balance: int
-    ):
+    def calculate(self, balance: int):
         self.decision = {"choice": "", "amount": 0, "id": None}
         if self.settings.strategy == Strategy.MOST_VOTED:
             self.decision["choice"] = (
@@ -98,7 +101,13 @@ class Bet:
                 "A" if self.outcomes[0]["odds"] > self.outcomes[1]["odds"] else "B"
             )
         elif self.settings.strategy == Strategy.SMART:
-            if abs(self.outcomes[0]["percentage_users"] - self.outcomes[1]["percentage_users"]) < self.settings.percentage_gap:
+            if (
+                abs(
+                    self.outcomes[0]["percentage_users"]
+                    - self.outcomes[1]["percentage_users"]
+                )
+                < self.settings.percentage_gap
+            ):
                 self.decision["choice"] = (
                     "A" if self.outcomes[0]["odds"] > self.outcomes[1]["odds"] else "B"
                 )
@@ -115,5 +124,8 @@ class Bet:
                 if self.decision["choice"] == "A"
                 else self.outcomes[1]["id"]
             )
-            self.decision["amount"] = min(round(balance * (self.settings.percentage / 100)), self.settings.max_points)
+            self.decision["amount"] = min(
+                round(balance * (self.settings.percentage / 100)),
+                self.settings.max_points,
+            )
         return self.decision

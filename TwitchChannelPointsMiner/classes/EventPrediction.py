@@ -12,7 +12,7 @@ class EventPrediction:
         prediction_window_seconds,
         status,
         outcomes,
-        bet_settings: BetSettings = BetSettings()
+        bet_settings: BetSettings = BetSettings(),
     ):
         self.streamer = streamer
 
