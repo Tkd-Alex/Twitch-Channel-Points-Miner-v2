@@ -177,8 +177,9 @@ class WebSocketsPool:
 
                     if event_id not in ws.events_predictions:
                         if event_status == "ACTIVE":
+                            time.sleep(random.uniform(0.5, 1.5))
                             prediction_window_seconds = (
-                                float(event_dict["prediction_window_seconds"]) - 20
+                                float(event_dict["prediction_window_seconds"]) - 25
                             )
                             event = EventPrediction(
                                 ws.streamers[streamer_index],
@@ -190,7 +191,7 @@ class WebSocketsPool:
                                 event_dict["outcomes"],
                                 bet_settings=ws.bet_settings,
                             )
-                            if event.closing_bet_after(current_timestamp) > 0:
+                            if ws.streamers[streamer_index].is_online and event.closing_bet_after(current_timestamp) > 0:
                                 ws.events_predictions[event_id] = event
                                 if ws.twitch_browser.currently_is_betting is False:
                                     if ws.twitch_browser.start_bet(
