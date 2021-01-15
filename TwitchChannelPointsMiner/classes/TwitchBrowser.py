@@ -69,7 +69,7 @@ class TwitchBrowser:
         self,
         auth_token: str,
         session_id: str,
-        settings: BrowserSettings = BrowserSettings(),
+        settings: BrowserSettings,
     ):
         self.auth_token = auth_token
         self.session_id = session_id
@@ -194,7 +194,7 @@ class TwitchBrowser:
         f.write(self.browser.page_source)
         f.close()
 
-    def screenshot(self, fname, write_timestamp=True):
+    def screenshot(self, fname, write_timestamp=False):
         screenshots_path = os.path.join(Path().absolute(), "screenshots")
         Path(screenshots_path).mkdir(parents=True, exist_ok=True)
         Path(os.path.join(screenshots_path, self.session_id)).mkdir(
@@ -317,8 +317,7 @@ class TwitchBrowser:
                             self.save_html(f"{event.event_id}___send_text")
 
                         logger.info(
-                            emoji.emojize(":wrench:  Going to place the bet"),
-                            use_aliases=True,
+                            emoji.emojize(":wrench:  Going to place the bet", use_aliases=True)
                         )
                         if (
                             self.__click_when_exist(
@@ -331,9 +330,8 @@ class TwitchBrowser:
                             if self.settings.save_html:
                                 self.save_html(f"{event.event_id}___click_on_vote")
 
-                            time.sleep(random.uniform(15, 25))
                             event.bet_placed = True
-
+                            time.sleep(random.uniform(15, 25))
                             self.browser.get("about:blank")
                             self.currently_is_betting = False
 

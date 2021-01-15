@@ -50,6 +50,7 @@ class TwitchChannelPointsMiner:
         self.twitch_browser = None
         self.follow_raid = follow_raid
         self.streamers = []
+        self.events_predictions = {}
         self.minute_watcher_thread = None
         self.ws_pool = None
 
@@ -142,6 +143,7 @@ class TwitchChannelPointsMiner:
                 twitch_browser=self.twitch_browser,
                 streamers=self.streamers,
                 bet_settings=self.bet_settings,
+                events_predictions=self.events_predictions
             )
             topics = [
                 PubsubTopic(
@@ -215,10 +217,10 @@ class TwitchChannelPointsMiner:
                     use_aliases=True,
                 )
             )
-            for event_id in self.ws_pool.ws.events_predictions:
+            for event_id in self.events_predictions:
                 logger.info(
                     emoji.emojize(
-                        f":bar_chart:  {self.ws_pool.ws.events_predictions[event_id].print_recap()}",
+                        f":bar_chart:  {self.events_predictions[event_id].print_recap()}",
                         use_aliases=True,
                     )
                 )

@@ -244,7 +244,7 @@ class Twitch:
 
             logger.info(
                 emoji.emojize(
-                    f":crossed_swords:  Joining raid from {streamer.username} to {raid.target_login}!",
+                    f":performing_arts:  Joining raid from {streamer.username} to {raid.target_login}!",
                     use_aliases=True,
                 )
             )

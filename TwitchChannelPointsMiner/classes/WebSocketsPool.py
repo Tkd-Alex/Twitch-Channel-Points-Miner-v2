@@ -3,6 +3,7 @@ import threading
 import time
 import json
 import emoji
+import random
 
 from dateutil import parser
 
@@ -19,11 +20,12 @@ def get_streamer_index(streamers, channel_id):
 
 # You can't listen for more than 50 topics at once
 class WebSocketsPool:
-    def __init__(self, twitch, twitch_browser, streamers, bet_settings):
+    def __init__(self, twitch, twitch_browser, streamers, bet_settings, events_predictions):
         self.ws = None
         self.twitch = twitch
         self.twitch_browser = twitch_browser
         self.streamers = streamers
+        self.events_predictions = events_predictions
         self.bet_settings = bet_settings
 
     def submit(self, topic):
@@ -55,7 +57,7 @@ class WebSocketsPool:
         self.ws.twitch_browser = self.twitch_browser
         self.ws.streamers = self.streamers
         self.ws.bet_settings = self.bet_settings
-        self.ws.events_predictions = {}
+        self.ws.events_predictions = self.events_predictions
 
         self.ws.last_message_time = 0
         self.ws.last_message_type = None
@@ -225,12 +227,13 @@ class WebSocketsPool:
 
             elif topic == "predictions-user-v1":
                 try:
+                    time.sleep(random.uniform(1, 2))
                     if (
                         message_type == "prediction-result"
-                        and message_data["event"]["result"]
+                        and message_data["prediction"]["result"] not in [None, {}]
                     ):
-                        event_id = message_data["event"]["id"]
-                        event_result = message_data["event"]["result"]
+                        event_id = message_data["prediction"]["id"]
+                        event_result = message_data["prediction"]["result"]
                         if event_id in ws.events_predictions:
                             logger.info(
                                 emoji.emojize(

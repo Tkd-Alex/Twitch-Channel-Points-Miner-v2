@@ -12,7 +12,7 @@ class EventPrediction:
         prediction_window_seconds,
         status,
         outcomes,
-        bet_settings: BetSettings = BetSettings(),
+        bet_settings: BetSettings,
     ):
         self.streamer = streamer
 
@@ -37,4 +37,4 @@ class EventPrediction:
         return round(float(self.prediction_window_seconds - self.elapsed(timestamp)), 2)
 
     def print_recap(self):
-        return f"{self} - {self.bet} - {self.final_result}"
+        return f"{self}\n\t\t{self.bet}\n\t\tResult: {self.final_result}"
