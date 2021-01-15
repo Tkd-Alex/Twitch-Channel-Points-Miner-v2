@@ -145,3 +145,4 @@ chromedriver*
 cookies/*
 logs/*
 screenshots/*
+htmls/*

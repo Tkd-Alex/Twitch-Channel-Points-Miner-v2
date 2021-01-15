@@ -191,9 +191,15 @@ class TwitchChannelPointsMiner:
         print("\n")
         logger.info(
             emoji.emojize(
-                f":stop_sign:  End session '{self.session_id}' - Logs file: {self.logs_file}", use_aliases=True
+                f":stop_sign:  End session '{self.session_id}'", use_aliases=True
             )
         )
+        if self.logs_file is not None:
+            logger.info(
+                emoji.emojize(
+                    f":page_facing_up:  Logs file: {self.logs_file}", use_aliases=True
+                )
+            )
         logger.info(
             emoji.emojize(
                 f":hourglass:  Duration {datetime.now() - self.start_datetime}",

@@ -43,13 +43,15 @@ class BrowserSettings:
     def __init__(
         self,
         timeout: float = 5.0,
-        do_screenshot: bool = False,
+        do_screenshot: bool = False,  # Options for debug
+        save_html: bool = False,  # Options for debug
         show: bool = True,
         browser: Browser = Browser.FIREFOX,
         chrome_path: str = None,
     ):
         self.timeout = timeout
         self.do_screenshot = do_screenshot
+        self.save_html = save_html
         self.show = show
         self.browser = browser
         self.chrome_path = (
@@ -83,7 +85,7 @@ class TwitchBrowser:
             self.__init_chrome()
 
         if self.browser is not None:
-            self.browser.set_window_size(250, 900)
+            self.browser.set_window_size(375, 900)
             self.browser.implicitly_wait(2)
 
         self.__init_twitch()
@@ -176,6 +178,22 @@ class TwitchBrowser:
 
         self.browser = webdriver.Firefox(options=options, firefox_profile=fp)
 
+    def save_html(self, fname):
+        htmls_path = os.path.join(Path().absolute(), "htmls")
+        Path(htmls_path).mkdir(parents=True, exist_ok=True)
+        Path(os.path.join(htmls_path, self.session_id)).mkdir(
+            parents=True, exist_ok=True
+        )
+
+        fname = f"{fname}.html" if fname.endswith(".html") is False else fname
+        fname = os.path.join(htmls_path, self.session_id, fname)
+
+        # Little delay ...
+        time.sleep(0.2)
+        f = open(fname, "w")
+        f.write(self.browser.page_source)
+        f.close()
+
     def screenshot(self, fname, write_timestamp=True):
         screenshots_path = os.path.join(Path().absolute(), "screenshots")
         Path(screenshots_path).mkdir(parents=True, exist_ok=True)
@@ -218,7 +236,9 @@ class TwitchBrowser:
                 draw.text((x, y), datetime_text, font=font, fill=color)
                 image.save(fname, optimize=True, quality=20)
         except Exception:
-            logger.error(f"Exception raised during screenshot file {fname}", exc_info=True)
+            logger.error(
+                f"Exception raised during screenshot file {fname}", exc_info=True
+            )
 
     def __click_when_exist(self, selector, by: By = By.CSS_SELECTOR):
         try:
@@ -226,25 +246,23 @@ class TwitchBrowser:
                 expected_conditions.element_to_be_clickable((by, selector))
             )
             ActionChains(self.browser).move_to_element(element).click().perform()
-            return element
+            return True
         except Exception:
             logger.error(f"Exception raised with: {selector}", exc_info=True)
-        finally:
-            return None
+        return False
 
     def __send_text(self, selector, text, by: By = By.CSS_SELECTOR):
         try:
             element = WebDriverWait(self.browser, self.settings.timeout).until(
-                expected_conditions.element_to_be_clickable((By.XPATH, selector))
+                expected_conditions.element_to_be_clickable((by, selector))
             )
-            ActionChains(self.browser, self.settings.timeout).move_to_element(
-                element
-            ).click().send_keys(text).perform()
-            return element
+            ActionChains(self.browser).move_to_element(element).click().send_keys(
+                text
+            ).perform()
+            return True
         except Exception:
             logger.error(f"Exception raised with: {selector}", exc_info=True)
-        finally:
-            return None
+        return False
 
     def start_bet(self, event: EventPrediction):
         if self.currently_is_betting:
@@ -260,10 +278,11 @@ class TwitchBrowser:
             )
             self.browser.get(event.streamer.chat_url)
             time.sleep(random.uniform(4, 6))
-            self.__open_coins_menu(event)
-            self.__click_on_bet(event)
-            self.__enable_custom_bet_value(event)
-            return self.currently_is_betting
+            if self.__open_coins_menu(event) is True:
+                if self.__click_on_bet(event) is True:
+                    if self.__enable_custom_bet_value(event) is True:
+                        return self.currently_is_betting
+            return False
 
     def place_bet(self, event: EventPrediction):
         logger.info(
@@ -284,26 +303,39 @@ class TwitchBrowser:
                             use_aliases=True,
                         )
                     )
-                    self.__send_text(
-                        streamBetVoteInput + selector_index,
-                        decision["amount"],
-                        By.XPATH,
-                    )
-                    if self.settings.do_screenshot:
-                        self.screenshot(f"{event.event_id}___send_text.png")
+                    if (
+                        self.__send_text(
+                            streamBetVoteInput + selector_index,
+                            decision["amount"],
+                            By.XPATH,
+                        )
+                        is True
+                    ):
+                        if self.settings.do_screenshot:
+                            self.screenshot(f"{event.event_id}___send_text")
+                        if self.settings.save_html:
+                            self.save_html(f"{event.event_id}___send_text")
 
-                    logger.info("Going to place the bet")
-                    self.__click_when_exist(
-                        streamBetVoteButton + selector_index, By.XPATH
-                    )
-                    if self.settings.do_screenshot:
-                        self.screenshot(f"{event.event_id}___click_on_vote.png")
+                        logger.info(
+                            emoji.emojize(":wrench:  Going to place the bet"),
+                            use_aliases=True,
+                        )
+                        if (
+                            self.__click_when_exist(
+                                streamBetVoteButton + selector_index, By.XPATH
+                            )
+                            is True
+                        ):
+                            if self.settings.do_screenshot:
+                                self.screenshot(f"{event.event_id}___click_on_vote")
+                            if self.settings.save_html:
+                                self.save_html(f"{event.event_id}___click_on_vote")
 
-                    time.sleep(random.uniform(15, 25))
-                    event.bet_placed = True
+                            time.sleep(random.uniform(15, 25))
+                            event.bet_placed = True
 
-                    self.browser.get("about:blank")
-                    self.currently_is_betting = False
+                            self.browser.get("about:blank")
+                            self.currently_is_betting = False
 
                 except Exception:
                     logger.error("Exception raised", exc_info=True)
@@ -322,10 +354,14 @@ class TwitchBrowser:
                 f":wrench:  Open coins menu for event: {event}", use_aliases=True
             )
         )
-        self.__click_when_exist(streamCoinsMenu, By.XPATH)
-        time.sleep(random.uniform(0.05, 0.1))
-        if self.settings.do_screenshot:
-            self.screenshot(f"{event.event_id}___open_coins_menu.png")
+        if self.__click_when_exist(streamCoinsMenu, By.XPATH) is True:
+            time.sleep(random.uniform(0.05, 0.1))
+            if self.settings.do_screenshot:
+                self.screenshot(f"{event.event_id}___open_coins_menu")
+            if self.settings.save_html:
+                self.save_html(f"{event.event_id}___open_coins_menu")
+            return True
+        return False
 
     def __click_on_bet(self, event):
         logger.info(
@@ -333,10 +369,14 @@ class TwitchBrowser:
                 f":wrench:  Click on the bet for event: {event}", use_aliases=True
             )
         )
-        self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR)
-        time.sleep(random.uniform(0.05, 0.1))
-        if self.settings.do_screenshot:
-            self.screenshot(f"{event.event_id}___click_on_bet.png")
+        if self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR) is True:
+            time.sleep(random.uniform(0.05, 0.1))
+            if self.settings.do_screenshot:
+                self.screenshot(f"{event.event_id}___click_on_bet")
+            if self.settings.save_html:
+                self.save_html(f"{event.event_id}___click_on_bet")
+            return True
+        return False
 
     def __enable_custom_bet_value(self, event):
         logger.info(
@@ -345,16 +385,29 @@ class TwitchBrowser:
                 use_aliases=True,
             )
         )
-        if self.__click_when_exist(streamBetCustomVote, By.CSS_SELECTOR) is not None:
+
+        try:
+            self.browser.execute_script(
+                """
+            var div = document.getElementsByClassName("simplebar-scroll-content")[1];
+            div.scrollTop = div.scrollHeight;
+            """
+            )
+        except Exception:
+            logger.error("Unable to scroll down in the bet window")
+
+        if self.__click_when_exist(streamBetCustomVote, By.CSS_SELECTOR) is True:
             time.sleep(random.uniform(0.05, 0.1))
             if self.settings.do_screenshot:
-                self.screenshot(
-                    f"{event.event_id}___enable_custom_bet_value.png"
-                )
+                self.screenshot(f"{event.event_id}___enable_custom_bet_value")
+            if self.settings.save_html:
+                self.save_html(f"{event.event_id}___enable_custom_bet_value")
 
             event.box_fillable = True
             self.currently_is_betting = True
+            return True
         else:
             logger.info(
-                "Something whent wrong unable to continue with betting - Fillable box not avaible"
+                "Something went wrong unable to continue with betting - Fillable box not avaible"
             )
+        return False
