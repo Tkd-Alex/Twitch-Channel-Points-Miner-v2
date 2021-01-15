@@ -229,11 +229,8 @@ class WebSocketsPool:
             elif topic == "predictions-user-v1":
                 try:
                     time.sleep(random.uniform(1, 2))
-                    if (
-                        message_type == "prediction-result"
-                        and message_data["prediction"]["result"] not in [None, {}]
-                    ):
-                        event_id = message_data["prediction"]["id"]
+                    if message_type == "prediction-result":
+                        event_id = message_data["prediction"]["event_id"]
                         event_result = message_data["prediction"]["result"]
                         if event_id in ws.events_predictions:
                             logger.info(

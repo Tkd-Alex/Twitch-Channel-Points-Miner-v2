@@ -73,7 +73,7 @@ class Bet:
         self.__clear_outcomes()
 
     def __repr__(self):
-        return f"Bet(Outcome0={self.outcomes[0]}, Outcome1={self.outcomes[1]}, TotalUsers={self.total_users}, TotalPoints={self.total_points}), Decision={self.decision})"
+        return f"Bet(TotalUsers={self.total_users}, TotalPoints={self.total_points}), Decision={self.decision})\n\t\tOutcome0({self.outcomes[0]})\n\t\tOutcome1({self.outcomes[1]})"
 
     def __clear_outcomes(self):
         for index in range(0, len(self.outcomes)):
