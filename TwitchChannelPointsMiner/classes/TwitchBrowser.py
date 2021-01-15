@@ -317,8 +317,7 @@ class TwitchBrowser:
                             self.save_html(f"{event.event_id}___send_text")
 
                         logger.info(
-                            emoji.emojize(":wrench:  Going to place the bet"),
-                            use_aliases=True,
+                            emoji.emojize(":wrench:  Going to place the bet", use_aliases=True)
                         )
                         if (
                             self.__click_when_exist(
