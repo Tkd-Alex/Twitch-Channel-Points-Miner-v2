@@ -42,7 +42,9 @@ class Browser(Enum):
 class BrowserSettings:
     def __init__(
         self,
-        timeout: float = 5.0,
+        timeout: float = 10.0,
+        implicitly_wait: int = 5,
+        max_attempts: int = 3,
         do_screenshot: bool = False,  # Options for debug
         save_html: bool = False,  # Options for debug
         show: bool = True,
@@ -86,7 +88,7 @@ class TwitchBrowser:
 
         if self.browser is not None:
             self.browser.set_window_size(375, 900)
-            self.browser.implicitly_wait(2)
+            self.browser.implicitly_wait(self.settings.implicitly_wait)
 
         self.__init_twitch()
 
@@ -270,18 +272,20 @@ class TwitchBrowser:
                 "Sorry, unable to start the bet. The browser it's currently betting another event"
             )
         else:
-            logger.info(
-                emoji.emojize(
-                    f":wrench:  Start betting at {event.streamer.chat_url} for event: {event}",
-                    use_aliases=True,
+            for attempt in range(0, self.settings.max_attempts):
+                logger.info(
+                    emoji.emojize(
+                        f":wrench:  Start betting at {event.streamer.chat_url} for event: {event}",
+                        use_aliases=True,
+                    )
                 )
-            )
-            self.browser.get(event.streamer.chat_url)
-            time.sleep(random.uniform(4, 6))
-            if self.__open_coins_menu(event) is True:
-                if self.__click_on_bet(event) is True:
-                    if self.__enable_custom_bet_value(event) is True:
-                        return self.currently_is_betting
+                self.browser.get(event.streamer.chat_url)
+                time.sleep(random.uniform(4, 6))
+                if self.__open_coins_menu(event) is True:
+                    if self.__click_on_bet(event) is True:
+                        if self.__enable_custom_bet_value(event) is True:
+                            return self.currently_is_betting
+                logger.error(emoji.emojize(f":wrench:  Attempt {attempt+1} failed!", use_aliases=True))
             return False
 
     def place_bet(self, event: EventPrediction):
