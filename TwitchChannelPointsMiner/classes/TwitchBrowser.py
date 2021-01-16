@@ -182,6 +182,12 @@ class TwitchBrowser:
 
         self.browser = webdriver.Firefox(options=options, firefox_profile=fp)
 
+    def __debug(self, event, method):
+        if self.settings.do_screenshot:
+            self.screenshot(f"{event.event_id}___{method}")
+        if self.settings.save_html:
+            self.save_html(f"{event.event_id}___{method}")
+
     def save_html(self, fname):
         htmls_path = os.path.join(Path().absolute(), "htmls")
         Path(htmls_path).mkdir(parents=True, exist_ok=True)
@@ -313,6 +319,7 @@ class TwitchBrowser:
                             use_aliases=True,
                         )
                     )
+                    self.__debug(event, "start_write_code")
                     if (
                         self.__send_text(
                             streamBetVoteInput + selector_index,
@@ -321,11 +328,7 @@ class TwitchBrowser:
                         )
                         is True
                     ):
-                        if self.settings.do_screenshot:
-                            self.screenshot(f"{event.event_id}___send_text")
-                        if self.settings.save_html:
-                            self.save_html(f"{event.event_id}___send_text")
-
+                        self.__debug(event, "send_text")
                         logger.info(
                             emoji.emojize(
                                 ":wrench:  Going to place the bet", use_aliases=True
@@ -337,10 +340,7 @@ class TwitchBrowser:
                             )
                             is True
                         ):
-                            if self.settings.do_screenshot:
-                                self.screenshot(f"{event.event_id}___click_on_vote")
-                            if self.settings.save_html:
-                                self.save_html(f"{event.event_id}___click_on_vote")
+                            self.__debug(event, "click_on_vote")
 
                             event.bet_placed = True
                             time.sleep(random.uniform(15, 25))
@@ -366,10 +366,7 @@ class TwitchBrowser:
         )
         if self.__click_when_exist(streamCoinsMenu, By.XPATH) is True:
             time.sleep(random.uniform(0.05, 0.1))
-            if self.settings.do_screenshot:
-                self.screenshot(f"{event.event_id}___open_coins_menu")
-            if self.settings.save_html:
-                self.save_html(f"{event.event_id}___open_coins_menu")
+            self.__debug(event, "open_coins_menu")
             return True
         return False
 
@@ -381,10 +378,7 @@ class TwitchBrowser:
         )
         if self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR) is True:
             time.sleep(random.uniform(0.05, 0.1))
-            if self.settings.do_screenshot:
-                self.screenshot(f"{event.event_id}___click_on_bet")
-            if self.settings.save_html:
-                self.save_html(f"{event.event_id}___click_on_bet")
+            self.__debug(event, "click_on_bet")
             return True
         return False
 
@@ -408,11 +402,7 @@ class TwitchBrowser:
 
         if self.__click_when_exist(streamBetCustomVote, By.CSS_SELECTOR) is True:
             time.sleep(random.uniform(0.05, 0.1))
-            if self.settings.do_screenshot:
-                self.screenshot(f"{event.event_id}___enable_custom_bet_value")
-            if self.settings.save_html:
-                self.save_html(f"{event.event_id}___enable_custom_bet_value")
-
+            self.__debug(event, "enable_custom_bet_value")
             event.box_fillable = True
             self.currently_is_betting = True
             return True
