@@ -307,55 +307,60 @@ class TwitchBrowser:
                 use_aliases=True,
             )
         )
-        if event.box_fillable and self.currently_is_betting:
-            decision = event.bet.calculate(event.streamer.channel_points)
-            if decision["choice"]:
-                selector_index = "[1]" if decision["choice"] == "A" else "[2]"
+        if event.status == "ACTIVE":
+            if event.box_fillable and self.currently_is_betting:
+                decision = event.bet.calculate(event.streamer.channel_points)
+                if decision["choice"]:
+                    selector_index = "[1]" if decision["choice"] == "A" else "[2]"
 
-                try:
-                    logger.info(
-                        emoji.emojize(
-                            f":wrench:  Going to write: {decision['amount']} on input {decision['choice']}",
-                            use_aliases=True,
-                        )
-                    )
-                    self.__debug(event, "start_write_code")
-                    if (
-                        self.__send_text(
-                            streamBetVoteInput + selector_index,
-                            decision["amount"],
-                            By.XPATH,
-                        )
-                        is True
-                    ):
-                        self.__debug(event, "send_text")
+                    try:
                         logger.info(
                             emoji.emojize(
-                                ":wrench:  Going to place the bet", use_aliases=True
+                                f":wrench:  Going to write: {decision['amount']} on input {decision['choice']}",
+                                use_aliases=True,
                             )
                         )
+                        self.__debug(event, "start_write_code")
                         if (
-                            self.__click_when_exist(
-                                streamBetVoteButton + selector_index, By.XPATH
+                            self.__send_text(
+                                streamBetVoteInput + selector_index,
+                                decision["amount"],
+                                By.XPATH,
                             )
                             is True
                         ):
-                            self.__debug(event, "click_on_vote")
+                            self.__debug(event, "send_text")
+                            logger.info(
+                                emoji.emojize(
+                                    ":wrench:  Going to place the bet", use_aliases=True
+                                )
+                            )
+                            if (
+                                self.__click_when_exist(
+                                    streamBetVoteButton + selector_index, By.XPATH
+                                )
+                                is True
+                            ):
+                                self.__debug(event, "click_on_vote")
 
-                            event.bet_placed = True
-                            time.sleep(random.uniform(15, 25))
-                            self.browser.get("about:blank")
-                            self.currently_is_betting = False
+                                event.bet_placed = True
+                                time.sleep(random.uniform(15, 25))
+                                self.browser.get("about:blank")
+                                self.currently_is_betting = False
 
-                except Exception:
-                    logger.error("Exception raised", exc_info=True)
+                    except Exception:
+                        logger.error("Exception raised", exc_info=True)
 
-                    self.browser.get("about:blank")
-                    self.currently_is_betting = False
+                        self.browser.get("about:blank")
+                        self.currently_is_betting = False
 
+            else:
+                logger.info(
+                    f"Sorry, unable to complete the bet. Event box fillable: {event.box_fillable}, the browser is betting: {self.currently_is_betting}"
+                )
         else:
             logger.info(
-                f"Sorry, unable to complete the bet. Event box fillable: {event.box_fillable}, the browser is betting: {self.currently_is_betting}"
+                f"Oh no! The event it's not more ACTIVE, current status: {event.status}"
             )
 
     def __open_coins_menu(self, event: EventPrediction):
