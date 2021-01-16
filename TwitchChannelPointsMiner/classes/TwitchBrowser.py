@@ -52,6 +52,8 @@ class BrowserSettings:
         chrome_path: str = None,
     ):
         self.timeout = timeout
+        self.implicitly_wait = implicitly_wait
+        self.max_attempts = max_attempts
         self.do_screenshot = do_screenshot
         self.save_html = save_html
         self.show = show
