@@ -20,7 +20,9 @@ def get_streamer_index(streamers, channel_id):
 
 # You can't listen for more than 50 topics at once
 class WebSocketsPool:
-    def __init__(self, twitch, twitch_browser, streamers, bet_settings, events_predictions):
+    def __init__(
+        self, twitch, twitch_browser, streamers, bet_settings, events_predictions
+    ):
         self.ws = None
         self.twitch = twitch
         self.twitch_browser = twitch_browser
@@ -191,7 +193,10 @@ class WebSocketsPool:
                                 event_dict["outcomes"],
                                 bet_settings=ws.bet_settings,
                             )
-                            if ws.streamers[streamer_index].is_online and event.closing_bet_after(current_timestamp) > 0:
+                            if (
+                                ws.streamers[streamer_index].is_online
+                                and event.closing_bet_after(current_timestamp) > 0
+                            ):
                                 ws.events_predictions[event_id] = event
                                 if ws.twitch_browser.currently_is_betting is False:
                                     if ws.twitch_browser.start_bet(

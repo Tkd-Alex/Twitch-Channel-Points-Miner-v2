@@ -285,7 +285,11 @@ class TwitchBrowser:
                     if self.__click_on_bet(event) is True:
                         if self.__enable_custom_bet_value(event) is True:
                             return self.currently_is_betting
-                logger.error(emoji.emojize(f":wrench:  Attempt {attempt+1} failed!", use_aliases=True))
+                logger.error(
+                    emoji.emojize(
+                        f":wrench:  Attempt {attempt+1} failed!", use_aliases=True
+                    )
+                )
             return False
 
     def place_bet(self, event: EventPrediction):
@@ -321,7 +325,9 @@ class TwitchBrowser:
                             self.save_html(f"{event.event_id}___send_text")
 
                         logger.info(
-                            emoji.emojize(":wrench:  Going to place the bet", use_aliases=True)
+                            emoji.emojize(
+                                ":wrench:  Going to place the bet", use_aliases=True
+                            )
                         )
                         if (
                             self.__click_when_exist(

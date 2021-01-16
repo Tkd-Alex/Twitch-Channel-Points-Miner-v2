@@ -75,7 +75,11 @@ class TwitchChannelPointsMiner:
                 f"{username}.{datetime.now().strftime('%d%m%Y-%H%M%S')}.log",
             )
             file_handler = logging.FileHandler(self.logs_file)
-            file_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s"))
+            file_handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s"
+                )
+            )
             root_logger.addHandler(file_handler)
         else:
             self.logs_file = None
@@ -143,7 +147,7 @@ class TwitchChannelPointsMiner:
                 twitch_browser=self.twitch_browser,
                 streamers=self.streamers,
                 bet_settings=self.bet_settings,
-                events_predictions=self.events_predictions
+                events_predictions=self.events_predictions,
             )
             topics = [
                 PubsubTopic(
