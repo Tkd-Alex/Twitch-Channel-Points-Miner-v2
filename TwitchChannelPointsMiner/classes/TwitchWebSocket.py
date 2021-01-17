@@ -25,7 +25,7 @@ def create_nonce(length=30):
 class TwitchWebSocket(WebSocketApp):
     def listen(self, topic, auth_token=None):
         data = {"topics": [str(topic)]}
-        if topic.is_user_topic and auth_token is not None:
+        if topic.is_user_topic() and auth_token is not None:
             data["auth_token"] = auth_token
 
         nonce = create_nonce()

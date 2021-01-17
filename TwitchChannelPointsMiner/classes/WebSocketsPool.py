@@ -18,7 +18,13 @@ def get_streamer_index(streamers, channel_id):
     return next(i for i, x in enumerate(streamers) if x.channel_id == channel_id)
 
 
-# You can't listen for more than 50 topics at once
+"""
+API Limits
+- Clients can listen on up to 50 topics per connection. Trying to listen on more topics will result in an error message.
+- We recommend that a single client IP address establishes no more than 10 simultaneous connections.
+The two limits above are likely to be relaxed for approved third-party applications, as we start to better understand third-party requirements.
+"""
+
 class WebSocketsPool:
     def __init__(
         self, twitch, twitch_browser, streamers, bet_settings, events_predictions

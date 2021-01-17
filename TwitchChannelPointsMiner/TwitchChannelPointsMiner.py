@@ -175,6 +175,9 @@ class TwitchChannelPointsMiner:
                         PubsubTopic("predictions-channel-v1", streamer=streamer)
                     )
 
+            if len(topics) >= 50:
+                logger.warning(f"Keep attention, the limits of topics that can be listened are 50. Currently topics are {len(topics)}")
+
             for topic in topics:
                 self.ws_pool.submit(topic)
 
