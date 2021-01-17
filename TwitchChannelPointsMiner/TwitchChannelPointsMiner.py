@@ -43,6 +43,7 @@ class TwitchChannelPointsMiner:
         make_predictions: bool = True,
         follow_raid: bool = True,
         save_logs: bool = True,
+        logs_level: int = logging.INFO,
         browser_settings: BrowserSettings = BrowserSettings(),
         bet_settings: BetSettings = BetSettings(),
     ):
@@ -66,7 +67,7 @@ class TwitchChannelPointsMiner:
 
         if save_logs is True:
             root_logger = logging.getLogger()
-            root_logger.setLevel(logging.INFO)
+            root_logger.setLevel(logs_level)
 
             logs_path = os.path.join(Path().absolute(), "logs")
             Path(logs_path).mkdir(parents=True, exist_ok=True)
@@ -173,6 +174,9 @@ class TwitchChannelPointsMiner:
                     topics.append(
                         PubsubTopic("predictions-channel-v1", streamer=streamer)
                     )
+
+            if len(topics) >= 50:
+                logger.warning(f"Keep attention, the limits of topics that can be listened are 50. Currently topics are {len(topics)}")
 
             for topic in topics:
                 self.ws_pool.submit(topic)
