@@ -52,6 +52,8 @@ class WebSocketsPool:
         self.ws.keep_running = True
         self.ws.is_closed = False
         self.ws.is_opened = False
+
+        # Custom attribute
         self.ws.topics = []
         self.ws.pending_topics = []
 
@@ -82,7 +84,7 @@ class WebSocketsPool:
 
             while not ws.is_closed:
                 ws.ping()
-                time.sleep(30)
+                time.sleep(random.uniform(25, 30))
 
         thread_ws = threading.Thread(target=run)
         thread_ws.daemon = True
@@ -91,8 +93,7 @@ class WebSocketsPool:
     @staticmethod
     def handle_websocket_reconnection(ws):
         ws.is_closed = True
-        if ws.keep_running:
-            ws.is_closed = True
+        if ws.keep_running is True:
             logger.info("Reconnecting to Twitch PubSub server in 30 seconds")
             time.sleep(30)
             self = ws.parent_pool
@@ -257,4 +258,5 @@ class WebSocketsPool:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")
 
         elif response["type"] == "RECONNECT":
+            logger.info(f"Reconnection required and keep running is: {ws.keep_running}")
             WebSocketsPool.handle_websocket_reconnection(ws)
