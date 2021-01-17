@@ -320,7 +320,7 @@ class TwitchBrowser:
                                 use_aliases=True,
                             )
                         )
-                        self.__debug(event, "start_write_code")
+                        self.__debug(event, "before__send_text")
                         if (
                             self.__send_text(
                                 streamBetVoteInput + selector_index,
@@ -342,18 +342,11 @@ class TwitchBrowser:
                                 is True
                             ):
                                 self.__debug(event, "click_on_vote")
-
                                 event.bet_placed = True
-                                time.sleep(random.uniform(15, 25))
-                                self.browser.get("about:blank")
-                                self.currently_is_betting = False
 
+                        time.sleep(random.uniform(15, 25))
                     except Exception:
                         logger.error("Exception raised", exc_info=True)
-
-                        self.browser.get("about:blank")
-                        self.currently_is_betting = False
-
             else:
                 logger.info(
                     f"Sorry, unable to complete the bet. Event box fillable: {event.box_fillable}, the browser is betting: {self.currently_is_betting}"
@@ -362,6 +355,9 @@ class TwitchBrowser:
             logger.info(
                 f"Oh no! The event it's not more ACTIVE, current status: {event.status}"
             )
+
+        self.browser.get("about:blank")
+        self.currently_is_betting = False
 
     def __open_coins_menu(self, event: EventPrediction):
         logger.info(
