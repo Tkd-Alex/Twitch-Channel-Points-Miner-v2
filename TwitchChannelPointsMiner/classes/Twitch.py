@@ -197,7 +197,7 @@ class Twitch:
                         headers=headers,
                     )
                     logger.debug(
-                        f"Send minute watched request for streamer {streamer} - Status code: {response.status_code}"
+                        f"Send minute watched request for {streamer} - Status code: {response.status_code}"
                     )
                 except requests.exceptions.ConnectionError as e:
                     logger.error(f"Error while trying to watch a minute: {e}")
