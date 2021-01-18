@@ -21,15 +21,21 @@ from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 TWITCH_URL = "https://www.twitch.tv/"
 
 cookiePolicyQuery = 'button[data-a-target="consent-banner-accept"]'
-streamCoinsMenu = '//div[@data-test-selector="community-points-summary"]//button'
+
+streamCoinsMenuXP = '//div[@data-test-selector="community-points-summary"]//button'
+streamCoinsMenuJS = 'document.querySelector("[data-test-selector=\"community-points-summary\"]").getElementsByTagName("button")[0].click();'
+
 streamBetTitleInBet = '[data-test-selector="predictions-list-item__title"]'
-streamBetCustomVote = (
-    '[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]'
-)
-streamBetVoteInput = (
-    "(//input[contains(@class,'tw-block tw-border-bottom-left-radius-medium')])"
-)
-streamBetVoteButton = "(//div[@id='channel-points-reward-center-body']//button)"
+
+streamBetCustomVoteXP = 'button[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]'
+streamBetCustomVoteJS = 'document.querySelector("button[data-test-selector=\"prediction-checkout-active-footer__input-type-toggle\"]").click();'
+
+streamBetMainDiv = "//div[@id='channel-points-reward-center-body']//div[contains(@class,'custom-prediction-button')]"
+streamBetVoteInputXP = f"({streamBetMainDiv}//input)"
+streamBetVoteButtonXP = f"({streamBetMainDiv}//button)"
+
+streamBetVoteInputJS = 'document.getElementById("channel-points-reward-center-body").getElementsByTagName("input")[{}].value = {};'
+streamBetVoteButtonJS = 'document.getElementById("channel-points-reward-center-body").getElementsByTagName("button")[{}].click();'
 
 logger = logging.getLogger(__name__)
 
@@ -121,7 +127,7 @@ class TwitchBrowser:
         time.sleep(1.5)
 
         # Edit value in localStorage for dark theme, point consent etc.
-        self.browser.execute_script(
+        self.__execute_script(
             """
             window.localStorage.setItem("volume", 0);
             window.localStorage.setItem("channelPointsOnboardingDismissed", true);
@@ -136,6 +142,14 @@ class TwitchBrowser:
 
     def __blank(self):
         self.browser.get("about:blank")
+
+    def __execute_script(self, javascript_code):
+        try:
+            self.browser.execute_script(javascript_code)
+            return True
+        except Exception:
+            logger.error(f"Failed to execute: {javascript_code}", exc_info=True)
+        return False
 
     # Private method __ - We can instantiate webdriver only with init_browser
     def __init_chrome(self):
@@ -320,31 +334,16 @@ class TwitchBrowser:
                                 use_aliases=True,
                             )
                         )
-                        self.__debug(event, "before__send_text")
-                        if (
-                            self.__send_text(
-                                streamBetVoteInput + selector_index,
-                                decision["amount"],
-                                By.XPATH,
-                            )
-                            is True
-                        ):
-                            self.__debug(event, "send_text")
+                        if self.__send_text_on_bet(event, selector_index, decision['amount']) is True:
                             logger.info(
                                 emoji.emojize(
                                     f":wrench:  Going to place the bet for event: {event}", use_aliases=True
                                 )
                             )
-                            if (
-                                self.__click_when_exist(
-                                    streamBetVoteButton + selector_index, By.XPATH
-                                )
-                                is True
-                            ):
+                            if self.__click_on_vote(event, selector_index) is True:
                                 self.__debug(event, "click_on_vote")
                                 event.bet_placed = True
-
-                        time.sleep(random.uniform(15, 25))
+                                time.sleep(random.uniform(15, 25))
                     except Exception:
                         logger.error("Exception raised", exc_info=True)
             else:
@@ -365,7 +364,11 @@ class TwitchBrowser:
                 f":wrench:  Open coins menu for event: {event}", use_aliases=True
             )
         )
-        if self.__click_when_exist(streamCoinsMenu, By.XPATH) is True:
+        status = self.__click_when_exist(streamCoinsMenuXP, By.XPATH)
+        if status is False:
+            status = self.__execute_script(streamCoinsMenuJS)
+
+        if status is True:
             time.sleep(random.uniform(0.05, 0.1))
             self.__debug(event, "open_coins_menu")
             return True
@@ -391,17 +394,17 @@ class TwitchBrowser:
             )
         )
 
-        try:
-            self.browser.execute_script(
-                """
-            var div = document.getElementsByClassName("simplebar-scroll-content")[1];
-            div.scrollTop = div.scrollHeight;
-            """
-            )
-        except Exception:
+        if self.__execute_script("""
+                                 var div = document.getElementsByClassName('simplebar-scroll-content')[1];
+                                 div.scrollTop = div.scrollHeight
+                                 """) is False:
             logger.error("Unable to scroll down in the bet window")
 
-        if self.__click_when_exist(streamBetCustomVote, By.CSS_SELECTOR) is True:
+        status = self.__click_when_exist(streamBetCustomVoteXP, By.CSS_SELECTOR)
+        if status is False:
+            status = self.__execute_script(streamBetCustomVoteJS)
+
+        if status is True:
             time.sleep(random.uniform(0.05, 0.1))
             self.__debug(event, "enable_custom_bet_value")
             event.box_fillable = True
@@ -411,4 +414,25 @@ class TwitchBrowser:
             logger.info(
                 "Something went wrong unable to continue with betting - Fillable box not avaible"
             )
+        return False
+
+    def __send_text_on_bet(self, event, selector_index, text):
+        self.__debug(event, "before__send_text")
+        status = self.__send_text(streamBetVoteInputXP + selector_index, text, By.XPATH)
+        if status is False:
+            status = self.__execute_script(streamBetVoteInputJS.format(int(selector_index) - 1, int(text)))
+
+        if status is True:
+            self.__debug(event, "send_text")
+            return True
+        return False
+
+    def __click_on_vote(self, event, selector_index):
+        status = self.__click_when_exist(streamBetVoteButtonXP + selector_index, By.XPATH)
+        if status is False:
+            status = self.__execute_script(streamBetVoteButtonJS.format(int(selector_index) - 1))
+
+        if status is True:
+            self.__debug(event, "click_on_vote")
+            return True
         return False
