@@ -186,10 +186,9 @@ class WebSocketsPool:
 
                     if event_id not in ws.events_predictions:
                         if event_status == "ACTIVE":
-                            time.sleep(random.uniform(0.5, 1.5))
-                            prediction_window_seconds = (
-                                float(event_dict["prediction_window_seconds"]) - 25
-                            )
+                            time.sleep(random.uniform(0.5, 1.0))
+                            prediction_window_seconds = float(event_dict["prediction_window_seconds"])
+                            prediction_window_seconds -= 25 if prediction_window_seconds <= 120 else 40
                             event = EventPrediction(
                                 ws.streamers[streamer_index],
                                 event_id,

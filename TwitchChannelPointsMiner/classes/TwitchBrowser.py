@@ -230,7 +230,7 @@ class TwitchBrowser:
         fname = f"{fname}.png" if fname.endswith(".png") is False else fname
         fname = os.path.join(screenshots_path, self.session_id, fname)
         # Little pause prevent effect/css animations in browser delayed
-        time.sleep(0.2)
+        time.sleep(0.1)
         self.browser.save_screenshot(fname)
 
         try:
@@ -304,7 +304,7 @@ class TwitchBrowser:
                     )
                 )
                 self.browser.get(event.streamer.chat_url)
-                time.sleep(random.uniform(4, 6))
+                time.sleep(random.uniform(3, 5))
                 if self.__open_coins_menu(event) is True:
                     if self.__click_on_bet(event) is True:
                         if self.__enable_custom_bet_value(event) is True:
@@ -355,7 +355,7 @@ class TwitchBrowser:
                             if self.__click_on_vote(event, selector_index) is True:
                                 self.__debug(event, "click_on_vote")
                                 event.bet_placed = True
-                                time.sleep(random.uniform(15, 25))
+                                time.sleep(random.uniform(10, 20))
                     except Exception:
                         logger.error("Exception raised", exc_info=True)
             else:
