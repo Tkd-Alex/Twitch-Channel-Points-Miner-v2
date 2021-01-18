@@ -41,21 +41,21 @@ class TwitchWebSocket(WebSocketApp):
         super().send(request_str)
 
     def reset(self, parent_pool):
-        self.ws.parent_pool = parent_pool
-        self.ws.keep_running = True
-        self.ws.is_closed = False
-        self.ws.is_opened = False
+        self.parent_pool = parent_pool
+        self.keep_running = True
+        self.is_closed = False
+        self.is_opened = False
 
         # Custom attribute
-        self.ws.topics = []
-        self.ws.pending_topics = []
+        self.topics = []
+        self.pending_topics = []
 
-        self.ws.twitch = parent_pool.twitch
-        self.ws.twitch_browser = parent_pool.twitch_browser
-        self.ws.streamers = parent_pool.streamers
-        self.ws.bet_settings = parent_pool.bet_settings
-        self.ws.events_predictions = parent_pool.events_predictions
+        self.twitch = parent_pool.twitch
+        self.twitch_browser = parent_pool.twitch_browser
+        self.streamers = parent_pool.streamers
+        self.bet_settings = parent_pool.bet_settings
+        self.events_predictions = parent_pool.events_predictions
 
-        self.ws.last_message_time = 0
-        self.ws.last_message_type = None
-        self.ws.last_pong = time.time()
+        self.last_message_time = 0
+        self.last_message_type = None
+        self.last_pong = time.time()
