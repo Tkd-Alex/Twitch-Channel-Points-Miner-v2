@@ -23,12 +23,14 @@ TWITCH_URL = "https://www.twitch.tv/"
 cookiePolicyQuery = 'button[data-a-target="consent-banner-accept"]'
 
 streamCoinsMenuXP = '//div[@data-test-selector="community-points-summary"]//button'
-streamCoinsMenuJS = 'document.querySelector("[data-test-selector=\"community-points-summary\"]").getElementsByTagName("button")[0].click();'
+streamCoinsMenuJS = 'document.querySelector("[data-test-selector="community-points-summary"]").getElementsByTagName("button")[0].click();'
 
 streamBetTitleInBet = '[data-test-selector="predictions-list-item__title"]'
 
-streamBetCustomVoteXP = 'button[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]'
-streamBetCustomVoteJS = 'document.querySelector("button[data-test-selector=\"prediction-checkout-active-footer__input-type-toggle\"]").click();'
+streamBetCustomVoteXP = (
+    'button[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]'
+)
+streamBetCustomVoteJS = 'document.querySelector("button[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]").click();'
 
 streamBetMainDiv = "//div[@id='channel-points-reward-center-body']//div[contains(@class,'custom-prediction-button')]"
 streamBetVoteInputXP = f"({streamBetMainDiv}//input)"
@@ -326,7 +328,11 @@ class TwitchBrowser:
                 decision = event.bet.calculate(event.streamer.channel_points)
                 if decision["choice"]:
                     selector_index = "[1]" if decision["choice"] == "A" else "[2]"
-                    decision_outcome = (event.bet.outcomes[0] if decision['choice'] == "A" else event.bet.outcomes[1])
+                    decision_outcome = (
+                        event.bet.outcomes[0]
+                        if decision["choice"] == "A"
+                        else event.bet.outcomes[1]
+                    )
                     try:
                         logger.info(
                             emoji.emojize(
@@ -334,10 +340,16 @@ class TwitchBrowser:
                                 use_aliases=True,
                             )
                         )
-                        if self.__send_text_on_bet(event, selector_index, decision['amount']) is True:
+                        if (
+                            self.__send_text_on_bet(
+                                event, selector_index, decision["amount"]
+                            )
+                            is True
+                        ):
                             logger.info(
                                 emoji.emojize(
-                                    f":wrench:  Going to place the bet for event: {event}", use_aliases=True
+                                    f":wrench:  Going to place the bet for event: {event}",
+                                    use_aliases=True,
                                 )
                             )
                             if self.__click_on_vote(event, selector_index) is True:
@@ -394,10 +406,15 @@ class TwitchBrowser:
             )
         )
 
-        if self.__execute_script("""
+        if (
+            self.__execute_script(
+                """
                                  var div = document.getElementsByClassName('simplebar-scroll-content')[1];
                                  div.scrollTop = div.scrollHeight
-                                 """) is False:
+                                 """
+            )
+            is False
+        ):
             logger.error("Unable to scroll down in the bet window")
 
         status = self.__click_when_exist(streamBetCustomVoteXP, By.CSS_SELECTOR)
@@ -420,7 +437,9 @@ class TwitchBrowser:
         self.__debug(event, "before__send_text")
         status = self.__send_text(streamBetVoteInputXP + selector_index, text, By.XPATH)
         if status is False:
-            status = self.__execute_script(streamBetVoteInputJS.format(int(selector_index) - 1, int(text)))
+            status = self.__execute_script(
+                streamBetVoteInputJS.format(int(selector_index) - 1, int(text))
+            )
 
         if status is True:
             self.__debug(event, "send_text")
@@ -428,9 +447,13 @@ class TwitchBrowser:
         return False
 
     def __click_on_vote(self, event, selector_index):
-        status = self.__click_when_exist(streamBetVoteButtonXP + selector_index, By.XPATH)
+        status = self.__click_when_exist(
+            streamBetVoteButtonXP + selector_index, By.XPATH
+        )
         if status is False:
-            status = self.__execute_script(streamBetVoteButtonJS.format(int(selector_index) - 1))
+            status = self.__execute_script(
+                streamBetVoteButtonJS.format(int(selector_index) - 1)
+            )
 
         if status is True:
             self.__debug(event, "click_on_vote")

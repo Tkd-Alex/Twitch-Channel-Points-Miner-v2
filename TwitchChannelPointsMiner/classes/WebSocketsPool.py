@@ -77,8 +77,18 @@ class WebSocketsPool:
                 ws.ping()
                 time.sleep(random.uniform(25, 30))
 
-                if int(timedelta(seconds=int(time.time() - float(ws.last_pong))).total_seconds() / 60) > 5:
-                    logger.info("The last pong was received more than 5 minutes ago. Reconnect the WebSocket")
+                if (
+                    int(
+                        timedelta(
+                            seconds=int(time.time() - float(ws.last_pong))
+                        ).total_seconds()
+                        / 60
+                    )
+                    > 5
+                ):
+                    logger.info(
+                        "The last pong was received more than 5 minutes ago. Reconnect the WebSocket"
+                    )
                     WebSocketsPool.handle_websocket_reconnection(ws)
 
         thread_ws = threading.Thread(target=run)
