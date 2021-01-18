@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 
 from random import randrange
 from websocket import WebSocketApp
@@ -38,3 +39,23 @@ class TwitchWebSocket(WebSocketApp):
         request_str = json.dumps(request, separators=(",", ":"))
         logger.debug(f"Send: {request_str}")
         super().send(request_str)
+
+    def reset(self, parent_pool):
+        self.ws.parent_pool = parent_pool
+        self.ws.keep_running = True
+        self.ws.is_closed = False
+        self.ws.is_opened = False
+
+        # Custom attribute
+        self.ws.topics = []
+        self.ws.pending_topics = []
+
+        self.ws.twitch = parent_pool.twitch
+        self.ws.twitch_browser = parent_pool.twitch_browser
+        self.ws.streamers = parent_pool.streamers
+        self.ws.bet_settings = parent_pool.bet_settings
+        self.ws.events_predictions = parent_pool.events_predictions
+
+        self.ws.last_message_time = 0
+        self.ws.last_message_type = None
+        self.ws.last_pong = time.time()

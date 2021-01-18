@@ -5,6 +5,7 @@ import json
 import emoji
 import random
 
+from datetime import timedelta
 from dateutil import parser
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
@@ -18,13 +19,6 @@ def get_streamer_index(streamers, channel_id):
     return next(i for i, x in enumerate(streamers) if x.channel_id == channel_id)
 
 
-"""
-API Limits
-- Clients can listen on up to 50 topics per connection. Trying to listen on more topics will result in an error message.
-- We recommend that a single client IP address establishes no more than 10 simultaneous connections.
-The two limits above are likely to be relaxed for approved third-party applications, as we start to better understand third-party requirements.
-"""
-
 class WebSocketsPool:
     def __init__(
         self, twitch, twitch_browser, streamers, bet_settings, events_predictions
@@ -35,6 +29,13 @@ class WebSocketsPool:
         self.streamers = streamers
         self.events_predictions = events_predictions
         self.bet_settings = bet_settings
+
+    """
+    API Limits
+    - Clients can listen on up to 50 topics per connection. Trying to listen on more topics will result in an error message.
+    - We recommend that a single client IP address establishes no more than 10 simultaneous connections.
+    The two limits above are likely to be relaxed for approved third-party applications, as we start to better understand third-party requirements.
+    """
 
     def submit(self, topic):
         if self.ws is None or len(self.ws.topics) >= 50:
@@ -54,23 +55,7 @@ class WebSocketsPool:
             on_open=WebSocketsPool.on_open,
             on_close=WebSocketsPool.handle_websocket_reconnection,
         )
-        self.ws.parent_pool = self
-        self.ws.keep_running = True
-        self.ws.is_closed = False
-        self.ws.is_opened = False
-
-        # Custom attribute
-        self.ws.topics = []
-        self.ws.pending_topics = []
-
-        self.ws.twitch = self.twitch
-        self.ws.twitch_browser = self.twitch_browser
-        self.ws.streamers = self.streamers
-        self.ws.bet_settings = self.bet_settings
-        self.ws.events_predictions = self.events_predictions
-
-        self.ws.last_message_time = 0
-        self.ws.last_message_type = None
+        self.ws.reset(self)
 
         self.thread_ws = threading.Thread(target=lambda: self.ws.run_forever())
         self.thread_ws.daemon = True
@@ -92,6 +77,10 @@ class WebSocketsPool:
                 ws.ping()
                 time.sleep(random.uniform(25, 30))
 
+                if int(timedelta(seconds=int(time.time() - float(ws.last_pong))).total_seconds() / 60) > 5:
+                    logger.info("The last pong was received more than 5 minutes ago. Reconnect the WebSocket")
+                    WebSocketsPool.handle_websocket_reconnection(ws)
+
         thread_ws = threading.Thread(target=run)
         thread_ws.daemon = True
         thread_ws.start()
@@ -100,8 +89,9 @@ class WebSocketsPool:
     def handle_websocket_reconnection(ws):
         ws.is_closed = True
         if ws.keep_running is True:
-            logger.info("Reconnecting to Twitch PubSub server in 30 seconds")
-            time.sleep(30)
+            logger.info("Reconnecting to Twitch PubSub server in 60 seconds")
+            time.sleep(60)
+
             self = ws.parent_pool
             if self.ws == ws:
                 self.ws = None
@@ -266,3 +256,6 @@ class WebSocketsPool:
         elif response["type"] == "RECONNECT":
             logger.info(f"Reconnection required and keep running is: {ws.keep_running}")
             WebSocketsPool.handle_websocket_reconnection(ws)
+
+        elif response["type"] == "PONG":
+            ws.last_pong = time.time()
