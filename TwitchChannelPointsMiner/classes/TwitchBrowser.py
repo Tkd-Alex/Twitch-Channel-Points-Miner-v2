@@ -105,7 +105,7 @@ class TwitchBrowser:
     def __init_twitch(self):
         logger.debug(
             emoji.emojize(
-                ":wrench:  Init Twitch page - Cookie - LocalStorage items",
+                ":wrench:  Init Twitch page - Cookies - LocalStorage items",
                 use_aliases=True,
             )
         )
