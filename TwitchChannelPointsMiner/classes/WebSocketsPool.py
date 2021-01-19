@@ -137,7 +137,10 @@ class WebSocketsPool:
                     reason_code = message_data["point_gain"]["reason_code"]
                     balance = message_data["balance"]["balance"]
                     ws.streamers[streamer_index].channel_points = balance
-                    logger.info(f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.", extra={"emoji": ":rocket:"})
+                    logger.info(
+                        f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
+                        extra={"emoji": ":rocket:"},
+                    )
                     ws.streamers[streamer_index].update_history(reason_code, earned)
                 elif message_type == "claim-available":
                     streamer_index = get_streamer_index(
@@ -175,8 +178,12 @@ class WebSocketsPool:
                     if event_id not in ws.events_predictions:
                         if event_status == "ACTIVE":
                             time.sleep(random.uniform(0.5, 1.0))
-                            prediction_window_seconds = float(event_dict["prediction_window_seconds"])
-                            prediction_window_seconds -= 25 if prediction_window_seconds <= 120 else 40
+                            prediction_window_seconds = float(
+                                event_dict["prediction_window_seconds"]
+                            )
+                            prediction_window_seconds -= (
+                                25 if prediction_window_seconds <= 120 else 40
+                            )
                             event = EventPrediction(
                                 ws.streamers[streamer_index],
                                 event_id,
@@ -205,7 +212,10 @@ class WebSocketsPool:
                                         place_bet_thread.daemon = True
                                         place_bet_thread.start()
 
-                                        logger.info(f"Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}", extra={"emoji": ":alarm_clock:"})
+                                        logger.info(
+                                            f"Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}",
+                                            extra={"emoji": ":alarm_clock:"},
+                                        )
 
                     else:
                         ws.events_predictions[event_id].status = event_status
@@ -227,7 +237,10 @@ class WebSocketsPool:
                         event_id = message_data["prediction"]["event_id"]
                         event_result = message_data["prediction"]["result"]
                         if event_id in ws.events_predictions:
-                            logger.info(f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}", extra={"emoji": ":bar_chart:"})
+                            logger.info(
+                                f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
+                                extra={"emoji": ":bar_chart:"},
+                            )
                             ws.events_predictions[event_id].final_result = {
                                 "type": event_result["type"],
                                 "won": event_result["points_won"]

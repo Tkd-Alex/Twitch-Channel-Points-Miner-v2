@@ -72,7 +72,9 @@ class TwitchChannelPointsMiner:
         if self.running:
             logger.error("You can't start multiple session of this istance!")
         else:
-            logger.info(f"Start session: '{self.session_id}'", extra={"emoji": ":bomb:"})
+            logger.info(
+                f"Start session: '{self.session_id}'", extra={"emoji": ":bomb:"}
+            )
             self.running = True
             self.start_datetime = datetime.now()
 
@@ -86,7 +88,10 @@ class TwitchChannelPointsMiner:
                     streamer = Streamer(streamer_username, channel_id)
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:
-                    logger.info(f"Streamer {streamer_username} does not exist", extra={"emoji": ":cry:"})
+                    logger.info(
+                        f"Streamer {streamer_username} does not exist",
+                        extra={"emoji": ":cry:"},
+                    )
 
             for streamer in self.streamers:
                 time.sleep(random.uniform(0.3, 0.7))
@@ -165,18 +170,32 @@ class TwitchChannelPointsMiner:
         print("\n")
         logger.info(f"End session '{self.session_id}'", extra={"emoji": ":stop_sign:"})
         if self.logs_file is not None:
-            logger.info(f"Logs file: {self.logs_file}", extra={"emoji": ":page_facing_up:"})
-        logger.info(f"Duration {datetime.now() - self.start_datetime}", extra={"emoji": ":hourglass:"})
+            logger.info(
+                f"Logs file: {self.logs_file}", extra={"emoji": ":page_facing_up:"}
+            )
+        logger.info(
+            f"Duration {datetime.now() - self.start_datetime}",
+            extra={"emoji": ":hourglass:"},
+        )
 
         if self.make_predictions:
             print("")
             logger.info(f"{self.bet_settings}", extra={"emoji": ":bar_chart:"})
             for event_id in self.events_predictions:
-                logger.info(f"{self.events_predictions[event_id].print_recap()}", extra={"emoji": ":bar_chart:"})
+                logger.info(
+                    f"{self.events_predictions[event_id].print_recap()}",
+                    extra={"emoji": ":bar_chart:"},
+                )
             print("")
 
         for streamer_index in range(0, len(self.streamers)):
-            logger.info(f"{self.streamers[streamer_index]}, Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}", extra={"emoji": ":nerd_face:"})
+            logger.info(
+                f"{self.streamers[streamer_index]}, Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
+                extra={"emoji": ":nerd_face:"},
+            )
             if self.streamers[streamer_index].history != {}:
-                logger.info(f"{self.streamers[streamer_index].print_history()}", extra={"emoji": ":moneybag:"})
+                logger.info(
+                    f"{self.streamers[streamer_index].print_history()}",
+                    extra={"emoji": ":moneybag:"},
+                )
                 # print("")

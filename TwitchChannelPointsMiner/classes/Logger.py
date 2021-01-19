@@ -14,7 +14,9 @@ class EmojiFormatter(logging.Formatter):
 
     def format(self, record):
         if hasattr(record, "emoji") and self.print_emoji is True:
-            record.msg = emoji.emojize(f"{record.emoji}  {record.msg.strip()}", use_aliases=True)
+            record.msg = emoji.emojize(
+                f"{record.emoji}  {record.msg.strip()}", use_aliases=True
+            )
         return super().format(record)
 
 
@@ -23,7 +25,7 @@ class LoggerSettings:
         self,
         save: bool = True,
         level: int = logging.INFO,
-        emoji: bool = platform.system() != "Windows"
+        emoji: bool = platform.system() != "Windows",
     ):
         self.save = save
         self.level = level
@@ -40,7 +42,7 @@ def configure_loggers(username, settings):
         EmojiFormatter(
             fmt="%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s",
             datefmt="%d/%m/%y %H:%M:%S",
-            print_emoji=settings.emoji
+            print_emoji=settings.emoji,
         )
     )
     root_logger.addHandler(console_handler)
@@ -52,12 +54,12 @@ def configure_loggers(username, settings):
             logs_path,
             f"{username}.{datetime.now().strftime('%d%m%Y-%H%M%S')}.log",
         )
-        file_handler = logging.FileHandler(logs_file, 'w', 'utf-8')
+        file_handler = logging.FileHandler(logs_file, "w", "utf-8")
         file_handler.setFormatter(
             EmojiFormatter(
                 fmt="%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s",
                 datefmt="%d/%m/%y %H:%M:%S",
-                print_emoji=settings.emoji
+                print_emoji=settings.emoji,
             )
         )
         root_logger.addHandler(file_handler)

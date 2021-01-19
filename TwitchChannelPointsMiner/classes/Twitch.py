@@ -237,4 +237,7 @@ class Twitch:
                 }
             )
 
-            logger.info(f"Joining raid from {streamer.username} to {raid.target_login}!", extra={"emoji": ":performing_arts:"})
+            logger.info(
+                f"Joining raid from {streamer.username} to {raid.target_login}!",
+                extra={"emoji": ":performing_arts:"},
+            )

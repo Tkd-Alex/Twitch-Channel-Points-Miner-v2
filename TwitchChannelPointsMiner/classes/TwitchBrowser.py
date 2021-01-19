@@ -22,14 +22,14 @@ TWITCH_URL = "https://www.twitch.tv/"
 cookiePolicyQuery = 'button[data-a-target="consent-banner-accept"]'
 
 streamCoinsMenuXP = '//div[@data-test-selector="community-points-summary"]//button'
-streamCoinsMenuJS = 'document.querySelector("[data-test-selector=\"community-points-summary\"]").getElementsByTagName("button")[0].click();'
+streamCoinsMenuJS = 'document.querySelector("[data-test-selector="community-points-summary"]").getElementsByTagName("button")[0].click();'
 
 streamBetTitleInBet = '[data-test-selector="predictions-list-item__title"]'
 
 streamBetCustomVoteXP = (
     'button[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]'
 )
-streamBetCustomVoteJS = 'document.querySelector("button[data-test-selector=\"prediction-checkout-active-footer__input-type-toggle\"]").click();'
+streamBetCustomVoteJS = 'document.querySelector("button[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]").click();'
 
 streamBetMainDiv = "//div[@id='channel-points-reward-center-body']//div[contains(@class,'custom-prediction-button')]"
 streamBetVoteInputXP = f"({streamBetMainDiv}//input)"
@@ -102,7 +102,10 @@ class TwitchBrowser:
         self.__init_twitch()
 
     def __init_twitch(self):
-        logger.debug("Init Twitch page - Cookies - LocalStorage items", extra={"emoji": ":wrench:"})
+        logger.debug(
+            "Init Twitch page - Cookies - LocalStorage items",
+            extra={"emoji": ":wrench:"},
+        )
         cookie = {
             "domain": ".twitch.tv",
             "hostOnly": False,
@@ -162,13 +165,18 @@ class TwitchBrowser:
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-setuid-sandbox")
 
-        options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})
+        options.add_experimental_option(
+            "prefs", {"profile.managed_default_content_settings.images": 2}
+        )
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
         if os.path.isfile(self.settings.chrome_path) is True:
             self.browser = webdriver.Chrome(self.settings.chrome_path, options=options)
         else:
-            logger.warning(f"The path {self.settings.chrome_path} is not valid", extra={"emoji": ":wrench:"})
+            logger.warning(
+                f"The path {self.settings.chrome_path} is not valid",
+                extra={"emoji": ":wrench:"},
+            )
             self.browser = webdriver.Chrome(options=options)
 
     # Private method __ - We can instantiate webdriver only with init_browser
@@ -287,18 +295,26 @@ class TwitchBrowser:
             )
         else:
             for attempt in range(0, self.settings.max_attempts):
-                logger.info(f"Start betting at {event.streamer.chat_url} for event: {event}", extra={"emoji": ":wrench:"})
+                logger.info(
+                    f"Start betting at {event.streamer.chat_url} for event: {event}",
+                    extra={"emoji": ":wrench:"},
+                )
                 self.browser.get(event.streamer.chat_url)
                 time.sleep(random.uniform(3, 5))
                 if self.__open_coins_menu(event) is True:
                     if self.__click_on_bet(event) is True:
                         if self.__enable_custom_bet_value(event) is True:
                             return self.currently_is_betting
-                logger.error(f"Attempt {attempt+1} failed!", extra={"emoji": ":wrench:"})
+                logger.error(
+                    f"Attempt {attempt+1} failed!", extra={"emoji": ":wrench:"}
+                )
             return False
 
     def place_bet(self, event: EventPrediction):
-        logger.info(f"Going to complete bet for event {event}. Current url page: {self.browser.current_url}", extra={"emoji": ":wrench:"})
+        logger.info(
+            f"Going to complete bet for event {event}. Current url page: {self.browser.current_url}",
+            extra={"emoji": ":wrench:"},
+        )
         if event.status == "ACTIVE":
             if event.box_fillable and self.currently_is_betting:
                 decision = event.bet.calculate(event.streamer.channel_points)
@@ -310,14 +326,20 @@ class TwitchBrowser:
                         else event.bet.outcomes[1]
                     )
                     try:
-                        logger.info(f"Going to write: {decision['amount']} on input {decision['choice']}: {decision_outcome}", extra={"emoji": ":wrench:"})
+                        logger.info(
+                            f"Going to write: {decision['amount']} on input {decision['choice']}: {decision_outcome}",
+                            extra={"emoji": ":wrench:"},
+                        )
                         if (
                             self.__send_text_on_bet(
                                 event, selector_index, decision["amount"]
                             )
                             is True
                         ):
-                            logger.info(f"Going to place the bet for event: {event}", extra={"emoji": ":wrench:"})
+                            logger.info(
+                                f"Going to place the bet for event: {event}",
+                                extra={"emoji": ":wrench:"},
+                            )
                             if self.__click_on_vote(event, selector_index) is True:
                                 self.__debug(event, "click_on_vote")
                                 event.bet_placed = True
@@ -357,7 +379,10 @@ class TwitchBrowser:
         return False
 
     def __enable_custom_bet_value(self, event):
-        logger.info(f"Enable input of custom value for event: {event}", extra={"emoji": ":wrench:"})
+        logger.info(
+            f"Enable input of custom value for event: {event}",
+            extra={"emoji": ":wrench:"},
+        )
 
         if (
             self.__execute_script(
@@ -388,7 +413,9 @@ class TwitchBrowser:
 
     def __send_text_on_bet(self, event, selector_index, text):
         self.__debug(event, "before__send_text")
-        status = self.__send_text(f"{streamBetVoteInputXP}[{selector_index}]", text, By.XPATH)
+        status = self.__send_text(
+            f"{streamBetVoteInputXP}[{selector_index}]", text, By.XPATH
+        )
         if status is False:
             status = self.__execute_script(
                 streamBetVoteInputJS.format(int(selector_index) - 1, int(text))
@@ -400,7 +427,9 @@ class TwitchBrowser:
         return False
 
     def __click_on_vote(self, event, selector_index):
-        status = self.__click_when_exist(f"{streamBetVoteButtonXP}[{selector_index}]", By.XPATH)
+        status = self.__click_when_exist(
+            f"{streamBetVoteButtonXP}[{selector_index}]", By.XPATH
+        )
         if status is False:
             status = self.__execute_script(
                 streamBetVoteButtonJS.format(int(selector_index) - 1)
