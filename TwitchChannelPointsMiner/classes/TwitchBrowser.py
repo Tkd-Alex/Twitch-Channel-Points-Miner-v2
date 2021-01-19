@@ -23,14 +23,14 @@ TWITCH_URL = "https://www.twitch.tv/"
 cookiePolicyQuery = 'button[data-a-target="consent-banner-accept"]'
 
 streamCoinsMenuXP = '//div[@data-test-selector="community-points-summary"]//button'
-streamCoinsMenuJS = 'document.querySelector("[data-test-selector="community-points-summary"]").getElementsByTagName("button")[0].click();'
+streamCoinsMenuJS = 'document.querySelector("[data-test-selector=\"community-points-summary\"]").getElementsByTagName("button")[0].click();'
 
 streamBetTitleInBet = '[data-test-selector="predictions-list-item__title"]'
 
 streamBetCustomVoteXP = (
     'button[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]'
 )
-streamBetCustomVoteJS = 'document.querySelector("button[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]").click();'
+streamBetCustomVoteJS = 'document.querySelector("button[data-test-selector=\"prediction-checkout-active-footer__input-type-toggle\"]").click();'
 
 streamBetMainDiv = "//div[@id='channel-points-reward-center-body']//div[contains(@class,'custom-prediction-button')]"
 streamBetVoteInputXP = f"({streamBetMainDiv}//input)"
