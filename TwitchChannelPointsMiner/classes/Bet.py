@@ -29,6 +29,10 @@ class BetSettings:
         return f"BetSettings(Strategy={self.strategy}, Percentage={self.percentage}, PercentageGap={self.percentage_gap}, MaxPoints={self.max_points}"
 
 
+def float_round(value):
+    return round(float(value), 2)
+
+
 class Bet:
     def __init__(self, outcomes: list, settings: BetSettings):
         self.outcomes = outcomes
@@ -56,18 +60,18 @@ class Bet:
             and self.outcomes[0]["total_points"] > 0
             and self.outcomes[1]["total_points"] > 0
         ):
-            self.outcomes[0]["percentage_users"] = round(
-                float((100 * self.outcomes[0]["total_users"]) / self.total_users), 2
+            self.outcomes[0]["percentage_users"] = float_round(
+                (100 * self.outcomes[0]["total_users"]) / self.total_users
             )
-            self.outcomes[1]["percentage_users"] = round(
-                float((100 * self.outcomes[1]["total_users"]) / self.total_users), 2
+            self.outcomes[1]["percentage_users"] = float_round(
+                (100 * self.outcomes[1]["total_users"]) / self.total_users
             )
 
-            self.outcomes[0]["odds"] = round(
-                float(self.total_points / self.outcomes[0]["total_points"]), 2
+            self.outcomes[0]["odds"] = float_round(
+                self.total_points / self.outcomes[0]["total_points"]
             )
-            self.outcomes[1]["odds"] = round(
-                float(self.total_points / self.outcomes[1]["total_points"]), 2
+            self.outcomes[1]["odds"] = float_round(
+                self.total_points / self.outcomes[1]["total_points"]
             )
 
         self.__clear_outcomes()
@@ -90,44 +94,36 @@ class Bet:
                 ]:
                     del self.outcomes[index][key]
 
+    def __return_choice(self, key):
+        return "A" if self.outcomes[0][key] > self.outcomes[1][key] else "B"
+
     def calculate(self, balance: int):
         self.decision = {"choice": "", "amount": 0, "id": None}
         if self.settings.strategy == Strategy.MOST_VOTED:
-            self.decision["choice"] = (
-                "A"
-                if self.outcomes[0]["total_users"] > self.outcomes[1]["total_users"]
-                else "B"
-            )
+            self.decision["choice"] = self.__return_choice("total_users")
         elif self.settings.strategy == Strategy.HIGH_ODDS:
-            self.decision["choice"] = (
-                "A" if self.outcomes[0]["odds"] > self.outcomes[1]["odds"] else "B"
-            )
+            self.decision["choice"] = self.__return_choice("odds")
         elif self.settings.strategy == Strategy.SMART:
-            if (
-                abs(
-                    self.outcomes[0]["percentage_users"]
-                    - self.outcomes[1]["percentage_users"]
+            self.decision["choice"] = (
+                self.__return_choice("odds")
+                if (
+                    abs(
+                        self.outcomes[0]["percentage_users"]
+                        - self.outcomes[1]["percentage_users"]
+                    )
+                    < self.settings.percentage_gap
                 )
-                < self.settings.percentage_gap
-            ):
-                self.decision["choice"] = (
-                    "A" if self.outcomes[0]["odds"] > self.outcomes[1]["odds"] else "B"
-                )
-            else:
-                self.decision["choice"] = (
-                    "A"
-                    if self.outcomes[0]["total_users"] > self.outcomes[1]["total_users"]
-                    else "B"
-                )  # Follow other users
+                else self.__return_choice("total_users")
+            )
 
-        if self.decision["choice"]:
+        if self.decision["choice"] != "":
             self.decision["id"] = (
                 self.outcomes[0]["id"]
                 if self.decision["choice"] == "A"
                 else self.outcomes[1]["id"]
             )
             self.decision["amount"] = min(
-                round(balance * (self.settings.percentage / 100)),
+                int(balance * (self.settings.percentage / 100)),
                 self.settings.max_points,
             )
         return self.decision
