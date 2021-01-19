@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.classes.Bet import Strategy, BetSettings
 from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser, BrowserSettings

@@ -167,6 +167,8 @@ class TwitchBrowser:
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-setuid-sandbox")
+
+        options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
         if os.path.isfile(self.settings.chrome_path) is True:
@@ -216,9 +218,8 @@ class TwitchBrowser:
 
         # Little delay ...
         time.sleep(0.2)
-        f = open(fname, "w")
-        f.write(self.browser.page_source)
-        f.close()
+        with open(fname, "w", encoding="utf-8") as writer:
+            writer.write(self.browser.page_source)
 
     def screenshot(self, fname, write_timestamp=False):
         screenshots_path = os.path.join(Path().absolute(), "screenshots")
@@ -327,7 +328,7 @@ class TwitchBrowser:
             if event.box_fillable and self.currently_is_betting:
                 decision = event.bet.calculate(event.streamer.channel_points)
                 if decision["choice"]:
-                    selector_index = "[1]" if decision["choice"] == "A" else "[2]"
+                    selector_index = 1 if decision["choice"] == "A" else 2
                     decision_outcome = (
                         event.bet.outcomes[0]
                         if decision["choice"] == "A"
@@ -435,7 +436,7 @@ class TwitchBrowser:
 
     def __send_text_on_bet(self, event, selector_index, text):
         self.__debug(event, "before__send_text")
-        status = self.__send_text(streamBetVoteInputXP + selector_index, text, By.XPATH)
+        status = self.__send_text(f"{streamBetVoteInputXP}[{selector_index}]", text, By.XPATH)
         if status is False:
             status = self.__execute_script(
                 streamBetVoteInputJS.format(int(selector_index) - 1, int(text))
@@ -447,9 +448,7 @@ class TwitchBrowser:
         return False
 
     def __click_on_vote(self, event, selector_index):
-        status = self.__click_when_exist(
-            streamBetVoteButtonXP + selector_index, By.XPATH
-        )
+        status = self.__click_when_exist(f"{streamBetVoteButtonXP}[{selector_index}]", By.XPATH)
         if status is False:
             status = self.__execute_script(
                 streamBetVoteButtonJS.format(int(selector_index) - 1)

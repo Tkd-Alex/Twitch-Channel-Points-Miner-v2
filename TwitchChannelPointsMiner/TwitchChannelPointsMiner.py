@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import logging
 import threading
 import signal
@@ -75,7 +77,7 @@ class TwitchChannelPointsMiner:
                 logs_path,
                 f"{username}.{datetime.now().strftime('%d%m%Y-%H%M%S')}.log",
             )
-            file_handler = logging.FileHandler(self.logs_file)
+            file_handler = logging.FileHandler(self.logs_file, 'w', 'utf-8')
             file_handler.setFormatter(
                 logging.Formatter(
                     "%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s"

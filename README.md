@@ -26,6 +26,8 @@ For the bet system the script use Selenium (Chrome implemented but not tested as
 2. Install all the requirements `pip install -r requirements.txt`
 3. Create your `run.py` file start from [example.py](/example.py)
 ```python
+# -*- coding: utf-8 -*-
+
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.classes.Bet import Strategy, BetSettings
 from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser, BrowserSettings
