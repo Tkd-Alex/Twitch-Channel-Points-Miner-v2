@@ -28,4 +28,7 @@ twitch_miner = TwitchChannelPointsMiner(
     )
 )
 
-twitch_miner.mine(["streamer1", "streamer2"])  # Array of streamers
+twitch_miner.mine(
+    ["streamer1", "streamer2"],  # Array of streamers
+    followers=False  # Automatic download the list of your followers
+)
