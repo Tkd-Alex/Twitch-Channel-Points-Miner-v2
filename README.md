@@ -78,7 +78,7 @@ twitch_miner.mine(["streamer1", "streamer2"], followers=True)  # Mixed
 - **HIGH_ODDS**: Select the option with the highest odds
 - **SMART**: If the majority in percent chose an option then follow the other users, otherwise choose the option with the highest odds
 
-## Migrating from old repository (the original on):
+## Migrating from old repository (the original one):
 If you already have a `twitch-cookies.pkl` and you don't want to login again please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
 ```
 .
