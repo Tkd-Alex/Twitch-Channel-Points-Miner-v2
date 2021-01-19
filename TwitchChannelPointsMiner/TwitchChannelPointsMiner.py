@@ -90,11 +90,12 @@ class TwitchChannelPointsMiner:
                 # Append at the end with lowest priority
                 followers_array = self.twitch.get_followers()
                 logger.info(
-                    f"Load {len(followers_array)} followers from your profile",
+                    f"Load {len(followers_array)} followers from your profile!",
                     extra={"emoji": ":clipboard:"},
                 )
                 streamers += [fw for fw in followers_array if fw not in streamers]
 
+            logger.info(f"Loading data for {len(streamers)}. This operation can take a while. Please wait ...", extra={"emoji": ":nerd_face:"})
             for streamer_username in streamers:
                 time.sleep(random.uniform(0.3, 0.7))
                 streamer_username.lower().strip()
@@ -206,7 +207,7 @@ class TwitchChannelPointsMiner:
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
                 f"{self.streamers[streamer_index]}, Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
-                extra={"emoji": ":nerd_face:"},
+                extra={"emoji": ":studio_microphone:"},
             )
             if self.streamers[streamer_index].history != {}:
                 logger.info(
