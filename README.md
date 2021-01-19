@@ -28,7 +28,9 @@ For the bet system the script use Selenium (Chrome implemented but not tested as
 ```python
 # -*- coding: utf-8 -*-
 
+import logging
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
+from TwitchChannelPointsMiner.classes.Logger import LoggerSettings
 from TwitchChannelPointsMiner.classes.Bet import Strategy, BetSettings
 from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser, BrowserSettings
 
