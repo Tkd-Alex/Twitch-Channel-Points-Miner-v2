@@ -5,15 +5,13 @@ import threading
 import signal
 import sys
 import time
-import os
 import uuid
 import copy
 import random
-import emoji
 
 from datetime import datetime
-from pathlib import Path
 
+from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.Streamer import Streamer
@@ -30,11 +28,6 @@ from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistExce
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 logging.getLogger("selenium").setLevel(logging.ERROR)
 
-logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s",
-    datefmt="%d/%m/%y %H:%M:%S",
-    level=logging.INFO,
-)
 logger = logging.getLogger(__name__)
 
 
@@ -44,8 +37,7 @@ class TwitchChannelPointsMiner:
         username: str,
         make_predictions: bool = True,
         follow_raid: bool = True,
-        save_logs: bool = True,
-        logs_level: int = logging.INFO,
+        logger_settings: LoggerSettings = LoggerSettings(),
         browser_settings: BrowserSettings = BrowserSettings(),
         bet_settings: BetSettings = BetSettings(),
     ):
@@ -67,25 +59,7 @@ class TwitchChannelPointsMiner:
         self.start_datetime = None
         self.original_streamers = []
 
-        if save_logs is True:
-            root_logger = logging.getLogger()
-            root_logger.setLevel(logs_level)
-
-            logs_path = os.path.join(Path().absolute(), "logs")
-            Path(logs_path).mkdir(parents=True, exist_ok=True)
-            self.logs_file = os.path.join(
-                logs_path,
-                f"{username}.{datetime.now().strftime('%d%m%Y-%H%M%S')}.log",
-            )
-            file_handler = logging.FileHandler(self.logs_file, 'w', 'utf-8')
-            file_handler.setFormatter(
-                logging.Formatter(
-                    "%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s"
-                )
-            )
-            root_logger.addHandler(file_handler)
-        else:
-            self.logs_file = None
+        self.logs_file = configure_loggers(username, logger_settings)
 
         signal.signal(signal.SIGINT, self.end)
         signal.signal(signal.SIGSEGV, self.end)
@@ -98,11 +72,7 @@ class TwitchChannelPointsMiner:
         if self.running:
             logger.error("You can't start multiple session of this istance!")
         else:
-            logger.info(
-                emoji.emojize(
-                    f":bomb:  Start session: '{self.session_id}'", use_aliases=True
-                )
-            )
+            logger.info(f"Start session: '{self.session_id}'", extra={"emoji": ":bomb:"})
             self.running = True
             self.start_datetime = datetime.now()
 
@@ -116,12 +86,7 @@ class TwitchChannelPointsMiner:
                     streamer = Streamer(streamer_username, channel_id)
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:
-                    logger.info(
-                        emoji.emojize(
-                            f":cry:  Streamer {streamer_username} does not exist",
-                            use_aliases=True,
-                        )
-                    )
+                    logger.info(f"Streamer {streamer_username} does not exist", extra={"emoji": ":cry:"})
 
             for streamer in self.streamers:
                 time.sleep(random.uniform(0.3, 0.7))
@@ -198,53 +163,20 @@ class TwitchChannelPointsMiner:
 
     def __print_report(self):
         print("\n")
-        logger.info(
-            emoji.emojize(
-                f":stop_sign:  End session '{self.session_id}'", use_aliases=True
-            )
-        )
+        logger.info(f"End session '{self.session_id}'", extra={"emoji": ":stop_sign:"})
         if self.logs_file is not None:
-            logger.info(
-                emoji.emojize(
-                    f":page_facing_up:  Logs file: {self.logs_file}", use_aliases=True
-                )
-            )
-        logger.info(
-            emoji.emojize(
-                f":hourglass:  Duration {datetime.now() - self.start_datetime}",
-                use_aliases=True,
-            )
-        )
+            logger.info(f"Logs file: {self.logs_file}", extra={"emoji": ":page_facing_up:"})
+        logger.info(f"Duration {datetime.now() - self.start_datetime}", extra={"emoji": ":hourglass:"})
 
         if self.make_predictions:
             print("")
-            logger.info(
-                emoji.emojize(
-                    f":bar_chart:  {self.bet_settings}",
-                    use_aliases=True,
-                )
-            )
+            logger.info(f"{self.bet_settings}", extra={"emoji": ":bar_chart:"})
             for event_id in self.events_predictions:
-                logger.info(
-                    emoji.emojize(
-                        f":bar_chart:  {self.events_predictions[event_id].print_recap()}",
-                        use_aliases=True,
-                    )
-                )
+                logger.info(f"{self.events_predictions[event_id].print_recap()}", extra={"emoji": ":bar_chart:"})
             print("")
 
         for streamer_index in range(0, len(self.streamers)):
-            logger.info(
-                emoji.emojize(
-                    f":nerd_face:  {self.streamers[streamer_index]}, Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
-                    use_aliases=True,
-                )
-            )
+            logger.info("f{self.streamers[streamer_index]}, Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}", extra={"emoji": ":nerd_face:"})
             if self.streamers[streamer_index].history != {}:
-                logger.info(
-                    emoji.emojize(
-                        f":moneybag:  {self.streamers[streamer_index].print_history()}",
-                        use_aliases=True,
-                    )
-                )
+                logger.info(f"{self.streamers[streamer_index].print_history()}", extra={"emoji": ":moneybag:"})
                 # print("")

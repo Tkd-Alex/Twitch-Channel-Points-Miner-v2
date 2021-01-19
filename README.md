@@ -36,7 +36,11 @@ twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
     make_predictions=True,  # If you want to Bet / Make prediction
     follow_raid=True,  # Follow raid to obtain more points
-    save_logs=True,  # Save logs in file
+    logger_settings=LoggerSettings(
+        save=True,  # If you want to save logs in file (suggested)
+        level=logging.INFO,  # Level of logs - use logging.DEBUG for more info)
+        emoji=True,  # On Windows we have a problem to print emoji. Set to false if you have a problem
+    ),
     browser_settings=BrowserSettings(
         browser=Browser.FIREFOX,  # Choose if you want to use Chrome or Firefox as browser
         show=False,  # Show the browser during bet

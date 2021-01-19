@@ -2,7 +2,6 @@ import logging
 import threading
 import time
 import json
-import emoji
 import random
 
 from datetime import timedelta
@@ -77,15 +76,9 @@ class WebSocketsPool:
                 ws.ping()
                 time.sleep(random.uniform(25, 30))
 
-                if (
-                    int(
-                        timedelta(
-                            seconds=int(time.time() - float(ws.last_pong))
-                        ).total_seconds()
-                        / 60
-                    )
-                    > 5
-                ):
+                elapsed = timedelta(seconds=int(time.time() - float(ws.last_pong)))
+                elapsed = int(elapsed.total_seconds()) / 60
+                if elapsed > 5:
                     logger.info(
                         "The last pong was received more than 5 minutes ago. Reconnect the WebSocket"
                     )
@@ -144,12 +137,7 @@ class WebSocketsPool:
                     reason_code = message_data["point_gain"]["reason_code"]
                     balance = message_data["balance"]["balance"]
                     ws.streamers[streamer_index].channel_points = balance
-                    logger.info(
-                        emoji.emojize(
-                            f":rocket:  +{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
-                            use_aliases=True,
-                        )
-                    )
+                    logger.info(f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.", extra={"emoji": ":rocket:"})
                     ws.streamers[streamer_index].update_history(reason_code, earned)
                 elif message_type == "claim-available":
                     streamer_index = get_streamer_index(
@@ -217,12 +205,7 @@ class WebSocketsPool:
                                         place_bet_thread.daemon = True
                                         place_bet_thread.start()
 
-                                        logger.info(
-                                            emoji.emojize(
-                                                f":alarm_clock:  Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}",
-                                                use_aliases=True,
-                                            )
-                                        )
+                                        logger.info(f"Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}", extra={"emoji": ":alarm_clock:"})
 
                     else:
                         ws.events_predictions[event_id].status = event_status
@@ -244,12 +227,7 @@ class WebSocketsPool:
                         event_id = message_data["prediction"]["event_id"]
                         event_result = message_data["prediction"]["result"]
                         if event_id in ws.events_predictions:
-                            logger.info(
-                                emoji.emojize(
-                                    f":bar_chart:  {ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
-                                    use_aliases=True,
-                                )
-                            )
+                            logger.info(f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}", extra={"emoji": ":bar_chart:"})
                             ws.events_predictions[event_id].final_result = {
                                 "type": event_result["type"],
                                 "won": event_result["points_won"]

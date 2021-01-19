@@ -2,7 +2,6 @@ import time
 import logging
 import random
 import os
-import emoji
 import platform
 
 from pathlib import Path
@@ -103,12 +102,7 @@ class TwitchBrowser:
         self.__init_twitch()
 
     def __init_twitch(self):
-        logger.debug(
-            emoji.emojize(
-                ":wrench:  Init Twitch page - Cookies - LocalStorage items",
-                use_aliases=True,
-            )
-        )
+        logger.debug("Init Twitch page - Cookies - LocalStorage items", extra={"emoji": ":wrench:"})
         cookie = {
             "domain": ".twitch.tv",
             "hostOnly": False,
@@ -155,7 +149,7 @@ class TwitchBrowser:
 
     # Private method __ - We can instantiate webdriver only with init_browser
     def __init_chrome(self):
-        logger.debug(emoji.emojize(":wrench:  Init Chrome browser", use_aliases=True))
+        logger.debug("Init Chrome browser", extra={"emoji": ":wrench:"})
         options = webdriver.ChromeOptions()
         options.add_argument("--mute-audio")
         if not self.settings.show:
@@ -174,17 +168,12 @@ class TwitchBrowser:
         if os.path.isfile(self.settings.chrome_path) is True:
             self.browser = webdriver.Chrome(self.settings.chrome_path, options=options)
         else:
-            logger.warning(
-                emoji.emojize(
-                    f":wrench:  The path {self.settings.chrome_path} is not valid",
-                    use_aliases=True,
-                )
-            )
+            logger.warning(f"The path {self.settings.chrome_path} is not valid", extra={"emoji": ":wrench:"})
             self.browser = webdriver.Chrome(options=options)
 
     # Private method __ - We can instantiate webdriver only with init_browser
     def __init_firefox(self):
-        logger.debug(emoji.emojize(":wrench:  Init Firefox browser", use_aliases=True))
+        logger.debug("Init Firefox browser", extra={"emoji": ":wrench:"})
         options = webdriver.FirefoxOptions()
         if not self.settings.show:
             options.headless = True
@@ -298,32 +287,18 @@ class TwitchBrowser:
             )
         else:
             for attempt in range(0, self.settings.max_attempts):
-                logger.info(
-                    emoji.emojize(
-                        f":wrench:  Start betting at {event.streamer.chat_url} for event: {event}",
-                        use_aliases=True,
-                    )
-                )
+                logger.info(f"Start betting at {event.streamer.chat_url} for event: {event}", extra={"emoji": ":wrench:"})
                 self.browser.get(event.streamer.chat_url)
                 time.sleep(random.uniform(3, 5))
                 if self.__open_coins_menu(event) is True:
                     if self.__click_on_bet(event) is True:
                         if self.__enable_custom_bet_value(event) is True:
                             return self.currently_is_betting
-                logger.error(
-                    emoji.emojize(
-                        f":wrench:  Attempt {attempt+1} failed!", use_aliases=True
-                    )
-                )
+                logger.error(f"Attempt {attempt+1} failed!", extra={"emoji": ":wrench:"})
             return False
 
     def place_bet(self, event: EventPrediction):
-        logger.info(
-            emoji.emojize(
-                f":wrench:  Going to complete bet for event {event}. Current url page: {self.browser.current_url}",
-                use_aliases=True,
-            )
-        )
+        logger.info(f"Going to complete bet for event {event}. Current url page: {self.browser.current_url}", extra={"emoji": ":wrench:"})
         if event.status == "ACTIVE":
             if event.box_fillable and self.currently_is_betting:
                 decision = event.bet.calculate(event.streamer.channel_points)
@@ -335,24 +310,14 @@ class TwitchBrowser:
                         else event.bet.outcomes[1]
                     )
                     try:
-                        logger.info(
-                            emoji.emojize(
-                                f":wrench:  Going to write: {decision['amount']} on input {decision['choice']}: {decision_outcome}",
-                                use_aliases=True,
-                            )
-                        )
+                        logger.info(f"Going to write: {decision['amount']} on input {decision['choice']}: {decision_outcome}", extra={"emoji": ":wrench:"})
                         if (
                             self.__send_text_on_bet(
                                 event, selector_index, decision["amount"]
                             )
                             is True
                         ):
-                            logger.info(
-                                emoji.emojize(
-                                    f":wrench:  Going to place the bet for event: {event}",
-                                    use_aliases=True,
-                                )
-                            )
+                            logger.info(f"Going to place the bet for event: {event}", extra={"emoji": ":wrench:"})
                             if self.__click_on_vote(event, selector_index) is True:
                                 self.__debug(event, "click_on_vote")
                                 event.bet_placed = True
@@ -372,11 +337,7 @@ class TwitchBrowser:
         self.currently_is_betting = False
 
     def __open_coins_menu(self, event: EventPrediction):
-        logger.info(
-            emoji.emojize(
-                f":wrench:  Open coins menu for event: {event}", use_aliases=True
-            )
-        )
+        logger.info(f"Open coins menu for event: {event}", extra={"emoji": ":wrench:"})
         status = self.__click_when_exist(streamCoinsMenuXP, By.XPATH)
         if status is False:
             status = self.__execute_script(streamCoinsMenuJS)
@@ -388,11 +349,7 @@ class TwitchBrowser:
         return False
 
     def __click_on_bet(self, event):
-        logger.info(
-            emoji.emojize(
-                f":wrench:  Click on the bet for event: {event}", use_aliases=True
-            )
-        )
+        logger.info(f"Click on the bet for event: {event}", extra={"emoji": ":wrench:"})
         if self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR) is True:
             time.sleep(random.uniform(0.05, 0.1))
             self.__debug(event, "click_on_bet")
@@ -400,12 +357,7 @@ class TwitchBrowser:
         return False
 
     def __enable_custom_bet_value(self, event):
-        logger.info(
-            emoji.emojize(
-                f":wrench:  Enable input of custom value for event: {event}",
-                use_aliases=True,
-            )
-        )
+        logger.info(f"Enable input of custom value for event: {event}", extra={"emoji": ":wrench:"})
 
         if (
             self.__execute_script(
