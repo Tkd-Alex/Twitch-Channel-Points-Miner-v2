@@ -10,6 +10,7 @@ import copy
 import random
 
 from datetime import datetime
+from collections import OrderedDict
 
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
@@ -65,10 +66,10 @@ class TwitchChannelPointsMiner:
         signal.signal(signal.SIGSEGV, self.end)
         signal.signal(signal.SIGTERM, self.end)
 
-    def mine(self, streamers: list = []):
-        self.run(streamers)
+    def mine(self, streamers: list = [], followers=False):
+        self.run(streamers, followers)
 
-    def run(self, streamers: list = []):
+    def run(self, streamers: list = [], followers=False):
         if self.running:
             logger.error("You can't start multiple session of this istance!")
         else:
@@ -79,6 +80,20 @@ class TwitchChannelPointsMiner:
             self.start_datetime = datetime.now()
 
             self.twitch.login()
+
+            # Clear streamers array
+            # Remove duplicate 3. Preserving Order: Use OrderedDict (askpython .com)
+            streamers = [streamer_name.lower().strip() for streamer_name in streamers]
+            streamers = list(OrderedDict.fromkeys(streamers))
+
+            if followers is True:
+                # Append at the end with lowest priority
+                followers_array = self.twitch.get_followers()
+                logger.info(
+                    f"Load {len(followers_array)} followers from your profile",
+                    extra={"emoji": ":clipboard:"},
+                )
+                streamers += [fw for fw in followers_array if fw not in streamers]
 
             for streamer_username in streamers:
                 time.sleep(random.uniform(0.3, 0.7))

@@ -10,6 +10,7 @@ import re
 import os
 import time
 import logging
+import random
 
 from base64 import b64encode
 from pathlib import Path
@@ -211,18 +212,44 @@ class Twitch:
                 time.sleep(60)
 
     def get_channel_id(self, streamer_username):
+        json_response = self.__do_helix_request(f"/users?login={streamer_username}")
+        data = json_response["data"]
+        if len(data) >= 1:
+            return data[0]["id"]
+        else:
+            raise StreamerDoesNotExistException
+
+    def get_followers(self, first=100):
+        followers = []
+        pagination = {}
+        while 1:
+            query = f"/users/follows?from_id={self.twitch_login.get_user_id()}&first={first}"
+            if pagination != {}:
+                query += f"&after={pagination['cursor']}"
+
+            json_response = self.__do_helix_request(query)
+            pagination = json_response["pagination"]
+            followers += [fw["to_name"].lower() for fw in json_response["data"]]
+            time.sleep(random.uniform(0.3, 0.7))
+
+            if pagination == {}:
+                break
+
+        return followers
+
+    def __do_helix_request(self, query, response_as_json=True):
+        url = f"https://api.twitch.tv/helix/{query.strip('/')}"
         response = requests.get(
-            f"https://api.twitch.tv/helix/users?login={streamer_username}",
+            url,
             headers={
                 "Authorization": f"Bearer {self.twitch_login.get_auth_token()}",
                 "Client-Id": TWITCH_CLIENT_ID,
             },
         )
-        data = response.json()["data"]
-        if len(data) >= 1:
-            return data[0]["id"]
-        else:
-            raise StreamerDoesNotExistException
+        logger.debug(
+            f"Query: {query}, Status code: {response.status_code}, Content: {response.json()}"
+        )
+        return response.json() if response_as_json is True else response
 
     def update_raid(self, streamer, raid):
         if streamer.raid != raid:
