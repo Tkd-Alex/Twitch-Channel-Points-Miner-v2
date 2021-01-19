@@ -81,6 +81,13 @@ If you already have a `twitch-cookies.pkl` and you don't want to login again ple
 |   +-- your-twitch-username.pkl
 ```
 
+## Windows
+Other users have find multiple problems on Windows my suggestion are:
+ - Stop use Windows :stuck_out_tongue_closed_eyes:
+ - Suppress the emoji in logs with `logger_settings=LoggerSettings(emoji=False)`
+ - Download the geckodriver from here: https://github.com/mozilla/geckodriver/releases/ and extract in the same folder of this project. For other issue with geckodriver just googling: https://stackoverflow.com/questions/40208051/selenium-using-python-geckodriver-executable-needs-to-be-in-path
+
+
 ## Use Chrome instead Firefox
 If you prefer Chrome instead Firefox please download the WebDriver matching with your Chrome version and OS from this link: https://chromedriver.chromium.org/downloads.
 Extract the archivie, copy the chromedriver file in this project folder.
@@ -88,6 +95,6 @@ Edit your run.py file and the browser_settings should something like this:
 ```python
 browser_settings=BrowserSettings(
     browser=Browser.CHROME,
-    chrome_path="/path/of/your/chromedriver"  # If no path was provided the script will try to search automatically
+    driver_path="/path/of/your/chromedriver"  # If no path was provided the script will try to search automatically
 ),
 ```

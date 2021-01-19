@@ -56,7 +56,7 @@ class BrowserSettings:
         save_html: bool = False,  # Options for debug
         show: bool = True,
         browser: Browser = Browser.FIREFOX,
-        chrome_path: str = None,
+        driver_path: str = None,
     ):
         self.timeout = timeout
         self.implicitly_wait = implicitly_wait
@@ -65,12 +65,15 @@ class BrowserSettings:
         self.save_html = save_html
         self.show = show
         self.browser = browser
-        self.chrome_path = (
-            chrome_path
-            if chrome_path is not None
+        self.driver_path = (
+            driver_path
+            if driver_path is not None
             else os.path.join(
                 Path().absolute(),
-                ("chromedriver" + (".exe" if platform.system() == "Windows" else "")),
+                (
+                    ("chromedriver" if browser == Browser.CHROME else "geckodriver")
+                    + (".exe" if platform.system() == "Windows" else "")
+                ),
             )
         )
 
@@ -170,11 +173,11 @@ class TwitchBrowser:
         )
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
-        if os.path.isfile(self.settings.chrome_path) is True:
-            self.browser = webdriver.Chrome(self.settings.chrome_path, options=options)
+        if os.path.isfile(self.settings.driver_path) is True:
+            self.browser = webdriver.Chrome(self.settings.driver_path, options=options)
         else:
             logger.warning(
-                f"The path {self.settings.chrome_path} is not valid",
+                f"The path {self.settings.driver_path} is not valid. Use default path",
                 extra={"emoji": ":wrench:"},
             )
             self.browser = webdriver.Chrome(options=options)
@@ -195,7 +198,18 @@ class TwitchBrowser:
         fp.set_preference("startup.homepage_welcome_url", "about:blank")
         fp.set_preference("startup.homepage_welcome_url.additional", "about:blank")
 
-        self.browser = webdriver.Firefox(options=options, firefox_profile=fp)
+        if os.path.isfile(self.settings.driver_path) is True:
+            self.browser = webdriver.Firefox(
+                executable_path=self.settings.driver_path,
+                options=options,
+                firefox_profile=fp,
+            )
+        else:
+            logger.warning(
+                f"The path {self.settings.driver_path} is not valid. Use default path",
+                extra={"emoji": ":wrench:"},
+            )
+            self.browser = webdriver.Firefox(options=options, firefox_profile=fp)
 
     def __debug(self, event, method):
         if self.settings.do_screenshot:

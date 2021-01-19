@@ -82,6 +82,9 @@ class Twitch:
                 "User-Agent": USER_AGENT,
             },
         )
+        logger.debug(
+            f"Data: {json_data}, Status code: {response.status_code}, Content: {response.json()}"
+        )
         return response.json()
 
     def get_broadcast_id(self, streamer):

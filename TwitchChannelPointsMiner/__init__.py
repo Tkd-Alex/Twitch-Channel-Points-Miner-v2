@@ -1,3 +1,3 @@
-__version__ = "2.0.0"
-
+# -*- coding: utf-8 -*-
+__version__ = "2.1.1"
 from .TwitchChannelPointsMiner import TwitchChannelPointsMiner
