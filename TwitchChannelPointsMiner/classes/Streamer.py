@@ -28,15 +28,13 @@ class Streamer:
 
     def set_offline(self):
         self.offline_at = time.time()
-        if self.is_online:
-            self.is_online = False
-            logger.info(f"{self} is Offline!", extra={"emoji": ":sleeping:"})
+        self.is_online = False
+        logger.info(f"{self} is Offline!", extra={"emoji": ":sleeping:"})
 
     def set_online(self):
         self.online_at = time.time()
-        if not self.is_online:
-            self.is_online = True
-            logger.info(f"{self} is Online!", extra={"emoji": ":partying_face:"})
+        self.is_online = True
+        logger.info(f"{self} is Online!", extra={"emoji": ":partying_face:"})
 
     def print_history(self):
         return ", ".join(
