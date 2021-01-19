@@ -207,7 +207,7 @@ class TwitchChannelPointsMiner:
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
                 f"{self.streamers[streamer_index]}, Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
-                extra={"emoji": ":studio_microphone:"},
+                extra={"emoji": ":microphone:"},
             )
             if self.streamers[streamer_index].history != {}:
                 logger.info(
