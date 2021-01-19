@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_streamer_index(streamers, channel_id):
-    return next(i for i, x in enumerate(streamers) if x.channel_id == channel_id)
+    return next(i for i, x in enumerate(streamers) if str(x.channel_id) == str(channel_id))
 
 
 class WebSocketsPool:
@@ -128,44 +128,45 @@ class WebSocketsPool:
             ws.last_message_time = time.time()
             ws.last_message_type = message_type
 
-            if topic == "community-points-user-v1":
-                if message_type == "points-earned":
-                    streamer_index = get_streamer_index(
-                        ws.streamers, message_data["channel_id"]
-                    )
-                    earned = message_data["point_gain"]["total_points"]
-                    reason_code = message_data["point_gain"]["reason_code"]
-                    balance = message_data["balance"]["balance"]
-                    ws.streamers[streamer_index].channel_points = balance
-                    logger.info(
-                        f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
-                        extra={"emoji": ":rocket:"},
-                    )
-                    ws.streamers[streamer_index].update_history(reason_code, earned)
-                elif message_type == "claim-available":
-                    streamer_index = get_streamer_index(
-                        ws.streamers, message_data["claim"]["channel_id"]
-                    )
-                    ws.twitch.claim_bonus(
-                        ws.streamers[streamer_index], message_data["claim"]["id"]
-                    )
+            try:
+                if topic == "community-points-user-v1":
+                    if message_type == "points-earned":
+                        streamer_index = get_streamer_index(
+                            ws.streamers, message_data["channel_id"]
+                        )
+                        earned = message_data["point_gain"]["total_points"]
+                        reason_code = message_data["point_gain"]["reason_code"]
+                        balance = message_data["balance"]["balance"]
+                        ws.streamers[streamer_index].channel_points = balance
+                        logger.info(
+                            f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
+                            extra={"emoji": ":rocket:"},
+                        )
+                        ws.streamers[streamer_index].update_history(reason_code, earned)
+                    elif message_type == "claim-available":
+                        streamer_index = get_streamer_index(
+                            ws.streamers, message_data["claim"]["channel_id"]
+                        )
+                        ws.twitch.claim_bonus(
+                            ws.streamers[streamer_index], message_data["claim"]["id"]
+                        )
 
-            elif topic == "video-playback-by-id":
-                streamer_index = get_streamer_index(ws.streamers, topic_user)
-                if message_type == "stream-down":
-                    ws.streamers[streamer_index].set_offline()
-                elif message_type == "viewcount":
-                    ws.twitch.check_streamer_online(ws.streamers[streamer_index])
-                # There is stream-up message type, but it's sent earlier than the API updates
+                elif topic == "video-playback-by-id":
+                    streamer_index = get_streamer_index(ws.streamers, topic_user)
+                    if message_type == "stream-down":
+                        ws.streamers[streamer_index].set_offline()
+                    elif message_type == "viewcount":
+                        ws.twitch.check_streamer_online(ws.streamers[streamer_index])
+                    # There is stream-up message type, but it's sent earlier than the API updates
 
-            elif topic == "raid":
-                streamer_index = get_streamer_index(ws.streamers, topic_user)
-                if message_type == "raid_update_v2":
-                    raid = Raid(message["raid"]["id"], message["raid"]["target_login"])
-                    ws.twitch.update_raid(ws.streamers[streamer_index], raid)
+                elif topic == "raid":
+                    streamer_index = get_streamer_index(ws.streamers, topic_user)
+                    if message_type == "raid_update_v2":
+                        raid = Raid(message["raid"]["id"], message["raid"]["target_login"])
+                        ws.twitch.update_raid(ws.streamers[streamer_index], raid)
 
-            elif topic == "predictions-channel-v1":
-                try:
+                elif topic == "predictions-channel-v1":
+
                     # message_data["event"]["channel_id"]
                     streamer_index = get_streamer_index(ws.streamers, topic_user)
 
@@ -227,11 +228,8 @@ class WebSocketsPool:
                             ws.events_predictions[event_id].bet.update_outcomes(
                                 event_dict["outcomes"]
                             )
-                except Exception:
-                    logger.error(f"Exception raised for topic {topic}", exc_info=True)
 
-            elif topic == "predictions-user-v1":
-                try:
+                elif topic == "predictions-user-v1":
                     time.sleep(random.uniform(1, 2))
                     if message_type == "prediction-result":
                         event_id = message_data["prediction"]["event_id"]
@@ -241,14 +239,13 @@ class WebSocketsPool:
                                 f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
                                 extra={"emoji": ":bar_chart:"},
                             )
+                            points_won = event_result["points_won"] if event_result["points_won"] else 0
                             ws.events_predictions[event_id].final_result = {
                                 "type": event_result["type"],
-                                "won": event_result["points_won"]
-                                if event_result["points_won"]
-                                else 0,
+                                "won": points_won,
                             }
-                except Exception:
-                    logger.error(f"Exception raised for topic {topic}", exc_info=True)
+            except Exception:
+                logger.error(f"Exception raised for topic: {topic} and message: {message}", exc_info=True)
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")
