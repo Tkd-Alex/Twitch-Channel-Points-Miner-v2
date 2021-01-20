@@ -72,6 +72,11 @@ twitch_miner.mine(["streamer1", "streamer2"], followers=True)  # Mixed
 ```
 4. Start mining! `python run.py`
 
+### Limits
+> Twitch has a limit - you can't watch more than 2 channels at one time. We take the first two streamers from the list as they have the highest priority.
+
+Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow have the highest priority.
+
 ### Bet strategy
 
 - **MOST_VOTED**: Select the option most voted based on users count
