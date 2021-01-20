@@ -24,7 +24,7 @@ twitch_miner = TwitchChannelPointsMiner(
         strategy=Strategy.SMART,  # Choose you strategy!
         percentage=5,  # Place the x% of your channel points
         percentage_gap=20,  # Gap difference between outcomesA and outcomesB (for SMART stragegy)
-        max_points=50000,  # If the x percetage of your channel points is gt bet_max_points set this value
+        max_points=50000,  # If the x percentage of your channel points is gt bet_max_points set this value
     )
 )
 
