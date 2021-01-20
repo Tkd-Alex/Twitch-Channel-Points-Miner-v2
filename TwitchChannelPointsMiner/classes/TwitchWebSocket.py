@@ -2,6 +2,7 @@ import json
 import logging
 import time
 
+from datetime import timedelta
 from random import randrange
 from websocket import WebSocketApp
 
@@ -34,6 +35,7 @@ class TwitchWebSocket(WebSocketApp):
 
     def ping(self):
         self.send({"type": "PING"})
+        self.last_ping = time.time()
 
     def send(self, request):
         request_str = json.dumps(request, separators=(",", ":"))
@@ -58,4 +60,14 @@ class TwitchWebSocket(WebSocketApp):
 
         self.last_message_time = 0
         self.last_message_type = None
+
         self.last_pong = time.time()
+        self.last_ping = time.time()
+
+    def elapsed_last_pong(self):
+        elapsed = timedelta(seconds=int(time.time() - float(self.last_pong)))
+        return elapsed.total_seconds() // 60
+
+    def elapsed_last_ping(self):
+        elapsed = timedelta(seconds=int(time.time() - float(self.last_ping)))
+        return elapsed.total_seconds() // 60

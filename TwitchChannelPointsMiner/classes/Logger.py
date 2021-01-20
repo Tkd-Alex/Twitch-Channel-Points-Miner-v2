@@ -14,9 +14,11 @@ class EmojiFormatter(logging.Formatter):
 
     def format(self, record):
         if hasattr(record, "emoji") and self.print_emoji is True:
-            record.msg = emoji.emojize(
-                f"{record.emoji}  {record.msg.strip()}", use_aliases=True
-            )
+            # Check also if the message have already the emoji
+            if record.emoji not in record.msg:
+                record.msg = emoji.emojize(
+                    f"{record.emoji}  {record.msg.strip()}", use_aliases=True
+                )
         return super().format(record)
 
 
@@ -62,6 +64,7 @@ def configure_loggers(username, settings):
                 print_emoji=settings.emoji,
             )
         )
+        # file_handler.setLevel(settings.level)
         root_logger.addHandler(file_handler)
         return logs_file
     return None

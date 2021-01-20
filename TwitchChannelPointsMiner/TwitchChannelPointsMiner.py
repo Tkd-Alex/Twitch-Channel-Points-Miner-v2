@@ -167,7 +167,13 @@ class TwitchChannelPointsMiner:
                 self.ws_pool.submit(topic)
 
             while self.running:
-                time.sleep(1.5)
+                time.sleep(random.uniform(20, 60))
+                # Do an external control for WebSocket. Check if the thread is running
+                if self.ws_pool.ws.elapsed_last_ping() > 5:
+                    logger.info(
+                        "The last ping was sent more than 5 minutes ago. Reconnect the WebSocket"
+                    )
+                    WebSocketsPool.handle_websocket_reconnection(self.ws_pool.ws)
 
     def end(self, signum, frame):
         # logger.info("Please wait, this operation can take a while ...")

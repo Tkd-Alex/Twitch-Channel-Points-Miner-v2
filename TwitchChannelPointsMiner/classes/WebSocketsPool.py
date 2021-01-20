@@ -4,7 +4,6 @@ import time
 import json
 import random
 
-from datetime import timedelta
 from dateutil import parser
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
@@ -76,9 +75,7 @@ class WebSocketsPool:
                 ws.ping()
                 time.sleep(random.uniform(25, 30))
 
-                elapsed = timedelta(seconds=int(time.time() - float(ws.last_pong)))
-                elapsed = int(elapsed.total_seconds()) / 60
-                if elapsed > 5:
+                if ws.elapsed_last_pong() > 5:
                     logger.info(
                         "The last pong was received more than 5 minutes ago. Reconnect the WebSocket"
                     )
