@@ -14,6 +14,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import TimeoutException
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 
@@ -315,14 +316,19 @@ class TwitchBrowser:
                 )
                 self.browser.get(event.streamer.chat_url)
                 time.sleep(random.uniform(3, 5))
-                if self.__open_coins_menu(event) is True:
-                    if self.__click_on_bet(event) is True:
-                        if self.__enable_custom_bet_value(event) is True:
-                            return self.currently_is_betting
+                if self.__bet_chains_methods(event) is True:
+                    return self.currently_is_betting
                 logger.error(
                     f"Attempt {attempt+1} failed!", extra={"emoji": ":wrench:"}
                 )
             return False
+
+    def __bet_chains_methods(self, event):
+        if self.__open_coins_menu(event) is True:
+            if self.__click_on_bet(event) is True:
+                if self.__enable_custom_bet_value(event) is True:
+                    return True
+        return False
 
     def place_bet(self, event: EventPrediction):
         logger.info(
@@ -331,6 +337,22 @@ class TwitchBrowser:
         )
         if event.status == "ACTIVE":
             if event.box_fillable and self.currently_is_betting:
+
+                try:
+                    WebDriverWait(self.browser, 1).until(
+                        expected_conditions.visibility_of_element_located((By.XPATH, streamBetMainDiv))
+                    )
+                except TimeoutException:
+                    logger.info(
+                        "The bet div was not found, maybe It was closed. Attempt to open again, hope to be in time",
+                        extra={"emoji": ":wrench:"},
+                    )
+                    if self.__bet_chains_methods(event) is True:
+                        logger.info(
+                            "Success! Bet div is now open, we can complete the bet",
+                            extra={"emoji": ":wrench:"}
+                        )
+
                 decision = event.bet.calculate(event.streamer.channel_points)
                 if decision["choice"]:
                     selector_index = 1 if decision["choice"] == "A" else 2
