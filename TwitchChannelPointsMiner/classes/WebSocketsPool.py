@@ -181,6 +181,9 @@ class WebSocketsPool:
                 elif topic == "predictions-channel-v1":
 
                     # message_data["event"]["channel_id"]
+                    # if message_type == "event-created"
+                    # if message_type == "event-updated"
+
                     streamer_index = get_streamer_index(ws.streamers, topic_user)
                     if streamer_index != -1:
                         event_dict = message_data["event"]
@@ -232,6 +235,10 @@ class WebSocketsPool:
                                                 f"Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}",
                                                 extra={"emoji": ":alarm_clock:"},
                                             )
+                                    else:
+                                        logger.info(
+                                            f"Sorry, unable to start {event}. The browser it's currently betting another event"
+                                        )
 
                         else:
                             ws.events_predictions[event_id].status = event_status

@@ -68,7 +68,7 @@ class Bet:
                 self.outcomes[index]["odds"] = float_round(
                     self.total_points / self.outcomes[index]["total_points"]
                 )
-                self.outcomes[index]["odds_percetange"] = float_round(
+                self.outcomes[index]["odds_percentage"] = float_round(
                     100 / self.outcomes[index]["odds"]
                 )
 
@@ -86,12 +86,13 @@ class Bet:
                     "total_points",
                     "percentage_users",
                     "odds",
+                    "odds_percentage",
                     "title",
                     "color",
                     "id",
                 ]:
                     del self.outcomes[index][key]
-            for key in ["percentage_users", "odds", "odds_percetange"]:
+            for key in ["percentage_users", "odds", "odds_percentage"]:
                 if key not in self.outcomes[index]:
                     self.outcomes[index][key] = 0
 
@@ -105,7 +106,7 @@ class Bet:
         elif self.settings.strategy == Strategy.HIGH_ODDS:
             self.decision["choice"] = self.__return_choice("odds")
         elif self.settings.strategy == Strategy.PERCENTAGE:
-            self.decision["choice"] = self.__return_choice("odds_percetange")
+            self.decision["choice"] = self.__return_choice("odds_percentage")
         elif self.settings.strategy == Strategy.SMART:
             difference = abs(
                 self.outcomes[0]["percentage_users"]

@@ -28,7 +28,7 @@ streamCoinsMenuJS = 'document.querySelector("[data-test-selector=\'community-poi
 streamBetTitleInBet = '[data-test-selector="predictions-list-item__title"]'
 
 streamBetCustomVoteXP = (
-    'button[data-test-selector="prediction-checkout-active-footer__input-type-toggle"]'
+    "button[data-test-selector='prediction-checkout-active-footer__input-type-toggle']"
 )
 streamBetCustomVoteJS = f'document.querySelector("{streamBetCustomVoteXP}").click();'
 
@@ -307,14 +307,16 @@ class TwitchBrowser:
     def start_bet(self, event: EventPrediction):
         if self.currently_is_betting:
             logger.info(
-                "Sorry, unable to start the bet. The browser it's currently betting another event"
+                f"Sorry, unable to start {event}. The browser it's currently betting another event"
             )
         elif self.browser.current_url != "about:blank":
-            logger.info("Sorry, but the browser is not currently on 'about:blank' screen. Unable to start bet")
+            logger.info(
+                "Sorry, but the browser is not currently on 'about:blank' screen. Unable to start bet"
+            )
         else:
             for attempt in range(0, self.settings.max_attempts):
                 logger.info(
-                    f"Start betting at {event.streamer.chat_url} for event: {event}",
+                    f"Start betting at {event.streamer.chat_url} for {event}",
                     extra={"emoji": ":wrench:"},
                 )
                 self.browser.get(event.streamer.chat_url)
@@ -324,7 +326,7 @@ class TwitchBrowser:
                 logger.error(
                     f"Attempt {attempt+1} failed!", extra={"emoji": ":wrench:"}
                 )
-            return False
+        return False
 
     def __bet_chains_methods(self, event):
         if self.__open_coins_menu(event) is True:
@@ -335,7 +337,7 @@ class TwitchBrowser:
 
     def place_bet(self, event: EventPrediction):
         logger.info(
-            f"Going to complete bet for event {event}. Current url page: {self.browser.current_url}",
+            f"Going to complete bet for {event}. Current url page: {self.browser.current_url}",
             extra={"emoji": ":wrench:"},
         )
         if event.status == "ACTIVE":
@@ -378,7 +380,7 @@ class TwitchBrowser:
                             is True
                         ):
                             logger.info(
-                                f"Going to place the bet for event: {event}",
+                                f"Going to place the bet for {event}",
                                 extra={"emoji": ":wrench:"},
                             )
                             if self.__click_on_vote(event, selector_index) is True:
@@ -400,7 +402,7 @@ class TwitchBrowser:
         self.currently_is_betting = False
 
     def __open_coins_menu(self, event: EventPrediction):
-        logger.info(f"Open coins menu for event: {event}", extra={"emoji": ":wrench:"})
+        logger.info(f"Open coins menu for {event}", extra={"emoji": ":wrench:"})
         status = self.__click_when_exist(streamCoinsMenuXP, By.XPATH)
         if status is False:
             status = self.__execute_script(streamCoinsMenuJS)
@@ -412,7 +414,7 @@ class TwitchBrowser:
         return False
 
     def __click_on_bet(self, event):
-        logger.info(f"Click on the bet for event: {event}", extra={"emoji": ":wrench:"})
+        logger.info(f"Click on the bet for {event}", extra={"emoji": ":wrench:"})
         if self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR) is True:
             time.sleep(random.uniform(0.05, 0.1))
             self.__debug(event, "click_on_bet")
@@ -421,7 +423,7 @@ class TwitchBrowser:
 
     def __enable_custom_bet_value(self, event):
         logger.info(
-            f"Enable input of custom value for event: {event}",
+            f"Enable input of custom value for {event}",
             extra={"emoji": ":wrench:"},
         )
 
