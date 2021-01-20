@@ -309,6 +309,8 @@ class TwitchBrowser:
             logger.info(
                 "Sorry, unable to start the bet. The browser it's currently betting another event"
             )
+        elif self.browser.current_url != "about:blank":
+            logger.info("Sorry, but the browser is not currently on 'about:blank' screen. Unable to start bet")
         else:
             for attempt in range(0, self.settings.max_attempts):
                 logger.info(
