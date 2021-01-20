@@ -15,10 +15,11 @@ class EmojiFormatter(logging.Formatter):
     def format(self, record):
         if hasattr(record, "emoji") and self.print_emoji is True:
             # Check also if the message have already the emoji
-            if record.emoji not in record.msg:
+            if hasattr(record, "emoji_is_present") is False or record.emoji_is_present is False:
                 record.msg = emoji.emojize(
                     f"{record.emoji}  {record.msg.strip()}", use_aliases=True
                 )
+                record.emoji_is_present = True
         return super().format(record)
 
 
