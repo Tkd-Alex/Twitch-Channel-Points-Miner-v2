@@ -222,16 +222,16 @@ class WebSocketsPool:
                                                 extra={"emoji": ":alarm_clock:"},
                                             )
 
-                    else:
-                        ws.events_predictions[event_id].status = event_status
-                        # Game over we can't update anymore the values... The bet was placed!
-                        if (
-                            ws.events_predictions[event_id].bet_placed is False
-                            and ws.events_predictions[event_id].bet.decision is None
-                        ):
-                            ws.events_predictions[event_id].bet.update_outcomes(
-                                event_dict["outcomes"]
-                            )
+                        else:
+                            ws.events_predictions[event_id].status = event_status
+                            # Game over we can't update anymore the values... The bet was placed!
+                            if (
+                                ws.events_predictions[event_id].bet_placed is False
+                                and ws.events_predictions[event_id].bet.decision is None
+                            ):
+                                ws.events_predictions[event_id].bet.update_outcomes(
+                                    event_dict["outcomes"]
+                                )
 
                 elif topic == "predictions-user-v1":
                     time.sleep(random.uniform(1, 2))

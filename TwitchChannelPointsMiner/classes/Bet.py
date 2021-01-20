@@ -61,26 +61,16 @@ class Bet:
             and self.outcomes[0]["total_points"] > 0
             and self.outcomes[1]["total_points"] > 0
         ):
-            self.outcomes[0]["percentage_users"] = float_round(
-                (100 * self.outcomes[0]["total_users"]) / self.total_users
-            )
-            self.outcomes[1]["percentage_users"] = float_round(
-                (100 * self.outcomes[1]["total_users"]) / self.total_users
-            )
-
-            self.outcomes[0]["odds"] = float_round(
-                self.total_points / self.outcomes[0]["total_points"]
-            )
-            self.outcomes[1]["odds"] = float_round(
-                self.total_points / self.outcomes[1]["total_points"]
-            )
-
-            self.outcomes[0]["odds_percetange"] = float_round(
-                100 / self.outcomes[0]["odds"]
-            )
-            self.outcomes[1]["odds_percetange"] = float_round(
-                100 / self.outcomes[1]["odds"]
-            )
+            for index in range(0, len(self.outcomes)):
+                self.outcomes[index]["percentage_users"] = float_round(
+                    (100 * self.outcomes[index]["total_users"]) / self.total_users
+                )
+                self.outcomes[index]["odds"] = float_round(
+                    self.total_points / self.outcomes[index]["total_points"]
+                )
+                self.outcomes[index]["odds_percetange"] = float_round(
+                    100 / self.outcomes[index]["odds"]
+                )
 
         self.__clear_outcomes()
 
@@ -101,6 +91,9 @@ class Bet:
                     "id",
                 ]:
                     del self.outcomes[index][key]
+            for key in ["percentage_users", "odds", "odds_percetange"]:
+                if key not in self.outcomes[index]:
+                    self.outcomes[index][key] = 0
 
     def __return_choice(self, key):
         return "A" if self.outcomes[0][key] > self.outcomes[1][key] else "B"
