@@ -107,7 +107,10 @@ class Bet:
         elif self.settings.strategy == Strategy.PERCENTAGE:
             self.decision["choice"] = self.__return_choice("odds_percetange")
         elif self.settings.strategy == Strategy.SMART:
-            difference = abs(self.outcomes[0]["percentage_users"] - self.outcomes[1]["percentage_users"])
+            difference = abs(
+                self.outcomes[0]["percentage_users"]
+                - self.outcomes[1]["percentage_users"]
+            )
             self.decision["choice"] = (
                 self.__return_choice("odds")
                 if difference < self.settings.percentage_gap

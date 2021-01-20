@@ -95,7 +95,10 @@ class TwitchChannelPointsMiner:
                 )
                 streamers += [fw for fw in followers_array if fw not in streamers]
 
-            logger.info(f"Loading data for {len(streamers)} streamers. This operation can take a while. Please wait ...", extra={"emoji": ":nerd_face:"})
+            logger.info(
+                f"Loading data for {len(streamers)} streamers. This operation can take a while. Please wait ...",
+                extra={"emoji": ":nerd_face:"},
+            )
             for streamer_username in streamers:
                 time.sleep(random.uniform(0.3, 0.7))
                 streamer_username.lower().strip()

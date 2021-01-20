@@ -253,7 +253,8 @@ class TwitchBrowser:
                 draw = ImageDraw.Draw(image)
 
                 font = ImageFont.truetype(
-                    os.path.join(Path().absolute(), "assets", "Roboto-Bold.ttf"), size=35
+                    os.path.join(Path().absolute(), "assets", "Roboto-Bold.ttf"),
+                    size=35,
                 )
                 (x, y) = (15, image.height // 3)
                 datetime_text = datetime.now().strftime("%d/%m %H:%M:%S.%f")
@@ -340,7 +341,9 @@ class TwitchBrowser:
 
                 try:
                     WebDriverWait(self.browser, 1).until(
-                        expected_conditions.visibility_of_element_located((By.XPATH, streamBetMainDiv))
+                        expected_conditions.visibility_of_element_located(
+                            (By.XPATH, streamBetMainDiv)
+                        )
                     )
                 except TimeoutException:
                     logger.info(
@@ -350,7 +353,7 @@ class TwitchBrowser:
                     if self.__bet_chains_methods(event) is True:
                         logger.info(
                             "Success! Bet div is now open, we can complete the bet",
-                            extra={"emoji": ":wrench:"}
+                            extra={"emoji": ":wrench:"},
                         )
 
                 decision = event.bet.calculate(event.streamer.channel_points)
