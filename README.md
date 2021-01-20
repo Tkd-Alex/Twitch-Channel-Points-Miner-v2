@@ -9,7 +9,7 @@ I've also take some piece of code - and idea to use Selenium fo do bet from: htt
 
 Read more here: https://help.twitch.tv/s/article/channel-points-guide?language=en_US
 
-![Screenshot](./screenshot.png)
+![Screenshot](./assets/main_screen.png)
 
 ## Main difference from the original repository:
 
@@ -76,7 +76,18 @@ twitch_miner.mine(["streamer1", "streamer2"], followers=True)  # Mixed
 
 - **MOST_VOTED**: Select the option most voted based on users count
 - **HIGH_ODDS**: Select the option with the highest odds
+- **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same of select LOWEST_ODDS
 - **SMART**: If the majority in percent chose an option then follow the other users, otherwise choose the option with the highest odds
+
+![Screenshot](./assets/prediction_screen.png)
+
+Here a concrete example:
+
+- **MOST_VOTED**: 21 Users have select **'over 7.5'**, instead of 9 'under 7.5'
+- **HIGH_ODDS**: The highest odds are 2.27 on **'over 7.5'** vs 1.79 on 'under 7.5'
+- **PERCENTAGE**: The highest percentage is 56% for **'under 7.5'**
+- **SMART**: Calculate the percentage based on the users. The percentage are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percatage are lower thant `percentage_gap` select the highest percentage, else the highest odds.
+In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 
 ## Migrating from old repository (the original one):
 If you already have a `twitch-cookies.pkl` and you don't want to login again please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`

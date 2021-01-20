@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 class Strategy(Enum):
     MOST_VOTED = auto()
     HIGH_ODDS = auto()
+    PERCENTAGE = auto()
     SMART = auto()
 
 
@@ -74,6 +75,13 @@ class Bet:
                 self.total_points / self.outcomes[1]["total_points"]
             )
 
+            self.outcomes[0]["odds_percetange"] = float_round(
+                100 / self.outcomes[0]["odds"]
+            )
+            self.outcomes[1]["odds_percetange"] = float_round(
+                100 / self.outcomes[1]["odds"]
+            )
+
         self.__clear_outcomes()
 
     def __repr__(self):
@@ -103,16 +111,13 @@ class Bet:
             self.decision["choice"] = self.__return_choice("total_users")
         elif self.settings.strategy == Strategy.HIGH_ODDS:
             self.decision["choice"] = self.__return_choice("odds")
+        elif self.settings.strategy == Strategy.PERCENTAGE:
+            self.decision["choice"] = self.__return_choice("odds_percetange")
         elif self.settings.strategy == Strategy.SMART:
+            difference = abs(self.outcomes[0]["percentage_users"] - self.outcomes[1]["percentage_users"])
             self.decision["choice"] = (
                 self.__return_choice("odds")
-                if (
-                    abs(
-                        self.outcomes[0]["percentage_users"]
-                        - self.outcomes[1]["percentage_users"]
-                    )
-                    < self.settings.percentage_gap
-                )
+                if difference < self.settings.percentage_gap
                 else self.__return_choice("total_users")
             )
 

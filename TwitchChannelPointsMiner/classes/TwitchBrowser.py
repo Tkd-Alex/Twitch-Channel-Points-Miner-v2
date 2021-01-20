@@ -253,7 +253,7 @@ class TwitchBrowser:
                 draw = ImageDraw.Draw(image)
 
                 font = ImageFont.truetype(
-                    os.path.join(Path().absolute(), "Roboto-Bold.ttf"), size=35
+                    os.path.join(Path().absolute(), "assets", "Roboto-Bold.ttf"), size=35
                 )
                 (x, y) = (15, image.height // 3)
                 datetime_text = datetime.now().strftime("%d/%m %H:%M:%S.%f")
