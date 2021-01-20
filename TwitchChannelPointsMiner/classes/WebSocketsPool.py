@@ -14,7 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 def get_streamer_index(streamers, channel_id):
-    return next(i for i, x in enumerate(streamers) if str(x.channel_id) == str(channel_id))
+    try:
+        return next(i for i, x in enumerate(streamers) if str(x.channel_id) == str(channel_id))
+    except StopIteration:
+        return -1
 
 
 class WebSocketsPool:
@@ -131,89 +134,93 @@ class WebSocketsPool:
                         streamer_index = get_streamer_index(
                             ws.streamers, message_data["channel_id"]
                         )
-                        earned = message_data["point_gain"]["total_points"]
-                        reason_code = message_data["point_gain"]["reason_code"]
-                        balance = message_data["balance"]["balance"]
-                        ws.streamers[streamer_index].channel_points = balance
-                        logger.info(
-                            f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
-                            extra={"emoji": ":rocket:"},
-                        )
-                        ws.streamers[streamer_index].update_history(reason_code, earned)
+                        if streamer_index != -1:
+                            earned = message_data["point_gain"]["total_points"]
+                            reason_code = message_data["point_gain"]["reason_code"]
+                            balance = message_data["balance"]["balance"]
+                            ws.streamers[streamer_index].channel_points = balance
+                            logger.info(
+                                f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
+                                extra={"emoji": ":rocket:"},
+                            )
+                            ws.streamers[streamer_index].update_history(reason_code, earned)
                     elif message_type == "claim-available":
                         streamer_index = get_streamer_index(
                             ws.streamers, message_data["claim"]["channel_id"]
                         )
-                        ws.twitch.claim_bonus(
-                            ws.streamers[streamer_index], message_data["claim"]["id"]
-                        )
+                        if streamer_index != -1:
+                            ws.twitch.claim_bonus(
+                                ws.streamers[streamer_index], message_data["claim"]["id"]
+                            )
 
                 elif topic == "video-playback-by-id":
                     streamer_index = get_streamer_index(ws.streamers, topic_user)
-                    if message_type == "stream-down":
-                        ws.streamers[streamer_index].set_offline()
-                    elif message_type == "viewcount":
-                        ws.twitch.check_streamer_online(ws.streamers[streamer_index])
-                    # There is stream-up message type, but it's sent earlier than the API updates
+                    if streamer_index != -1:
+                        if message_type == "stream-down":
+                            ws.streamers[streamer_index].set_offline()
+                        elif message_type == "viewcount":
+                            ws.twitch.check_streamer_online(ws.streamers[streamer_index])
+                        # There is stream-up message type, but it's sent earlier than the API updates
 
                 elif topic == "raid":
                     streamer_index = get_streamer_index(ws.streamers, topic_user)
-                    if message_type == "raid_update_v2":
-                        raid = Raid(message["raid"]["id"], message["raid"]["target_login"])
-                        ws.twitch.update_raid(ws.streamers[streamer_index], raid)
+                    if streamer_index != -1:
+                        if message_type == "raid_update_v2":
+                            raid = Raid(message["raid"]["id"], message["raid"]["target_login"])
+                            ws.twitch.update_raid(ws.streamers[streamer_index], raid)
 
                 elif topic == "predictions-channel-v1":
 
                     # message_data["event"]["channel_id"]
                     streamer_index = get_streamer_index(ws.streamers, topic_user)
+                    if streamer_index != -1:
+                        event_dict = message_data["event"]
+                        event_id = event_dict["id"]
+                        event_status = event_dict["status"]
 
-                    event_dict = message_data["event"]
-                    event_id = event_dict["id"]
-                    event_status = event_dict["status"]
+                        current_timestamp = parser.parse(message_data["timestamp"])
 
-                    current_timestamp = parser.parse(message_data["timestamp"])
+                        if event_id not in ws.events_predictions:
+                            if event_status == "ACTIVE":
+                                time.sleep(random.uniform(0.5, 1.0))
+                                prediction_window_seconds = float(
+                                    event_dict["prediction_window_seconds"]
+                                )
+                                prediction_window_seconds -= (
+                                    25 if prediction_window_seconds <= 120 else 40
+                                )
+                                event = EventPrediction(
+                                    ws.streamers[streamer_index],
+                                    event_id,
+                                    event_dict["title"],
+                                    parser.parse(event_dict["created_at"]),
+                                    prediction_window_seconds,
+                                    event_status,
+                                    event_dict["outcomes"],
+                                    bet_settings=ws.bet_settings,
+                                )
+                                if (
+                                    ws.streamers[streamer_index].is_online
+                                    and event.closing_bet_after(current_timestamp) > 0
+                                ):
+                                    ws.events_predictions[event_id] = event
+                                    if ws.twitch_browser.currently_is_betting is False:
+                                        if ws.twitch_browser.start_bet(
+                                            ws.events_predictions[event_id]
+                                        ):
+                                            # place_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
+                                            place_bet_thread = threading.Timer(
+                                                event.closing_bet_after(current_timestamp),
+                                                ws.twitch_browser.place_bet,
+                                                (ws.events_predictions[event_id],),
+                                            )
+                                            place_bet_thread.daemon = True
+                                            place_bet_thread.start()
 
-                    if event_id not in ws.events_predictions:
-                        if event_status == "ACTIVE":
-                            time.sleep(random.uniform(0.5, 1.0))
-                            prediction_window_seconds = float(
-                                event_dict["prediction_window_seconds"]
-                            )
-                            prediction_window_seconds -= (
-                                25 if prediction_window_seconds <= 120 else 40
-                            )
-                            event = EventPrediction(
-                                ws.streamers[streamer_index],
-                                event_id,
-                                event_dict["title"],
-                                parser.parse(event_dict["created_at"]),
-                                prediction_window_seconds,
-                                event_status,
-                                event_dict["outcomes"],
-                                bet_settings=ws.bet_settings,
-                            )
-                            if (
-                                ws.streamers[streamer_index].is_online
-                                and event.closing_bet_after(current_timestamp) > 0
-                            ):
-                                ws.events_predictions[event_id] = event
-                                if ws.twitch_browser.currently_is_betting is False:
-                                    if ws.twitch_browser.start_bet(
-                                        ws.events_predictions[event_id]
-                                    ):
-                                        # place_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                        place_bet_thread = threading.Timer(
-                                            event.closing_bet_after(current_timestamp),
-                                            ws.twitch_browser.place_bet,
-                                            (ws.events_predictions[event_id],),
-                                        )
-                                        place_bet_thread.daemon = True
-                                        place_bet_thread.start()
-
-                                        logger.info(
-                                            f"Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}",
-                                            extra={"emoji": ":alarm_clock:"},
-                                        )
+                                            logger.info(
+                                                f"Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}",
+                                                extra={"emoji": ":alarm_clock:"},
+                                            )
 
                     else:
                         ws.events_predictions[event_id].status = event_status
