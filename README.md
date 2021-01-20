@@ -84,9 +84,9 @@ twitch_miner.mine(["streamer1", "streamer2"], followers=True)  # Mixed
 Here a concrete example:
 
 - **MOST_VOTED**: 21 Users have select **'over 7.5'**, instead of 9 'under 7.5'
-- **HIGH_ODDS**: The highest odds are 2.27 on **'over 7.5'** vs 1.79 on 'under 7.5'
+- **HIGH_ODDS**: The highest odd is 2.27 on **'over 7.5'** vs 1.79 on 'under 7.5'
 - **PERCENTAGE**: The highest percentage is 56% for **'under 7.5'**
-- **SMART**: Calculate the percentage based on the users. The percentage are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percatage are lower thant `percentage_gap` select the highest percentage, else the highest odds.
+- **SMART**: Calculate the percentage based on the users. The percentage are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percatage are highter thant `percentage_gap` select the highest percentage, else the highest odds.
 In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 
 ## Migrating from old repository (the original one):
