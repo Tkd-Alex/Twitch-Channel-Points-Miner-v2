@@ -14,7 +14,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, JavascriptException
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 
@@ -151,8 +151,8 @@ class TwitchBrowser:
         try:
             self.browser.execute_script(javascript_code)
             return True
-        except Exception:
-            logger.error(f"Failed to execute: {javascript_code}", exc_info=True)
+        except JavascriptException:
+            logger.warning(f"Failed to execute: {javascript_code}")
         return False
 
     # Private method __ - We can instantiate webdriver only with init_browser
@@ -425,7 +425,7 @@ class TwitchBrowser:
             return True
         return False
 
-    def __enable_custom_bet_value(self, event, scroll_down=False):
+    def __enable_custom_bet_value(self, event, scroll_down=True):
         logger.info(
             f"Enable input of custom value for {event}",
             extra={"emoji": ":wrench:"},
@@ -436,9 +436,9 @@ class TwitchBrowser:
             if (
                 self.__execute_script(
                     """
-                                    var div = document.getElementsByClassName('simplebar-scroll-content')[1];
-                                    div.scrollTop = div.scrollHeight
-                                    """
+                                      var scrollable = document.getElementById("channel-points-reward-center-body").closest("div.simplebar-scroll-content");
+                                      scrollable.scrollTop = scrollable.scrollHeight;
+                                      """
                 )
                 is False
             ):
