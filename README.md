@@ -17,8 +17,7 @@ Read more here: https://help.twitch.tv/s/article/channel-points-guide?language=e
 - Final report with all the datas
 - Rewrite the entire code using classe instead of module with global variables
 - Automatic download the followers list and use as input
-- Place the bet / make prediction and won or lose (good luck) your channel points!
-**CURRENTLY IN BETA / VERY UNSTABLE**
+- Place the bet / make prediction and won or lose (good luck) your channel points! **(CURRENTLY IN BETA)**
 
 For the bet system the script use Selenium. Could be usefull how to MakePrediction usign a [POST] request. I've also write a [poc](/TwitchChannelPointsMiner/classes/Twitch.py#L160) but I don't know how to calculate/create the transactionID. Any helps are welcome
 
@@ -37,16 +36,16 @@ from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser, BrowserSetti
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
-    make_predictions=True,  # If you want to Bet / Make prediction
+    make_predictions=True,  # If you want to Bet / Make prediction | The browser will never start
     follow_raid=True,  # Follow raid to obtain more points
     logger_settings=LoggerSettings(
         save=True,  # If you want to save logs in file (suggested)
-        level=logging.INFO,  # Level of logs - use logging.DEBUG for more info)
+        console_level=logging.INFO,  # Level of logs - use logging.DEBUG for more info)
         emoji=True,  # On Windows we have a problem to print emoji. Set to false if you have a problem
     ),
     browser_settings=BrowserSettings(
         browser=Browser.FIREFOX,  # Choose if you want to use Chrome or Firefox as browser
-        show=False,  # Show the browser during bet
+        show=False,  # Show the browser during bet else headless mode
         do_screenshot=False,  # Do screenshot during the bet
     ),
     bet_settings=BetSettings(

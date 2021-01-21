@@ -32,11 +32,13 @@ class LoggerSettings:
     def __init__(
         self,
         save: bool = True,
-        level: int = logging.INFO,
+        console_level: int = logging.INFO,
+        file_level: int = logging.DEBUG,
         emoji: bool = platform.system() != "Windows",
     ):
         self.save = save
-        self.level = level
+        self.console_level = console_level
+        self.file_level = file_level
         self.emoji = emoji
 
 
@@ -45,7 +47,7 @@ def configure_loggers(username, settings):
     root_logger.setLevel(logging.DEBUG)
 
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(settings.level)
+    console_handler.setLevel(settings.console_level)
     console_handler.setFormatter(
         EmojiFormatter(
             fmt="%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s",
@@ -70,7 +72,7 @@ def configure_loggers(username, settings):
                 print_emoji=settings.emoji,
             )
         )
-        # file_handler.setLevel(settings.level)  # Use the same level as Root logger
+        file_handler.setLevel(settings.file_level)
         root_logger.addHandler(file_handler)
         return logs_file
     return None

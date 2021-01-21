@@ -126,7 +126,7 @@ class TwitchBrowser:
         self.browser.get(TWITCH_URL)
         self.browser.add_cookie(cookie)
 
-        self.__click_when_exist(cookiePolicyQuery, By.CSS_SELECTOR)
+        self.__click_when_exist(cookiePolicyQuery, By.CSS_SELECTOR, suppress_error=True)
         time.sleep(1.5)
 
         # Edit value in localStorage for dark theme, point consent etc.
@@ -283,7 +283,7 @@ class TwitchBrowser:
                 f"Exception raised during screenshot file {fname}", exc_info=True
             )
 
-    def __click_when_exist(self, selector, by: By = By.CSS_SELECTOR):
+    def __click_when_exist(self, selector, by: By = By.CSS_SELECTOR, suppress_error=True):
         try:
             element = WebDriverWait(self.browser, self.settings.timeout).until(
                 expected_conditions.element_to_be_clickable((by, selector))
@@ -291,10 +291,11 @@ class TwitchBrowser:
             ActionChains(self.browser).move_to_element(element).click().perform()
             return True
         except Exception:
-            logger.error(f"Exception raised with: {selector}", exc_info=True)
+            if suppress_error is False:
+                logger.error(f"Exception raised with: {selector}", exc_info=True)
         return False
 
-    def __send_text(self, selector, text, by: By = By.CSS_SELECTOR):
+    def __send_text(self, selector, text, by: By = By.CSS_SELECTOR, suppress_error=True):
         try:
             element = WebDriverWait(self.browser, self.settings.timeout).until(
                 expected_conditions.element_to_be_clickable((by, selector))
@@ -304,7 +305,8 @@ class TwitchBrowser:
             ).perform()
             return True
         except Exception:
-            logger.error(f"Exception raised with: {selector}", exc_info=True)
+            if suppress_error is False:
+                logger.error(f"Exception raised with: {selector}", exc_info=True)
         return False
 
     def start_bet(self, event: EventPrediction):
