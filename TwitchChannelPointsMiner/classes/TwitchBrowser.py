@@ -20,6 +20,7 @@ from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 
 TWITCH_URL = "https://www.twitch.tv/"
 
+# XPath Selector and Javascript helpers
 cookiePolicyQuery = 'button[data-a-target="consent-banner-accept"]'
 
 streamCoinsMenuXP = '//div[@data-test-selector="community-points-summary"]//button'
@@ -38,6 +39,43 @@ streamBetVoteButtonXP = f"({streamBetMainDiv}//button)"
 
 streamBetVoteInputJS = 'document.getElementById("channel-points-reward-center-body").getElementsByTagName("input")[{}].value = {};'
 streamBetVoteButtonJS = 'document.getElementById("channel-points-reward-center-body").getElementsByTagName("button")[{}].click();'
+
+# Some Javascript code that should help the script
+localStorageJS = """
+window.localStorage.setItem("volume", 0);
+window.localStorage.setItem("channelPointsOnboardingDismissed", true);
+window.localStorage.setItem("twilight.theme", 1);
+window.localStorage.setItem("mature", true);
+window.localStorage.setItem("rebrand-notice-dismissed", true);
+window.localStorage.setItem("emoteAnimationsEnabled", false);
+window.localStorage.setItem("chatPauseSetting", "ALTKEY");
+"""
+clearStyleChatJS = """
+var item = document.querySelector('[data-test-selector="chat-scrollable-area__message-container"]');
+if (item) {
+    var parent = item.closest("div.simplebar-scroll-content");
+    if(parent) parent.hidden = true;
+}
+var header = document.querySelector('[data-test-selector="channel-leaderboard-container"]');
+if(header) header.hidden = true;
+"""
+maximizeBetWindowJS = """
+var absolute = document.querySelector('[aria-describedby="channel-points-reward-center-body"]').closest("div.tw-absolute")
+if(absolute) absolute.classList.remove("tw-absolute")
+
+document.getElementsByClassName("reward-center__content")[0].style.width = "44rem";
+document.getElementsByClassName("reward-center__content")[0].style.height = "55rem";
+
+document.querySelector('[aria-describedby="channel-points-reward-center-body"]').style["max-height"] = "55rem";
+
+document.getElementsByClassName("reward-center-body")[0].style["max-width"] = "44rem";
+// document.getElementsByClassName("reward-center-body")[0].style["min-height"] = "55rem";
+"""
+scrollDownBetWindowJS = """
+var scrollable = document.getElementById("channel-points-reward-center-body").closest("div.simplebar-scroll-content");
+scrollable.scrollTop = scrollable.scrollHeight;
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +138,7 @@ class TwitchBrowser:
             self.__init_chrome()
 
         if self.browser is not None:
-            self.browser.set_window_size(375, 850)
+            self.browser.set_window_size(450, 800)
             self.browser.implicitly_wait(self.settings.implicitly_wait)
 
         self.__init_twitch()
@@ -125,55 +163,55 @@ class TwitchBrowser:
         }
         self.browser.get(TWITCH_URL)
         self.browser.add_cookie(cookie)
+        time.sleep(random.uniform(2.5, 3.5))
 
         self.__click_when_exist(cookiePolicyQuery, By.CSS_SELECTOR, suppress_error=True)
-        time.sleep(1.5)
+        time.sleep(random.uniform(0.5, 1.5))
 
         # Edit value in localStorage for dark theme, point consent etc.
-        self.__execute_script(
-            """
-            window.localStorage.setItem("volume", 0);
-            window.localStorage.setItem("channelPointsOnboardingDismissed", true);
-            window.localStorage.setItem("twilight.theme", 1);
-            window.localStorage.setItem("mature", true);
-            window.localStorage.setItem("rebrand-notice-dismissed", true);
-            window.localStorage.setItem("emoteAnimationsEnabled", false);
-            window.localStorage.setItem("chatPauseSetting", "ALTKEY");
-        """
-        )
-        time.sleep(1.5)
+        self.__execute_script(localStorageJS)
+        time.sleep(random.uniform(0.5, 1.5))
         self.__blank()
 
     def __blank(self):
         self.browser.get("about:blank")
 
-    def __execute_script(self, javascript_code):
+    def __execute_script(self, javascript_code, suppress_error=False):
         try:
             self.browser.execute_script(javascript_code)
             return True
         except JavascriptException:
-            logger.warning(f"Failed to execute: {javascript_code}")
+            if suppress_error is False:
+                logger.warning(f"Failed to execute: {javascript_code}")
         return False
 
     # Private method __ - We can instantiate webdriver only with init_browser
     def __init_chrome(self):
         logger.debug("Init Chrome browser", extra={"emoji": ":wrench:"})
         options = webdriver.ChromeOptions()
-        options.add_argument("--mute-audio")
         if not self.settings.show:
             options.add_argument("headless")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-accelerated-2d-canvas")
-        options.add_argument("--no-first-run")
-        options.add_argument("--no-zygote")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-setuid-sandbox")
+
+        options.add_argument("mute-audio")
+        options.add_argument("disable-dev-shm-usage")
+        options.add_argument("disable-accelerated-2d-canvas")
+        options.add_argument("no-first-run")
+        options.add_argument("no-zygote")
+        options.add_argument("disable-gpu")
+        options.add_argument("no-sandbox")
+        options.add_argument("disable-setuid-sandbox")
+        options.add_argument("disable-infobars")
+        options.add_argument(
+            "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36"
+        )
 
         options.add_experimental_option(
             "prefs", {"profile.managed_default_content_settings.images": 2}
         )
-        options.add_experimental_option("excludeSwitches", ["enable-logging"])
+        options.add_experimental_option("useAutomationExtension", False)
+        options.add_experimental_option(
+            "excludeSwitches", ["enable-automation", "enable-logging"]
+        )
 
         if os.path.isfile(self.settings.driver_path) is True:
             self.browser = webdriver.Chrome(self.settings.driver_path, options=options)
@@ -199,6 +237,10 @@ class TwitchBrowser:
         fp.set_preference("browser.startup.homepage", "about:blank")
         fp.set_preference("startup.homepage_welcome_url", "about:blank")
         fp.set_preference("startup.homepage_welcome_url.additional", "about:blank")
+        fp.set_preference(
+            "general.useragent.override",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:56.0) Gecko/20100101 Firefox/56.0",
+        )
 
         if os.path.isfile(self.settings.driver_path) is True:
             self.browser = webdriver.Firefox(
@@ -283,7 +325,9 @@ class TwitchBrowser:
                 f"Exception raised during screenshot file {fname}", exc_info=True
             )
 
-    def __click_when_exist(self, selector, by: By = By.CSS_SELECTOR, suppress_error=True):
+    def __click_when_exist(
+        self, selector, by: By = By.CSS_SELECTOR, suppress_error=False
+    ):
         try:
             element = WebDriverWait(self.browser, self.settings.timeout).until(
                 expected_conditions.element_to_be_clickable((by, selector))
@@ -295,7 +339,9 @@ class TwitchBrowser:
                 logger.error(f"Exception raised with: {selector}", exc_info=True)
         return False
 
-    def __send_text(self, selector, text, by: By = By.CSS_SELECTOR, suppress_error=True):
+    def __send_text(
+        self, selector, text, by: By = By.CSS_SELECTOR, suppress_error=False
+    ):
         try:
             element = WebDriverWait(self.browser, self.settings.timeout).until(
                 expected_conditions.element_to_be_clickable((by, selector))
@@ -326,6 +372,10 @@ class TwitchBrowser:
                 )
                 self.browser.get(event.streamer.chat_url)
                 time.sleep(random.uniform(3, 5))
+
+                # Hide the chat ... Don't ask me why
+                self.__execute_script(clearStyleChatJS, suppress_error=True)
+
                 if self.__bet_chains_methods(event) is True:
                     return self.currently_is_betting
                 logger.error(
@@ -414,15 +464,18 @@ class TwitchBrowser:
             status = self.__execute_script(streamCoinsMenuJS)
 
         if status is True:
-            time.sleep(random.uniform(0.05, 0.1))
+            time.sleep(random.uniform(0.01, 0.1))
             self.__debug(event, "open_coins_menu")
             return True
         return False
 
-    def __click_on_bet(self, event):
+    def __click_on_bet(self, event, maximize_div=True):
         logger.info(f"Click on the bet for {event}", extra={"emoji": ":wrench:"})
         if self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR) is True:
-            time.sleep(random.uniform(0.05, 0.1))
+            time.sleep(random.uniform(0.01, 0.1))
+            if maximize_div is True:
+                # Edit the css for make the window full-screen in browser. Another useless change
+                self.__execute_script(maximizeBetWindowJS, suppress_error=True)
             self.__debug(event, "click_on_bet")
             return True
         return False
@@ -434,16 +487,8 @@ class TwitchBrowser:
         )
 
         if scroll_down is True:
-            time.sleep(random.uniform(0.05, 0.1))
-            if (
-                self.__execute_script(
-                    """
-                                      var scrollable = document.getElementById("channel-points-reward-center-body").closest("div.simplebar-scroll-content");
-                                      scrollable.scrollTop = scrollable.scrollHeight;
-                                      """
-                )
-                is False
-            ):
+            time.sleep(random.uniform(0.01, 0.1))
+            if self.__execute_script(scrollDownBetWindowJS) is False:
                 logger.error("Unable to scroll down in the bet window")
 
         status = self.__click_when_exist(streamBetCustomVoteXP, By.CSS_SELECTOR)
@@ -451,7 +496,7 @@ class TwitchBrowser:
             status = self.__execute_script(streamBetCustomVoteJS)
 
         if status is True:
-            time.sleep(random.uniform(0.05, 0.1))
+            time.sleep(random.uniform(0.01, 0.1))
             self.__debug(event, "enable_custom_bet_value")
             event.box_fillable = True
             self.currently_is_betting = True
