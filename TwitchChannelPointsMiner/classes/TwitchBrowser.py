@@ -100,7 +100,7 @@ class TwitchBrowser:
             self.__init_chrome()
 
         if self.browser is not None:
-            self.browser.set_window_size(375, 900)
+            self.browser.set_window_size(375, 850)
             self.browser.implicitly_wait(self.settings.implicitly_wait)
 
         self.__init_twitch()
@@ -138,6 +138,7 @@ class TwitchBrowser:
             window.localStorage.setItem("mature", true);
             window.localStorage.setItem("rebrand-notice-dismissed", true);
             window.localStorage.setItem("emoteAnimationsEnabled", false);
+            window.localStorage.setItem("chatPauseSetting", "ALTKEY");
         """
         )
         time.sleep(1.5)
@@ -226,6 +227,7 @@ class TwitchBrowser:
         )
 
         fname = f"{fname}.html" if fname.endswith(".html") is False else fname
+        fname = fname.replace(".html", f".{time.time()}.html")
         fname = os.path.join(htmls_path, self.session_id, fname)
 
         # Little delay ...
@@ -241,6 +243,7 @@ class TwitchBrowser:
         )
 
         fname = f"{fname}.png" if fname.endswith(".png") is False else fname
+        fname = fname.replace(".png", f".{time.time()}.png")
         fname = os.path.join(screenshots_path, self.session_id, fname)
         # Little pause prevent effect/css animations in browser delayed
         time.sleep(0.1)
@@ -343,6 +346,7 @@ class TwitchBrowser:
         if event.status == "ACTIVE":
             if event.box_fillable and self.currently_is_betting:
 
+                self.__debug(event, "place_bet")
                 try:
                     WebDriverWait(self.browser, 1).until(
                         expected_conditions.visibility_of_element_located(
@@ -421,22 +425,24 @@ class TwitchBrowser:
             return True
         return False
 
-    def __enable_custom_bet_value(self, event):
+    def __enable_custom_bet_value(self, event, scroll_down=False):
         logger.info(
             f"Enable input of custom value for {event}",
             extra={"emoji": ":wrench:"},
         )
 
-        if (
-            self.__execute_script(
-                """
-                                 var div = document.getElementsByClassName('simplebar-scroll-content')[1];
-                                 div.scrollTop = div.scrollHeight
-                                 """
-            )
-            is False
-        ):
-            logger.error("Unable to scroll down in the bet window")
+        if scroll_down is True:
+            time.sleep(random.uniform(0.05, 0.1))
+            if (
+                self.__execute_script(
+                    """
+                                    var div = document.getElementsByClassName('simplebar-scroll-content')[1];
+                                    div.scrollTop = div.scrollHeight
+                                    """
+                )
+                is False
+            ):
+                logger.error("Unable to scroll down in the bet window")
 
         status = self.__click_when_exist(streamBetCustomVoteXP, By.CSS_SELECTOR)
         if status is False:
