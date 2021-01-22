@@ -2,6 +2,7 @@ import logging
 import copy
 
 from enum import Enum, auto
+from millify import millify
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +77,10 @@ class Bet:
 
     def __repr__(self):
         return f"Bet(TotalUsers={self.total_users}, TotalPoints={self.total_points}), Decision={self.decision})\n\t\tOutcome0({self.outcomes[0]})\n\t\tOutcome1({self.outcomes[1]})"
+
+    def get_outcome(self, index):
+        outcome = self.outcomes[index]
+        return f"{outcome['title']} ({outcome['color']}), Points: {millify(outcome['total_points'])}, Users: {millify(outcome['total_users'])} ({outcome['percentage_users']}%), Odds: {outcome['odds']} ({outcome['odds_percentage']}%)"
 
     def __clear_outcomes(self):
         for index in range(0, len(self.outcomes)):

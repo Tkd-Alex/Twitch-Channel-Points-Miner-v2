@@ -419,14 +419,11 @@ class TwitchBrowser:
                 decision = event.bet.calculate(event.streamer.channel_points)
                 if decision["choice"]:
                     selector_index = 1 if decision["choice"] == "A" else 2
-                    decision_outcome = (
-                        event.bet.outcomes[0]
-                        if decision["choice"] == "A"
-                        else event.bet.outcomes[1]
-                    )
+                    decision_outcome = event.bet.get_outcome(selector_index - 1)
+
                     try:
                         logger.info(
-                            f"Going to write: {decision['amount']} on input {decision['choice']}\n\t\t{decision_outcome}",
+                            f"Going to write: {decision['amount']} on input {decision['choice']}: {decision_outcome}",
                             extra={"emoji": ":wrench:"},
                         )
                         if (

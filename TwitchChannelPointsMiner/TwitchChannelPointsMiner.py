@@ -98,7 +98,7 @@ class TwitchChannelPointsMiner:
                 streamers += [fw for fw in followers_array if fw not in streamers]
 
             logger.info(
-                f"Loading data for {len(streamers)} streamers. This operation can take a while. Please wait ...",
+                f"Loading data for {len(streamers)} streamers. This operation can take a while ...",
                 extra={"emoji": ":nerd_face:"},
             )
             for streamer_username in streamers:
@@ -130,8 +130,7 @@ class TwitchChannelPointsMiner:
                 self.twitch_browser = TwitchBrowser(
                     self.twitch.twitch_login.get_auth_token(),
                     self.session_id,
-                    settings=self.browser_settings,
-                    less_printing=self.logger_settings.less,
+                    settings=self.browser_settings
                 )
                 self.twitch_browser.init()
 

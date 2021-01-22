@@ -5,3 +5,4 @@ pillow
 selenium
 python-dateutil
 emoji
+millify
