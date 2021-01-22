@@ -33,7 +33,7 @@ class Twitch:
         cookies_path = os.path.join(Path().absolute(), "cookies")
         Path(cookies_path).mkdir(parents=True, exist_ok=True)
         self.cookies_file = os.path.join(cookies_path, f"{username}.pkl")
-        self.twitch_login = TwitchLogin(TWITCH_CLIENT_ID, username)
+        self.twitch_login = TwitchLogin(TWITCH_CLIENT_ID, username, USER_AGENT)
         self.running = True
 
     def login(self):
@@ -42,6 +42,7 @@ class Twitch:
                 self.twitch_login.save_cookies(self.cookies_file)
         else:
             self.twitch_login.load_cookies(self.cookies_file)
+            self.twitch_login.set_token(self.twitch_login.get_auth_token())
 
     def update_minute_watched_event_request(self, streamer):
         event_properties = {
