@@ -4,6 +4,7 @@ import random
 import os
 import platform
 
+from millify import millify
 from pathlib import Path
 from datetime import datetime
 from enum import Enum, auto
@@ -367,7 +368,7 @@ class TwitchBrowser:
         else:
             for attempt in range(0, self.settings.max_attempts):
                 logger.info(
-                    f"Start betting at {event.streamer.chat_url} for {event}",
+                    f"Start betting for {event}",
                     extra={"emoji": ":wrench:"},
                 )
                 self.browser.get(event.streamer.chat_url)
@@ -419,11 +420,14 @@ class TwitchBrowser:
                 decision = event.bet.calculate(event.streamer.channel_points)
                 if decision["choice"]:
                     selector_index = 1 if decision["choice"] == "A" else 2
-                    decision_outcome = event.bet.get_outcome(selector_index - 1)
+                    logger.info(
+                        f"Decision: {event.bet.get_outcome(selector_index - 1)}",
+                        extra={"emoji": ":wrench:"},
+                    )
 
                     try:
                         logger.info(
-                            f"Going to write: {decision['amount']} on input {decision['choice']}: {decision_outcome}",
+                            f"Going to write: {decision['amount']} channel points on input {decision['choice']}",
                             extra={"emoji": ":wrench:"},
                         )
                         if (
@@ -439,7 +443,7 @@ class TwitchBrowser:
                             if self.__click_on_vote(event, selector_index) is True:
                                 self.__debug(event, "click_on_vote")
                                 event.bet_placed = True
-                                time.sleep(random.uniform(10, 20))
+                                time.sleep(random.uniform(5, 10))
                     except Exception:
                         logger.error("Exception raised", exc_info=True)
             else:

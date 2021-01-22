@@ -241,7 +241,7 @@ class WebSocketsPool:
                                             place_bet_thread.start()
 
                                             logger.info(
-                                                f"Thread should start and place the bet after: {event.closing_bet_after(current_timestamp)}s for the event: {ws.events_predictions[event_id]}",
+                                                f"Place the bet after: {event.closing_bet_after(current_timestamp)}s for: {ws.events_predictions[event_id]}",
                                                 extra={"emoji": ":alarm_clock:"},
                                             )
                                     else:

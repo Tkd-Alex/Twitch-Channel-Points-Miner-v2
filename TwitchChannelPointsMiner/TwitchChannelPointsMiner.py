@@ -98,7 +98,7 @@ class TwitchChannelPointsMiner:
                 streamers += [fw for fw in followers_array if fw not in streamers]
 
             logger.info(
-                f"Loading data for {len(streamers)} streamers. This operation can take a while ...",
+                f"Loading data for {len(streamers)} streamers. Please wait ...",
                 extra={"emoji": ":nerd_face:"},
             )
             for streamer_username in streamers:
@@ -137,7 +137,7 @@ class TwitchChannelPointsMiner:
             self.minute_watcher_thread = threading.Thread(
                 target=self.twitch.send_minute_watched_events, args=(self.streamers,)
             )
-            self.minute_watcher_thread.daemon = True
+            # self.minute_watcher_thread.daemon = True
             self.minute_watcher_thread.start()
 
             self.ws_pool = WebSocketsPool(
@@ -146,6 +146,7 @@ class TwitchChannelPointsMiner:
                 streamers=self.streamers,
                 bet_settings=self.bet_settings,
                 events_predictions=self.events_predictions,
+                less_printing=self.logger_settings.less
             )
             topics = [
                 PubsubTopic(
@@ -185,12 +186,13 @@ class TwitchChannelPointsMiner:
                     WebSocketsPool.handle_websocket_reconnection(self.ws_pool.ws)
 
     def end(self, signum, frame):
-        # logger.info("Please wait, this operation can take a while ...")
         if self.twitch_browser is not None:
             self.twitch_browser.browser.quit()
 
         self.running = self.twitch.running = False
         self.ws_pool.end()
+
+        self.minute_watcher_thread.join()
 
         self.__print_report()
         time.sleep(3.5)  # Do sleep for ending browser and threads
