@@ -130,7 +130,7 @@ class TwitchChannelPointsMiner:
                 self.twitch_browser = TwitchBrowser(
                     self.twitch.twitch_login.get_auth_token(),
                     self.session_id,
-                    settings=self.browser_settings
+                    settings=self.browser_settings,
                 )
                 self.twitch_browser.init()
 
@@ -146,7 +146,7 @@ class TwitchChannelPointsMiner:
                 streamers=self.streamers,
                 bet_settings=self.bet_settings,
                 events_predictions=self.events_predictions,
-                less_printing=self.logger_settings.less
+                less_printing=self.logger_settings.less,
             )
             topics = [
                 PubsubTopic(
