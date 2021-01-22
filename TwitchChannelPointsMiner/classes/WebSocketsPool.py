@@ -24,7 +24,13 @@ def get_streamer_index(streamers, channel_id):
 
 class WebSocketsPool:
     def __init__(
-        self, twitch, twitch_browser, streamers, bet_settings, events_predictions
+        self,
+        twitch,
+        twitch_browser,
+        streamers,
+        bet_settings,
+        events_predictions,
+        less_printing: bool = False,
     ):
         self.ws = None
         self.twitch = twitch
@@ -32,6 +38,8 @@ class WebSocketsPool:
         self.streamers = streamers
         self.events_predictions = events_predictions
         self.bet_settings = bet_settings
+
+        self.less_printing = less_printing
 
     """
     API Limits
@@ -210,6 +218,7 @@ class WebSocketsPool:
                                     event_status,
                                     event_dict["outcomes"],
                                     bet_settings=ws.bet_settings,
+                                    less_printing=ws.less_printing,
                                 )
                                 if (
                                     ws.streamers[streamer_index].is_online

@@ -13,6 +13,7 @@ class EventPrediction:
         status,
         outcomes,
         bet_settings: BetSettings,
+        less_printing: bool = False,
     ):
         self.streamer = streamer
 
@@ -27,8 +28,21 @@ class EventPrediction:
         self.bet_placed = False
         self.bet = Bet(outcomes, bet_settings)
 
+        self.less_printing = less_printing
+
     def __repr__(self):
-        return f"EventPrediction(event_id={self.event_id}, title={self.title})"
+        return (
+            f"EventPrediction: {self.title}"
+            if self.less_printing is True
+            else f"EventPrediction(event_id={self.event_id}, title={self.title})"
+        )
+
+    def __str__(self):
+        return (
+            f"EventPrediction: {self.title}"
+            if self.less_printing is True
+            else f"EventPrediction(event_id={self.event_id}, title={self.title})"
+        )
 
     def elapsed(self, timestamp):
         return round(float((timestamp - self.created_at).total_seconds()), 2)
@@ -38,3 +52,7 @@ class EventPrediction:
 
     def print_recap(self):
         return f"{self}\n\t\t{self.streamer}\n\t\t{self.bet}\n\t\tResult: {self.final_result}"
+
+    def set_less_printing(self, value):
+        self.less_printing = value
+        self.streamer.less_printing = value

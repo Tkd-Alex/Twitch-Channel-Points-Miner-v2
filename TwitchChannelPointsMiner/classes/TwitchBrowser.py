@@ -392,7 +392,7 @@ class TwitchBrowser:
 
     def place_bet(self, event: EventPrediction):
         logger.info(
-            f"Going to complete bet for {event}. Current url page: {self.browser.current_url}",
+            f"Going to complete bet for {event}",  # ". Current url page: {self.browser.current_url}",
             extra={"emoji": ":wrench:"},
         )
         if event.status == "ACTIVE":
@@ -426,7 +426,7 @@ class TwitchBrowser:
                     )
                     try:
                         logger.info(
-                            f"Going to write: {decision['amount']} on input {decision['choice']}: {decision_outcome}",
+                            f"Going to write: {decision['amount']} on input {decision['choice']}\n\t\t{decision_outcome}",
                             extra={"emoji": ":wrench:"},
                         )
                         if (

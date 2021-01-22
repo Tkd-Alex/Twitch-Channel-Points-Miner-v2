@@ -42,7 +42,8 @@ class TwitchChannelPointsMiner:
         browser_settings: BrowserSettings = BrowserSettings(),
         bet_settings: BetSettings = BetSettings(),
     ):
-        self.twitch = Twitch(username)
+        self.username = username
+        self.twitch = Twitch(self.username)
         self.twitch_browser = None
         self.follow_raid = follow_raid
         self.streamers = []
@@ -60,7 +61,8 @@ class TwitchChannelPointsMiner:
         self.start_datetime = None
         self.original_streamers = []
 
-        self.logs_file = configure_loggers(username, logger_settings)
+        self.logger_settings = logger_settings
+        self.logs_file = configure_loggers(self.username, self.logger_settings)
 
         signal.signal(signal.SIGINT, self.end)
         signal.signal(signal.SIGSEGV, self.end)
@@ -104,7 +106,11 @@ class TwitchChannelPointsMiner:
                 streamer_username.lower().strip()
                 try:
                     channel_id = self.twitch.get_channel_id(streamer_username)
-                    streamer = Streamer(streamer_username, channel_id)
+                    streamer = Streamer(
+                        streamer_username,
+                        channel_id,
+                        less_printing=self.logger_settings.less,
+                    )
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:
                     logger.info(
@@ -125,6 +131,7 @@ class TwitchChannelPointsMiner:
                     self.twitch.twitch_login.get_auth_token(),
                     self.session_id,
                     settings=self.browser_settings,
+                    less_printing=self.logger_settings.less,
                 )
                 self.twitch_browser.init()
 
@@ -207,6 +214,7 @@ class TwitchChannelPointsMiner:
             print("")
             logger.info(f"{self.bet_settings}", extra={"emoji": ":bar_chart:"})
             for event_id in self.events_predictions:
+                self.events_predictions[event_id].set_less_printing(False)
                 logger.info(
                     f"{self.events_predictions[event_id].print_recap()}",
                     extra={"emoji": ":bar_chart:"},
@@ -214,6 +222,7 @@ class TwitchChannelPointsMiner:
             print("")
 
         for streamer_index in range(0, len(self.streamers)):
+            self.streamers[streamer_index].set_less_printing(False)
             logger.info(
                 f"{self.streamers[streamer_index]}, Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
                 extra={"emoji": ":microphone:"},

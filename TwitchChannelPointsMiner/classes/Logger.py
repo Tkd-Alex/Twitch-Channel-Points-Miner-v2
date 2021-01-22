@@ -32,11 +32,13 @@ class LoggerSettings:
     def __init__(
         self,
         save: bool = True,
+        less: bool = False,
         console_level: int = logging.INFO,
         file_level: int = logging.DEBUG,
         emoji: bool = platform.system() != "Windows",
     ):
         self.save = save
+        self.less = less
         self.console_level = console_level
         self.file_level = file_level
         self.emoji = emoji
@@ -50,8 +52,12 @@ def configure_loggers(username, settings):
     console_handler.setLevel(settings.console_level)
     console_handler.setFormatter(
         EmojiFormatter(
-            fmt="%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s",
-            datefmt="%d/%m/%y %H:%M:%S",
+            fmt=(
+                "%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s"
+                if settings.less is False
+                else "%(asctime)s : %(message)s"
+            ),
+            datefmt=("%d/%m/%y %H:%M:%S" if settings.less is False else "%d/%m %H:%M:%S"),
             print_emoji=settings.emoji,
         )
     )

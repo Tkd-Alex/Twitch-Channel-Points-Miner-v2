@@ -5,11 +5,7 @@ logger = logging.getLogger(__name__)
 
 
 class Streamer:
-    def __init__(
-        self,
-        username,
-        channel_id,
-    ):
+    def __init__(self, username, channel_id, less_printing: bool = False):
         self.username = username
         self.channel_id = channel_id
         self.is_online = False
@@ -23,8 +19,21 @@ class Streamer:
         self.streamer_url = f"https://www.twitch.tv/{self.username}"
         self.chat_url = f"https://www.twitch.tv/popout/{self.username}/chat?popout="
 
+        self.less_printing = less_printing
+
     def __repr__(self):
-        return f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={self.channel_points})"
+        return (
+            f"Streamer: {self.username}"
+            if self.less_printing is True
+            else f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={self.channel_points})"
+        )
+
+    def __str__(self):
+        return (
+            f"Streamer: {self.username}"
+            if self.less_printing is True
+            else f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={self.channel_points})"
+        )
 
     def set_offline(self):
         self.offline_at = time.time()
@@ -49,3 +58,6 @@ class Streamer:
             self.history[reason_code] = {"counter": 0, "amount": 0}
         self.history[reason_code]["counter"] += 1
         self.history[reason_code]["amount"] += earned
+
+    def set_less_printing(self, value):
+        self.less_printing = value
