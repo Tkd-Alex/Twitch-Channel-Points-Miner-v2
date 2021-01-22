@@ -357,6 +357,7 @@ class TwitchBrowser:
         return False
 
     def start_bet(self, event: EventPrediction):
+        start_time = time.time()
         if self.currently_is_betting:
             logger.info(
                 f"Sorry, unable to start {event}. The browser it's currently betting another event"
@@ -378,11 +379,11 @@ class TwitchBrowser:
                 self.__execute_script(clearStyleChatJS, suppress_error=True)
 
                 if self.__bet_chains_methods(event) is True:
-                    return self.currently_is_betting
+                    return self.currently_is_betting, time.time() - start_time
                 logger.error(
                     f"Attempt {attempt+1} failed!", extra={"emoji": ":wrench:"}
                 )
-        return False
+        return False, time.time() - start_time
 
     def __bet_chains_methods(self, event):
         if self.__open_coins_menu(event) is True:
@@ -399,6 +400,7 @@ class TwitchBrowser:
         if event.status == "ACTIVE":
             if event.box_fillable and self.currently_is_betting:
 
+                div_bet_is_open = False
                 self.__debug(event, "place_bet")
                 try:
                     WebDriverWait(self.browser, 1).until(
@@ -406,46 +408,53 @@ class TwitchBrowser:
                             (By.XPATH, streamBetMainDiv)
                         )
                     )
+                    div_bet_is_open = True
                 except TimeoutException:
                     logger.info(
                         "The bet div was not found, maybe It was closed. Attempt to open again, hope to be in time",
                         extra={"emoji": ":wrench:"},
                     )
-                    if self.__bet_chains_methods(event) is True:
+                    div_bet_is_open = self.__bet_chains_methods(event)
+                    if div_bet_is_open is True:
                         logger.info(
                             "Success! Bet div is now open, we can complete the bet",
                             extra={"emoji": ":wrench:"},
                         )
 
-                decision = event.bet.calculate(event.streamer.channel_points)
-                if decision["choice"]:
-                    selector_index = 1 if decision["choice"] == "A" else 2
-                    logger.info(
-                        f"Decision: {event.bet.get_outcome(selector_index - 1)}",
-                        extra={"emoji": ":wrench:"},
-                    )
-
-                    try:
+                if div_bet_is_open is True:
+                    decision = event.bet.calculate(event.streamer.channel_points)
+                    if decision["choice"]:
+                        selector_index = 1 if decision["choice"] == "A" else 2
                         logger.info(
-                            f"Going to write: {decision['amount']} channel points on input {decision['choice']}",
+                            f"Decision: {event.bet.get_outcome(selector_index - 1)}",
                             extra={"emoji": ":wrench:"},
                         )
-                        if (
-                            self.__send_text_on_bet(
-                                event, selector_index, decision["amount"]
-                            )
-                            is True
-                        ):
+
+                        try:
                             logger.info(
-                                f"Going to place the bet for {event}",
+                                f"Going to write: {decision['amount']} channel points on input {decision['choice']}",
                                 extra={"emoji": ":wrench:"},
                             )
-                            if self.__click_on_vote(event, selector_index) is True:
-                                self.__debug(event, "click_on_vote")
-                                event.bet_placed = True
-                                time.sleep(random.uniform(5, 10))
-                    except Exception:
-                        logger.error("Exception raised", exc_info=True)
+                            if (
+                                self.__send_text_on_bet(
+                                    event, selector_index, decision["amount"]
+                                )
+                                is True
+                            ):
+                                logger.info(
+                                    f"Going to place the bet for {event}",
+                                    extra={"emoji": ":wrench:"},
+                                )
+                                if self.__click_on_vote(event, selector_index) is True:
+                                    self.__debug(event, "click_on_vote")
+                                    event.bet_placed = True
+                                    time.sleep(random.uniform(5, 10))
+                        except Exception:
+                            logger.error("Exception raised", exc_info=True)
+                else:
+                    logger.info(
+                        "Sorry, unable to complete the bet. The bet div still closed"
+                    )
             else:
                 logger.info(
                     f"Sorry, unable to complete the bet. Event box fillable: {event.box_fillable}, the browser is betting: {self.currently_is_betting}"

@@ -207,7 +207,7 @@ class WebSocketsPool:
                                     event_dict["prediction_window_seconds"]
                                 )
                                 prediction_window_seconds -= (
-                                    30 if prediction_window_seconds <= 120 else 60
+                                    25 if prediction_window_seconds <= 120 else 50
                                 )
                                 event = EventPrediction(
                                     ws.streamers[streamer_index],
@@ -226,14 +226,24 @@ class WebSocketsPool:
                                 ):
                                     ws.events_predictions[event_id] = event
                                     if ws.twitch_browser.currently_is_betting is False:
-                                        if ws.twitch_browser.start_bet(
+                                        (
+                                            start_bet_status,
+                                            execution_time,
+                                        ) = ws.twitch_browser.start_bet(
                                             ws.events_predictions[event_id]
-                                        ):
+                                        )
+                                        if start_bet_status is True:
                                             # place_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                            place_bet_thread = threading.Timer(
+                                            execution_time = round(execution_time, 2)
+                                            start_after = (
                                                 event.closing_bet_after(
                                                     current_timestamp
-                                                ),
+                                                )
+                                                - execution_time
+                                            )
+                                            start_after = max(1, start_after)
+                                            place_bet_thread = threading.Timer(
+                                                start_after,
                                                 ws.twitch_browser.place_bet,
                                                 (ws.events_predictions[event_id],),
                                             )
@@ -241,7 +251,7 @@ class WebSocketsPool:
                                             place_bet_thread.start()
 
                                             logger.info(
-                                                f"Place the bet after: {event.closing_bet_after(current_timestamp)}s for: {ws.events_predictions[event_id]}",
+                                                f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
                                                 extra={"emoji": ":alarm_clock:"},
                                             )
                                     else:

@@ -66,9 +66,7 @@ class TwitchWebSocket(WebSocketApp):
         self.last_ping = time.time()
 
     def elapsed_last_pong(self):
-        elapsed = timedelta(seconds=int(time.time() - float(self.last_pong)))
-        return elapsed.total_seconds() // 60
+        return (time.time - self.last_pong) // 60
 
     def elapsed_last_ping(self):
-        elapsed = timedelta(seconds=int(time.time() - float(self.last_ping)))
-        return elapsed.total_seconds() // 60
+        return (time.time - self.last_ping) // 60

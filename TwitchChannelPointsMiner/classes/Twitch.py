@@ -239,13 +239,7 @@ class Twitch:
 
     def __do_helix_request(self, query, response_as_json=True):
         url = f"https://api.twitch.tv/helix/{query.strip('/')}"
-        response = requests.get(
-            url,
-            headers={
-                "Authorization": f"Bearer {self.twitch_login.get_auth_token()}",
-                "Client-Id": TWITCH_CLIENT_ID,
-            },
-        )
+        response = self.twitch_login.session.get(url)
         logger.debug(
             f"Query: {query}, Status code: {response.status_code}, Content: {response.json()}"
         )
