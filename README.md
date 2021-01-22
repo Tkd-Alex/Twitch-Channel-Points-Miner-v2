@@ -11,6 +11,16 @@
 Read more about channels point here:
 https://help.twitch.tv/s/article/channel-points-guide
 
+## Main difference from the original repository:
+
+- Improve the logging
+- Final report with all the datas
+- Rewrite the entire code using classe instead of module with global variables
+- Automatic download the followers list and use as input
+- Place the bet / make prediction and won or lose (good luck) your channel points! **(CURRENTLY IN BETA)**
+
+For the bet system the script use Selenium. Could be usefull understand how to MakePrediction usign a [POST] request. I've also write a [poc](/TwitchChannelPointsMiner/classes/Twitch.py#L160) but I don't know how to calculate/create the transactionID. Any helps are welcome
+
 ### Full logs
 ```
 %d/%m/%y %H:%M:%S - INFO - [run]: 💣  Start session: '9eb934b0-1684-4a62-b3e2-ba097bd67d35'
@@ -117,17 +127,6 @@ https://help.twitch.tv/s/article/channel-points-guide
 %d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username7, channel_id=0000000, channel_points=2380), Gained (end-start): 0
 %d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username8, channel_id=0000000, channel_points=10230), Gained (end-start): 0
 ```
-
-
-## Main difference from the original repository:
-
-- Improve the logging
-- Final report with all the datas
-- Rewrite the entire code using classe instead of module with global variables
-- Automatic download the followers list and use as input
-- Place the bet / make prediction and won or lose (good luck) your channel points! **(CURRENTLY IN BETA)**
-
-For the bet system the script use Selenium. Could be usefull how to MakePrediction usign a [POST] request. I've also write a [poc](/TwitchChannelPointsMiner/classes/Twitch.py#L160) but I don't know how to calculate/create the transactionID. Any helps are welcome
 
 ## How to use:
 1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
