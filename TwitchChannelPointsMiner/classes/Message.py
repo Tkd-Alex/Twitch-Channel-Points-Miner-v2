@@ -18,10 +18,10 @@ class Message:
         self.identifier = f"{self.type}.{self.topic}.{self.channel_id}"
 
     def __repr__(self):
-        return self.message
+        return f"{self.message}"
 
     def __str__(self):
-        return self.message
+        return f"{self.message}"
 
     def __get_timestamp(self):
         return (

@@ -197,6 +197,8 @@ class Twitch:
             Check if we need need to change priority based on watch streak
             Viewers receive points for returning for x consecutive streams.
             Each stream must be at least 10 minutes long and it must have been at least 30 minutes since the last stream ended.
+
+            Watch at least 6m for get the +10
             """
             streamers_watching = []
             if watch_streak is True:
@@ -207,7 +209,7 @@ class Twitch:
                             streamers[index].offline_at == 0
                             or ((time.time() - streamers[index].offline_at) // 60) > 30
                         )
-                        and streamers[index].minute_watched <= random.uniform(1, 2)
+                        and streamers[index].minute_watched <= 6
                     ):
                         logger.info(
                             f"Switch priority: {streamers[index]}, WatchStreak missing is {streamers[index].watch_streak_missing} and minute_watched: {streamers[index].minute_watched}"
