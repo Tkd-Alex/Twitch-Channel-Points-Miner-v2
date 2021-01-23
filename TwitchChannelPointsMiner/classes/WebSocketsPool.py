@@ -122,6 +122,7 @@ class WebSocketsPool:
 
             message = json.loads(data["message"])
             message_type = message["type"]
+            message_timestamp = message["timestamp"]
 
             message_data = message["data"] if "data" in message else None
             channel_id = (
@@ -145,14 +146,13 @@ class WebSocketsPool:
             # If we have more than one PubSub connection, messages may be duplicated
             # Check the concatenation between message_type and channel_id
             if (
-                time.time() - ws.last_message_time < 0.1
-                and ws.last_message_type_topic == f"{message_type}.{channel_id}"
+                ws.last_message_timestamp == message_timestamp
+                and ws.last_message_type_channel == f"{message_type}.{channel_id}"
             ):
-                ws.last_message_time = time.time()
                 return
 
-            ws.last_message_time = time.time()
-            ws.last_message_type_topic = f"{message_type}.{channel_id}"
+            ws.last_message_timestamp = message_timestamp
+            ws.last_message_type_channel = f"{message_type}.{channel_id}"
 
             streamer_index = get_streamer_index(ws.streamers, channel_id)
             if streamer_index != -1:
