@@ -13,50 +13,17 @@ def get_streamer_index(streamers, channel_id):
         return -1
 
 
+def float_round(value):
+    return round(float(value), 2)
+
+
 def server_time(message_data):
     return (
-        datetime.fromtimestamp(message_data["server_time"], timezone.utc).isoformat() + "Z"
+        datetime.fromtimestamp(message_data["server_time"], timezone.utc).isoformat()
+        + "Z"
         if message_data is not None and "server_time" in message_data
         else datetime.fromtimestamp(time.time(), timezone.utc).isoformat() + "Z"
     )
-
-
-def get_timestamp(message):
-    message_data = message["data"] if "data" in message else None
-    return (
-        server_time(message)
-        if message_data is None
-        else (
-            message_data["timestamp"]
-            if "timestamp" in message_data
-            else server_time(message_data)
-        )
-    )
-
-
-def get_channel_id(message, topic_user):
-    message_data = message["data"] if "data" in message else None
-    return (
-        topic_user
-        if message_data is None
-        else (
-            message_data["prediction"]["channel_id"]
-            if "prediction" in message_data
-            else (
-                message_data["claim"]["channel_id"]
-                if "claim" in message_data
-                else (
-                    message_data["channel_id"]
-                    if "channel_id" in message_data
-                    else topic_user
-                )
-            )
-        )
-    )
-
-
-def float_round(value):
-    return round(float(value), 2)
 
 
 # https://en.wikipedia.org/wiki/Cryptographic_nonce
