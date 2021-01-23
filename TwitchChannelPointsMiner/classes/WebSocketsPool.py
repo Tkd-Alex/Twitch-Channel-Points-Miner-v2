@@ -122,9 +122,10 @@ class WebSocketsPool:
 
             message = json.loads(data["message"])
             message_type = message["type"]
-            message_timestamp = message["timestamp"]
 
             message_data = message["data"] if "data" in message else None
+            message_timestamp = None if message_data is None else message_data["timestamp"]
+
             channel_id = (
                 None
                 if message_data is None
