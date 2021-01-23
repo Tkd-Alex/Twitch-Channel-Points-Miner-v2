@@ -182,7 +182,7 @@ class WebSocketsPool:
                                     event_dict["prediction_window_seconds"]
                                 )
                                 prediction_window_seconds -= (
-                                    25 if prediction_window_seconds <= 120 else 50
+                                    25 if prediction_window_seconds <= 180 else 60
                                 )
                                 event = EventPrediction(
                                     ws.streamers[streamer_index],
