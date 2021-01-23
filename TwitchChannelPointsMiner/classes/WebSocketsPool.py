@@ -123,28 +123,43 @@ class WebSocketsPool:
             message = json.loads(data["message"])
             message_type = message["type"]
 
-            message_data = None
-            if "data" in message:
-                message_data = message["data"]
+            message_data = message["data"] if "data" in message else None
+            channel_id = (
+                None
+                if message_data is None
+                else (
+                    message_data["prediction"]["channel_id"]
+                    if "prediction" in message_data
+                    else (
+                        message_data["claim"]["channel_id"]
+                        if "claim" in message_data
+                        else (
+                            message_data["channel_id"]
+                            if "channel_id" in message_data
+                            else topic_user
+                        )
+                    )
+                )
+            )
 
             # If we have more than one PubSub connection, messages may be duplicated
+            # Check the concatenation between message_type and channel_id
             if (
                 time.time() - ws.last_message_time < 0.1
-                and ws.last_message_type == message_type
+                and ws.last_message_type_topic == f"{message_type}.{channel_id}"
             ):
                 ws.last_message_time = time.time()
                 return
 
             ws.last_message_time = time.time()
-            ws.last_message_type = message_type
+            ws.last_message_type_topic = f"{message_type}.{channel_id}"
 
-            try:
-                if topic == "community-points-user-v1":
-                    if message_type == "points-earned":
-                        streamer_index = get_streamer_index(
-                            ws.streamers, message_data["channel_id"]
-                        )
-                        if streamer_index != -1:
+            streamer_index = get_streamer_index(ws.streamers, channel_id)
+            if streamer_index != -1:
+
+                try:
+                    if topic == "community-points-user-v1":
+                        if message_type == "points-earned":
                             earned = message_data["point_gain"]["total_points"]
                             reason_code = message_data["point_gain"]["reason_code"]
                             balance = message_data["balance"]["balance"]
@@ -156,20 +171,14 @@ class WebSocketsPool:
                             ws.streamers[streamer_index].update_history(
                                 reason_code, earned
                             )
-                    elif message_type == "claim-available":
-                        streamer_index = get_streamer_index(
-                            ws.streamers, message_data["claim"]["channel_id"]
-                        )
-                        if streamer_index != -1:
+                        elif message_type == "claim-available":
                             ws.twitch.claim_bonus(
                                 ws.streamers[streamer_index],
                                 message_data["claim"]["id"],
                             )
 
-                elif topic == "video-playback-by-id":
-                    # There is stream-up message type, but it's sent earlier than the API updates
-                    streamer_index = get_streamer_index(ws.streamers, topic_user)
-                    if streamer_index != -1:
+                    elif topic == "video-playback-by-id":
+                        # There is stream-up message type, but it's sent earlier than the API updates
                         if message_type == "stream-down":
                             if ws.streamers[streamer_index].is_online is True:
                                 ws.streamers[streamer_index].set_offline()
@@ -178,23 +187,18 @@ class WebSocketsPool:
                                 ws.streamers[streamer_index]
                             )
 
-                elif topic == "raid":
-                    streamer_index = get_streamer_index(ws.streamers, topic_user)
-                    if streamer_index != -1:
+                    elif topic == "raid":
                         if message_type == "raid_update_v2":
                             raid = Raid(
                                 message["raid"]["id"], message["raid"]["target_login"]
                             )
                             ws.twitch.update_raid(ws.streamers[streamer_index], raid)
 
-                elif topic == "predictions-channel-v1":
+                    elif topic == "predictions-channel-v1":
 
-                    # message_data["event"]["channel_id"]
-                    # if message_type == "event-created"
-                    # if message_type == "event-updated"
+                        # if message_type == "event-created"
+                        # if message_type == "event-updated"
 
-                    streamer_index = get_streamer_index(ws.streamers, topic_user)
-                    if streamer_index != -1:
                         event_dict = message_data["event"]
                         event_id = event_dict["id"]
                         event_status = event_dict["status"]
@@ -203,7 +207,6 @@ class WebSocketsPool:
 
                         if event_id not in ws.events_predictions:
                             if event_status == "ACTIVE":
-                                time.sleep(random.uniform(0.5, 1.0))
                                 prediction_window_seconds = float(
                                     event_dict["prediction_window_seconds"]
                                 )
@@ -271,30 +274,31 @@ class WebSocketsPool:
                                     event_dict["outcomes"]
                                 )
 
-                elif topic == "predictions-user-v1":
-                    time.sleep(random.uniform(1, 2))
-                    if message_type == "prediction-result":
-                        event_id = message_data["prediction"]["event_id"]
-                        event_result = message_data["prediction"]["result"]
-                        if event_id in ws.events_predictions:
-                            logger.info(
-                                f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
-                                extra={"emoji": ":bar_chart:"},
-                            )
-                            points_won = (
-                                event_result["points_won"]
-                                if event_result["points_won"]
-                                else 0
-                            )
-                            ws.events_predictions[event_id].final_result = {
-                                "type": event_result["type"],
-                                "won": points_won,
-                            }
-            except Exception:
-                logger.error(
-                    f"Exception raised for topic: {topic} and message: {message}",
-                    exc_info=True,
-                )
+                    elif topic == "predictions-user-v1":
+                        # message_type == "prediction-made"  # Confirm the prediction ...
+                        if message_type == "prediction-result":
+                            event_id = message_data["prediction"]["event_id"]
+                            event_result = message_data["prediction"]["result"]
+                            if event_id in ws.events_predictions:
+                                logger.info(
+                                    f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
+                                    extra={"emoji": ":bar_chart:"},
+                                )
+                                points_won = (
+                                    event_result["points_won"]
+                                    if event_result["points_won"]
+                                    else 0
+                                )
+                                ws.events_predictions[event_id].final_result = {
+                                    "type": event_result["type"],
+                                    "won": points_won,
+                                }
+
+                except Exception:
+                    logger.error(
+                        f"Exception raised for topic: {topic} and message: {message}",
+                        exc_info=True,
+                    )
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")

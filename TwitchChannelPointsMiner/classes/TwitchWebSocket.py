@@ -59,7 +59,7 @@ class TwitchWebSocket(WebSocketApp):
         self.less_printing = parent_pool.less_printing
 
         self.last_message_time = 0
-        self.last_message_type = None
+        self.last_message_type_topic = None
 
         self.last_pong = time.time()
         self.last_ping = time.time()

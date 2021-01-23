@@ -207,7 +207,7 @@ class Twitch:
                             streamers[index].offline_at == 0
                             or ((time.time() - streamers[index].offline_at) // 60) > 30
                         )
-                        and streamers[index].minute_watched <= random.uniform(16, 18)
+                        and streamers[index].minute_watched <= random.uniform(1, 2)
                     ):
                         logger.info(
                             f"Switch priority: {streamers[index]}, WatchStreak missing is {streamers[index].watch_streak_missing} and minute_watched: {streamers[index].minute_watched}"
