@@ -60,7 +60,9 @@ class Streamer:
 
     def update_minute_watched(self):
         if self.last_minute_watched != 0:
-            self.minute_watched += round((time.time() - self.last_minute_watched) / 60, 5)
+            self.minute_watched += round(
+                (time.time() - self.last_minute_watched) / 60, 5
+            )
         self.last_minute_watched = time.time()
 
     def print_history(self):
