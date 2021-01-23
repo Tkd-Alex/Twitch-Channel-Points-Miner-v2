@@ -132,7 +132,8 @@ class WebSocketsPool:
                     message_data["timestamp"]
                     if "timestamp" in message_data
                     else (
-                        datetime.fromtimestamp(message_data["server_time"]).isoformat() + "Z"
+                        datetime.fromtimestamp(message_data["server_time"]).isoformat()
+                        + "Z"
                         if "server_time" in message_data
                         else datetime.fromtimestamp(time.time()).isoformat() + "Z"
                     )
@@ -158,20 +159,23 @@ class WebSocketsPool:
             )
 
             # If we have more than one PubSub connection, messages may be duplicated
-            # Check the concatenation between message_type and channel_id
+            # Check the concatenation between message_type.top.channel_id
             if (
-                ws.last_message_type_channel != ws.last_message_timestamp
+                ws.last_message_type_channel is not None
+                and ws.last_message_timestamp is not None
                 and ws.last_message_timestamp == message_timestamp
-                and ws.last_message_type_channel == f"{message_type}.{channel_id}"
+                and ws.last_message_type_channel
+                == f"{message_type}.{topic}.{topic_user}.{channel_id}"
             ):
                 return
 
             ws.last_message_timestamp = message_timestamp
-            ws.last_message_type_channel = f"{message_type}.{channel_id}"
+            ws.last_message_type_channel = (
+                f"{message_type}.{topic}.{topic_user}.{channel_id}"
+            )
 
             streamer_index = get_streamer_index(ws.streamers, channel_id)
             if streamer_index != -1:
-
                 try:
                     if topic == "community-points-user-v1":
                         if message_type == "points-earned":
