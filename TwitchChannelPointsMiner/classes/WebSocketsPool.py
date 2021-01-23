@@ -4,7 +4,7 @@ import time
 import json
 import random
 
-from datetime import fromtimestamp
+from datetime import datetime
 from dateutil import parser
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
@@ -132,9 +132,9 @@ class WebSocketsPool:
                     message_data["timestamp"]
                     if "timestamp" in message_data
                     else (
-                        fromtimestamp(message_data["server_time"]).isoformat() + "Z"
+                        datetime.fromtimestamp(message_data["server_time"]).isoformat() + "Z"
                         if "server_time" in message_data
-                        else fromtimestamp(time.time()).isoformat() + "Z"
+                        else datetime.fromtimestamp(time.time()).isoformat() + "Z"
                     )
                 )
             )
