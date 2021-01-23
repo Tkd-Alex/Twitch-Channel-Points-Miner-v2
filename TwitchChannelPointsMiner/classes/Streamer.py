@@ -12,8 +12,13 @@ class Streamer:
         self.online_at = 0
         self.offline_at = 0
         self.channel_points = 0
+
         self.minute_watched_requests = None
+        self.minute_watched = 0
+        self.last_minute_watched = 0
+
         self.raid = None
+        self.watch_streak_missing = True
         self.history = {}
 
         self.streamer_url = f"https://www.twitch.tv/{self.username}"
@@ -36,14 +41,27 @@ class Streamer:
         )
 
     def set_offline(self):
-        self.offline_at = time.time()
-        self.is_online = False
+        if self.is_online is True:
+            self.offline_at = time.time()
+            self.is_online = False
+
         logger.info(f"{self} is Offline!", extra={"emoji": ":sleeping:"})
 
     def set_online(self):
-        self.online_at = time.time()
-        self.is_online = True
+        if self.is_online is False:
+            self.online_at = time.time()
+            self.is_online = True
+            # Watch streak variables
+            self.watch_streak_missing = True
+            self.minute_watched = 0
+            self.last_minute_watched = 0
+
         logger.info(f"{self} is Online!", extra={"emoji": ":partying_face:"})
+
+    def update_minute_watched(self):
+        if self.last_minute_watched != 0:
+            self.minute_watched += round((time.time() - self.last_minute_watched) / 60, 5)
+        self.last_minute_watched = time.time()
 
     def print_history(self):
         return ", ".join(
@@ -58,6 +76,9 @@ class Streamer:
             self.history[reason_code] = {"counter": 0, "amount": 0}
         self.history[reason_code]["counter"] += 1
         self.history[reason_code]["amount"] += earned
+
+        if reason_code == "WATCH_STREAK":
+            self.watch_streak_missing = False
 
     def set_less_printing(self, value):
         self.less_printing = value

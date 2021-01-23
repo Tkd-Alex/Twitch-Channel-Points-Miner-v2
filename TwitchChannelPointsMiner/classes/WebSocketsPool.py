@@ -167,15 +167,16 @@ class WebSocketsPool:
                             )
 
                 elif topic == "video-playback-by-id":
+                    # There is stream-up message type, but it's sent earlier than the API updates
                     streamer_index = get_streamer_index(ws.streamers, topic_user)
                     if streamer_index != -1:
                         if message_type == "stream-down":
-                            ws.streamers[streamer_index].set_offline()
+                            if ws.streamers[streamer_index].is_online is True:
+                                ws.streamers[streamer_index].set_offline()
                         elif message_type == "viewcount":
                             ws.twitch.check_streamer_online(
                                 ws.streamers[streamer_index]
                             )
-                        # There is stream-up message type, but it's sent earlier than the API updates
 
                 elif topic == "raid":
                     streamer_index = get_streamer_index(ws.streamers, topic_user)
@@ -234,7 +235,6 @@ class WebSocketsPool:
                                         )
                                         if start_bet_status is True:
                                             # place_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                            execution_time = round(execution_time, 2)
                                             start_after = (
                                                 event.closing_bet_after(
                                                     current_timestamp
@@ -242,6 +242,7 @@ class WebSocketsPool:
                                                 - execution_time
                                             )
                                             start_after = max(1, start_after)
+                                            start_after = round(start_after, 2)
                                             place_bet_thread = threading.Timer(
                                                 start_after,
                                                 ws.twitch_browser.place_bet,

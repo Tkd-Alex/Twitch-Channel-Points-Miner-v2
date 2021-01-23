@@ -180,25 +180,60 @@ class Twitch:
             }
         )
 
-    def send_minute_watched_events(self, streamers):
+    def send_minute_watched_events(self, streamers, watch_streak=False):
         headers = {"user-agent": USER_AGENT}
         while self.running:
             # Twitch has a limit - you can't watch more than 2 channels at one time.
             # We take the first two streamers from the list as they have the highest priority.
-            streamers_watching = [
-                streamer for streamer in streamers if streamer.is_online
-            ][:2]
-            for streamer in streamers_watching:
+            streamers_index = [
+                i for i in range(0, len(streamers)) if streamers[i].is_online
+            ]
+
+            # Check if we need need to change priority based on watch streak
+            """
+            Viewers receive points for returning for x consecutive streams.
+            Each stream must be at least 10 minutes long and it must have been at least 30 minutes since the last stream ended.
+            """
+            streamers_watching = []
+            if watch_streak is True:
+                for index in streamers_index:
+                    if (
+                        streamers[index].watch_streak_missing
+                        and (
+                            streamers[index].offline_at == 0
+                            or ((time.time() - streamers[index].offline_at) // 60) > 30
+                        )
+                        and streamers[index].minute_watched <= 6
+                    ):
+                        logger.info(
+                            f"Switch priority: {streamers[index]}, WatchStreak missing is {streamers[index].watch_streak_missing} and minute_watched: {streamers[index].minute_watched}"
+                        )
+                        streamers_watching.append(index)
+                        if len(streamers_watching) == 2:
+                            break
+
+            if streamers_watching == []:
+                streamers_watching = streamers_index
+            else:
+                while len(streamers_watching) < 2 and len(streamers_index) > 1:
+                    another_streamer_index = streamers_index.pop(0)
+                    if another_streamer_index not in streamers_watching:
+                        streamers_watching.append(another_streamer_index)
+
+            streamers_watching = streamers_watching[:2]
+            for index in streamers_watching:
                 next_iteration = time.time() + 60 / len(streamers_watching)
                 try:
                     response = requests.post(
-                        streamer.minute_watched_requests.url,
-                        data=streamer.minute_watched_requests.payload,
+                        streamers[index].minute_watched_requests.url,
+                        data=streamers[index].minute_watched_requests.payload,
                         headers=headers,
                     )
                     logger.debug(
-                        f"Send minute watched request for {streamer} - Status code: {response.status_code}"
+                        f"Send minute watched request for {streamers[index]} - Status code: {response.status_code}"
                     )
+                    if response.status_code == 204:
+                        streamers[index].update_minute_watched()
                 except requests.exceptions.ConnectionError as e:
                     logger.error(f"Error while trying to watch a minute: {e}")
 

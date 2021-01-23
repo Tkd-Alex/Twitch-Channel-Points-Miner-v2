@@ -38,6 +38,7 @@ class TwitchChannelPointsMiner:
         username: str,
         make_predictions: bool = True,
         follow_raid: bool = True,
+        watch_streak: bool = False,
         logger_settings: LoggerSettings = LoggerSettings(),
         browser_settings: BrowserSettings = BrowserSettings(),
         bet_settings: BetSettings = BetSettings(),
@@ -46,6 +47,7 @@ class TwitchChannelPointsMiner:
         self.twitch = Twitch(self.username)
         self.twitch_browser = None
         self.follow_raid = follow_raid
+        self.watch_streak = watch_streak
         self.streamers = []
         self.events_predictions = {}
         self.minute_watcher_thread = None
@@ -135,7 +137,11 @@ class TwitchChannelPointsMiner:
                 self.twitch_browser.init()
 
             self.minute_watcher_thread = threading.Thread(
-                target=self.twitch.send_minute_watched_events, args=(self.streamers,)
+                target=self.twitch.send_minute_watched_events,
+                args=(
+                    self.streamers,
+                    self.watch_streak,
+                ),
             )
             # self.minute_watcher_thread.daemon = True
             self.minute_watcher_thread.start()
@@ -186,6 +192,8 @@ class TwitchChannelPointsMiner:
                     WebSocketsPool.handle_websocket_reconnection(self.ws_pool.ws)
 
     def end(self, signum, frame):
+        logger.info("CTRL+C Detected! Please wait, just a moment\n")
+
         if self.twitch_browser is not None:
             self.twitch_browser.browser.quit()
 
