@@ -183,14 +183,18 @@ class Twitch:
     def send_minute_watched_events(self, streamers, watch_streak=False):
         headers = {"user-agent": USER_AGENT}
         while self.running:
-            # Twitch has a limit - you can't watch more than 2 channels at one time.
-            # We take the first two streamers from the list as they have the highest priority.
             streamers_index = [
-                i for i in range(0, len(streamers)) if streamers[i].is_online
+                i
+                for i in range(0, len(streamers))
+                if streamers[i].is_online
+                and (
+                    streamers[i].online_at == 0
+                    or (time.time() - streamers[i].online_at) > 30
+                )
             ]
 
-            # Check if we need need to change priority based on watch streak
             """
+            Check if we need need to change priority based on watch streak
             Viewers receive points for returning for x consecutive streams.
             Each stream must be at least 10 minutes long and it must have been at least 30 minutes since the last stream ended.
             """
@@ -220,9 +224,15 @@ class Twitch:
                     if another_streamer_index not in streamers_watching:
                         streamers_watching.append(another_streamer_index)
 
+            """
+            Twitch has a limit - you can't watch more than 2 channels at one time.
+            We take the first two streamers from the list as they have the highest priority (based on order or WatchStreak).
+            """
             streamers_watching = streamers_watching[:2]
+
             for index in streamers_watching:
                 next_iteration = time.time() + 60 / len(streamers_watching)
+
                 try:
                     response = requests.post(
                         streamers[index].minute_watched_requests.url,
@@ -238,13 +248,14 @@ class Twitch:
                     logger.error(f"Error while trying to watch a minute: {e}")
 
                 # Create chunk of sleep of speed-up the break loop after CTRL+C
-                sleep_time = max(next_iteration - time.time(), 0) / 3
-                for i in range(0, 3):
+                chunk_size = 3
+                sleep_time = max(next_iteration - time.time(), 0) / chunk_size
+                for i in range(0, chunk_size):
                     time.sleep(sleep_time)
                     if self.running is False:
                         break
 
-            if not streamers_watching:
+            if streamers_watching == []:
                 time.sleep(60)
 
     def get_channel_id(self, streamer_username):
