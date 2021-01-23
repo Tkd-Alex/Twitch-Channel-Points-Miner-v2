@@ -192,7 +192,7 @@ class TwitchChannelPointsMiner:
                     WebSocketsPool.handle_websocket_reconnection(self.ws_pool.ws)
 
     def end(self, signum, frame):
-        logger.info("CTRL+C Detected! Please wait, just a moment\n")
+        logger.info("CTRL+C Detected! Please wait, just a moment")
 
         if self.twitch_browser is not None:
             self.twitch_browser.browser.quit()
