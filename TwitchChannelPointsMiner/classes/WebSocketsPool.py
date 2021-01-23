@@ -3,24 +3,16 @@ import threading
 import time
 import json
 import random
+import code
 
-from datetime import datetime
 from dateutil import parser
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
+from TwitchChannelPointsMiner.utils import get_streamer_index, get_timestamp, get_channel_id
 
 logger = logging.getLogger(__name__)
-
-
-def get_streamer_index(streamers, channel_id):
-    try:
-        return next(
-            i for i, x in enumerate(streamers) if str(x.channel_id) == str(channel_id)
-        )
-    except StopIteration:
-        return -1
 
 
 class WebSocketsPool:
@@ -118,45 +110,16 @@ class WebSocketsPool:
         response = json.loads(message)
 
         if response["type"] == "MESSAGE":
+            # We should create a Message class ...
             data = response["data"]
             topic, topic_user = data["topic"].split(".")
 
             message = json.loads(data["message"])
             message_type = message["type"]
 
+            message_timestamp = get_timestamp(message)
+            channel_id = get_channel_id(message, topic_user)
             message_data = message["data"] if "data" in message else None
-            message_timestamp = (
-                None
-                if message_data is None
-                else (
-                    message_data["timestamp"]
-                    if "timestamp" in message_data
-                    else (
-                        datetime.fromtimestamp(message_data["server_time"]).isoformat()
-                        + "Z"
-                        if "server_time" in message_data
-                        else datetime.fromtimestamp(time.time()).isoformat() + "Z"
-                    )
-                )
-            )
-
-            channel_id = (
-                None
-                if message_data is None
-                else (
-                    message_data["prediction"]["channel_id"]
-                    if "prediction" in message_data
-                    else (
-                        message_data["claim"]["channel_id"]
-                        if "claim" in message_data
-                        else (
-                            message_data["channel_id"]
-                            if "channel_id" in message_data
-                            else topic_user
-                        )
-                    )
-                )
-            )
 
             # If we have more than one PubSub connection, messages may be duplicated
             # Check the concatenation between message_type.top.channel_id
@@ -165,13 +128,13 @@ class WebSocketsPool:
                 and ws.last_message_timestamp is not None
                 and ws.last_message_timestamp == message_timestamp
                 and ws.last_message_type_channel
-                == f"{message_type}.{topic}.{topic_user}.{channel_id}"
+                == f"{message_type}.{topic}.{channel_id}"
             ):
                 return
 
             ws.last_message_timestamp = message_timestamp
             ws.last_message_type_channel = (
-                f"{message_type}.{topic}.{topic_user}.{channel_id}"
+                f"{message_type}.{topic}.{channel_id}"
             )
 
             streamer_index = get_streamer_index(ws.streamers, channel_id)
