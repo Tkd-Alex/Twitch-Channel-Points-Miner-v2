@@ -4,6 +4,7 @@ import time
 import json
 import random
 
+from datetime import fromtimestamp
 from dateutil import parser
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
@@ -124,7 +125,19 @@ class WebSocketsPool:
             message_type = message["type"]
 
             message_data = message["data"] if "data" in message else None
-            message_timestamp = None if message_data is None else message_data["timestamp"]
+            message_timestamp = (
+                None
+                if message_data is None
+                else (
+                    message_data["timestamp"]
+                    if "timestamp" in message_data
+                    else (
+                        fromtimestamp(message_data["server_time"]).isoformat() + "Z"
+                        if "server_time" in message_data
+                        else fromtimestamp(time.time()).isoformat() + "Z"
+                    )
+                )
+            )
 
             channel_id = (
                 None
@@ -147,7 +160,8 @@ class WebSocketsPool:
             # If we have more than one PubSub connection, messages may be duplicated
             # Check the concatenation between message_type and channel_id
             if (
-                ws.last_message_timestamp == message_timestamp
+                ws.last_message_type_channel != ws.last_message_timestamp
+                and ws.last_message_timestamp == message_timestamp
                 and ws.last_message_type_channel == f"{message_type}.{channel_id}"
             ):
                 return
