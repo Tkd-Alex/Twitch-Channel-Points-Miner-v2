@@ -4,7 +4,6 @@ import random
 import os
 import platform
 
-from millify import millify
 from pathlib import Path
 from datetime import datetime
 from enum import Enum, auto
