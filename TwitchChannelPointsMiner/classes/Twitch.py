@@ -209,7 +209,7 @@ class Twitch:
                             streamers[index].offline_at == 0
                             or ((time.time() - streamers[index].offline_at) // 60) > 30
                         )
-                        and streamers[index].minute_watched <= 6
+                        and streamers[index].minute_watched < 7
                     ):
                         logger.info(
                             f"Switch priority: {streamers[index]}, WatchStreak missing is {streamers[index].watch_streak_missing} and minute_watched: {streamers[index].minute_watched}"
