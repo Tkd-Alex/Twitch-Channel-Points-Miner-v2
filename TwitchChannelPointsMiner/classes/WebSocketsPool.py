@@ -81,9 +81,9 @@ class WebSocketsPool:
                 ws.ping()
                 time.sleep(random.uniform(25, 30))
 
-                if ws.elapsed_last_pong() > 5:
+                if ws.elapsed_last_pong() > 15:
                     logger.info(
-                        "The last pong was received more than 5 minutes ago. Reconnect the WebSocket"
+                        "The last pong was received more than 15 minutes ago. Reconnect the WebSocket"
                     )
                     WebSocketsPool.handle_websocket_reconnection(ws)
 
@@ -167,16 +167,16 @@ class WebSocketsPool:
 
                     elif message.topic == "predictions-channel-v1":
 
-                        # if message.type == "event-created"
-                        # if message.type == "event-updated"
-
                         event_dict = message.data["event"]
                         event_id = event_dict["id"]
                         event_status = event_dict["status"]
 
                         current_timestamp = parser.parse(message.timestamp)
 
-                        if event_id not in ws.events_predictions:
+                        if (
+                            message.type == "event-created"
+                            and event_id not in ws.events_predictions
+                        ):
                             if event_status == "ACTIVE":
                                 prediction_window_seconds = float(
                                     event_dict["prediction_window_seconds"]
@@ -199,8 +199,8 @@ class WebSocketsPool:
                                     ws.streamers[streamer_index].is_online
                                     and event.closing_bet_after(current_timestamp) > 0
                                 ):
-                                    ws.events_predictions[event_id] = event
                                     if ws.twitch_browser.currently_is_betting is False:
+                                        ws.events_predictions[event_id] = event
                                         (
                                             start_bet_status,
                                             execution_time,
@@ -229,12 +229,17 @@ class WebSocketsPool:
                                                 f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
                                                 extra={"emoji": ":alarm_clock:"},
                                             )
+                                        else:
+                                            del ws.events_predictions[event_id]
                                     else:
                                         logger.info(
                                             f"Sorry, unable to start {event}. The browser it's currently betting another event"
                                         )
 
-                        else:
+                        elif (
+                            message.type == "event-updated"
+                            and event_id in ws.events_predictions
+                        ):
                             ws.events_predictions[event_id].status = event_status
                             # Game over we can't update anymore the values... The bet was placed!
                             if (
@@ -246,11 +251,10 @@ class WebSocketsPool:
                                 )
 
                     elif message.topic == "predictions-user-v1":
-                        # message_type == "prediction-made"  # Confirm the prediction ...
-                        if message.type == "prediction-result":
-                            event_id = message.data["prediction"]["event_id"]
-                            event_result = message.data["prediction"]["result"]
-                            if event_id in ws.events_predictions:
+                        event_id = message.data["prediction"]["event_id"]
+                        if event_id in ws.events_predictions:
+                            if message.type == "prediction-result":
+                                event_result = message.data["prediction"]["result"]
                                 logger.info(
                                     f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
                                     extra={"emoji": ":bar_chart:"},
@@ -264,6 +268,8 @@ class WebSocketsPool:
                                     "type": event_result["type"],
                                     "won": points_won,
                                 }
+                            elif message.type == "prediction-made":
+                                ws.events_predictions[event_id].bet_confirmed = True
 
                 except Exception:
                     logger.error(

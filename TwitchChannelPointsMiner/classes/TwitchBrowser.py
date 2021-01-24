@@ -460,7 +460,8 @@ class TwitchBrowser:
                 )
         else:
             logger.info(
-                f"Oh no! The event It's not more ACTIVE, current status: {event.status}", extra={"emoji": ":disappointed_relieved:"}
+                f"Oh no! The event It's not more ACTIVE, current status: {event.status}",
+                extra={"emoji": ":disappointed_relieved:"},
             )
 
         self.browser.get("about:blank")

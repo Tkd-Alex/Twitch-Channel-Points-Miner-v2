@@ -25,6 +25,7 @@ class EventPrediction:
         self.final_result = {}
 
         self.box_fillable = False
+        self.bet_confirmed = False
         self.bet_placed = False
         self.bet = Bet(outcomes, bet_settings)
 
