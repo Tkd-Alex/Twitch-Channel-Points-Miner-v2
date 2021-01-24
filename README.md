@@ -216,6 +216,7 @@ Other users have find multiple problems on Windows my suggestion are:
  - Suppress the emoji in logs with `logger_settings=LoggerSettings(emoji=False)`
  - Download the geckodriver from here: https://github.com/mozilla/geckodriver/releases/ and extract in the same folder of this project. For other issue with geckodriver just googling: https://stackoverflow.com/questions/40208051/selenium-using-python-geckodriver-executable-needs-to-be-in-path
 
+Other usefully infos can be founded here: https://github.com/gottagofaster236/Twitch-Channel-Points-Miner/issues/31
 
 ## Use Chrome instead Firefox
 If you prefer Chrome instead Firefox please download the WebDriver matching with your Chrome version and OS from this link: https://chromedriver.chromium.org/downloads.
