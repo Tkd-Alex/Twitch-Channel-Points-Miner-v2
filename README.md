@@ -30,13 +30,13 @@ For the bet system the script use Selenium. Could be usefull understand how to M
 %d/%m/%y %H:%M:%S - INFO - [set_offline]: 😴  Streamer(username=streamer-username3, channel_id=0000000, channel_points=61365) is Offline!
 %d/%m/%y %H:%M:%S - INFO - [set_offline]: 😴  Streamer(username=streamer-username4, channel_id=0000000, channel_points=3760) is Offline!
 %d/%m/%y %H:%M:%S - INFO - [set_online]: 🥳  Streamer(username=streamer-username, channel_id=0000000, channel_points=61365) is Online!
-%d/%m/%y %H:%M:%S - INFO - [start_bet]: 🔧  Start betting for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
+%d/%m/%y %H:%M:%S - INFO - [start_bet]: 🔧  Start betting for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo) owned by Streamer(username=streamer-username, channel_id=0000000, channel_points=61365)
 %d/%m/%y %H:%M:%S - INFO - [__open_coins_menu]: 🔧  Open coins menu for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
 %d/%m/%y %H:%M:%S - INFO - [__click_on_bet]: 🔧  Click on the bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
 %d/%m/%y %H:%M:%S - INFO - [__enable_custom_bet_value]: 🔧  Enable input of custom value for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
 %d/%m/%y %H:%M:%S - INFO - [on_message]: ⏰  Place the bet after: 89.99s for: EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx-15c61914ef69, title=Please star this repo)
 %d/%m/%y %H:%M:%S - INFO - [on_message]: 🚀  +12 → Streamer(username=streamer-username, channel_id=0000000, channel_points=61377) - Reason: WATCH.
-%d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to complete bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
+%d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to complete bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo) owned by Streamer(username=streamer-username, channel_id=0000000, channel_points=61365)
 %d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Decision: YES (PINK), Points: 156k, Users: 46 (61.33%), Odds: 1.57 (63.69%)
 %d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to write: 4296 channel points on input B
 %d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to place the bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
@@ -63,13 +63,13 @@ For the bet system the script use Selenium. Could be usefull understand how to M
 %d/%m %H:%M:%S - 😴  streamer-username3 (xxx points) is Offline!
 %d/%m %H:%M:%S - 😴  streamer-username4 (xxx points) is Offline!
 %d/%m %H:%M:%S - 🥳  streamer-username (xxx points) is Online!
-%d/%m %H:%M:%S - 🔧  Start betting for EventPrediction: Please star this repo
+%d/%m %H:%M:%S - 🔧  Start betting for EventPrediction: Please star this repo owned by streamer-username (xxx points)
 %d/%m %H:%M:%S - 🔧  Open coins menu for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - 🔧  Click on the bet for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - 🔧  Enable input of custom value for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - ⏰  Place the bet after: 89.99s EventPrediction: Please star this repo
 %d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
-%d/%m %H:%M:%S - 🔧  Going to complete bet for EventPrediction: Please star this repo
+%d/%m %H:%M:%S - 🔧  Going to complete bet for EventPrediction: Please star this repo owned by streamer-username (xxx points)
 %d/%m %H:%M:%S - 🔧  Decision: YES (PINK), Points: 156k, Users: 46 (61.33%), Odds: 1.57 (63.69%)
 %d/%m %H:%M:%S - 🔧  Going to write: 4296 channel points on input B
 %d/%m %H:%M:%S - 🔧  Going to place the bet for EventPrediction: Please star this repo
