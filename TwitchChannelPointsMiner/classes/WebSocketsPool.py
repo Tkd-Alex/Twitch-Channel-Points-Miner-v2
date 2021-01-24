@@ -161,7 +161,7 @@ class WebSocketsPool:
                     elif message.topic == "raid":
                         if message.type == "raid_update_v2":
                             raid = Raid(
-                                message["raid"]["id"], message["raid"]["target_login"]
+                                message.message["raid"]["id"], message.message["raid"]["target_login"]
                             )
                             ws.twitch.update_raid(ws.streamers[streamer_index], raid)
 
