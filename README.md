@@ -229,3 +229,15 @@ browser_settings=BrowserSettings(
     driver_path="/path/of/your/chromedriver"  # If no path was provided the script will try to search automatically
 ),
 ```
+
+## Issue / Debug
+When you open a new issue please use the correct template. 
+Please provide at least the following information/files:
+- Browser (if you have the prediction feature enabled)
+- Operation System
+- Python Version
+- logs/ `LoggerSettings(file_level=logging.DEBUG)`
+- htmls/ `BrowserSettings(save_html=True)`
+- screenshots/ `BrowserSettings(do_screenshot=True)`
+
+Make sure also to have the latest commit.
