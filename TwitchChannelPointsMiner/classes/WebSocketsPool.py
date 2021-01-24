@@ -164,6 +164,7 @@ class WebSocketsPool:
                             ws.twitch.claim_bonus(
                                 ws.streamers[streamer_index],
                                 message_data["claim"]["id"],
+                                less_printing=ws.less_printing
                             )
 
                 elif topic == "video-playback-by-id":

@@ -58,34 +58,32 @@ For the bet system the script use Selenium. Could be usefull understand how to M
 ```
 %d/%m %H:%M:%S - 💣  Start session: '9eb934b0-1684-4a62-b3e2-ba097bd67d35'
 %d/%m %H:%M:%S - 🤓  Loading data for 13 streamers. Please wait ...
-%d/%m %H:%M:%S - 😴  Streamer: streamer-username1 is Offline!
-%d/%m %H:%M:%S - 😴  Streamer: streamer-username2 is Offline!
-%d/%m %H:%M:%S - 😴  Streamer: streamer-username3 is Offline!
-%d/%m %H:%M:%S - 😴  Streamer: streamer-username4 is Offline!
-%d/%m %H:%M:%S - 🥳  Streamer: streamer-username is Online!
+%d/%m %H:%M:%S - 😴  streamer-username1 (xxx points) is Offline!
+%d/%m %H:%M:%S - 😴  streamer-username2 (xxx points) is Offline!
+%d/%m %H:%M:%S - 😴  streamer-username3 (xxx points) is Offline!
+%d/%m %H:%M:%S - 😴  streamer-username4 (xxx points) is Offline!
+%d/%m %H:%M:%S - 🥳  streamer-username (xxx points) is Online!
 %d/%m %H:%M:%S - 🔧  Start betting for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - 🔧  Open coins menu for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - 🔧  Click on the bet for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - 🔧  Enable input of custom value for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - ⏰  Place the bet after: 89.99s EventPrediction: Please star this repo
-%d/%m %H:%M:%S - 🚀  +12 → Streamer: streamer-username - Reason: WATCH.
+%d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
 %d/%m %H:%M:%S - 🔧  Going to complete bet for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - 🔧  Decision: YES (PINK), Points: 156k, Users: 46 (61.33%), Odds: 1.57 (63.69%)
 %d/%m %H:%M:%S - 🔧  Going to write: 4296 channel points on input B
 %d/%m %H:%M:%S - 🔧  Going to place the bet for EventPrediction: Please star this repo
-%d/%m %H:%M:%S - 🚀  +6675 → Streamer: streamer-username - Reason: PREDICTION.
+%d/%m %H:%M:%S - 🚀  +6675 → streamer-username (xxx points) - Reason: PREDICTION.
 %d/%m %H:%M:%S - 📊  EventPrediction: Please star this repo - Result: WIN, Points won: 6675
-%d/%m %H:%M:%S - 🚀  +12 → Streamer: streamer-username - Reason: WATCH.
-%d/%m %H:%M:%S - 🚀  +12 → Streamer: streamer-username - Reason: WATCH.
-%d/%m %H:%M:%S - 🎁  Claiming the bonus for Streamer: streamer-username!
-%d/%m %H:%M:%S - 🚀  +60 → Streamer: streamer-username - Reason: CLAIM.
-%d/%m %H:%M:%S - 🚀  +12 → Streamer: streamer-username - Reason: WATCH.
-%d/%m %H:%M:%S - 🚀  +400 → Streamer: streamer-username - Reason: WATCH_STREAK.
-%d/%m %H:%M:%S - 🎁  Claiming the bonus for Streamer: streamer-username!
-%d/%m %H:%M:%S - 🚀  +60 → Streamer: streamer-username - Reason: CLAIM.
-%d/%m %H:%M:%S - 🚀  +12 → Streamer: streamer-username - Reason: WATCH.
-%d/%m %H:%M:%S - 🎭  Joining raid from Streamer: streamer-username to another-username!
-%d/%m %H:%M:%S - 🚀  +250 → Streamer: streamer-username - Reason: RAID.
+%d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
+%d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
+%d/%m %H:%M:%S - 🚀  +60 → streamer-username (xxx points) - Reason: CLAIM.
+%d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
+%d/%m %H:%M:%S - 🚀  +400 → streamer-username (xxx points) - Reason: WATCH_STREAK.
+%d/%m %H:%M:%S - 🚀  +60 → streamer-username (xxx points) - Reason: CLAIM.
+%d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
+%d/%m %H:%M:%S - 🎭  Joining raid from streamer-username (xxx points) to another-username!
+%d/%m %H:%M:%S - 🚀  +250 → streamer-username (xxx points) - Reason: RAID.
 ```
 ### Final report:
 ```
@@ -231,7 +229,7 @@ browser_settings=BrowserSettings(
 ```
 
 ## Issue / Debug
-When you open a new issue please use the correct template. 
+When you open a new issue please use the correct template.
 Please provide at least the following information/files:
 - Browser (if you have the prediction feature enabled)
 - Operation System

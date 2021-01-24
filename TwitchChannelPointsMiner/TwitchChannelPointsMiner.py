@@ -120,7 +120,7 @@ class TwitchChannelPointsMiner:
 
             for streamer in self.streamers:
                 time.sleep(random.uniform(0.3, 0.7))
-                self.twitch.load_channel_points_context(streamer)
+                self.twitch.load_channel_points_context(streamer, less_printing=self.logger_settings.less)
                 self.twitch.check_streamer_online(streamer)
             self.original_streamers = copy.deepcopy(self.streamers)
 

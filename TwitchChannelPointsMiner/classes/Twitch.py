@@ -119,8 +119,10 @@ class Twitch:
             else:
                 streamer.set_online()
 
-    def claim_bonus(self, streamer, claim_id):
-        logger.info(f"Claiming the bonus for {streamer}!", extra={"emoji": ":gift:"})
+    def claim_bonus(self, streamer, claim_id, less_printing=False):
+        if less_printing is False:
+            logger.info(f"Claiming the bonus for {streamer}!", extra={"emoji": ":gift:"})
+
         json_data = {
             "operationName": "ClaimCommunityPoints",
             "variables": {
@@ -136,7 +138,7 @@ class Twitch:
         self.post_gql_request(json_data)
 
     # Load the amount of current points for a channel, check if a bonus is available
-    def load_channel_points_context(self, streamer):
+    def load_channel_points_context(self, streamer, less_printing=False):
         json_data = {
             "operationName": "ChannelPointsContext",
             "variables": {"channelLogin": streamer.username},
@@ -156,7 +158,7 @@ class Twitch:
         streamer.channel_points = community_points["balance"]
         # logger.info(f"{streamer.channel_points} channel points for {streamer.username}!")
         if community_points["availableClaim"] is not None:
-            self.claim_bonus(streamer, community_points["availableClaim"]["id"])
+            self.claim_bonus(streamer, community_points["availableClaim"]["id"], less_printing=less_printing)
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
