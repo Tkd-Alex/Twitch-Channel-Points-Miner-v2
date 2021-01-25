@@ -409,7 +409,6 @@ class TwitchBrowser:
                                     extra={"emoji": ":wrench:"},
                                 )
                                 if self.__click_on_vote(event, selector_index) is True:
-                                    self.__debug(event, "click_on_vote")
                                     event.bet_placed = True
                                     time.sleep(random.uniform(5, 10))
                         except Exception:
