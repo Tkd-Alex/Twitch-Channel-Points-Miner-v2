@@ -334,6 +334,9 @@ class TwitchBrowser:
                 )
                 self.browser.get(event.streamer.chat_url)
                 time.sleep(random.uniform(3, 5))
+                self.__click_when_exist(
+                    cookiePolicyQuery, By.CSS_SELECTOR, suppress_error=True, timeout=1.5
+                )
 
                 # Hide the chat ... Don't ask me why
                 self.__execute_script(clearStyleChatJS, suppress_error=True)
@@ -343,8 +346,6 @@ class TwitchBrowser:
                 logger.error(
                     f"Attempt {attempt+1} failed!", extra={"emoji": ":wrench:"}
                 )
-                # Maybe we have failed because we have Cookies also in chat - Low probability
-                self.__click_when_exist(cookiePolicyQuery, By.CSS_SELECTOR, suppress_error=True, timeout=2.5)
         return False, time.time() - start_time
 
     def __bet_chains_methods(self, event):
