@@ -8,7 +8,7 @@ def read(fname):
 
 setuptools.setup(
     name="Twitch-Channel-Points-Miner-v2",
-    version="2.3.1",
+    version="2.3.5",
     author="Tkd-Alex (Alessandro Maggio)",
     author_email="alex.tkd.alex@gmail.com",
     description="A simple script that will watch a stream for you and earn the channel points.",

@@ -21,7 +21,12 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerIsOfflineException,
     StreamerDoesNotExistException,
 )
-from TwitchChannelPointsMiner.constants import TWITCH_CLIENT_ID, USER_AGENT, TWITCH_API, TWITCH_GQL
+from TwitchChannelPointsMiner.constants import (
+    TWITCH_CLIENT_ID,
+    USER_AGENT,
+    TWITCH_API,
+    TWITCH_GQL,
+)
 
 logger = logging.getLogger(__name__)
 
