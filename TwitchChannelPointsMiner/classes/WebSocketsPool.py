@@ -147,7 +147,7 @@ class WebSocketsPool:
                             ws.twitch.claim_bonus(
                                 ws.streamers[streamer_index],
                                 message.data["claim"]["id"],
-                                less_printing=ws.less_printing
+                                less_printing=ws.less_printing,
                             )
 
                     elif message.topic == "video-playback-by-id":
@@ -158,7 +158,7 @@ class WebSocketsPool:
                             if ws.streamers[streamer_index].is_online is True:
                                 ws.streamers[streamer_index].set_offline()
                         elif message.type == "viewcount":
-                            if (ws.streamers[streamer_index].stream_up == 0 or ((time.time() - ws.streamers[streamer_index].stream_up) > 30)):
+                            if ws.streamers[streamer_index].stream_up_elapsed():
                                 ws.twitch.check_streamer_online(
                                     ws.streamers[streamer_index]
                                 )

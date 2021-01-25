@@ -89,3 +89,6 @@ class Streamer:
         self.watch_streak_missing = True
         self.minute_watched = 0
         self.minute_watched_timestamp = 0
+
+    def stream_up_elapsed(self):
+        return self.stream_up == 0 or ((time.time() - self.stream_up) > 120)

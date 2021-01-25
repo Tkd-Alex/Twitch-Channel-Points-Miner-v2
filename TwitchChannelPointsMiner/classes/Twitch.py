@@ -124,7 +124,9 @@ class Twitch:
 
     def claim_bonus(self, streamer, claim_id, less_printing=False):
         if less_printing is False:
-            logger.info(f"Claiming the bonus for {streamer}!", extra={"emoji": ":gift:"})
+            logger.info(
+                f"Claiming the bonus for {streamer}!", extra={"emoji": ":gift:"}
+            )
 
         json_data = {
             "operationName": "ClaimCommunityPoints",
@@ -161,7 +163,11 @@ class Twitch:
         streamer.channel_points = community_points["balance"]
         # logger.info(f"{streamer.channel_points} channel points for {streamer.username}!")
         if community_points["availableClaim"] is not None:
-            self.claim_bonus(streamer, community_points["availableClaim"]["id"], less_printing=less_printing)
+            self.claim_bonus(
+                streamer,
+                community_points["availableClaim"]["id"],
+                less_printing=less_printing,
+            )
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
