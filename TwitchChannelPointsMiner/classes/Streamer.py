@@ -13,16 +13,15 @@ class Streamer:
         self.username = username
         self.channel_id = channel_id
         self.is_online = False
+        self.stream_up = 0
         self.online_at = 0
         self.offline_at = 0
         self.channel_points = 0
-
         self.minute_watched_requests = None
-        self.minute_watched = 0
-        self.last_minute_watched = 0
+
+        self.__init_watch_streak()
 
         self.raid = None
-        self.watch_streak_missing = True
         self.history = {}
 
         self.streamer_url = f"{TWITCH_URL}/{self.username}"
@@ -45,31 +44,26 @@ class Streamer:
         )
 
     def set_offline(self):
-        # Print the offline message only If we are recently online or we are in bootstrap phase (offline_at == 0)
-        if self.is_online is True or self.offline_at == 0:
-            logger.info(f"{self} is Offline!", extra={"emoji": ":sleeping:"})
-
         if self.is_online is True:
             self.offline_at = time.time()
             self.is_online = False
+
+        logger.info(f"{self} is Offline!", extra={"emoji": ":sleeping:"})
 
     def set_online(self):
         if self.is_online is False:
             self.online_at = time.time()
             self.is_online = True
-            # Watch streak variables
-            self.watch_streak_missing = True
-            self.minute_watched = 0
-            self.last_minute_watched = 0
+            self.__init_watch_streak()
 
         logger.info(f"{self} is Online!", extra={"emoji": ":partying_face:"})
 
     def update_minute_watched(self):
-        if self.last_minute_watched != 0:
+        if self.minute_watched_timestamp != 0:
             self.minute_watched += round(
-                (time.time() - self.last_minute_watched) / 60, 5
+                (time.time() - self.minute_watched_timestamp) / 60, 5
             )
-        self.last_minute_watched = time.time()
+        self.minute_watched_timestamp = time.time()
 
     def print_history(self):
         return ", ".join(
@@ -90,3 +84,8 @@ class Streamer:
 
     def set_less_printing(self, value):
         self.less_printing = value
+
+    def __init_watch_streak(self):
+        self.watch_streak_missing = True
+        self.minute_watched = 0
+        self.minute_watched_timestamp = 0

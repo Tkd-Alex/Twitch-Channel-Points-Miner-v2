@@ -152,13 +152,16 @@ class WebSocketsPool:
 
                     elif message.topic == "video-playback-by-id":
                         # There is stream-up message type, but it's sent earlier than the API updates
-                        if message.type == "stream-down":
+                        if message.type == "stream-up":
+                            ws.streamers[streamer_index].stream_up = time.time()
+                        elif message.type == "stream-down":
                             if ws.streamers[streamer_index].is_online is True:
                                 ws.streamers[streamer_index].set_offline()
                         elif message.type == "viewcount":
-                            ws.twitch.check_streamer_online(
-                                ws.streamers[streamer_index]
-                            )
+                            if (ws.streamers[streamer_index].stream_up == 0 or ((time.time() - ws.streamers[streamer_index].stream_up) > 10)):
+                                ws.twitch.check_streamer_online(
+                                    ws.streamers[streamer_index]
+                                )
 
                     elif message.topic == "raid":
                         if message.type == "raid_update_v2":
