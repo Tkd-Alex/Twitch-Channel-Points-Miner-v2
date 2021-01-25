@@ -31,13 +31,13 @@ For the bet system the script use Selenium. Could be usefull understand how to M
 %d/%m/%y %H:%M:%S - INFO - [set_offline]: 😴  Streamer(username=streamer-username3, channel_id=0000000, channel_points=61365) is Offline!
 %d/%m/%y %H:%M:%S - INFO - [set_offline]: 😴  Streamer(username=streamer-username4, channel_id=0000000, channel_points=3760) is Offline!
 %d/%m/%y %H:%M:%S - INFO - [set_online]: 🥳  Streamer(username=streamer-username, channel_id=0000000, channel_points=61365) is Online!
-%d/%m/%y %H:%M:%S - INFO - [start_bet]: 🔧  Start betting for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
+%d/%m/%y %H:%M:%S - INFO - [start_bet]: 🔧  Start betting for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo) owned by Streamer(username=streamer-username, channel_id=0000000, channel_points=61365)
 %d/%m/%y %H:%M:%S - INFO - [__open_coins_menu]: 🔧  Open coins menu for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
 %d/%m/%y %H:%M:%S - INFO - [__click_on_bet]: 🔧  Click on the bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
 %d/%m/%y %H:%M:%S - INFO - [__enable_custom_bet_value]: 🔧  Enable input of custom value for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
 %d/%m/%y %H:%M:%S - INFO - [on_message]: ⏰  Place the bet after: 89.99s for: EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx-15c61914ef69, title=Please star this repo)
 %d/%m/%y %H:%M:%S - INFO - [on_message]: 🚀  +12 → Streamer(username=streamer-username, channel_id=0000000, channel_points=61377) - Reason: WATCH.
-%d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to complete bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
+%d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to complete bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo) owned by Streamer(username=streamer-username, channel_id=0000000, channel_points=61365)
 %d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Decision: YES (PINK), Points: 156k, Users: 46 (61.33%), Odds: 1.57 (63.69%)
 %d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to write: 4296 channel points on input B
 %d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to place the bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
@@ -59,34 +59,32 @@ For the bet system the script use Selenium. Could be usefull understand how to M
 ```
 %d/%m %H:%M:%S - 💣  Start session: '9eb934b0-1684-4a62-b3e2-ba097bd67d35'
 %d/%m %H:%M:%S - 🤓  Loading data for 13 streamers. Please wait ...
-%d/%m %H:%M:%S - 😴  Streamer: streamer-username1 is Offline!
-%d/%m %H:%M:%S - 😴  Streamer: streamer-username2 is Offline!
-%d/%m %H:%M:%S - 😴  Streamer: streamer-username3 is Offline!
-%d/%m %H:%M:%S - 😴  Streamer: streamer-username4 is Offline!
-%d/%m %H:%M:%S - 🥳  Streamer: streamer-username is Online!
-%d/%m %H:%M:%S - 🔧  Start betting for EventPrediction: Please star this repo
+%d/%m %H:%M:%S - 😴  streamer-username1 (xxx points) is Offline!
+%d/%m %H:%M:%S - 😴  streamer-username2 (xxx points) is Offline!
+%d/%m %H:%M:%S - 😴  streamer-username3 (xxx points) is Offline!
+%d/%m %H:%M:%S - 😴  streamer-username4 (xxx points) is Offline!
+%d/%m %H:%M:%S - 🥳  streamer-username (xxx points) is Online!
+%d/%m %H:%M:%S - 🔧  Start betting for EventPrediction: Please star this repo owned by streamer-username (xxx points)
 %d/%m %H:%M:%S - 🔧  Open coins menu for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - 🔧  Click on the bet for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - 🔧  Enable input of custom value for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - ⏰  Place the bet after: 89.99s EventPrediction: Please star this repo
-%d/%m %H:%M:%S - 🚀  +12 → Streamer: streamer-username - Reason: WATCH.
-%d/%m %H:%M:%S - 🔧  Going to complete bet for EventPrediction: Please star this repo
+%d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
+%d/%m %H:%M:%S - 🔧  Going to complete bet for EventPrediction: Please star this repo owned by streamer-username (xxx points)
 %d/%m %H:%M:%S - 🔧  Decision: YES (PINK), Points: 156k, Users: 46 (61.33%), Odds: 1.57 (63.69%)
 %d/%m %H:%M:%S - 🔧  Going to write: 4296 channel points on input B
 %d/%m %H:%M:%S - 🔧  Going to place the bet for EventPrediction: Please star this repo
-%d/%m %H:%M:%S - 🚀  +6675 → Streamer: streamer-username - Reason: PREDICTION.
+%d/%m %H:%M:%S - 🚀  +6675 → streamer-username (xxx points) - Reason: PREDICTION.
 %d/%m %H:%M:%S - 📊  EventPrediction: Please star this repo - Result: WIN, Points won: 6675
-%d/%m %H:%M:%S - 🚀  +12 → Streamer: streamer-username - Reason: WATCH.
-%d/%m %H:%M:%S - 🚀  +12 → Streamer: streamer-username - Reason: WATCH.
-%d/%m %H:%M:%S - 🎁  Claiming the bonus for Streamer: streamer-username!
-%d/%m %H:%M:%S - 🚀  +60 → Streamer: streamer-username - Reason: CLAIM.
-%d/%m %H:%M:%S - 🚀  +12 → Streamer: streamer-username - Reason: WATCH.
-%d/%m %H:%M:%S - 🚀  +400 → Streamer: streamer-username - Reason: WATCH_STREAK.
-%d/%m %H:%M:%S - 🎁  Claiming the bonus for Streamer: streamer-username!
-%d/%m %H:%M:%S - 🚀  +60 → Streamer: streamer-username - Reason: CLAIM.
-%d/%m %H:%M:%S - 🚀  +12 → Streamer: streamer-username - Reason: WATCH.
-%d/%m %H:%M:%S - 🎭  Joining raid from Streamer: streamer-username to another-username!
-%d/%m %H:%M:%S - 🚀  +250 → Streamer: streamer-username - Reason: RAID.
+%d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
+%d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
+%d/%m %H:%M:%S - 🚀  +60 → streamer-username (xxx points) - Reason: CLAIM.
+%d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
+%d/%m %H:%M:%S - 🚀  +400 → streamer-username (xxx points) - Reason: WATCH_STREAK.
+%d/%m %H:%M:%S - 🚀  +60 → streamer-username (xxx points) - Reason: CLAIM.
+%d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
+%d/%m %H:%M:%S - 🎭  Joining raid from streamer-username (xxx points) to another-username!
+%d/%m %H:%M:%S - 🚀  +250 → streamer-username (xxx points) - Reason: RAID.
 ```
 ### Final report:
 ```
@@ -221,6 +219,7 @@ Other users have find multiple problems on Windows my suggestion are:
  - Suppress the emoji in logs with `logger_settings=LoggerSettings(emoji=False)`
  - Download the geckodriver from here: https://github.com/mozilla/geckodriver/releases/ and extract in the same folder of this project. For other issue with geckodriver just googling: https://stackoverflow.com/questions/40208051/selenium-using-python-geckodriver-executable-needs-to-be-in-path
 
+Other usefully infos can be founded here: https://github.com/gottagofaster236/Twitch-Channel-Points-Miner/issues/31
 
 ## Use Chrome instead Firefox
 If you prefer Chrome instead Firefox please download the WebDriver matching with your Chrome version and OS from this link: https://chromedriver.chromium.org/downloads.
@@ -232,3 +231,15 @@ browser_settings=BrowserSettings(
     driver_path="/path/of/your/chromedriver"  # If no path was provided the script will try to search automatically
 ),
 ```
+
+## Issue / Debug
+When you open a new issue please use the correct template.
+Please provide at least the following information/files:
+- Browser (if you have the prediction feature enabled)
+- Operation System
+- Python Version
+- logs/ `LoggerSettings(file_level=logging.DEBUG)`
+- htmls/ `BrowserSettings(save_html=True)`
+- screenshots/ `BrowserSettings(do_screenshot=True)`
+
+Make sure also to have the latest commit.

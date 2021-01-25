@@ -4,6 +4,7 @@ import random
 import os
 import platform
 
+from millify import prettify
 from pathlib import Path
 from datetime import datetime
 from enum import Enum, auto
@@ -327,7 +328,7 @@ class TwitchBrowser:
         else:
             for attempt in range(0, self.settings.max_attempts):
                 logger.info(
-                    f"Start betting for {event}",
+                    f"Start betting for {event} owned by {event.streamer}",
                     extra={"emoji": ":wrench:"},
                 )
                 self.browser.get(event.streamer.chat_url)
@@ -352,7 +353,7 @@ class TwitchBrowser:
 
     def place_bet(self, event: EventPrediction):
         logger.info(
-            f"Going to complete bet for {event}",  # ". Current url page: {self.browser.current_url}",
+            f"Going to complete bet for {event} owned by {event.streamer}",
             extra={"emoji": ":wrench:"},
         )
         if event.status == "ACTIVE":
@@ -390,7 +391,7 @@ class TwitchBrowser:
 
                         try:
                             logger.info(
-                                f"Going to write: {decision['amount']} channel points on input {decision['choice']}",
+                                f"Going to write: {prettify(decision['amount'], '.')} channel points on input {decision['choice']}",
                                 extra={"emoji": ":wrench:"},
                             )
                             if (
