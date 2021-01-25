@@ -21,9 +21,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerIsOfflineException,
     StreamerDoesNotExistException,
 )
-
-TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36"
+from TwitchChannelPointsMiner.constants import TWITCH_CLIENT_ID, USER_AGENT, TWITCH_API, TWITCH_GQL
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +74,7 @@ class Twitch:
 
     def post_gql_request(self, json_data):
         response = requests.post(
-            "https://gql.twitch.tv/gql",
+            TWITCH_GQL,
             json=json_data,
             headers={
                 "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
@@ -211,8 +209,8 @@ class Twitch:
                         )
                         and streamers[index].minute_watched < 7
                     ):
-                        logger.info(
-                            f"Switch priority: {streamers[index]}, WatchStreak missing is {streamers[index].watch_streak_missing} and minute_watched: {streamers[index].minute_watched}"
+                        logger.debug(
+                            f"Switch priority: {streamers[index]}, WatchStreak missing is {streamers[index].watch_streak_missing} and minute_watched: {round(streamers[index].minute_watched, 2)}"
                         )
                         streamers_watching.append(index)
                         if len(streamers_watching) == 2:
@@ -287,7 +285,7 @@ class Twitch:
         return followers
 
     def __do_helix_request(self, query, response_as_json=True):
-        url = f"https://api.twitch.tv/helix/{query.strip('/')}"
+        url = f"{TWITCH_API}/helix/{query.strip('/')}"
         response = self.twitch_login.session.get(url)
         logger.debug(
             f"Query: {query}, Status code: {response.status_code}, Content: {response.json()}"

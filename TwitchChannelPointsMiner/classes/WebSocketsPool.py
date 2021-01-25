@@ -10,7 +10,8 @@ from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.classes.Message import Message
-from TwitchChannelPointsMiner.utils import get_streamer_index
+from TwitchChannelPointsMiner.utils import get_streamer_index, calculate_start_after
+from TwitchChannelPointsMiner.constants import TWITCH_WEBSOCKET
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,7 @@ class WebSocketsPool:
 
     def create_new_websocket(self):
         self.ws = TwitchWebSocket(
-            "wss://pubsub-edge.twitch.tv/v1",
+            TWITCH_WEBSOCKET,
             on_message=WebSocketsPool.on_message,
             on_open=WebSocketsPool.on_open,
             on_close=WebSocketsPool.handle_websocket_reconnection,
@@ -161,7 +162,8 @@ class WebSocketsPool:
                     elif message.topic == "raid":
                         if message.type == "raid_update_v2":
                             raid = Raid(
-                                message.message["raid"]["id"], message.message["raid"]["target_login"]
+                                message.message["raid"]["id"],
+                                message.message["raid"]["target_login"],
                             )
                             ws.twitch.update_raid(ws.streamers[streamer_index], raid)
 
@@ -171,7 +173,7 @@ class WebSocketsPool:
                         event_id = event_dict["id"]
                         event_status = event_dict["status"]
 
-                        current_timestamp = parser.parse(message.timestamp)
+                        current_tmsp = parser.parse(message.timestamp)
 
                         if (
                             message.type == "event-created"
@@ -197,7 +199,7 @@ class WebSocketsPool:
                                 )
                                 if (
                                     ws.streamers[streamer_index].is_online
-                                    and event.closing_bet_after(current_timestamp) > 0
+                                    and event.closing_bet_after(current_tmsp) > 0
                                 ):
                                     if ws.twitch_browser.currently_is_betting is False:
                                         ws.events_predictions[event_id] = event
@@ -208,15 +210,12 @@ class WebSocketsPool:
                                             ws.events_predictions[event_id]
                                         )
                                         if start_bet_status is True:
-                                            # place_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                            start_after = (
-                                                event.closing_bet_after(
-                                                    current_timestamp
-                                                )
-                                                - execution_time
+                                            # place_bet_thread = threading.Timer(event.closing_bet_after(current_tmsp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
+                                            start_after = calculate_start_after(
+                                                event.closing_bet_after(current_tmsp),
+                                                execution_time,
                                             )
-                                            start_after = max(1, start_after)
-                                            start_after = round(start_after, 2)
+
                                             place_bet_thread = threading.Timer(
                                                 start_after,
                                                 ws.twitch_browser.place_bet,

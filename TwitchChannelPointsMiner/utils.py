@@ -13,8 +13,8 @@ def get_streamer_index(streamers, channel_id):
         return -1
 
 
-def float_round(value):
-    return round(float(value), 2)
+def float_round(number, ndigits=2):
+    return round(float(number), ndigits)
 
 
 def server_time(message_data):
@@ -24,6 +24,10 @@ def server_time(message_data):
         if message_data is not None and "server_time" in message_data
         else datetime.fromtimestamp(time.time(), timezone.utc).isoformat() + "Z"
     )
+
+
+def calculate_start_after(closing_bet_after, execution_time):
+    return round(max(1, closing_bet_after - execution_time), 2)
 
 
 # https://en.wikipedia.org/wiki/Cryptographic_nonce

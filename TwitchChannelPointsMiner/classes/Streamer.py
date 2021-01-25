@@ -1,6 +1,8 @@
 import time
 import logging
 
+from TwitchChannelPointsMiner.constants import TWITCH_URL
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,8 +23,8 @@ class Streamer:
         self.watch_streak_missing = True
         self.history = {}
 
-        self.streamer_url = f"https://www.twitch.tv/{self.username}"
-        self.chat_url = f"https://www.twitch.tv/popout/{self.username}/chat?popout="
+        self.streamer_url = f"{TWITCH_URL}/{self.username}"
+        self.chat_url = f"{TWITCH_URL}/popout/{self.username}/chat?popout="
 
         self.less_printing = less_printing
 
@@ -41,11 +43,13 @@ class Streamer:
         )
 
     def set_offline(self):
+        # Print the offline message only If we are recently online or we are in bootstrap phase (offline_at == 0)
+        if self.is_online is True or self.offline_at == 0:
+            logger.info(f"{self} is Offline!", extra={"emoji": ":sleeping:"})
+
         if self.is_online is True:
             self.offline_at = time.time()
             self.is_online = False
-
-        logger.info(f"{self} is Offline!", extra={"emoji": ":sleeping:"})
 
     def set_online(self):
         if self.is_online is False:
