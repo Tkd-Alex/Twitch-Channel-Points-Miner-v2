@@ -158,7 +158,7 @@ class WebSocketsPool:
                             if ws.streamers[streamer_index].is_online is True:
                                 ws.streamers[streamer_index].set_offline()
                         elif message.type == "viewcount":
-                            if (ws.streamers[streamer_index].stream_up == 0 or ((time.time() - ws.streamers[streamer_index].stream_up) > 10)):
+                            if (ws.streamers[streamer_index].stream_up == 0 or ((time.time() - ws.streamers[streamer_index].stream_up) > 30)):
                                 ws.twitch.check_streamer_online(
                                     ws.streamers[streamer_index]
                                 )
