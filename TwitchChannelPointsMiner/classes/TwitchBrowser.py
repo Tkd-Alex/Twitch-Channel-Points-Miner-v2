@@ -286,10 +286,11 @@ class TwitchBrowser:
             )
 
     def __click_when_exist(
-        self, selector, by: By = By.CSS_SELECTOR, suppress_error=False
+        self, selector, by: By = By.CSS_SELECTOR, suppress_error=False, timeout=None
     ):
+        timeout = self.settings.timeout if timeout is None else timeout
         try:
-            element = WebDriverWait(self.browser, self.settings.timeout).until(
+            element = WebDriverWait(self.browser, timeout).until(
                 expected_conditions.element_to_be_clickable((by, selector))
             )
             ActionChains(self.browser).move_to_element(element).click().perform()
@@ -342,6 +343,8 @@ class TwitchBrowser:
                 logger.error(
                     f"Attempt {attempt+1} failed!", extra={"emoji": ":wrench:"}
                 )
+                # Maybe we have failed because we have Cookies also in chat - Low probability
+                self.__click_when_exist(cookiePolicyQuery, By.CSS_SELECTOR, suppress_error=True, timeout=2.5)
         return False, time.time() - start_time
 
     def __bet_chains_methods(self, event):
