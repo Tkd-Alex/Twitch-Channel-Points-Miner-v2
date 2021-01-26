@@ -4,6 +4,8 @@ import copy
 from enum import Enum, auto
 from millify import millify
 
+from TwitchChannelPointsMiner.utils import float_round
+
 logger = logging.getLogger(__name__)
 
 
@@ -29,10 +31,6 @@ class BetSettings:
 
     def __repr__(self):
         return f"BetSettings(Strategy={self.strategy}, Percentage={self.percentage}, PercentageGap={self.percentage_gap}, MaxPoints={self.max_points}"
-
-
-def float_round(value):
-    return round(float(value), 2)
 
 
 class Bet:

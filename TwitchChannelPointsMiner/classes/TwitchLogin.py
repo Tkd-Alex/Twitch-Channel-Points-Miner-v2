@@ -20,10 +20,9 @@ class TwitchLogin:
         self.token = None
         self.login_check_result = False
         self.session = requests.session()
-        self.session.headers.update({
-            "Client-ID": self.client_id,
-            "User-Agent": user_agent
-        })
+        self.session.headers.update(
+            {"Client-ID": self.client_id, "User-Agent": user_agent}
+        )
         self.username = username
         self.user_id = None
         self.email = None

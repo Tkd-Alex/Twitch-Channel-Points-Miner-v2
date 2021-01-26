@@ -9,17 +9,11 @@ from dateutil import parser
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
+from TwitchChannelPointsMiner.classes.Message import Message
+from TwitchChannelPointsMiner.utils import get_streamer_index, calculate_start_after
+from TwitchChannelPointsMiner.constants import TWITCH_WEBSOCKET
 
 logger = logging.getLogger(__name__)
-
-
-def get_streamer_index(streamers, channel_id):
-    try:
-        return next(
-            i for i, x in enumerate(streamers) if str(x.channel_id) == str(channel_id)
-        )
-    except StopIteration:
-        return -1
 
 
 class WebSocketsPool:
@@ -61,7 +55,7 @@ class WebSocketsPool:
 
     def create_new_websocket(self):
         self.ws = TwitchWebSocket(
-            "wss://pubsub-edge.twitch.tv/v1",
+            TWITCH_WEBSOCKET,
             on_message=WebSocketsPool.on_message,
             on_open=WebSocketsPool.on_open,
             on_close=WebSocketsPool.handle_websocket_reconnection,
@@ -88,9 +82,9 @@ class WebSocketsPool:
                 ws.ping()
                 time.sleep(random.uniform(25, 30))
 
-                if ws.elapsed_last_pong() > 5:
+                if ws.elapsed_last_pong() > 15:
                     logger.info(
-                        "The last pong was received more than 5 minutes ago. Reconnect the WebSocket"
+                        "The last pong was received more than 15 minutes ago. Reconnect the WebSocket"
                     )
                     WebSocketsPool.handle_websocket_reconnection(ws)
 
@@ -117,37 +111,30 @@ class WebSocketsPool:
         response = json.loads(message)
 
         if response["type"] == "MESSAGE":
-            data = response["data"]
-            topic, topic_user = data["topic"].split(".")
-
-            message = json.loads(data["message"])
-            message_type = message["type"]
-
-            message_data = None
-            if "data" in message:
-                message_data = message["data"]
+            # We should create a Message class ...
+            message = Message(response["data"])
 
             # If we have more than one PubSub connection, messages may be duplicated
+            # Check the concatenation between message_type.top.channel_id
             if (
-                time.time() - ws.last_message_time < 0.1
-                and ws.last_message_type == message_type
+                ws.last_message_type_channel is not None
+                and ws.last_message_timestamp is not None
+                and ws.last_message_timestamp == message.timestamp
+                and ws.last_message_type_channel == message.identifier
             ):
-                ws.last_message_time = time.time()
                 return
 
-            ws.last_message_time = time.time()
-            ws.last_message_type = message_type
+            ws.last_message_timestamp = message.timestamp
+            ws.last_message_type_channel = message.identifier
 
-            try:
-                if topic == "community-points-user-v1":
-                    if message_type == "points-earned":
-                        streamer_index = get_streamer_index(
-                            ws.streamers, message_data["channel_id"]
-                        )
-                        if streamer_index != -1:
-                            earned = message_data["point_gain"]["total_points"]
-                            reason_code = message_data["point_gain"]["reason_code"]
-                            balance = message_data["balance"]["balance"]
+            streamer_index = get_streamer_index(ws.streamers, message.channel_id)
+            if streamer_index != -1:
+                try:
+                    if message.topic == "community-points-user-v1":
+                        if message.type == "points-earned":
+                            earned = message.data["point_gain"]["total_points"]
+                            reason_code = message.data["point_gain"]["reason_code"]
+                            balance = message.data["balance"]["balance"]
                             ws.streamers[streamer_index].channel_points = balance
                             logger.info(
                                 f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
@@ -156,59 +143,52 @@ class WebSocketsPool:
                             ws.streamers[streamer_index].update_history(
                                 reason_code, earned
                             )
-                    elif message_type == "claim-available":
-                        streamer_index = get_streamer_index(
-                            ws.streamers, message_data["claim"]["channel_id"]
-                        )
-                        if streamer_index != -1:
+                        elif message.type == "claim-available":
                             ws.twitch.claim_bonus(
                                 ws.streamers[streamer_index],
-                                message_data["claim"]["id"],
-                                less_printing=ws.less_printing
+                                message.data["claim"]["id"],
+                                less_printing=ws.less_printing,
                             )
 
-                elif topic == "video-playback-by-id":
-                    streamer_index = get_streamer_index(ws.streamers, topic_user)
-                    if streamer_index != -1:
-                        if message_type == "stream-down":
-                            ws.streamers[streamer_index].set_offline()
-                        elif message_type == "viewcount":
-                            ws.twitch.check_streamer_online(
-                                ws.streamers[streamer_index]
-                            )
+                    elif message.topic == "video-playback-by-id":
                         # There is stream-up message type, but it's sent earlier than the API updates
+                        if message.type == "stream-up":
+                            ws.streamers[streamer_index].stream_up = time.time()
+                        elif message.type == "stream-down":
+                            if ws.streamers[streamer_index].is_online is True:
+                                ws.streamers[streamer_index].set_offline()
+                        elif message.type == "viewcount":
+                            if ws.streamers[streamer_index].stream_up_elapsed():
+                                ws.twitch.check_streamer_online(
+                                    ws.streamers[streamer_index]
+                                )
 
-                elif topic == "raid":
-                    streamer_index = get_streamer_index(ws.streamers, topic_user)
-                    if streamer_index != -1:
-                        if message_type == "raid_update_v2":
+                    elif message.topic == "raid":
+                        if message.type == "raid_update_v2":
                             raid = Raid(
-                                message["raid"]["id"], message["raid"]["target_login"]
+                                message.message["raid"]["id"],
+                                message.message["raid"]["target_login"],
                             )
                             ws.twitch.update_raid(ws.streamers[streamer_index], raid)
 
-                elif topic == "predictions-channel-v1":
+                    elif message.topic == "predictions-channel-v1":
 
-                    # message_data["event"]["channel_id"]
-                    # if message_type == "event-created"
-                    # if message_type == "event-updated"
-
-                    streamer_index = get_streamer_index(ws.streamers, topic_user)
-                    if streamer_index != -1:
-                        event_dict = message_data["event"]
+                        event_dict = message.data["event"]
                         event_id = event_dict["id"]
                         event_status = event_dict["status"]
 
-                        current_timestamp = parser.parse(message_data["timestamp"])
+                        current_tmsp = parser.parse(message.timestamp)
 
-                        if event_id not in ws.events_predictions:
+                        if (
+                            message.type == "event-created"
+                            and event_id not in ws.events_predictions
+                        ):
                             if event_status == "ACTIVE":
-                                time.sleep(random.uniform(0.5, 1.0))
                                 prediction_window_seconds = float(
                                     event_dict["prediction_window_seconds"]
                                 )
                                 prediction_window_seconds -= (
-                                    25 if prediction_window_seconds <= 120 else 50
+                                    25 if prediction_window_seconds <= 180 else 60
                                 )
                                 event = EventPrediction(
                                     ws.streamers[streamer_index],
@@ -223,10 +203,10 @@ class WebSocketsPool:
                                 )
                                 if (
                                     ws.streamers[streamer_index].is_online
-                                    and event.closing_bet_after(current_timestamp) > 0
+                                    and event.closing_bet_after(current_tmsp) > 0
                                 ):
-                                    ws.events_predictions[event_id] = event
                                     if ws.twitch_browser.currently_is_betting is False:
+                                        ws.events_predictions[event_id] = event
                                         (
                                             start_bet_status,
                                             execution_time,
@@ -234,15 +214,12 @@ class WebSocketsPool:
                                             ws.events_predictions[event_id]
                                         )
                                         if start_bet_status is True:
-                                            # place_bet_thread = threading.Timer(event.closing_bet_after(current_timestamp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                            execution_time = round(execution_time, 2)
-                                            start_after = (
-                                                event.closing_bet_after(
-                                                    current_timestamp
-                                                )
-                                                - execution_time
+                                            # place_bet_thread = threading.Timer(event.closing_bet_after(current_tmsp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
+                                            start_after = calculate_start_after(
+                                                event.closing_bet_after(current_tmsp),
+                                                execution_time,
                                             )
-                                            start_after = max(1, start_after)
+
                                             place_bet_thread = threading.Timer(
                                                 start_after,
                                                 ws.twitch_browser.place_bet,
@@ -255,12 +232,17 @@ class WebSocketsPool:
                                                 f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
                                                 extra={"emoji": ":alarm_clock:"},
                                             )
+                                        else:
+                                            del ws.events_predictions[event_id]
                                     else:
                                         logger.info(
                                             f"Sorry, unable to start {event}. The browser it's currently betting another event"
                                         )
 
-                        else:
+                        elif (
+                            message.type == "event-updated"
+                            and event_id in ws.events_predictions
+                        ):
                             ws.events_predictions[event_id].status = event_status
                             # Game over we can't update anymore the values... The bet was placed!
                             if (
@@ -271,30 +253,32 @@ class WebSocketsPool:
                                     event_dict["outcomes"]
                                 )
 
-                elif topic == "predictions-user-v1":
-                    time.sleep(random.uniform(1, 2))
-                    if message_type == "prediction-result":
-                        event_id = message_data["prediction"]["event_id"]
-                        event_result = message_data["prediction"]["result"]
+                    elif message.topic == "predictions-user-v1":
+                        event_id = message.data["prediction"]["event_id"]
                         if event_id in ws.events_predictions:
-                            logger.info(
-                                f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
-                                extra={"emoji": ":bar_chart:"},
-                            )
-                            points_won = (
-                                event_result["points_won"]
-                                if event_result["points_won"]
-                                else 0
-                            )
-                            ws.events_predictions[event_id].final_result = {
-                                "type": event_result["type"],
-                                "won": points_won,
-                            }
-            except Exception:
-                logger.error(
-                    f"Exception raised for topic: {topic} and message: {message}",
-                    exc_info=True,
-                )
+                            if message.type == "prediction-result":
+                                event_result = message.data["prediction"]["result"]
+                                logger.info(
+                                    f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
+                                    extra={"emoji": ":bar_chart:"},
+                                )
+                                points_won = (
+                                    event_result["points_won"]
+                                    if event_result["points_won"]
+                                    else 0
+                                )
+                                ws.events_predictions[event_id].final_result = {
+                                    "type": event_result["type"],
+                                    "won": points_won,
+                                }
+                            elif message.type == "prediction-made":
+                                ws.events_predictions[event_id].bet_confirmed = True
+
+                except Exception:
+                    logger.error(
+                        f"Exception raised for topic: {message.topic} and message: {message}",
+                        exc_info=True,
+                    )
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")

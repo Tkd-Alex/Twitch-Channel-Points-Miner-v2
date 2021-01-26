@@ -2,26 +2,12 @@ import json
 import logging
 import time
 
-from datetime import timedelta
-from random import randrange
 from websocket import WebSocketApp
 
+from TwitchChannelPointsMiner.utils import create_nonce
+
+
 logger = logging.getLogger(__name__)
-
-
-# https://en.wikipedia.org/wiki/Cryptographic_nonce
-def create_nonce(length=30):
-    nonce = ""
-    for i in range(length):
-        char_index = randrange(0, 10 + 26 + 26)
-        if char_index < 10:
-            char = chr(ord("0") + char_index)
-        elif char_index < 10 + 26:
-            char = chr(ord("a") + char_index - 10)
-        else:
-            char = chr(ord("A") + char_index - 26 - 10)
-        nonce += char
-    return nonce
 
 
 class TwitchWebSocket(WebSocketApp):
@@ -59,8 +45,8 @@ class TwitchWebSocket(WebSocketApp):
         self.events_predictions = parent_pool.events_predictions
         self.less_printing = parent_pool.less_printing
 
-        self.last_message_time = 0
-        self.last_message_type = None
+        self.last_message_timestamp = None
+        self.last_message_type_channel = None
 
         self.last_pong = time.time()
         self.last_ping = time.time()

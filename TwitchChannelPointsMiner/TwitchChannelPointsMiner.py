@@ -38,6 +38,7 @@ class TwitchChannelPointsMiner:
         username: str,
         make_predictions: bool = True,
         follow_raid: bool = True,
+        watch_streak: bool = False,
         logger_settings: LoggerSettings = LoggerSettings(),
         browser_settings: BrowserSettings = BrowserSettings(),
         bet_settings: BetSettings = BetSettings(),
@@ -46,6 +47,7 @@ class TwitchChannelPointsMiner:
         self.twitch = Twitch(self.username)
         self.twitch_browser = None
         self.follow_raid = follow_raid
+        self.watch_streak = watch_streak
         self.streamers = []
         self.events_predictions = {}
         self.minute_watcher_thread = None
@@ -120,7 +122,9 @@ class TwitchChannelPointsMiner:
 
             for streamer in self.streamers:
                 time.sleep(random.uniform(0.3, 0.7))
-                self.twitch.load_channel_points_context(streamer, less_printing=self.logger_settings.less)
+                self.twitch.load_channel_points_context(
+                    streamer, less_printing=self.logger_settings.less
+                )
                 self.twitch.check_streamer_online(streamer)
             self.original_streamers = copy.deepcopy(self.streamers)
 
@@ -135,7 +139,11 @@ class TwitchChannelPointsMiner:
                 self.twitch_browser.init()
 
             self.minute_watcher_thread = threading.Thread(
-                target=self.twitch.send_minute_watched_events, args=(self.streamers,)
+                target=self.twitch.send_minute_watched_events,
+                args=(
+                    self.streamers,
+                    self.watch_streak,
+                ),
             )
             # self.minute_watcher_thread.daemon = True
             self.minute_watcher_thread.start()
@@ -186,6 +194,8 @@ class TwitchChannelPointsMiner:
                     WebSocketsPool.handle_websocket_reconnection(self.ws_pool.ws)
 
     def end(self, signum, frame):
+        logger.info("CTRL+C Detected! Please wait, just a moment")
+
         if self.twitch_browser is not None:
             self.twitch_browser.browser.quit()
 
@@ -215,11 +225,12 @@ class TwitchChannelPointsMiner:
             print("")
             logger.info(f"{self.bet_settings}", extra={"emoji": ":bar_chart:"})
             for event_id in self.events_predictions:
-                self.events_predictions[event_id].set_less_printing(False)
-                logger.info(
-                    f"{self.events_predictions[event_id].print_recap()}",
-                    extra={"emoji": ":bar_chart:"},
-                )
+                if self.events_predictions[event_id].bet_confirmed is True:
+                    self.events_predictions[event_id].set_less_printing(False)
+                    logger.info(
+                        f"{self.events_predictions[event_id].print_recap()}",
+                        extra={"emoji": ":bar_chart:"},
+                    )
             print("")
 
         for streamer_index in range(0, len(self.streamers)):

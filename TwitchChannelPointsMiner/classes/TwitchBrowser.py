@@ -18,65 +18,24 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException, JavascriptException
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
-
-TWITCH_URL = "https://www.twitch.tv/"
-
-# XPath Selector and Javascript helpers
-cookiePolicyQuery = 'button[data-a-target="consent-banner-accept"]'
-
-streamCoinsMenuXP = '//div[@data-test-selector="community-points-summary"]//button'
-streamCoinsMenuJS = 'document.querySelector("[data-test-selector=\'community-points-summary\']").getElementsByTagName("button")[0].click();'
-
-streamBetTitleInBet = '[data-test-selector="predictions-list-item__title"]'
-
-streamBetCustomVoteXP = (
-    "button[data-test-selector='prediction-checkout-active-footer__input-type-toggle']"
+from TwitchChannelPointsMiner.constants import (
+    TWITCH_URL,
+    cookiePolicyQuery,
+    streamCoinsMenuXP,
+    streamCoinsMenuJS,
+    streamBetTitleInBet,
+    streamBetCustomVoteXP,
+    streamBetCustomVoteJS,
+    streamBetMainDiv,
+    streamBetVoteInputXP,
+    streamBetVoteButtonXP,
+    streamBetVoteInputJS,
+    streamBetVoteButtonJS,
+    localStorageJS,
+    clearStyleChatJS,
+    maximizeBetWindowJS,
+    scrollDownBetWindowJS,
 )
-streamBetCustomVoteJS = f'document.querySelector("{streamBetCustomVoteXP}").click();'
-
-streamBetMainDiv = "//div[@id='channel-points-reward-center-body']//div[contains(@class,'custom-prediction-button')]"
-streamBetVoteInputXP = f"({streamBetMainDiv}//input)"
-streamBetVoteButtonXP = f"({streamBetMainDiv}//button)"
-
-streamBetVoteInputJS = 'document.getElementById("channel-points-reward-center-body").getElementsByTagName("input")[{}].value = {};'
-streamBetVoteButtonJS = 'document.getElementById("channel-points-reward-center-body").getElementsByTagName("button")[{}].click();'
-
-# Some Javascript code that should help the script
-localStorageJS = """
-window.localStorage.setItem("volume", 0);
-window.localStorage.setItem("channelPointsOnboardingDismissed", true);
-window.localStorage.setItem("twilight.theme", 1);
-window.localStorage.setItem("mature", true);
-window.localStorage.setItem("rebrand-notice-dismissed", true);
-window.localStorage.setItem("emoteAnimationsEnabled", false);
-window.localStorage.setItem("chatPauseSetting", "ALTKEY");
-"""
-clearStyleChatJS = """
-var item = document.querySelector('[data-test-selector="chat-scrollable-area__message-container"]');
-if (item) {
-    var parent = item.closest("div.simplebar-scroll-content");
-    if(parent) parent.hidden = true;
-}
-var header = document.querySelector('[data-test-selector="channel-leaderboard-container"]');
-if(header) header.hidden = true;
-"""
-maximizeBetWindowJS = """
-var absolute = document.querySelector('[aria-describedby="channel-points-reward-center-body"]').closest("div.tw-absolute")
-if(absolute) absolute.classList.remove("tw-absolute")
-
-document.getElementsByClassName("reward-center__content")[0].style.width = "44rem";
-document.getElementsByClassName("reward-center__content")[0].style.height = "55rem";
-
-document.querySelector('[aria-describedby="channel-points-reward-center-body"]').style["max-height"] = "55rem";
-
-document.getElementsByClassName("reward-center-body")[0].style["max-width"] = "44rem";
-// document.getElementsByClassName("reward-center-body")[0].style["min-height"] = "55rem";
-"""
-scrollDownBetWindowJS = """
-var scrollable = document.getElementById("channel-points-reward-center-body").closest("div.simplebar-scroll-content");
-scrollable.scrollTop = scrollable.scrollHeight;
-"""
-
 
 logger = logging.getLogger(__name__)
 
@@ -327,10 +286,11 @@ class TwitchBrowser:
             )
 
     def __click_when_exist(
-        self, selector, by: By = By.CSS_SELECTOR, suppress_error=False
+        self, selector, by: By = By.CSS_SELECTOR, suppress_error=False, timeout=None
     ):
+        timeout = self.settings.timeout if timeout is None else timeout
         try:
-            element = WebDriverWait(self.browser, self.settings.timeout).until(
+            element = WebDriverWait(self.browser, timeout).until(
                 expected_conditions.element_to_be_clickable((by, selector))
             )
             ActionChains(self.browser).move_to_element(element).click().perform()
@@ -374,6 +334,9 @@ class TwitchBrowser:
                 )
                 self.browser.get(event.streamer.chat_url)
                 time.sleep(random.uniform(3, 5))
+                self.__click_when_exist(
+                    cookiePolicyQuery, By.CSS_SELECTOR, suppress_error=True, timeout=1.5
+                )
 
                 # Hide the chat ... Don't ask me why
                 self.__execute_script(clearStyleChatJS, suppress_error=True)
@@ -446,7 +409,6 @@ class TwitchBrowser:
                                     extra={"emoji": ":wrench:"},
                                 )
                                 if self.__click_on_vote(event, selector_index) is True:
-                                    self.__debug(event, "click_on_vote")
                                     event.bet_placed = True
                                     time.sleep(random.uniform(5, 10))
                         except Exception:
@@ -461,7 +423,8 @@ class TwitchBrowser:
                 )
         else:
             logger.info(
-                f"Oh no! The event it's not more ACTIVE, current status: {event.status}"
+                f"Oh no! The event It's not more ACTIVE, current status: {event.status}",
+                extra={"emoji": ":disappointed_relieved:"},
             )
 
         self.browser.get("about:blank")

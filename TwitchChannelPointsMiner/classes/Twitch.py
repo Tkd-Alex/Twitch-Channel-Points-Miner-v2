@@ -21,9 +21,12 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerIsOfflineException,
     StreamerDoesNotExistException,
 )
-
-TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36"
+from TwitchChannelPointsMiner.constants import (
+    TWITCH_CLIENT_ID,
+    USER_AGENT,
+    TWITCH_API,
+    TWITCH_GQL,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +79,7 @@ class Twitch:
 
     def post_gql_request(self, json_data):
         response = requests.post(
-            "https://gql.twitch.tv/gql",
+            TWITCH_GQL,
             json=json_data,
             headers={
                 "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
@@ -121,7 +124,9 @@ class Twitch:
 
     def claim_bonus(self, streamer, claim_id, less_printing=False):
         if less_printing is False:
-            logger.info(f"Claiming the bonus for {streamer}!", extra={"emoji": ":gift:"})
+            logger.info(
+                f"Claiming the bonus for {streamer}!", extra={"emoji": ":gift:"}
+            )
 
         json_data = {
             "operationName": "ClaimCommunityPoints",
@@ -158,7 +163,11 @@ class Twitch:
         streamer.channel_points = community_points["balance"]
         # logger.info(f"{streamer.channel_points} channel points for {streamer.username}!")
         if community_points["availableClaim"] is not None:
-            self.claim_bonus(streamer, community_points["availableClaim"]["id"], less_printing=less_printing)
+            self.claim_bonus(
+                streamer,
+                community_points["availableClaim"]["id"],
+                less_printing=less_printing,
+            )
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
@@ -182,36 +191,84 @@ class Twitch:
             }
         )
 
-    def send_minute_watched_events(self, streamers):
+    def send_minute_watched_events(self, streamers, watch_streak=False):
         headers = {"user-agent": USER_AGENT}
         while self.running:
-            # Twitch has a limit - you can't watch more than 2 channels at one time.
-            # We take the first two streamers from the list as they have the highest priority.
-            streamers_watching = [
-                streamer for streamer in streamers if streamer.is_online
-            ][:2]
-            for streamer in streamers_watching:
+            streamers_index = [
+                i
+                for i in range(0, len(streamers))
+                if streamers[i].is_online
+                and (
+                    streamers[i].online_at == 0
+                    or (time.time() - streamers[i].online_at) > 30
+                )
+            ]
+
+            """
+            Check if we need need to change priority based on watch streak
+            Viewers receive points for returning for x consecutive streams.
+            Each stream must be at least 10 minutes long and it must have been at least 30 minutes since the last stream ended.
+
+            Watch at least 6m for get the +10
+            """
+            streamers_watching = []
+            if watch_streak is True:
+                for index in streamers_index:
+                    if (
+                        streamers[index].watch_streak_missing is True
+                        and (
+                            streamers[index].offline_at == 0
+                            or ((time.time() - streamers[index].offline_at) // 60) > 30
+                        )
+                        and streamers[index].minute_watched < 7
+                    ):
+                        logger.debug(
+                            f"Switch priority: {streamers[index]}, WatchStreak missing is {streamers[index].watch_streak_missing} and minute_watched: {round(streamers[index].minute_watched, 2)}"
+                        )
+                        streamers_watching.append(index)
+                        if len(streamers_watching) == 2:
+                            break
+
+            if streamers_watching == []:
+                streamers_watching = streamers_index
+            else:
+                while len(streamers_watching) < 2 and len(streamers_index) > 1:
+                    another_streamer_index = streamers_index.pop(0)
+                    if another_streamer_index not in streamers_watching:
+                        streamers_watching.append(another_streamer_index)
+
+            """
+            Twitch has a limit - you can't watch more than 2 channels at one time.
+            We take the first two streamers from the list as they have the highest priority (based on order or WatchStreak).
+            """
+            streamers_watching = streamers_watching[:2]
+
+            for index in streamers_watching:
                 next_iteration = time.time() + 60 / len(streamers_watching)
+
                 try:
                     response = requests.post(
-                        streamer.minute_watched_requests.url,
-                        data=streamer.minute_watched_requests.payload,
+                        streamers[index].minute_watched_requests.url,
+                        data=streamers[index].minute_watched_requests.payload,
                         headers=headers,
                     )
                     logger.debug(
-                        f"Send minute watched request for {streamer} - Status code: {response.status_code}"
+                        f"Send minute watched request for {streamers[index]} - Status code: {response.status_code}"
                     )
+                    if response.status_code == 204:
+                        streamers[index].update_minute_watched()
                 except requests.exceptions.ConnectionError as e:
                     logger.error(f"Error while trying to watch a minute: {e}")
 
                 # Create chunk of sleep of speed-up the break loop after CTRL+C
-                sleep_time = max(next_iteration - time.time(), 0) / 3
-                for i in range(0, 3):
+                chunk_size = 3
+                sleep_time = max(next_iteration - time.time(), 0) / chunk_size
+                for i in range(0, chunk_size):
                     time.sleep(sleep_time)
                     if self.running is False:
                         break
 
-            if not streamers_watching:
+            if streamers_watching == []:
                 time.sleep(60)
 
     def get_channel_id(self, streamer_username):
@@ -241,7 +298,7 @@ class Twitch:
         return followers
 
     def __do_helix_request(self, query, response_as_json=True):
-        url = f"https://api.twitch.tv/helix/{query.strip('/')}"
+        url = f"{TWITCH_API}/helix/{query.strip('/')}"
         response = self.twitch_login.session.get(url)
         logger.debug(
             f"Query: {query}, Status code: {response.status_code}, Content: {response.json()}"

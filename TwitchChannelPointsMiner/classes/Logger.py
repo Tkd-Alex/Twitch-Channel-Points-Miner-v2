@@ -26,8 +26,8 @@ class EmojiFormatter(logging.Formatter):
             )
             record.emoji_is_present = True
 
-        if u"\u2192" in record.msg and self.print_emoji is False:
-            record.msg = record.msg.replace(u"\u2192", "-->")
+        if "\u2192" in record.msg and self.print_emoji is False:
+            record.msg = record.msg.replace("\u2192", "-->")
 
         return super().format(record)
 
