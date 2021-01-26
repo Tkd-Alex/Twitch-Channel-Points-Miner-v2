@@ -325,3 +325,21 @@ class Twitch:
                 f"Joining raid from {streamer} to {raid.target_login}!",
                 extra={"emoji": ":performing_arts:"},
             )
+
+    def viewer_is_mod(self, streamer):
+        response = self.post_gql_request(
+            {
+                "operationName": "ModViewChannelQuery",
+                "variables": {"channelLogin": streamer.username},
+                "extensions": {
+                    "persistedQuery": {
+                        "version": 1,
+                        "sha256Hash": "df5d55b6401389afb12d3017c9b2cf1237164220c8ef4ed754eae8188068a807",
+                    }
+                },
+            }
+        )
+        try:
+            streamer.viewer_is_mod = response["data"]["user"]["self"]["isModerator"]
+        except (ValueError, KeyError) as e:
+            streamer.viewer_is_mod = False

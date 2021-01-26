@@ -18,6 +18,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException, JavascriptException
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
+from TwitchChannelPointsMiner.utils import bet_condition
 from TwitchChannelPointsMiner.constants import (
     TWITCH_URL,
     cookiePolicyQuery,
@@ -318,15 +319,7 @@ class TwitchBrowser:
 
     def start_bet(self, event: EventPrediction):
         start_time = time.time()
-        if self.currently_is_betting:
-            logger.info(
-                f"Sorry, unable to start {event}. The browser it's currently betting another event"
-            )
-        elif self.browser.current_url != "about:blank":
-            logger.info(
-                "Sorry, but the browser is not currently on 'about:blank' screen. Unable to start bet"
-            )
-        else:
+        if bet_condition(self, event, logger) is True:
             for attempt in range(0, self.settings.max_attempts):
                 logger.info(
                     f"Start betting for {event} owned by {event.streamer}",

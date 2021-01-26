@@ -126,6 +126,7 @@ class TwitchChannelPointsMiner:
                     streamer, less_printing=self.logger_settings.less
                 )
                 self.twitch.check_streamer_online(streamer)
+                self.twitch.viewer_is_mod(streamer)
             self.original_streamers = copy.deepcopy(self.streamers)
 
             if (
@@ -244,4 +245,3 @@ class TwitchChannelPointsMiner:
                     f"{self.streamers[streamer_index].print_history()}",
                     extra={"emoji": ":moneybag:"},
                 )
-                # print("")

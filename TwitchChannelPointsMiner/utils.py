@@ -43,3 +43,22 @@ def create_nonce(length=30):
             char = chr(ord("A") + char_index - 26 - 10)
         nonce += char
     return nonce
+
+
+def bet_condition(twitch_browser, event, logger):
+    if twitch_browser.currently_is_betting is True:
+        logger.info(
+            f"Sorry, unable to start {event}. The browser it's currently betting another event"
+        )
+        return False
+    elif twitch_browser.browser.current_url != "about:blank":
+        logger.info(
+            "Sorry, but the browser is not currently on 'about:blank' screen. Unable to start bet"
+        )
+        return False
+    elif event.streamer.viewer_is_mod is True:
+        logger.info(
+            f"Sorry, you are moderator of {event.streamer} and you can't start the bet"
+        )
+        return False
+    return True

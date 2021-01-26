@@ -10,7 +10,11 @@ from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.classes.Message import Message
-from TwitchChannelPointsMiner.utils import get_streamer_index, calculate_start_after
+from TwitchChannelPointsMiner.utils import (
+    get_streamer_index,
+    calculate_start_after,
+    bet_condition,
+)
 from TwitchChannelPointsMiner.constants import TWITCH_WEBSOCKET
 
 logger = logging.getLogger(__name__)
@@ -86,6 +90,7 @@ class WebSocketsPool:
                     logger.info(
                         "The last pong was received more than 15 minutes ago. Reconnect the WebSocket"
                     )
+                    ws.keep_running = True
                     WebSocketsPool.handle_websocket_reconnection(ws)
 
         thread_ws = threading.Thread(target=run)
@@ -204,40 +209,41 @@ class WebSocketsPool:
                                 if (
                                     ws.streamers[streamer_index].is_online
                                     and event.closing_bet_after(current_tmsp) > 0
+                                    and bet_condition(
+                                        ws.twitch_browser,
+                                        event,
+                                        logger,
+                                    )
+                                    is True
                                 ):
-                                    if ws.twitch_browser.currently_is_betting is False:
-                                        ws.events_predictions[event_id] = event
-                                        (
-                                            start_bet_status,
+                                    ws.events_predictions[event_id] = event
+                                    (
+                                        start_bet_status,
+                                        execution_time,
+                                    ) = ws.twitch_browser.start_bet(
+                                        ws.events_predictions[event_id]
+                                    )
+                                    if start_bet_status is True:
+                                        # place_bet_thread = threading.Timer(event.closing_bet_after(current_tmsp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
+                                        start_after = calculate_start_after(
+                                            event.closing_bet_after(current_tmsp),
                                             execution_time,
-                                        ) = ws.twitch_browser.start_bet(
-                                            ws.events_predictions[event_id]
                                         )
-                                        if start_bet_status is True:
-                                            # place_bet_thread = threading.Timer(event.closing_bet_after(current_tmsp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                            start_after = calculate_start_after(
-                                                event.closing_bet_after(current_tmsp),
-                                                execution_time,
-                                            )
 
-                                            place_bet_thread = threading.Timer(
-                                                start_after,
-                                                ws.twitch_browser.place_bet,
-                                                (ws.events_predictions[event_id],),
-                                            )
-                                            place_bet_thread.daemon = True
-                                            place_bet_thread.start()
+                                        place_bet_thread = threading.Timer(
+                                            start_after,
+                                            ws.twitch_browser.place_bet,
+                                            (ws.events_predictions[event_id],),
+                                        )
+                                        place_bet_thread.daemon = True
+                                        place_bet_thread.start()
 
-                                            logger.info(
-                                                f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
-                                                extra={"emoji": ":alarm_clock:"},
-                                            )
-                                        else:
-                                            del ws.events_predictions[event_id]
-                                    else:
                                         logger.info(
-                                            f"Sorry, unable to start {event}. The browser it's currently betting another event"
+                                            f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
+                                            extra={"emoji": ":alarm_clock:"},
                                         )
+                                    else:
+                                        del ws.events_predictions[event_id]
 
                         elif (
                             message.type == "event-updated"

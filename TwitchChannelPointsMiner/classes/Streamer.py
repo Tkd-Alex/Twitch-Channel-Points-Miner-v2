@@ -18,6 +18,7 @@ class Streamer:
         self.offline_at = 0
         self.channel_points = 0
         self.minute_watched_requests = None
+        self.viewer_is_mod = False
 
         self.__init_watch_streak()
 
