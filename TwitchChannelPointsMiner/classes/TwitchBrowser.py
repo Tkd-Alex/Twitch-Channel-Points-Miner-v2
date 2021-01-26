@@ -339,6 +339,7 @@ class TwitchBrowser:
                 logger.error(
                     f"Attempt {attempt+1} failed!", extra={"emoji": ":wrench:"}
                 )
+            self.__blank()  # If we fail return to blank page
         return False, time.time() - start_time
 
     def __bet_chains_methods(self, event):
