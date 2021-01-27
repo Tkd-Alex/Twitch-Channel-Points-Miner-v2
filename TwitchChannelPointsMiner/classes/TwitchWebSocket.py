@@ -33,6 +33,7 @@ class TwitchWebSocket(WebSocketApp):
         self.keep_running = True
         self.is_closed = False
         self.is_opened = False
+        self.is_reconneting = False
 
         # Custom attribute
         self.topics = []

@@ -86,11 +86,12 @@ class WebSocketsPool:
                 ws.ping()
                 time.sleep(random.uniform(25, 30))
 
-                if ws.elapsed_last_pong() > 15:
+                if ws.elapsed_last_pong() > 15 and ws.is_reconneting is False:
                     logger.info(
                         "The last pong was received more than 15 minutes ago. Reconnect the WebSocket"
                     )
                     ws.keep_running = True
+                    ws.is_reconneting = True
                     WebSocketsPool.handle_websocket_reconnection(ws)
 
         thread_ws = threading.Thread(target=run)
@@ -291,6 +292,7 @@ class WebSocketsPool:
 
         elif response["type"] == "RECONNECT":
             logger.info(f"Reconnection required and keep running is: {ws.keep_running}")
+            ws.is_reconneting = True
             WebSocketsPool.handle_websocket_reconnection(ws)
 
         elif response["type"] == "PONG":
