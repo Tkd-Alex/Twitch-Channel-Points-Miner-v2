@@ -18,7 +18,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException, JavascriptException
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
-from TwitchChannelPointsMiner.utils import bet_condition
+from TwitchChannelPointsMiner.utils import bet_condition, get_user_agent
 from TwitchChannelPointsMiner.constants import (
     TWITCH_URL,
     cookiePolicyQuery,
@@ -163,7 +163,7 @@ class TwitchBrowser:
         options.add_argument("disable-setuid-sandbox")
         options.add_argument("disable-infobars")
         options.add_argument(
-            "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
+            f"user-agent={get_user_agent(self.settings.browser)}"
         )
 
         options.add_experimental_option(
@@ -200,7 +200,7 @@ class TwitchBrowser:
         fp.set_preference("startup.homepage_welcome_url.additional", "about:blank")
         fp.set_preference(
             "general.useragent.override",
-            "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0",
+            get_user_agent(self.settings.browser),
         )
 
         if os.path.isfile(self.settings.driver_path) is True:

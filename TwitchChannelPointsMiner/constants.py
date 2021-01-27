@@ -6,6 +6,16 @@ TWITCH_WEBSOCKET = "wss://pubsub-edge.twitch.tv/v1"
 TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"
 
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
+USER_AGENTS = {
+    "Windows": {
+        "CHROME": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36",
+        "FIREFOX": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"
+    },
+    "Linux": {
+        "CHROME": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36",
+        "FIREFOX": "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0"
+    }
+}
 
 # XPath Selector and Javascript helpers
 cookiePolicyQuery = 'button[data-a-target="consent-banner-accept"]'

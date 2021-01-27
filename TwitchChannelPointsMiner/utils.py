@@ -1,7 +1,10 @@
 import time
+import platform
 
 from datetime import datetime, timezone
 from random import randrange
+
+from TwitchChannelPointsMiner.constants import USER_AGENTS
 
 
 def get_streamer_index(streamers, channel_id):
@@ -62,3 +65,10 @@ def bet_condition(twitch_browser, event, logger):
         )
         return False
     return True
+
+
+def get_user_agent(browser):
+    try:
+        return USER_AGENTS[platform.system()][browser.name if type(browser) != str else browser]
+    except KeyError:
+        return USER_AGENTS["Linux"]["FIREFOX"]

@@ -12,6 +12,7 @@ import random
 from datetime import datetime
 from collections import OrderedDict
 
+from TwitchChannelPointsMiner.utils import get_user_agent
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
@@ -44,7 +45,10 @@ class TwitchChannelPointsMiner:
         bet_settings: BetSettings = BetSettings(),
     ):
         self.username = username
-        self.twitch = Twitch(self.username)
+        self.browser_settings = browser_settings
+        self.bet_settings = bet_settings
+
+        self.twitch = Twitch(self.username, get_user_agent(self.browser_settings.browser))
         self.twitch_browser = None
         self.follow_raid = follow_raid
         self.watch_streak = watch_streak
@@ -54,9 +58,6 @@ class TwitchChannelPointsMiner:
         self.ws_pool = None
 
         self.make_predictions = make_predictions
-
-        self.browser_settings = browser_settings
-        self.bet_settings = bet_settings
 
         self.session_id = str(uuid.uuid4())
         self.running = False

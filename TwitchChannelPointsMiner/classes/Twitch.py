@@ -23,7 +23,6 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
 )
 from TwitchChannelPointsMiner.constants import (
     TWITCH_CLIENT_ID,
-    USER_AGENT,
     TWITCH_API,
     TWITCH_GQL,
 )
@@ -32,11 +31,12 @@ logger = logging.getLogger(__name__)
 
 
 class Twitch:
-    def __init__(self, username):
+    def __init__(self, username, user_agent):
         cookies_path = os.path.join(Path().absolute(), "cookies")
         Path(cookies_path).mkdir(parents=True, exist_ok=True)
         self.cookies_file = os.path.join(cookies_path, f"{username}.pkl")
-        self.twitch_login = TwitchLogin(TWITCH_CLIENT_ID, username, USER_AGENT)
+        self.user_agent = user_agent
+        self.twitch_login = TwitchLogin(TWITCH_CLIENT_ID, username, self.user_agent)
         self.running = True
 
     def login(self):
@@ -62,8 +62,9 @@ class Twitch:
         )
 
     def get_minute_watched_request_url(self, streamer):
+        headers = {"User-Agent": self.user_agent}
         main_page_request = requests.get(
-            streamer.streamer_url, headers={"User-Agent": USER_AGENT}
+            streamer.streamer_url, headers=headers
         )
         response = main_page_request.text
         settings_url = re.search(
@@ -71,7 +72,7 @@ class Twitch:
         ).group(1)
 
         settings_request = requests.get(
-            settings_url, headers={"User-Agent": USER_AGENT}
+            settings_url, headers=headers
         )
         response = settings_request.text
         minute_watched_request_url = re.search('"spade_url":"(.*?)"', response).group(1)
@@ -84,7 +85,7 @@ class Twitch:
             headers={
                 "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
                 "Client-Id": TWITCH_CLIENT_ID,
-                "User-Agent": USER_AGENT,
+                "User-Agent": self.user_agent,
             },
         )
         logger.debug(
@@ -192,7 +193,6 @@ class Twitch:
         )
 
     def send_minute_watched_events(self, streamers, watch_streak=False):
-        headers = {"user-agent": USER_AGENT}
         while self.running:
             streamers_index = [
                 i
@@ -250,7 +250,7 @@ class Twitch:
                     response = requests.post(
                         streamers[index].minute_watched_requests.url,
                         data=streamers[index].minute_watched_requests.payload,
-                        headers=headers,
+                        headers={"User-Agent": self.user_agent},
                     )
                     logger.debug(
                         f"Send minute watched request for {streamers[index]} - Status code: {response.status_code}"
