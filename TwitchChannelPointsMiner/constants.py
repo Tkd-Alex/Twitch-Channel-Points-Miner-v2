@@ -5,7 +5,7 @@ TWITCH_GQL = "https://gql.twitch.tv/gql"
 TWITCH_WEBSOCKET = "wss://pubsub-edge.twitch.tv/v1"
 TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"
 
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36"
+USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"
 
 # XPath Selector and Javascript helpers
 cookiePolicyQuery = 'button[data-a-target="consent-banner-accept"]'
