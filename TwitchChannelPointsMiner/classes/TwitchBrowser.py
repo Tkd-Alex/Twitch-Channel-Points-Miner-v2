@@ -178,7 +178,7 @@ class TwitchBrowser:
             self.browser = webdriver.Chrome(self.settings.driver_path, options=options)
         else:
             logger.warning(
-                f"The path {self.settings.driver_path} is not valid. Use default path",
+                f"The path {self.settings.driver_path} is not valid. Using default path...",
                 extra={"emoji": ":wrench:"},
             )
             self.browser = webdriver.Chrome(options=options)
@@ -200,7 +200,7 @@ class TwitchBrowser:
         fp.set_preference("startup.homepage_welcome_url.additional", "about:blank")
         fp.set_preference(
             "general.useragent.override",
-            "Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0",
+            "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0",
         )
 
         if os.path.isfile(self.settings.driver_path) is True:
@@ -211,7 +211,7 @@ class TwitchBrowser:
             )
         else:
             logger.warning(
-                f"The path {self.settings.driver_path} is not valid. Using default path",
+                f"The path {self.settings.driver_path} is not valid. Using default path...",
                 extra={"emoji": ":wrench:"},
             )
             self.browser = webdriver.Firefox(options=options, firefox_profile=fp)
