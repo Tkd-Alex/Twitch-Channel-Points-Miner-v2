@@ -12,7 +12,6 @@ import time
 import logging
 import random
 
-from base64 import b64encode
 from pathlib import Path
 
 from TwitchChannelPointsMiner.classes.RequestInfo import RequestInfo
@@ -47,7 +46,11 @@ class Twitch:
             self.twitch_login.load_cookies(self.cookies_file)
             self.twitch_login.set_token(self.twitch_login.get_auth_token())
 
-    def update_minute_watched_event_request(self, streamer):
+    def create_minute_watched_event_request(self, streamer):
+        streamer.minute_watched_requests = RequestInfo(self.get_minute_watched_request_url(streamer))
+        self.update_payload_minute_watched_event_request(streamer)
+
+    def update_payload_minute_watched_event_request(self, streamer):
         streamer_info = self.get_stream_info(streamer)
         event_properties = {
             "channel_id": streamer.channel_id,
@@ -67,12 +70,7 @@ class Twitch:
                 logger.info(f"{streamer} - Drops are enabled for this stream! ")
                 event_properties["game"] = streamer_info['broadcastSettings']['game']['name']
 
-        minute_watched = [{"event": "minute-watched", "properties": event_properties}]
-        json_event = json.dumps(minute_watched, separators=(",", ":"))
-        streamer.minute_watched_requests = RequestInfo(
-            self.get_minute_watched_request_url(streamer),
-            {"data": (b64encode(json_event.encode("utf-8"))).decode("utf-8")},
-        )
+        streamer.minute_watched_requests.payload = [{"event": "minute-watched", "properties": event_properties}]
 
     def get_minute_watched_request_url(self, streamer):
         headers = {"User-Agent": self.user_agent}
@@ -147,14 +145,18 @@ class Twitch:
         if time.time() < streamer.offline_at + 60:
             return
 
-        try:
-            self.update_minute_watched_event_request(streamer)
-        except StreamerIsOfflineException:
-            if streamer.is_online is True:
+        if streamer.is_online is False:
+            try:
+                self.create_minute_watched_event_request(streamer)
+            except StreamerIsOfflineException:
                 streamer.set_offline()
-        else:
-            if streamer.is_online is False:
+            else:
                 streamer.set_online()
+        else:
+            try:
+                self.update_payload_minute_watched_event_request(streamer)
+            except StreamerIsOfflineException:
+                streamer.set_offline()
 
     def claim_bonus(self, streamer, claim_id, less_printing=False):
         if less_printing is False:
@@ -302,7 +304,7 @@ class Twitch:
                 try:
                     response = requests.post(
                         streamers[index].minute_watched_requests.url,
-                        data=streamers[index].minute_watched_requests.payload,
+                        data=streamers[index].minute_watched_requests.encode_payload(),
                         headers={"User-Agent": self.user_agent},
                     )
                     logger.debug(
