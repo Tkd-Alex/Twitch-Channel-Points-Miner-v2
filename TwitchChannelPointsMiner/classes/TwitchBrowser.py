@@ -18,7 +18,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException, JavascriptException
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
-from TwitchChannelPointsMiner.utils import bet_condition
+from TwitchChannelPointsMiner.utils import bet_condition, get_user_agent
 from TwitchChannelPointsMiner.constants import (
     TWITCH_URL,
     cookiePolicyQuery,
@@ -163,7 +163,7 @@ class TwitchBrowser:
         options.add_argument("disable-setuid-sandbox")
         options.add_argument("disable-infobars")
         options.add_argument(
-            "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36"
+            f"user-agent={get_user_agent(self.settings.browser)}"
         )
 
         options.add_experimental_option(
@@ -178,7 +178,7 @@ class TwitchBrowser:
             self.browser = webdriver.Chrome(self.settings.driver_path, options=options)
         else:
             logger.warning(
-                f"The path {self.settings.driver_path} is not valid. Use default path",
+                f"The path {self.settings.driver_path} is not valid. Using default path...",
                 extra={"emoji": ":wrench:"},
             )
             self.browser = webdriver.Chrome(options=options)
@@ -200,7 +200,7 @@ class TwitchBrowser:
         fp.set_preference("startup.homepage_welcome_url.additional", "about:blank")
         fp.set_preference(
             "general.useragent.override",
-            "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:56.0) Gecko/20100101 Firefox/56.0",
+            get_user_agent(self.settings.browser),
         )
 
         if os.path.isfile(self.settings.driver_path) is True:
@@ -211,7 +211,7 @@ class TwitchBrowser:
             )
         else:
             logger.warning(
-                f"The path {self.settings.driver_path} is not valid. Use default path",
+                f"The path {self.settings.driver_path} is not valid. Using default path...",
                 extra={"emoji": ":wrench:"},
             )
             self.browser = webdriver.Firefox(options=options, firefox_profile=fp)
@@ -283,7 +283,7 @@ class TwitchBrowser:
                 image.save(fname, optimize=True, quality=20)
         except Exception:
             logger.error(
-                f"Exception raised during screenshot file {fname}", exc_info=True
+                f"Exception raised during screenshot. File: {fname}", exc_info=True
             )
 
     def __click_when_exist(
@@ -322,7 +322,7 @@ class TwitchBrowser:
         if bet_condition(self, event, logger) is True:
             for attempt in range(0, self.settings.max_attempts):
                 logger.info(
-                    f"Start betting for {event} owned by {event.streamer}",
+                    f"Starting betting for {event} owned by {event.streamer}",
                     extra={"emoji": ":wrench:"},
                 )
                 self.browser.get(event.streamer.chat_url)
@@ -368,13 +368,13 @@ class TwitchBrowser:
                     div_bet_is_open = True
                 except TimeoutException:
                     logger.info(
-                        "The bet div was not found, maybe It was closed. Attempt to open again, hope to be in time",
+                        "The bet div was not found, maybe It was closed. Attempting to open again... Hopefully in time!",
                         extra={"emoji": ":wrench:"},
                     )
                     div_bet_is_open = self.__bet_chains_methods(event)
                     if div_bet_is_open is True:
                         logger.info(
-                            "Success! Bet div is now open, we can complete the bet",
+                            "Success! Bet div is now open, we can complete the bet!",
                             extra={"emoji": ":wrench:"},
                         )
 
@@ -409,7 +409,7 @@ class TwitchBrowser:
                             logger.error("Exception raised", exc_info=True)
                 else:
                     logger.info(
-                        "Sorry, unable to complete the bet. The bet div still closed"
+                        "Sorry, unable to complete the bet. The bet div is still closed!"
                     )
             else:
                 logger.info(
@@ -417,7 +417,7 @@ class TwitchBrowser:
                 )
         else:
             logger.info(
-                f"Oh no! The event It's not more ACTIVE, current status: {event.status}",
+                f"Oh no! The event is not active anymore! Current status: {event.status}",
                 extra={"emoji": ":disappointed_relieved:"},
             )
 
@@ -425,7 +425,7 @@ class TwitchBrowser:
         self.currently_is_betting = False
 
     def __open_coins_menu(self, event: EventPrediction):
-        logger.info(f"Open coins menu for {event}", extra={"emoji": ":wrench:"})
+        logger.info(f"Opening coins menu for {event}", extra={"emoji": ":wrench:"})
         status = self.__click_when_exist(streamCoinsMenuXP, By.XPATH)
         if status is False:
             status = self.__execute_script(streamCoinsMenuJS)
@@ -437,7 +437,7 @@ class TwitchBrowser:
         return False
 
     def __click_on_bet(self, event, maximize_div=True):
-        logger.info(f"Click on the bet for {event}", extra={"emoji": ":wrench:"})
+        logger.info(f"Clicking on the bet for {event}", extra={"emoji": ":wrench:"})
         if self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR) is True:
             time.sleep(random.uniform(0.01, 0.1))
             if maximize_div is True:
@@ -456,7 +456,7 @@ class TwitchBrowser:
         if scroll_down is True:
             time.sleep(random.uniform(0.01, 0.1))
             if self.__execute_script(scrollDownBetWindowJS) is False:
-                logger.error("Unable to scroll down in the bet window")
+                logger.error("Unable to scroll down in the bet window!")
 
         status = self.__click_when_exist(streamBetCustomVoteXP, By.CSS_SELECTOR)
         if status is False:
@@ -470,7 +470,7 @@ class TwitchBrowser:
             return True
         else:
             logger.info(
-                "Something went wrong unable to continue with betting - Fillable box not avaible"
+                "Something went wrong unable to continue with betting - Fillable box not available!"
             )
         return False
 

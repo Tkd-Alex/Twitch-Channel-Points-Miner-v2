@@ -4,6 +4,7 @@ import time
 import json
 import random
 
+from millify import millify
 from dateutil import parser
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
@@ -266,7 +267,7 @@ class WebSocketsPool:
                             if message.type == "prediction-result":
                                 event_result = message.data["prediction"]["result"]
                                 logger.info(
-                                    f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {event_result['points_won'] if event_result['points_won'] else 0}",
+                                    f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {millify(event_result['points_won']) if event_result['points_won'] else 0}",
                                     extra={"emoji": ":bar_chart:"},
                                 )
                                 points_won = (

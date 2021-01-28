@@ -12,6 +12,7 @@ import random
 from datetime import datetime
 from collections import OrderedDict
 
+from TwitchChannelPointsMiner.utils import get_user_agent
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
@@ -44,7 +45,10 @@ class TwitchChannelPointsMiner:
         bet_settings: BetSettings = BetSettings(),
     ):
         self.username = username
-        self.twitch = Twitch(self.username)
+        self.browser_settings = browser_settings
+        self.bet_settings = bet_settings
+
+        self.twitch = Twitch(self.username, get_user_agent(self.browser_settings.browser))
         self.twitch_browser = None
         self.follow_raid = follow_raid
         self.watch_streak = watch_streak
@@ -54,9 +58,6 @@ class TwitchChannelPointsMiner:
         self.ws_pool = None
 
         self.make_predictions = make_predictions
-
-        self.browser_settings = browser_settings
-        self.bet_settings = bet_settings
 
         self.session_id = str(uuid.uuid4())
         self.running = False
@@ -75,7 +76,7 @@ class TwitchChannelPointsMiner:
 
     def run(self, streamers: list = [], followers=False):
         if self.running:
-            logger.error("You can't start multiple session of this istance!")
+            logger.error("You can't start multiple sessions of this instance!")
         else:
             logger.info(
                 f"Start session: '{self.session_id}'", extra={"emoji": ":bomb:"}
@@ -100,7 +101,7 @@ class TwitchChannelPointsMiner:
                 streamers += [fw for fw in followers_array if fw not in streamers]
 
             logger.info(
-                f"Loading data for {len(streamers)} streamers. Please wait ...",
+                f"Loading data for {len(streamers)} streamers. Please wait...",
                 extra={"emoji": ":nerd_face:"},
             )
             for streamer_username in streamers:
@@ -190,12 +191,12 @@ class TwitchChannelPointsMiner:
                 # Do an external control for WebSocket. Check if the thread is running
                 if self.ws_pool.ws.elapsed_last_ping() > 5:
                     logger.info(
-                        "The last ping was sent more than 5 minutes ago. Reconnect the WebSocket"
+                        "The last ping was sent more than 5 minutes ago. Reconnecting to the WebSocket..."
                     )
                     WebSocketsPool.handle_websocket_reconnection(self.ws_pool.ws)
 
     def end(self, signum, frame):
-        logger.info("CTRL+C Detected! Please wait, just a moment")
+        logger.info("CTRL+C Detected! Please wait just a moment!s")
 
         if self.twitch_browser is not None:
             self.twitch_browser.browser.quit()
@@ -212,7 +213,7 @@ class TwitchChannelPointsMiner:
 
     def __print_report(self):
         print("\n")
-        logger.info(f"End session '{self.session_id}'", extra={"emoji": ":stop_sign:"})
+        logger.info(f"Ending session: '{self.session_id}'", extra={"emoji": ":stop_sign:"})
         if self.logs_file is not None:
             logger.info(
                 f"Logs file: {self.logs_file}", extra={"emoji": ":page_facing_up:"}
@@ -237,7 +238,7 @@ class TwitchChannelPointsMiner:
         for streamer_index in range(0, len(self.streamers)):
             self.streamers[streamer_index].set_less_printing(False)
             logger.info(
-                f"{self.streamers[streamer_index]}, Gained (end-start): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
+                f"{self.streamers[streamer_index]}, Total Points Gained (after farming - before farming): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
                 extra={"emoji": ":microphone:"},
             )
             if self.streamers[streamer_index].history != {}:

@@ -1,7 +1,10 @@
 import time
+import platform
 
 from datetime import datetime, timezone
 from random import randrange
+
+from TwitchChannelPointsMiner.constants import USER_AGENTS
 
 
 def get_streamer_index(streamers, channel_id):
@@ -48,17 +51,24 @@ def create_nonce(length=30):
 def bet_condition(twitch_browser, event, logger):
     if twitch_browser.currently_is_betting is True:
         logger.info(
-            f"Sorry, unable to start {event}. The browser it's currently betting another event"
+            f"Sorry, unable to start {event}, the browser is currently betting on another event!"
         )
         return False
     elif twitch_browser.browser.current_url != "about:blank":
         logger.info(
-            "Sorry, but the browser is not currently on 'about:blank' screen. Unable to start bet"
+            "Sorry, but the browser is not currently on 'about:blank' screen. Unable to start bet!"
         )
         return False
     elif event.streamer.viewer_is_mod is True:
         logger.info(
-            f"Sorry, you are moderator of {event.streamer} and you can't start the bet"
+            f"Sorry, you are moderator of {event.streamer}, so you can't bet!"
         )
         return False
     return True
+
+
+def get_user_agent(browser):
+    try:
+        return USER_AGENTS[platform.system()][browser.name if type(browser) != str else browser]
+    except KeyError:
+        return USER_AGENTS["Linux"]["FIREFOX"]
