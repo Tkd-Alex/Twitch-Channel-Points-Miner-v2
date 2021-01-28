@@ -134,6 +134,9 @@ class WebSocketsPool:
             ws.last_message_timestamp = message.timestamp
             ws.last_message_type_channel = message.identifier
 
+            if message.topic == "user-drop-events":
+                logger.info(f"Drop update: {message.strip()}")
+
             streamer_index = get_streamer_index(ws.streamers, message.channel_id)
             if streamer_index != -1:
                 try:

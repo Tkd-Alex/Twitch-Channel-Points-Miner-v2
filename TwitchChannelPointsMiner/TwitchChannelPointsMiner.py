@@ -162,6 +162,10 @@ class TwitchChannelPointsMiner:
                 PubsubTopic(
                     "community-points-user-v1",
                     user_id=self.twitch.twitch_login.get_user_id(),
+                ),
+                PubsubTopic(
+                    "user-drop-events",
+                    user_id=self.twitch.twitch_login.get_user_id(),
                 )
             ]
             if self.make_predictions is True:

@@ -48,12 +48,25 @@ class Twitch:
             self.twitch_login.set_token(self.twitch_login.get_auth_token())
 
     def update_minute_watched_event_request(self, streamer):
+        streamer_info = self.get_stream_info(streamer)
         event_properties = {
             "channel_id": streamer.channel_id,
-            "broadcast_id": self.get_broadcast_id(streamer),
+            "broadcast_id": streamer_info["stream"]["id"],
             "player": "site",
             "user_id": self.twitch_login.get_user_id(),
         }
+
+        # First debbuging phase
+        logger.info(f"{streamer} - Title: {streamer_info['broadcastSettings']['title']}")
+        if streamer_info['broadcastSettings']['game'] != {}:
+            logger.info(f"{streamer} - Game: {streamer_info['broadcastSettings']['game']['displayName']}")
+
+            tags = [tag['localizedName'] for tag in streamer_info['stream']['tags']]
+            logger.info(f"{streamer} - Views: {streamer_info['stream']['viewersCount']}, Tags {tags}")
+            if "c2542d6d-cd10-4532-919b-3d19f30a768b" in [tag['id'] for tag in streamer_info['stream']['tags']]:
+                logger.info(f"{streamer} - Drops are enabled for this stream! ")
+                event_properties["game"] = streamer_info['broadcastSettings']['game']['name']
+
         minute_watched = [{"event": "minute-watched", "properties": event_properties}]
         json_event = json.dumps(minute_watched, separators=(",", ":"))
         streamer.minute_watched_requests = RequestInfo(
@@ -111,16 +124,36 @@ class Twitch:
         else:
             raise StreamerIsOfflineException
 
+    def get_stream_info(self, streamer):
+        json_data = {
+            "operationName": "VideoPlayerStreamInfoOverlayChannel",
+            "variables": {
+                "channel": streamer.username
+            },
+            "extensions": {
+                "persistedQuery": {
+                    "version": 1,
+                    "sha256Hash": "a5f2e34d626a9f4f5c0204f910bab2194948a9502089be558bb6e779a9e1b3d2"
+                }
+            }
+        }
+        response = self.post_gql_request(json_data)
+        if response["data"]["user"]["stream"] is None:
+            raise StreamerIsOfflineException
+        else:
+            return response["data"]["user"]
+
     def check_streamer_online(self, streamer):
         if time.time() < streamer.offline_at + 60:
             return
 
-        if streamer.is_online is False:
-            try:
-                self.update_minute_watched_event_request(streamer)
-            except StreamerIsOfflineException:
+        try:
+            self.update_minute_watched_event_request(streamer)
+        except StreamerIsOfflineException:
+            if streamer.is_online is True:
                 streamer.set_offline()
-            else:
+        else:
+            if streamer.is_online is False:
                 streamer.set_online()
 
     def claim_bonus(self, streamer, claim_id, less_printing=False):
@@ -138,6 +171,26 @@ class Twitch:
                 "persistedQuery": {
                     "version": 1,
                     "sha256Hash": "46aaeebe02c99afdf4fc97c7c0cba964124bf6b0af229395f1f6d1feed05b3d0",
+                }
+            },
+        }
+        self.post_gql_request(json_data)
+
+    def claim_drop(self, streamer, drop_id, less_printing=False):
+        if less_printing is False:
+            logger.info(
+                f"Claiming the drop for {streamer}!", extra={"emoji": ":gift:"}
+            )
+
+        json_data = {
+            "operationName": "DropsPage_ClaimDropRewards",
+            "variables": {
+                "input": {"dropInstanceID": drop_id}
+            },
+            "extensions": {
+                "persistedQuery": {
+                    "version": 1,
+                    "sha256Hash": "2f884fa187b8fadb2a49db0adc033e636f7b6aaee6e76de1e2bba9a7baf0daf6",
                 }
             },
         }
