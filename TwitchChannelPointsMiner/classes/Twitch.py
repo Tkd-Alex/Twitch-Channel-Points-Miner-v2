@@ -11,7 +11,6 @@ import time
 import logging
 import random
 import copy
-import random
 
 from pathlib import Path
 
@@ -21,7 +20,6 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerDoesNotExistException,
     TimeBasedDropNotFound,
 )
-from TwitchChannelPointsMiner.utils import get_streamer_index
 from TwitchChannelPointsMiner.constants.twitch import CLIENT_ID, API, GQLOperations
 
 logger = logging.getLogger(__name__)
