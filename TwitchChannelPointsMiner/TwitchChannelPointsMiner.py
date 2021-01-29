@@ -254,7 +254,7 @@ class TwitchChannelPointsMiner:
             self.streamers[streamer_index].set_less_printing(False)
             logger.info(
                 f"{self.streamers[streamer_index]}, Total Points Gained (after farming - before farming): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
-                extra={"emoji": ":microphone:"},
+                extra={"emoji": ":robot:"},
             )
             if self.streamers[streamer_index].history != {}:
                 logger.info(

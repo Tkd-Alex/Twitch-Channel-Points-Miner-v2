@@ -1,14 +1,20 @@
-import os
+from os import path
+
 import setuptools
+import re
 
 
 def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname), encoding='utf-8').read()
+    return open(path.join(path.dirname(__file__), fname), encoding='utf-8').read()
 
+
+metadata = dict(
+    re.findall(r"""__([a-z]+)__ = "([^"]+)""", read("TwitchChannelPointsMiner/__init__.py"))
+)
 
 setuptools.setup(
     name="Twitch-Channel-Points-Miner-v2",
-    version="2.3.5",
+    version=metadata["version"],
     author="Tkd-Alex (Alessandro Maggio)",
     author_email="alex.tkd.alex@gmail.com",
     description="A simple script that will watch a stream for you and earn the channel points.",
