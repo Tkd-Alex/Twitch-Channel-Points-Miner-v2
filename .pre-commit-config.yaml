@@ -10,6 +10,7 @@ repos:
     hooks:
     -   id: isort
         files: ^TwitchChannelPointsMiner/
+        args: ["--profile", "black"]
 -   repo: https://github.com/psf/black
     rev: 20.8b1
     hooks:
