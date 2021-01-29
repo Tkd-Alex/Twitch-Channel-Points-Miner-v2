@@ -20,7 +20,7 @@ jobs:
       - name: Run black
         uses: psf/black@stable
         with:
-          args: "TwitchChannelPointsMiner --check --diff"
+          args: "--check --diff --exclude example.py"
 
   static-check:
     runs-on: ubuntu-latest
