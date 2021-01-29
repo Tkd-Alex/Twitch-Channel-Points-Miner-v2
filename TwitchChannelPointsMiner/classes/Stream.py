@@ -4,7 +4,7 @@ import logging
 
 from base64 import b64encode
 
-from TwitchChannelPointsMiner.constants import TWITCH_DROP_ID
+from TwitchChannelPointsMiner.constants.twitch import DROP_ID
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class Stream:
         self.viewers_count = viewers_count
 
         self.drops_enabled = (
-            TWITCH_DROP_ID in [tag["id"] for tag in self.tags] and self.game != {}
+            DROP_ID in [tag["id"] for tag in self.tags] and self.game != {}
         )
         self.__last_update = time.time()
 

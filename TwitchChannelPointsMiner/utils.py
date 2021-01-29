@@ -4,7 +4,7 @@ import platform
 from datetime import datetime, timezone
 from random import randrange
 
-from TwitchChannelPointsMiner.constants import USER_AGENTS
+from TwitchChannelPointsMiner.constants.browser import USER_AGENTS
 
 
 def get_streamer_index(streamers, channel_id):

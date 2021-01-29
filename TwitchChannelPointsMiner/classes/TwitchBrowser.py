@@ -6,9 +6,7 @@ import platform
 
 from millify import prettify
 from pathlib import Path
-from datetime import datetime
 from enum import Enum, auto
-from PIL import Image, ImageDraw, ImageFont
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -19,8 +17,8 @@ from selenium.common.exceptions import TimeoutException, JavascriptException
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.utils import bet_condition, get_user_agent
-from TwitchChannelPointsMiner.constants import (
-    TWITCH_URL,
+from TwitchChannelPointsMiner.constants.twitch import URL
+from TwitchChannelPointsMiner.constants.browser import (
     cookiePolicyQuery,
     streamCoinsMenuXP,
     streamCoinsMenuJS,
@@ -122,7 +120,7 @@ class TwitchBrowser:
             "id": 1,
             "value": self.auth_token,
         }
-        self.browser.get(TWITCH_URL)
+        self.browser.get(URL)
         self.browser.add_cookie(cookie)
         time.sleep(random.uniform(2.5, 3.5))
 
@@ -236,7 +234,7 @@ class TwitchBrowser:
         with open(fname, "w", encoding="utf-8") as writer:
             writer.write(self.browser.page_source)
 
-    def screenshot(self, fname, write_timestamp=False):
+    def screenshot(self, fname):
         screenshots_path = os.path.join(Path().absolute(), "screenshots")
         Path(screenshots_path).mkdir(parents=True, exist_ok=True)
         Path(os.path.join(screenshots_path, self.session_id)).mkdir(
@@ -249,40 +247,6 @@ class TwitchBrowser:
         # Little pause prevent effect/css animations in browser delayed
         time.sleep(0.1)
         self.browser.save_screenshot(fname)
-
-        try:
-            if write_timestamp is True:
-                time.sleep(0.5)
-                image = Image.open(fname)
-                draw = ImageDraw.Draw(image)
-
-                font = ImageFont.truetype(
-                    os.path.join(Path().absolute(), "assets", "Roboto-Bold.ttf"),
-                    size=35,
-                )
-                (x, y) = (15, image.height // 3)
-                datetime_text = datetime.now().strftime("%d/%m %H:%M:%S.%f")
-
-                shadowcolor = "rgb(0, 0, 0)"  # black color
-                # Thin border
-                draw.text((x - 1, y), datetime_text, font=font, fill=shadowcolor)
-                draw.text((x + 1, y), datetime_text, font=font, fill=shadowcolor)
-                draw.text((x, y - 1), datetime_text, font=font, fill=shadowcolor)
-                draw.text((x, y + 1), datetime_text, font=font, fill=shadowcolor)
-
-                # Thicker border
-                draw.text((x - 1, y - 1), datetime_text, font=font, fill=shadowcolor)
-                draw.text((x + 1, y - 1), datetime_text, font=font, fill=shadowcolor)
-                draw.text((x - 1, y + 1), datetime_text, font=font, fill=shadowcolor)
-                draw.text((x + 1, y + 1), datetime_text, font=font, fill=shadowcolor)
-
-                color = "rgb(255, 255, 255)"  # white color
-                draw.text((x, y), datetime_text, font=font, fill=color)
-                image.save(fname, optimize=True, quality=20)
-        except Exception:
-            logger.error(
-                f"Exception raised during screenshot. File: {fname}", exc_info=True
-            )
 
     def __click_when_exist(
         self, selector, by: By = By.CSS_SELECTOR, suppress_error=False, timeout=None

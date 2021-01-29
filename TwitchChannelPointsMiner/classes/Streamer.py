@@ -4,7 +4,7 @@ import logging
 from millify import prettify
 
 from TwitchChannelPointsMiner.classes.Stream import Stream
-from TwitchChannelPointsMiner.constants import TWITCH_URL
+from TwitchChannelPointsMiner.constants.twitch import URL
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +26,8 @@ class Streamer:
         self.raid = None
         self.history = {}
 
-        self.streamer_url = f"{TWITCH_URL}/{self.username}"
-        self.chat_url = f"{TWITCH_URL}/popout/{self.username}/chat?popout="
+        self.streamer_url = f"{URL}/{self.username}"
+        self.chat_url = f"{URL}/popout/{self.username}/chat?popout="
 
         self.less_printing = less_printing
 

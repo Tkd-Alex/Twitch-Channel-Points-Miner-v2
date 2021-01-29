@@ -10,6 +10,7 @@ import os
 import time
 import logging
 import random
+import copy
 
 from pathlib import Path
 
@@ -18,11 +19,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerIsOfflineException,
     StreamerDoesNotExistException,
 )
-from TwitchChannelPointsMiner.constants import (
-    TWITCH_CLIENT_ID,
-    TWITCH_API,
-    TWITCH_GQL,
-)
+from TwitchChannelPointsMiner.constants.twitch import CLIENT_ID, API, GQLOperations
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +30,7 @@ class Twitch:
         Path(cookies_path).mkdir(parents=True, exist_ok=True)
         self.cookies_file = os.path.join(cookies_path, f"{username}.pkl")
         self.user_agent = user_agent
-        self.twitch_login = TwitchLogin(TWITCH_CLIENT_ID, username, self.user_agent)
+        self.twitch_login = TwitchLogin(CLIENT_ID, username, self.user_agent)
         self.running = True
 
     def login(self):
@@ -83,11 +80,11 @@ class Twitch:
 
     def post_gql_request(self, json_data):
         response = requests.post(
-            TWITCH_GQL,
+            GQLOperations.url,
             json=json_data,
             headers={
                 "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
-                "Client-Id": TWITCH_CLIENT_ID,
+                "Client-Id": CLIENT_ID,
                 "User-Agent": self.user_agent,
             },
         )
@@ -97,16 +94,8 @@ class Twitch:
         return response.json()
 
     def get_broadcast_id(self, streamer):
-        json_data = {
-            "operationName": "WithIsStreamLiveQuery",
-            "variables": {"id": streamer.channel_id},
-            "extensions": {
-                "persistedQuery": {
-                    "version": 1,
-                    "sha256Hash": "04e46329a6786ff3a81c01c50bfa5d725902507a0deb83b0edbf7abe7a3716ea",
-                }
-            },
-        }
+        json_data = copy.deepcopy(GQLOperations.WithIsStreamLiveQuery)
+        json_data["variables"] = {"id": streamer.channel_id}
         response = self.post_gql_request(json_data)
         stream = response["data"]["user"]["stream"]
         if stream is not None:
@@ -115,16 +104,8 @@ class Twitch:
             raise StreamerIsOfflineException
 
     def get_stream_info(self, streamer):
-        json_data = {
-            "operationName": "VideoPlayerStreamInfoOverlayChannel",
-            "variables": {"channel": streamer.username},
-            "extensions": {
-                "persistedQuery": {
-                    "version": 1,
-                    "sha256Hash": "a5f2e34d626a9f4f5c0204f910bab2194948a9502089be558bb6e779a9e1b3d2",
-                }
-            },
-        }
+        json_data = copy.deepcopy(GQLOperations.VideoPlayerStreamInfoOverlayChannel)
+        json_data["variables"] = {"channel": streamer.username}
         response = self.post_gql_request(json_data)
         if response["data"]["user"]["stream"] is None:
             raise StreamerIsOfflineException
@@ -157,17 +138,9 @@ class Twitch:
                 f"Claiming the bonus for {streamer}!", extra={"emoji": ":gift:"}
             )
 
-        json_data = {
-            "operationName": "ClaimCommunityPoints",
-            "variables": {
-                "input": {"channelID": streamer.channel_id, "claimID": claim_id}
-            },
-            "extensions": {
-                "persistedQuery": {
-                    "version": 1,
-                    "sha256Hash": "46aaeebe02c99afdf4fc97c7c0cba964124bf6b0af229395f1f6d1feed05b3d0",
-                }
-            },
+        json_data = copy.deepcopy(GQLOperations.ClaimCommunityPoints)
+        json_data["variables"] = {
+            "input": {"channelID": streamer.channel_id, "claimID": claim_id}
         }
         self.post_gql_request(json_data)
 
@@ -175,30 +148,15 @@ class Twitch:
         if less_printing is False:
             logger.info(f"Claiming the drop for {streamer}!", extra={"emoji": ":gift:"})
 
-        json_data = {
-            "operationName": "DropsPage_ClaimDropRewards",
-            "variables": {"input": {"dropInstanceID": drop_instance_id}},
-            "extensions": {
-                "persistedQuery": {
-                    "version": 1,
-                    "sha256Hash": "2f884fa187b8fadb2a49db0adc033e636f7b6aaee6e76de1e2bba9a7baf0daf6",
-                }
-            },
-        }
+        json_data = copy.deepcopy(GQLOperations.ClaimCommunityPoints)
+        json_data["variables"] = {"input": {"dropInstanceID": drop_instance_id}}
         self.post_gql_request(json_data)
 
     # Load the amount of current points for a channel, check if a bonus is available
     def load_channel_points_context(self, streamer, less_printing=False):
-        json_data = {
-            "operationName": "ChannelPointsContext",
-            "variables": {"channelLogin": streamer.username},
-            "extensions": {
-                "persistedQuery": {
-                    "version": 1,
-                    "sha256Hash": "9988086babc615a918a1e9a722ff41d98847acac822645209ac7379eecb27152",
-                }
-            },
-        }
+        json_data = copy.deepcopy(GQLOperations.ChannelPointsContext)
+        json_data["variables"] = ({"channelLogin": streamer.username},)
+
         response = self.post_gql_request(json_data)
         if response["data"]["community"] is None:
             raise StreamerDoesNotExistException
@@ -216,25 +174,16 @@ class Twitch:
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
-        return self.post_gql_request(
-            {
-                "operationName": "MakePrediction",
-                "variables": {
-                    "input": {
-                        "eventID": event.event_id,
-                        "outcomeID": decision["id"],
-                        "points": decision["amount"],
-                        "transactionID": "412118d3********79ac856",  # How we can calculate this?
-                    }
-                },
-                "extensions": {
-                    "persistedQuery": {
-                        "version": 1,
-                        "sha256Hash": "b44682ecc88358817009f20e69d75081b1e58825bb40aa53d5dbadcc17c881d8",
-                    }
-                },
+        json_data = copy.deepcopy(GQLOperations.MakePrediction)
+        json_data["variables"] = {
+            "input": {
+                "eventID": event.event_id,
+                "outcomeID": decision["id"],
+                "points": decision["amount"],
+                "transactionID": "412118d3********79ac856",  # How we can calculate this?
             }
-        )
+        }
+        return self.post_gql_request(json_data)
 
     def send_minute_watched_events(self, streamers, watch_streak=False):
         while self.running:
@@ -342,7 +291,7 @@ class Twitch:
         return followers
 
     def __do_helix_request(self, query, response_as_json=True):
-        url = f"{TWITCH_API}/helix/{query.strip('/')}"
+        url = f"{API}/helix/{query.strip('/')}"
         response = self.twitch_login.session.get(url)
         logger.debug(
             f"Query: {query}, Status code: {response.status_code}, Content: {response.json()}"
@@ -352,18 +301,9 @@ class Twitch:
     def update_raid(self, streamer, raid):
         if streamer.raid != raid:
             streamer.raid = raid
-            self.post_gql_request(
-                {
-                    "operationName": "JoinRaid",
-                    "variables": {"input": {"raidID": raid.raid_id}},
-                    "extensions": {
-                        "persistedQuery": {
-                            "version": 1,
-                            "sha256Hash": "c6a332a86d1087fbbb1a8623aa01bd1313d2386e7c63be60fdb2d1901f01a4ae",
-                        }
-                    },
-                }
-            )
+            json_data = copy.deepcopy(GQLOperations.JoinRaid)
+            json_data["variables"] = {"input": {"raidID": raid.raid_id}}
+            self.post_gql_request(json_data)
 
             logger.info(
                 f"Joining raid from {streamer} to {raid.target_login}!",
@@ -371,18 +311,9 @@ class Twitch:
             )
 
     def viewer_is_mod(self, streamer):
-        response = self.post_gql_request(
-            {
-                "operationName": "ModViewChannelQuery",
-                "variables": {"channelLogin": streamer.username},
-                "extensions": {
-                    "persistedQuery": {
-                        "version": 1,
-                        "sha256Hash": "df5d55b6401389afb12d3017c9b2cf1237164220c8ef4ed754eae8188068a807",
-                    }
-                },
-            }
-        )
+        json_data = copy.deepcopy(GQLOperations.ModViewChannelQuery)
+        json_data["variables"] = {"channelLogin": streamer.username}
+        response = self.post_gql_request(json_data)
         try:
             streamer.viewer_is_mod = response["data"]["user"]["self"]["isModerator"]
         except (ValueError, KeyError):

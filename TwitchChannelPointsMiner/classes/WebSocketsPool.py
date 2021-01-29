@@ -16,7 +16,7 @@ from TwitchChannelPointsMiner.utils import (
     calculate_start_after,
     bet_condition,
 )
-from TwitchChannelPointsMiner.constants import TWITCH_WEBSOCKET
+from TwitchChannelPointsMiner.constants.twitch import WEBSOCKET
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class WebSocketsPool:
 
     def create_new_websocket(self):
         self.ws = TwitchWebSocket(
-            TWITCH_WEBSOCKET,
+            WEBSOCKET,
             on_message=WebSocketsPool.on_message,
             on_open=WebSocketsPool.on_open,
             on_close=WebSocketsPool.handle_websocket_reconnection,
