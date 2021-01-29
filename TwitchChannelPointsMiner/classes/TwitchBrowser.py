@@ -379,7 +379,7 @@ class TwitchBrowser:
         logger.info(f"Opening coins menu for {event}", extra={"emoji": ":wrench:"})
         status = self.__click_when_exist(Selectors.coinsMenuXP, By.XPATH)
         if status is False:
-            status = self.__execute_script(Javascript.streamCoinsMenu)
+            status = self.__execute_script(Javascript.coinsMenu)
 
         if status is True:
             time.sleep(random.uniform(0.01, 0.1))
