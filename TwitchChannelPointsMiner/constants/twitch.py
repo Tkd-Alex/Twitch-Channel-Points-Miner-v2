@@ -71,3 +71,13 @@ class GQLOperations:
             }
         },
     }
+    Inventory = {
+        "operationName": "Inventory",
+        "variables": {},
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "e0765ebaa8e8eeb4043cc6dfeab3eac7f682ef5f724b81367e6e55c7aef2be4c",
+            }
+        },
+    }

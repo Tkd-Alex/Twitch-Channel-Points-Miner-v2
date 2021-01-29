@@ -7,6 +7,7 @@ import random
 from millify import millify
 from dateutil import parser
 
+from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
@@ -283,14 +284,25 @@ class WebSocketsPool:
                                 ws.events_predictions[event_id].bet_confirmed = True
 
                     elif message.topic == "user-drop-events":
-                        # if message.type == "drop-progress" # We don't need to handle this event
-                        if message.type == "drop-claim":
-                            # Random delay before claim. Maybe It's not required.
-                            time.sleep(random.uniform(20, 40))
-                            ws.twitch.claim_drop(
-                                ws.streamers[streamer_index],
-                                message.data["drop_instance_id"]
-                            )
+                        if message.type == "drop-progress":
+                            if (
+                                message.data["current_progress_min"]
+                                >= message.data["required_progress_min"]
+                            ):
+                                try:
+                                    drop = ws.twitch.search_drop_in_inventory(
+                                        ws.streamers[streamer_index],
+                                        message.data["drop_id"],
+                                    )
+                                    if drop["dropInstanceID"] is not None:
+                                        ws.twitch.claim_drop(
+                                            ws.streamers[streamer_index],
+                                            drop["dropInstanceID"],
+                                        )
+                                except TimeBasedDropNotFound:
+                                    logger.error(
+                                        f"Unable to find {message.data['drop_id']} in your inventory"
+                                    )
 
                 except Exception:
                     logger.error(

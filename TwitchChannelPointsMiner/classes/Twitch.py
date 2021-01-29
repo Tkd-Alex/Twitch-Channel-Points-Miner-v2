@@ -18,6 +18,7 @@ from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerIsOfflineException,
     StreamerDoesNotExistException,
+    TimeBasedDropNotFound,
 )
 from TwitchChannelPointsMiner.constants.twitch import CLIENT_ID, API, GQLOperations
 
@@ -149,19 +150,27 @@ class Twitch:
         json_data["variables"] = {"input": {"dropInstanceID": drop_instance_id}}
         self.post_gql_request(json_data)
 
+    def search_drop_in_inventory(self, streamer, drop_id):
+        response = self.post_gql_request(GQLOperations.Inventory)
+        inventory = response["data"]["currentUser"]["inventory"]
+        for campaign in inventory["dropCampaignsInProgress"]:
+            for drop in campaign["timeBasedDrops"]:
+                if drop["id"] == drop_id:
+                    return drop["self"]
+        raise TimeBasedDropNotFound
+
     # Load the amount of current points for a channel, check if a bonus is available
     def load_channel_points_context(self, streamer, less_printing=False):
         json_data = copy.deepcopy(GQLOperations.ChannelPointsContext)
-        json_data["variables"] = ({"channelLogin": streamer.username})
+        json_data["variables"] = {"channelLogin": streamer.username}
 
         response = self.post_gql_request(json_data)
         if response["data"]["community"] is None:
             raise StreamerDoesNotExistException
-        community_points = response["data"]["community"]["channel"]["self"][
-            "communityPoints"
-        ]
+        channel = response["data"]["community"]["channel"]
+        community_points = channel["self"]["communityPoints"]
         streamer.channel_points = community_points["balance"]
-        # logger.info(f"{streamer.channel_points} channel points for {streamer.username}!")
+
         if community_points["availableClaim"] is not None:
             self.claim_bonus(
                 streamer,
