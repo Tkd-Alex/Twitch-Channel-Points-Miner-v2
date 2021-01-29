@@ -33,7 +33,7 @@ class Stream:
 
     def update(self, broadcast_id, title, game, tags, viewers_count):
         self.broadcast_id = broadcast_id
-        self.title = title
+        self.title = title.strip()
         self.game = game
         self.tags = tags
         self.viewers_count = viewers_count
@@ -43,20 +43,20 @@ class Stream:
         )
         self.__last_update = time.time()
 
-        logger.info(f"Update received: {self}")
+        logger.debug(f"Update: {self}")
 
     def __repr__(self):
         return (
             f"{self.title}"
             if self.less_printing is True
-            else f"Streamer(title={self.title}, game={self.__str_game()}, tags={self.__str_tags})"
+            else f"Stream(title={self.title}, game={self.__str_game()}, tags={self.__str_tags()})"
         )
 
     def __str__(self):
         return (
             f"{self.title}"
             if self.less_printing is True
-            else f"Streamer(title={self.title}, game={self.__str_game()}, tags={self.__str_tags})"
+            else f"Stream(title={self.title}, game={self.__str_game()}, tags={self.__str_tags()})"
         )
 
     def __str_tags(self):

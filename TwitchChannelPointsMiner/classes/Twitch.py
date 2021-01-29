@@ -66,7 +66,7 @@ class Twitch:
                 {"event": "minute-watched", "properties": event_properties}
             ]
 
-    def get_minute_watched_request_url(self, streamer):
+    def get_spade_url(self, streamer):
         headers = {"User-Agent": self.user_agent}
         main_page_request = requests.get(streamer.streamer_url, headers=headers)
         response = main_page_request.text
@@ -76,7 +76,7 @@ class Twitch:
 
         settings_request = requests.get(settings_url, headers=headers)
         response = settings_request.text
-        return re.search('"spade_url":"(.*?)"', response).group(1)
+        streamer.stream.spade_url = re.search('"spade_url":"(.*?)"', response).group(1)
 
     def post_gql_request(self, json_data):
         response = requests.post(
@@ -118,9 +118,7 @@ class Twitch:
 
         if streamer.is_online is False:
             try:
-                self.streamer.stream.spade_url = self.get_minute_watched_request_url(
-                    streamer
-                )
+                self.get_spade_url(streamer)
                 self.update_stream(streamer)
             except StreamerIsOfflineException:
                 streamer.set_offline()
@@ -144,18 +142,17 @@ class Twitch:
         }
         self.post_gql_request(json_data)
 
-    def claim_drop(self, streamer, drop_instance_id, less_printing=False):
-        if less_printing is False:
-            logger.info(f"Claiming the drop for {streamer}!", extra={"emoji": ":gift:"})
+    def claim_drop(self, streamer, drop_instance_id):
+        logger.info(f"Claiming the drop for {streamer}!", extra={"emoji": ":package:"})
 
-        json_data = copy.deepcopy(GQLOperations.ClaimCommunityPoints)
+        json_data = copy.deepcopy(GQLOperations.DropsPage_ClaimDropRewards)
         json_data["variables"] = {"input": {"dropInstanceID": drop_instance_id}}
         self.post_gql_request(json_data)
 
     # Load the amount of current points for a channel, check if a bonus is available
     def load_channel_points_context(self, streamer, less_printing=False):
         json_data = copy.deepcopy(GQLOperations.ChannelPointsContext)
-        json_data["variables"] = ({"channelLogin": streamer.username},)
+        json_data["variables"] = ({"channelLogin": streamer.username})
 
         response = self.post_gql_request(json_data)
         if response["data"]["community"] is None:
@@ -185,7 +182,7 @@ class Twitch:
         }
         return self.post_gql_request(json_data)
 
-    def send_minute_watched_events(self, streamers, watch_streak=False):
+    def send_minute_watched_events(self, streamers, watch_streak=False, chunk_size=3):
         while self.running:
             streamers_index = [
                 i
@@ -241,7 +238,7 @@ class Twitch:
 
                 try:
                     response = requests.post(
-                        streamers[index].stream.url,
+                        streamers[index].stream.spade_url,
                         data=streamers[index].stream.encode_payload(),
                         headers={"User-Agent": self.user_agent},
                     )
@@ -249,12 +246,11 @@ class Twitch:
                         f"Send minute watched request for {streamers[index]} - Status code: {response.status_code}"
                     )
                     if response.status_code == 204:
-                        streamers[index].update_minute_watched()
+                        streamers[index].stream.update_minute_watched()
                 except requests.exceptions.ConnectionError as e:
                     logger.error(f"Error while trying to watch a minute: {e}")
 
                 # Create chunk of sleep of speed-up the break loop after CTRL+C
-                chunk_size = 3
                 sleep_time = max(next_iteration - time.time(), 0) / chunk_size
                 for i in range(0, chunk_size):
                     time.sleep(sleep_time)

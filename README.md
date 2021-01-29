@@ -8,8 +8,7 @@
 
 > It can wait for a streamer to go live (+_450 points_ when the stream starts), it will automatically click the bonus button (_+50 points_), and it will follow raids (_+250 points_).
 
-Read more about channels point here:
-https://help.twitch.tv/s/article/channel-points-guide
+Read more about channels point [here](https://help.twitch.tv/s/article/channel-points-guide)
 
 ## Main difference from the original repository:
 
@@ -18,7 +17,7 @@ https://help.twitch.tv/s/article/channel-points-guide
 - Rewrite the entire code using classe instead of module with global variables
 - Automatic download the followers list and use as input
 - Better 'Watch Streak' strategy in priority system [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)
-- Auto claim game drops from Twitch inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21)
+- Auto claim game drops from Twitch inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) Read more about game drops [here](https://help.twitch.tv/s/article/mission-based-drops)
 - Place the bet / make prediction and won or lose (good luck) your channel points! **(CURRENTLY IN BETA)**
 
 For the bet system the script use Selenium. Could be usefull understand how to MakePrediction usign a [POST] request. I've also write a [poc](/TwitchChannelPointsMiner/classes/Twitch.py#L160) but I don't know how to calculate/create the transactionID. Any helps are welcome

@@ -21,7 +21,7 @@ class Streamer:
         self.minute_watched_requests = None
         self.viewer_is_mod = False
 
-        self.stream = Stream()
+        self.stream = Stream(less_printing=less_printing)
 
         self.raid = None
         self.history = {}

@@ -283,24 +283,14 @@ class WebSocketsPool:
                                 ws.events_predictions[event_id].bet_confirmed = True
 
                     elif message.topic == "user-drop-events":
-                        logger.info(f"Drop update: {message}")
-                        """
-                        if message.type == "drop-progress":
-                            if message.data["current_progress_min"] >= message.data["required_progress_min"]:
-                                time.sleep(random.uniform(20, 40))
-                                ws.twitch.claim_drop(ws.streamers[streamer_index], message.data["drop_id"], less_printing=False)  # ws.less_printing)
-                        """
+                        # if message.type == "drop-progress" # We don't need to handle this event
                         if message.type == "drop-claim":
-                            logger.info(
-                                f"We can claim a drop from {ws.streamers[streamer_index]}!",
-                                extra={"emoji": ":package:"},
-                            )
+                            # Random delay before claim. Maybe It's not required.
                             time.sleep(random.uniform(20, 40))
                             ws.twitch.claim_drop(
                                 ws.streamers[streamer_index],
-                                message.data["drop_instance_id"],
-                                less_printing=False,
-                            )  # ws.less_printing)
+                                message.data["drop_instance_id"]
+                            )
 
                 except Exception:
                     logger.error(
