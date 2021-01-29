@@ -11,6 +11,7 @@ twitch_miner = TwitchChannelPointsMiner(
     make_predictions=True,              # If you want to Bet / Make prediction | The browser will never start
     follow_raid=True,                   # Follow raid to obtain more points
     watch_streak=True,                  # If a streamer go online change the priotiry of streamers array and catch the watch screak. Issue #11
+    drops_events=True,                  # If you want to auto claim game drops from Twitch inventory Issue #21
     logger_settings=LoggerSettings(
         save=True,                      # If you want to save logs in file (suggested)
         console_level=logging.INFO,     # Level of logs - use logging.DEBUG for more info)

@@ -40,6 +40,7 @@ class TwitchChannelPointsMiner:
         make_predictions: bool = True,
         follow_raid: bool = True,
         watch_streak: bool = False,
+        drops_events: bool = False,
         logger_settings: LoggerSettings = LoggerSettings(),
         browser_settings: BrowserSettings = BrowserSettings(),
         bet_settings: BetSettings = BetSettings(),
@@ -54,6 +55,7 @@ class TwitchChannelPointsMiner:
         self.twitch_browser = None
         self.follow_raid = follow_raid
         self.watch_streak = watch_streak
+        self.drops_events = drops_events
         self.streamers = []
         self.events_predictions = {}
         self.minute_watcher_thread = None
@@ -164,12 +166,17 @@ class TwitchChannelPointsMiner:
                 PubsubTopic(
                     "community-points-user-v1",
                     user_id=self.twitch.twitch_login.get_user_id(),
-                ),
-                PubsubTopic(
-                    "user-drop-events",
-                    user_id=self.twitch.twitch_login.get_user_id(),
-                ),
+                )
             ]
+
+            if self.drops_events is True:
+                topics.append(
+                    PubsubTopic(
+                        "user-drop-events",
+                        user_id=self.twitch.twitch_login.get_user_id(),
+                    ),
+                )
+
             if self.make_predictions is True:
                 topics.append(
                     PubsubTopic(
