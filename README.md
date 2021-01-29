@@ -187,6 +187,8 @@ twitch_miner.mine(["streamer1", "streamer2"], followers=True)   # Mixed
 
 Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow have the highest priority.
 
+If the browser are currently betting or wait for more data It's impossible to interact with another event prediction from another streamer.
+
 ### Bet strategy
 
 - **MOST_VOTED**: Select the option most voted based on users count
@@ -243,3 +245,6 @@ Please provide at least the following information/files:
 - screenshots/ `BrowserSettings(do_screenshot=True)`
 
 Make sure also to have the latest commit.
+
+## Disclaimer
+This project comes with no gurantee or warranty. You are responsible for whatever happens from using this project. It is possible to get soft or hard banned by using this project if you are not careful. This is a personal project and is in no way affiliated with Twitch.
