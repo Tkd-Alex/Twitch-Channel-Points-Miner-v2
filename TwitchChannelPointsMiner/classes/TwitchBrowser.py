@@ -162,9 +162,7 @@ class TwitchBrowser:
         options.add_argument("no-sandbox")
         options.add_argument("disable-setuid-sandbox")
         options.add_argument("disable-infobars")
-        options.add_argument(
-            f"user-agent={get_user_agent(self.settings.browser)}"
-        )
+        options.add_argument(f"user-agent={get_user_agent(self.settings.browser)}")
 
         options.add_experimental_option(
             "prefs", {"profile.managed_default_content_settings.images": 2}

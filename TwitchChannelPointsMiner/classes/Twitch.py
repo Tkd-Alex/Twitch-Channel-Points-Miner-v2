@@ -13,7 +13,6 @@ import random
 
 from pathlib import Path
 
-from TwitchChannelPointsMiner.classes.RequestInfo import RequestInfo
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerIsOfflineException,
@@ -45,48 +44,42 @@ class Twitch:
             self.twitch_login.load_cookies(self.cookies_file)
             self.twitch_login.set_token(self.twitch_login.get_auth_token())
 
-    def create_minute_watched_event_request(self, streamer):
-        streamer.minute_watched_requests = RequestInfo(self.get_minute_watched_request_url(streamer))
-        self.update_payload_minute_watched_event_request(streamer)
+    def update_stream(self, streamer):
+        if streamer.stream.update_required() is True:
+            stream_info = self.get_stream_info(streamer)
+            streamer.stream.update(
+                broadcast_id=stream_info["stream"]["id"],
+                title=stream_info["broadcastSettings"]["title"],
+                game=stream_info["broadcastSettings"]["game"],
+                tags=stream_info["stream"]["tags"],
+                viewers_count=stream_info["stream"]["viewersCount"],
+            )
 
-    def update_payload_minute_watched_event_request(self, streamer):
-        streamer_info = self.get_stream_info(streamer)
-        event_properties = {
-            "channel_id": streamer.channel_id,
-            "broadcast_id": streamer_info["stream"]["id"],
-            "player": "site",
-            "user_id": self.twitch_login.get_user_id(),
-        }
+            event_properties = {
+                "channel_id": streamer.channel_id,
+                "broadcast_id": streamer.stream.broadcast_id,
+                "player": "site",
+                "user_id": self.twitch_login.get_user_id(),
+            }
 
-        # First debbuging phase
-        logger.info(f"{streamer} - Title: {streamer_info['broadcastSettings']['title']}")
-        if streamer_info['broadcastSettings']['game'] != {}:
-            logger.info(f"{streamer} - Game: {streamer_info['broadcastSettings']['game']['displayName']}")
+            if streamer.stream.game_name() is not None:
+                event_properties["game"] = streamer.stream.game_name()
 
-            tags = [tag['localizedName'] for tag in streamer_info['stream']['tags']]
-            logger.info(f"{streamer} - Views: {streamer_info['stream']['viewersCount']}, Tags {tags}")
-            if "c2542d6d-cd10-4532-919b-3d19f30a768b" in [tag['id'] for tag in streamer_info['stream']['tags']]:
-                logger.info(f"{streamer} - Drops are enabled for this stream! ")
-                event_properties["game"] = streamer_info['broadcastSettings']['game']['name']
-
-        streamer.minute_watched_requests.payload = [{"event": "minute-watched", "properties": event_properties}]
+            streamer.stream.payload = [
+                {"event": "minute-watched", "properties": event_properties}
+            ]
 
     def get_minute_watched_request_url(self, streamer):
         headers = {"User-Agent": self.user_agent}
-        main_page_request = requests.get(
-            streamer.streamer_url, headers=headers
-        )
+        main_page_request = requests.get(streamer.streamer_url, headers=headers)
         response = main_page_request.text
         settings_url = re.search(
             "(https://static.twitchcdn.net/config/settings.*?js)", response
         ).group(1)
 
-        settings_request = requests.get(
-            settings_url, headers=headers
-        )
+        settings_request = requests.get(settings_url, headers=headers)
         response = settings_request.text
-        minute_watched_request_url = re.search('"spade_url":"(.*?)"', response).group(1)
-        return minute_watched_request_url
+        return re.search('"spade_url":"(.*?)"', response).group(1)
 
     def post_gql_request(self, json_data):
         response = requests.post(
@@ -124,15 +117,13 @@ class Twitch:
     def get_stream_info(self, streamer):
         json_data = {
             "operationName": "VideoPlayerStreamInfoOverlayChannel",
-            "variables": {
-                "channel": streamer.username
-            },
+            "variables": {"channel": streamer.username},
             "extensions": {
                 "persistedQuery": {
                     "version": 1,
-                    "sha256Hash": "a5f2e34d626a9f4f5c0204f910bab2194948a9502089be558bb6e779a9e1b3d2"
+                    "sha256Hash": "a5f2e34d626a9f4f5c0204f910bab2194948a9502089be558bb6e779a9e1b3d2",
                 }
-            }
+            },
         }
         response = self.post_gql_request(json_data)
         if response["data"]["user"]["stream"] is None:
@@ -146,14 +137,17 @@ class Twitch:
 
         if streamer.is_online is False:
             try:
-                self.create_minute_watched_event_request(streamer)
+                self.streamer.stream.spade_url = self.get_minute_watched_request_url(
+                    streamer
+                )
+                self.update_stream(streamer)
             except StreamerIsOfflineException:
                 streamer.set_offline()
             else:
                 streamer.set_online()
         else:
             try:
-                self.update_payload_minute_watched_event_request(streamer)
+                self.update_stream(streamer)
             except StreamerIsOfflineException:
                 streamer.set_offline()
 
@@ -179,15 +173,11 @@ class Twitch:
 
     def claim_drop(self, streamer, drop_instance_id, less_printing=False):
         if less_printing is False:
-            logger.info(
-                f"Claiming the drop for {streamer}!", extra={"emoji": ":gift:"}
-            )
+            logger.info(f"Claiming the drop for {streamer}!", extra={"emoji": ":gift:"})
 
         json_data = {
             "operationName": "DropsPage_ClaimDropRewards",
-            "variables": {
-                "input": {"dropInstanceID": drop_instance_id}
-            },
+            "variables": {"input": {"dropInstanceID": drop_instance_id}},
             "extensions": {
                 "persistedQuery": {
                     "version": 1,
@@ -269,15 +259,15 @@ class Twitch:
             if watch_streak is True:
                 for index in streamers_index:
                     if (
-                        streamers[index].watch_streak_missing is True
+                        streamers[index].stream.watch_streak_missing is True
                         and (
                             streamers[index].offline_at == 0
                             or ((time.time() - streamers[index].offline_at) // 60) > 30
                         )
-                        and streamers[index].minute_watched < 7
+                        and streamers[index].stream.minute_watched < 7
                     ):
                         logger.debug(
-                            f"Switch priority: {streamers[index]}, WatchStreak missing is {streamers[index].watch_streak_missing} and minute_watched: {round(streamers[index].minute_watched, 2)}"
+                            f"Switch priority: {streamers[index]}, WatchStreak missing is {streamers[index].stream.watch_streak_missing} and minute_watched: {round(streamers[index].stream.minute_watched, 2)}"
                         )
                         streamers_watching.append(index)
                         if len(streamers_watching) == 2:
@@ -302,8 +292,8 @@ class Twitch:
 
                 try:
                     response = requests.post(
-                        streamers[index].minute_watched_requests.url,
-                        data=streamers[index].minute_watched_requests.encode_payload(),
+                        streamers[index].stream.url,
+                        data=streamers[index].stream.encode_payload(),
                         headers={"User-Agent": self.user_agent},
                     )
                     logger.debug(

@@ -4,16 +4,17 @@ TWITCH_API = "https://api.twitch.tv"
 TWITCH_GQL = "https://gql.twitch.tv/gql"
 TWITCH_WEBSOCKET = "wss://pubsub-edge.twitch.tv/v1"
 TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"
+TWITCH_DROP_ID = "c2542d6d-cd10-4532-919b-3d19f30a768b"
 
 USER_AGENTS = {
     "Windows": {
         "CHROME": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36",
-        "FIREFOX": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"
+        "FIREFOX": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0",
     },
     "Linux": {
         "CHROME": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36",
-        "FIREFOX": "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0"
-    }
+        "FIREFOX": "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0",
+    },
 }
 
 # XPath Selector and Javascript helpers

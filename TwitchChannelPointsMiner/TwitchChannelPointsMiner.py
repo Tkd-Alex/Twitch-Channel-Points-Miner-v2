@@ -48,7 +48,9 @@ class TwitchChannelPointsMiner:
         self.browser_settings = browser_settings
         self.bet_settings = bet_settings
 
-        self.twitch = Twitch(self.username, get_user_agent(self.browser_settings.browser))
+        self.twitch = Twitch(
+            self.username, get_user_agent(self.browser_settings.browser)
+        )
         self.twitch_browser = None
         self.follow_raid = follow_raid
         self.watch_streak = watch_streak
@@ -166,7 +168,7 @@ class TwitchChannelPointsMiner:
                 PubsubTopic(
                     "user-drop-events",
                     user_id=self.twitch.twitch_login.get_user_id(),
-                )
+                ),
             ]
             if self.make_predictions is True:
                 topics.append(
@@ -217,7 +219,9 @@ class TwitchChannelPointsMiner:
 
     def __print_report(self):
         print("\n")
-        logger.info(f"Ending session: '{self.session_id}'", extra={"emoji": ":stop_sign:"})
+        logger.info(
+            f"Ending session: '{self.session_id}'", extra={"emoji": ":stop_sign:"}
+        )
         if self.logs_file is not None:
             logger.info(
                 f"Logs file: {self.logs_file}", extra={"emoji": ":page_facing_up:"}

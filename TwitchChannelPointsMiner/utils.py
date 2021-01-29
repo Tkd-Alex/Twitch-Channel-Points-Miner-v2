@@ -60,15 +60,15 @@ def bet_condition(twitch_browser, event, logger):
         )
         return False
     elif event.streamer.viewer_is_mod is True:
-        logger.info(
-            f"Sorry, you are moderator of {event.streamer}, so you can't bet!"
-        )
+        logger.info(f"Sorry, you are moderator of {event.streamer}, so you can't bet!")
         return False
     return True
 
 
 def get_user_agent(browser):
     try:
-        return USER_AGENTS[platform.system()][browser.name if type(browser) != str else browser]
+        return USER_AGENTS[platform.system()][
+            browser.name if type(browser) != str else browser
+        ]
     except KeyError:
         return USER_AGENTS["Linux"]["FIREFOX"]

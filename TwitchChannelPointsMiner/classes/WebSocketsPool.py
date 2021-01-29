@@ -291,9 +291,16 @@ class WebSocketsPool:
                                 ws.twitch.claim_drop(ws.streamers[streamer_index], message.data["drop_id"], less_printing=False)  # ws.less_printing)
                         """
                         if message.type == "drop-claim":
-                            logger.info(f"We can claim a drop from {ws.streamers[streamer_index]}!", extra={"emoji": ":package:"})
+                            logger.info(
+                                f"We can claim a drop from {ws.streamers[streamer_index]}!",
+                                extra={"emoji": ":package:"},
+                            )
                             time.sleep(random.uniform(20, 40))
-                            ws.twitch.claim_drop(ws.streamers[streamer_index], message.data["drop_instance_id"], less_printing=False)  # ws.less_printing)
+                            ws.twitch.claim_drop(
+                                ws.streamers[streamer_index],
+                                message.data["drop_instance_id"],
+                                less_printing=False,
+                            )  # ws.less_printing)
 
                 except Exception:
                     logger.error(
