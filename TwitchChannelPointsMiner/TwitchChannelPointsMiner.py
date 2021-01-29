@@ -40,6 +40,7 @@ class TwitchChannelPointsMiner:
         make_predictions: bool = True,
         follow_raid: bool = True,
         watch_streak: bool = False,
+        claim_drops_startup: bool = False,
         drops_events: bool = False,
         logger_settings: LoggerSettings = LoggerSettings(),
         browser_settings: BrowserSettings = BrowserSettings(),
@@ -56,6 +57,7 @@ class TwitchChannelPointsMiner:
         self.follow_raid = follow_raid
         self.watch_streak = watch_streak
         self.drops_events = drops_events
+        self.claim_drops_startup = claim_drops_startup
         self.streamers = []
         self.events_predictions = {}
         self.minute_watcher_thread = None
@@ -89,6 +91,9 @@ class TwitchChannelPointsMiner:
             self.start_datetime = datetime.now()
 
             self.twitch.login()
+
+            if self.claim_drops_startup is True:
+                self.twitch.claim_all_drops_from_inventory()
 
             # Clear streamers array
             # Remove duplicate 3. Preserving Order: Use OrderedDict (askpython .com)

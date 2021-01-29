@@ -295,8 +295,8 @@ class WebSocketsPool:
                                     )
                                     if drop["dropInstanceID"] is not None:
                                         ws.twitch.claim_drop(
-                                            ws.streamers[streamer_index],
                                             drop["dropInstanceID"],
+                                            ws.streamers[streamer_index],
                                         )
                                 except TimeBasedDropNotFound:
                                     logger.error(

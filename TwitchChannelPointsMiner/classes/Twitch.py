@@ -11,6 +11,7 @@ import time
 import logging
 import random
 import copy
+import random
 
 from pathlib import Path
 
@@ -20,6 +21,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerDoesNotExistException,
     TimeBasedDropNotFound,
 )
+from TwitchChannelPointsMiner.utils import get_streamer_index
 from TwitchChannelPointsMiner.constants.twitch import CLIENT_ID, API, GQLOperations
 
 logger = logging.getLogger(__name__)
@@ -143,21 +145,39 @@ class Twitch:
         }
         self.post_gql_request(json_data)
 
-    def claim_drop(self, streamer, drop_instance_id):
-        logger.info(f"Claiming the drop for {streamer}!", extra={"emoji": ":package:"})
+    def claim_drop(self, drop_instance_id, streamer=None):
+        if streamer is not None:
+            logger.info(
+                f"Claiming the drop for {streamer}!", extra={"emoji": ":package:"}
+            )
+        else:
+            logger.info(
+                f"Startup claim drop {drop_instance_id}", extra={"emoji": ":package:"}
+            )
 
         json_data = copy.deepcopy(GQLOperations.DropsPage_ClaimDropRewards)
         json_data["variables"] = {"input": {"dropInstanceID": drop_instance_id}}
         self.post_gql_request(json_data)
 
     def search_drop_in_inventory(self, streamer, drop_id):
-        response = self.post_gql_request(GQLOperations.Inventory)
-        inventory = response["data"]["currentUser"]["inventory"]
+        inventory = self.__get_inventory()
         for campaign in inventory["dropCampaignsInProgress"]:
             for drop in campaign["timeBasedDrops"]:
                 if drop["id"] == drop_id:
                     return drop["self"]
         raise TimeBasedDropNotFound
+
+    def claim_all_drops_from_inventory(self, streamers):
+        inventory = self.__get_inventory()
+        for campaign in inventory["dropCampaignsInProgress"]:
+            for drop in campaign["timeBasedDrops"]:
+                if drop["self"]["dropInstanceID"] is not None:
+                    self.claim_drop(drop["dropInstanceID"])
+                    time.sleep(random.uniform(10, 30))
+
+    def __get_inventory(self):
+        response = self.post_gql_request(GQLOperations.Inventory)
+        return response["data"]["currentUser"]["inventory"]
 
     # Load the amount of current points for a channel, check if a bonus is available
     def load_channel_points_context(self, streamer, less_printing=False):
