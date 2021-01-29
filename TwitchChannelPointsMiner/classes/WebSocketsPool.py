@@ -134,9 +134,6 @@ class WebSocketsPool:
             ws.last_message_timestamp = message.timestamp
             ws.last_message_type_channel = message.identifier
 
-            if message.topic == "user-drop-events":
-                logger.info(f"Drop update: {message}")
-
             streamer_index = get_streamer_index(ws.streamers, message.channel_id)
             if streamer_index != -1:
                 try:
@@ -284,6 +281,19 @@ class WebSocketsPool:
                                 }
                             elif message.type == "prediction-made":
                                 ws.events_predictions[event_id].bet_confirmed = True
+
+                    elif message.topic == "user-drop-events":
+                        logger.info(f"Drop update: {message}")
+                        """
+                        if message.type == "drop-progress":
+                            if message.data["current_progress_min"] >= message.data["required_progress_min"]:
+                                time.sleep(random.uniform(20, 40))
+                                ws.twitch.claim_drop(ws.streamers[streamer_index], message.data["drop_id"], less_printing=False)  # ws.less_printing)
+                        """
+                        if message.type == "drop-claim":
+                            logger.info(f"We can claim a drop from {ws.streamers[streamer_index]}!", extra={"emoji": ":package:"})
+                            time.sleep(random.uniform(20, 40))
+                            ws.twitch.claim_drop(ws.streamers[streamer_index], message.data["drop_instance_id"], less_printing=False)  # ws.less_printing)
 
                 except Exception:
                     logger.error(

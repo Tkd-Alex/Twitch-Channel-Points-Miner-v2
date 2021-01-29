@@ -5,7 +5,6 @@
 
 
 import requests
-import json
 import re
 import os
 import time
@@ -178,7 +177,7 @@ class Twitch:
         }
         self.post_gql_request(json_data)
 
-    def claim_drop(self, streamer, drop_id, less_printing=False):
+    def claim_drop(self, streamer, drop_instance_id, less_printing=False):
         if less_printing is False:
             logger.info(
                 f"Claiming the drop for {streamer}!", extra={"emoji": ":gift:"}
@@ -187,7 +186,7 @@ class Twitch:
         json_data = {
             "operationName": "DropsPage_ClaimDropRewards",
             "variables": {
-                "input": {"dropInstanceID": drop_id}
+                "input": {"dropInstanceID": drop_instance_id}
             },
             "extensions": {
                 "persistedQuery": {
@@ -396,5 +395,5 @@ class Twitch:
         )
         try:
             streamer.viewer_is_mod = response["data"]["user"]["self"]["isModerator"]
-        except (ValueError, KeyError) as e:
+        except (ValueError, KeyError):
             streamer.viewer_is_mod = False
