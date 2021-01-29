@@ -167,7 +167,7 @@ class Twitch:
                     return drop["self"]
         raise TimeBasedDropNotFound
 
-    def claim_all_drops_from_inventory(self, streamers):
+    def claim_all_drops_from_inventory(self):
         inventory = self.__get_inventory()
         for campaign in inventory["dropCampaignsInProgress"]:
             for drop in campaign["timeBasedDrops"]:
