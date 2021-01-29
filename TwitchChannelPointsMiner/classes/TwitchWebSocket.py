@@ -6,7 +6,6 @@ from websocket import WebSocketApp
 
 from TwitchChannelPointsMiner.utils import create_nonce
 
-
 logger = logging.getLogger(__name__)
 
 

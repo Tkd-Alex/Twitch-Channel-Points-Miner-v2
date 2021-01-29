@@ -1,29 +1,28 @@
 # -*- coding: utf-8 -*-
 
+import copy
 import logging
-import threading
+import random
 import signal
 import sys
+import threading
 import time
 import uuid
-import copy
-import random
-
-from datetime import datetime
 from collections import OrderedDict
+from datetime import datetime
 
-from TwitchChannelPointsMiner.utils import get_user_agent
+from TwitchChannelPointsMiner.classes.Bet import BetSettings
+from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
-from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.Streamer import Streamer
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
-from TwitchChannelPointsMiner.classes.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.TwitchBrowser import (
-    TwitchBrowser,
     BrowserSettings,
+    TwitchBrowser,
 )
-from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
+from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
+from TwitchChannelPointsMiner.utils import get_user_agent
 
 # Suppress warning for urllib3.connectionpool (selenium close connection)
 # Suppress also the selenium logger please

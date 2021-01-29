@@ -4,23 +4,23 @@
 # Full list of available methods: https://azr.ivr.fi/schema/query.doc.html (a bit outdated)
 
 
-import requests
-import re
-import os
-import time
-import logging
-import random
 import copy
-
+import logging
+import os
+import random
+import re
+import time
 from pathlib import Path
 
-from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
+import requests
+
 from TwitchChannelPointsMiner.classes.Exceptions import (
-    StreamerIsOfflineException,
     StreamerDoesNotExistException,
+    StreamerIsOfflineException,
     TimeBasedDropNotFound,
 )
-from TwitchChannelPointsMiner.constants.twitch import CLIENT_ID, API, GQLOperations
+from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
+from TwitchChannelPointsMiner.constants.twitch import API, CLIENT_ID, GQLOperations
 
 logger = logging.getLogger(__name__)
 

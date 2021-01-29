@@ -1,7 +1,6 @@
-import time
 import platform
 import re
-
+import time
 from datetime import datetime, timezone
 from random import randrange
 

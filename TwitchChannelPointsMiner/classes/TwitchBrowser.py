@@ -1,24 +1,23 @@
-import time
 import logging
-import random
 import os
 import platform
+import random
+import time
+from enum import Enum, auto
+from pathlib import Path
 
 from millify import prettify
-from pathlib import Path
-from enum import Enum, auto
-
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.common.by import By
+from selenium.common.exceptions import JavascriptException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import TimeoutException, JavascriptException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.ui import WebDriverWait
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
-from TwitchChannelPointsMiner.utils import bet_condition, get_user_agent
+from TwitchChannelPointsMiner.constants.browser import Javascript, Selectors
 from TwitchChannelPointsMiner.constants.twitch import URL
-from TwitchChannelPointsMiner.constants.browser import Selectors, Javascript
+from TwitchChannelPointsMiner.utils import bet_condition, get_user_agent
 
 logger = logging.getLogger(__name__)
 

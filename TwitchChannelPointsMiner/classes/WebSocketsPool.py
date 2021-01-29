@@ -1,23 +1,23 @@
+import json
 import logging
+import random
 import threading
 import time
-import json
-import random
 
-from millify import millify
 from dateutil import parser
+from millify import millify
 
-from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
+from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
+from TwitchChannelPointsMiner.classes.Message import Message
 from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
-from TwitchChannelPointsMiner.classes.Message import Message
-from TwitchChannelPointsMiner.utils import (
-    get_streamer_index,
-    calculate_start_after,
-    bet_condition,
-)
 from TwitchChannelPointsMiner.constants.twitch import WEBSOCKET
+from TwitchChannelPointsMiner.utils import (
+    bet_condition,
+    calculate_start_after,
+    get_streamer_index,
+)
 
 logger = logging.getLogger(__name__)
 
