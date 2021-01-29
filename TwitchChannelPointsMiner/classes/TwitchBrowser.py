@@ -18,23 +18,7 @@ from selenium.common.exceptions import TimeoutException, JavascriptException
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.utils import bet_condition, get_user_agent
 from TwitchChannelPointsMiner.constants.twitch import URL
-from TwitchChannelPointsMiner.constants.browser import (
-    cookiePolicyQuery,
-    streamCoinsMenuXP,
-    streamCoinsMenuJS,
-    streamBetTitleInBet,
-    streamBetCustomVoteXP,
-    streamBetCustomVoteJS,
-    streamBetMainDiv,
-    streamBetVoteInputXP,
-    streamBetVoteButtonXP,
-    streamBetVoteInputJS,
-    streamBetVoteButtonJS,
-    localStorageJS,
-    clearStyleChatJS,
-    maximizeBetWindowJS,
-    scrollDownBetWindowJS,
-)
+from TwitchChannelPointsMiner.constants.browser import Selectors, Javascript
 
 logger = logging.getLogger(__name__)
 
@@ -124,11 +108,13 @@ class TwitchBrowser:
         self.browser.add_cookie(cookie)
         time.sleep(random.uniform(2.5, 3.5))
 
-        self.__click_when_exist(cookiePolicyQuery, By.CSS_SELECTOR, suppress_error=True)
+        self.__click_when_exist(
+            Selectors.cookiePolicy, By.CSS_SELECTOR, suppress_error=True
+        )
         time.sleep(random.uniform(0.5, 1.5))
 
         # Edit value in localStorage for dark theme, point consent etc.
-        self.__execute_script(localStorageJS)
+        self.__execute_script(Javascript.localStorage)
         time.sleep(random.uniform(0.5, 1.5))
         self.__blank()
 
@@ -290,11 +276,14 @@ class TwitchBrowser:
                 self.browser.get(event.streamer.chat_url)
                 time.sleep(random.uniform(3, 5))
                 self.__click_when_exist(
-                    cookiePolicyQuery, By.CSS_SELECTOR, suppress_error=True, timeout=1.5
+                    Selectors.cookiePolicy,
+                    By.CSS_SELECTOR,
+                    suppress_error=True,
+                    timeout=1.5,
                 )
 
                 # Hide the chat ... Don't ask me why
-                self.__execute_script(clearStyleChatJS, suppress_error=True)
+                self.__execute_script(Javascript.clearStyleChat, suppress_error=True)
 
                 if self.__bet_chains_methods(event) is True:
                     return self.currently_is_betting, time.time() - start_time
@@ -324,7 +313,7 @@ class TwitchBrowser:
                 try:
                     WebDriverWait(self.browser, 1).until(
                         expected_conditions.visibility_of_element_located(
-                            (By.XPATH, streamBetMainDiv)
+                            (By.XPATH, Selectors.betMainDivXP)
                         )
                     )
                     div_bet_is_open = True
@@ -388,9 +377,9 @@ class TwitchBrowser:
 
     def __open_coins_menu(self, event: EventPrediction):
         logger.info(f"Opening coins menu for {event}", extra={"emoji": ":wrench:"})
-        status = self.__click_when_exist(streamCoinsMenuXP, By.XPATH)
+        status = self.__click_when_exist(Selectors.coinsMenuXP, By.XPATH)
         if status is False:
-            status = self.__execute_script(streamCoinsMenuJS)
+            status = self.__execute_script(Javascript.streamCoinsMenu)
 
         if status is True:
             time.sleep(random.uniform(0.01, 0.1))
@@ -400,11 +389,11 @@ class TwitchBrowser:
 
     def __click_on_bet(self, event, maximize_div=True):
         logger.info(f"Clicking on the bet for {event}", extra={"emoji": ":wrench:"})
-        if self.__click_when_exist(streamBetTitleInBet, By.CSS_SELECTOR) is True:
+        if self.__click_when_exist(Selectors.betTitle, By.CSS_SELECTOR) is True:
             time.sleep(random.uniform(0.01, 0.1))
             if maximize_div is True:
                 # Edit the css for make the window full-screen in browser. Another useless change
-                self.__execute_script(maximizeBetWindowJS, suppress_error=True)
+                self.__execute_script(Javascript.maximizeBetWindow, suppress_error=True)
             self.__debug(event, "click_on_bet")
             return True
         return False
@@ -417,12 +406,12 @@ class TwitchBrowser:
 
         if scroll_down is True:
             time.sleep(random.uniform(0.01, 0.1))
-            if self.__execute_script(scrollDownBetWindowJS) is False:
+            if self.__execute_script(Javascript.scrollDownBetWindow) is False:
                 logger.error("Unable to scroll down in the bet window!")
 
-        status = self.__click_when_exist(streamBetCustomVoteXP, By.CSS_SELECTOR)
+        status = self.__click_when_exist(Selectors.betCustomVote, By.CSS_SELECTOR)
         if status is False:
-            status = self.__execute_script(streamBetCustomVoteJS)
+            status = self.__execute_script(Javascript.betCustomVote)
 
         if status is True:
             time.sleep(random.uniform(0.01, 0.1))
@@ -439,11 +428,11 @@ class TwitchBrowser:
     def __send_text_on_bet(self, event, selector_index, text):
         self.__debug(event, "before__send_text")
         status = self.__send_text(
-            f"{streamBetVoteInputXP}[{selector_index}]", text, By.XPATH
+            f"{Selectors.betVoteInputXP}[{selector_index}]", text, By.XPATH
         )
         if status is False:
             status = self.__execute_script(
-                streamBetVoteInputJS.format(int(selector_index) - 1, int(text))
+                Javascript.betVoteInput.format(int(selector_index) - 1, int(text))
             )
 
         if status is True:
@@ -453,11 +442,11 @@ class TwitchBrowser:
 
     def __click_on_vote(self, event, selector_index):
         status = self.__click_when_exist(
-            f"{streamBetVoteButtonXP}[{selector_index}]", By.XPATH
+            f"{Selectors.betVoteButtonXP}[{selector_index}]", By.XPATH
         )
         if status is False:
             status = self.__execute_script(
-                streamBetVoteButtonJS.format(int(selector_index) - 1)
+                Javascript.betVoteButton.format(int(selector_index) - 1)
             )
 
         if status is True:
