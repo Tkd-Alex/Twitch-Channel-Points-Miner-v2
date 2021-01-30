@@ -1,10 +1,12 @@
 import logging
-import emoji
-import platform
 import os
-
-from pathlib import Path
+import platform
 from datetime import datetime
+from pathlib import Path
+
+import emoji
+
+from TwitchChannelPointsMiner.utils import remove_emoji
 
 
 class EmojiFormatter(logging.Formatter):
@@ -26,8 +28,13 @@ class EmojiFormatter(logging.Formatter):
             )
             record.emoji_is_present = True
 
-        if "\u2192" in record.msg and self.print_emoji is False:
-            record.msg = record.msg.replace("\u2192", "-->")
+        if self.print_emoji is False:
+            if "\u2192" in record.msg:
+                record.msg = record.msg.replace("\u2192", "-->")
+
+            # With the update of Stream class It's possible that the Stream Title contains emoji
+            # Full remove using a method from utils.
+            record.msg = remove_emoji(record.msg)
 
         return super().format(record)
 

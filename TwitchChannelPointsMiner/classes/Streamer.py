@@ -1,9 +1,10 @@
-import time
 import logging
+import time
 
 from millify import prettify
 
-from TwitchChannelPointsMiner.constants import TWITCH_URL
+from TwitchChannelPointsMiner.classes.Stream import Stream
+from TwitchChannelPointsMiner.constants.twitch import URL
 
 logger = logging.getLogger(__name__)
 
@@ -20,13 +21,13 @@ class Streamer:
         self.minute_watched_requests = None
         self.viewer_is_mod = False
 
-        self.__init_watch_streak()
+        self.stream = Stream(less_printing=less_printing)
 
         self.raid = None
         self.history = {}
 
-        self.streamer_url = f"{TWITCH_URL}/{self.username}"
-        self.chat_url = f"{TWITCH_URL}/popout/{self.username}/chat?popout="
+        self.streamer_url = f"{URL}/{self.username}"
+        self.chat_url = f"{URL}/popout/{self.username}/chat?popout="
 
         self.less_printing = less_printing
 
@@ -55,16 +56,9 @@ class Streamer:
         if self.is_online is False:
             self.online_at = time.time()
             self.is_online = True
-            self.__init_watch_streak()
+            self.stream.init_watch_streak()
 
         logger.info(f"{self} is Online!", extra={"emoji": ":partying_face:"})
-
-    def update_minute_watched(self):
-        if self.minute_watched_timestamp != 0:
-            self.minute_watched += round(
-                (time.time() - self.minute_watched_timestamp) / 60, 5
-            )
-        self.minute_watched_timestamp = time.time()
 
     def print_history(self):
         return ", ".join(
@@ -81,15 +75,10 @@ class Streamer:
         self.history[reason_code]["amount"] += earned
 
         if reason_code == "WATCH_STREAK":
-            self.watch_streak_missing = False
+            self.stream.watch_streak_missing = False
 
     def set_less_printing(self, value):
         self.less_printing = value
-
-    def __init_watch_streak(self):
-        self.watch_streak_missing = True
-        self.minute_watched = 0
-        self.minute_watched_timestamp = 0
 
     def stream_up_elapsed(self):
         return self.stream_up == 0 or ((time.time() - self.stream_up) > 120)

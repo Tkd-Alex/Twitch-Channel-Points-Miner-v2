@@ -1,7 +1,7 @@
-import logging
 import copy
-
+import logging
 from enum import Enum, auto
+
 from millify import millify
 
 from TwitchChannelPointsMiner.utils import float_round
@@ -37,7 +37,7 @@ class Bet:
     def __init__(self, outcomes: list, settings: BetSettings):
         self.outcomes = outcomes
         self.__clear_outcomes()
-        self.decision = None
+        self.decision: dict = {}
         self.total_users = 0
         self.total_points = 0
         self.settings = settings
@@ -99,11 +99,11 @@ class Bet:
                 if key not in self.outcomes[index]:
                     self.outcomes[index][key] = 0
 
-    def __return_choice(self, key):
+    def __return_choice(self, key) -> str:
         return "A" if self.outcomes[0][key] > self.outcomes[1][key] else "B"
 
-    def calculate(self, balance: int):
-        self.decision = {"choice": "", "amount": 0, "id": None}
+    def calculate(self, balance: int) -> dict:
+        self.decision = {"choice": None, "amount": 0, "id": None}
         if self.settings.strategy == Strategy.MOST_VOTED:
             self.decision["choice"] = self.__return_choice("total_users")
         elif self.settings.strategy == Strategy.HIGH_ODDS:
@@ -121,7 +121,7 @@ class Bet:
                 else self.__return_choice("total_users")
             )
 
-        if self.decision["choice"] != "":
+        if self.decision["choice"] is not None:
             self.decision["id"] = (
                 self.outcomes[0]["id"]
                 if self.decision["choice"] == "A"
