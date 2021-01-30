@@ -4,7 +4,6 @@ from enum import Enum, auto
 
 from millify import millify
 
-from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.utils import float_round
 
 logger = logging.getLogger(__name__)

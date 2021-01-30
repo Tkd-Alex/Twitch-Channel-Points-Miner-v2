@@ -61,7 +61,10 @@ class Twitch:
                 "user_id": self.twitch_login.get_user_id(),
             }
 
-            if streamer.stream.game_name() is not None and streamer.settings.claim_drops is True:
+            if (
+                streamer.stream.game_name() is not None
+                and streamer.settings.claim_drops is True
+            ):
                 event_properties["game"] = streamer.stream.game_name()
 
             streamer.stream.payload = [

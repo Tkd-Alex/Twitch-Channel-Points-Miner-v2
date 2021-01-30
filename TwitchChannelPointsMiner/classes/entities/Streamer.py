@@ -10,19 +10,22 @@ from TwitchChannelPointsMiner.constants.twitch import URL
 
 logger = logging.getLogger(__name__)
 
+
 class StreamerSettings(object):
-    def __init__(self,
+    def __init__(
+        self,
         make_predictions: bool = True,
         follow_raid: bool = True,
         claim_drops: bool = True,
         watch_streak: bool = True,
-        bet: BetSettings = BetSettings()
+        bet: BetSettings = BetSettings(),
     ):
         self.make_predictions = make_predictions
         self.follow_raid = follow_raid
         self.claim_drops = claim_drops
         self.watch_streak = watch_streak
         self.bet = bet
+
 
 class Streamer(object):
     def __init__(self, username, settings=None):
