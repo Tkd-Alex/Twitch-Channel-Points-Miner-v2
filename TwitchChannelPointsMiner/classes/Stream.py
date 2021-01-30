@@ -26,7 +26,7 @@ class Stream:
 
         self.less_printing = less_printing
 
-    def encode_payload(self):
+    def encode_payload(self) -> dict:
         json_event = json.dumps(self.payload, separators=(",", ":"))
         return {"data": (b64encode(json_event.encode("utf-8"))).decode("utf-8")}
 

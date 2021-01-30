@@ -235,7 +235,7 @@ class TwitchBrowser:
 
     def __click_when_exist(
         self, selector, by: By = By.CSS_SELECTOR, suppress_error=False, timeout=None
-    ):
+    ) -> bool:
         timeout = self.settings.timeout if timeout is None else timeout
         try:
             element = WebDriverWait(self.browser, timeout).until(
@@ -250,7 +250,7 @@ class TwitchBrowser:
 
     def __send_text(
         self, selector, text, by: By = By.CSS_SELECTOR, suppress_error=False
-    ):
+    ) -> bool:
         try:
             element = WebDriverWait(self.browser, self.settings.timeout).until(
                 expected_conditions.element_to_be_clickable((by, selector))
@@ -292,7 +292,7 @@ class TwitchBrowser:
             self.__blank()  # If we fail return to blank page
         return False, time.time() - start_time
 
-    def __bet_chains_methods(self, event):
+    def __bet_chains_methods(self, event) -> bool:
         if self.__open_coins_menu(event) is True:
             if self.__click_on_bet(event) is True:
                 if self.__enable_custom_bet_value(event) is True:
@@ -330,7 +330,7 @@ class TwitchBrowser:
 
                 if div_bet_is_open is True:
                     decision = event.bet.calculate(event.streamer.channel_points)
-                    if decision["choice"]:
+                    if decision["choice"] is not None:
                         selector_index = 1 if decision["choice"] == "A" else 2
                         logger.info(
                             f"Decision: {event.bet.get_outcome(selector_index - 1)}",
@@ -374,7 +374,7 @@ class TwitchBrowser:
         self.browser.get("about:blank")
         self.currently_is_betting = False
 
-    def __open_coins_menu(self, event: EventPrediction):
+    def __open_coins_menu(self, event: EventPrediction) -> bool:
         logger.info(f"Opening coins menu for {event}", extra={"emoji": ":wrench:"})
         status = self.__click_when_exist(Selectors.coinsMenuXP, By.XPATH)
         if status is False:
@@ -386,7 +386,7 @@ class TwitchBrowser:
             return True
         return False
 
-    def __click_on_bet(self, event, maximize_div=True):
+    def __click_on_bet(self, event, maximize_div=True) -> bool:
         logger.info(f"Clicking on the bet for {event}", extra={"emoji": ":wrench:"})
         if self.__click_when_exist(Selectors.betTitle, By.CSS_SELECTOR) is True:
             time.sleep(random.uniform(0.01, 0.1))
@@ -397,7 +397,7 @@ class TwitchBrowser:
             return True
         return False
 
-    def __enable_custom_bet_value(self, event, scroll_down=True):
+    def __enable_custom_bet_value(self, event, scroll_down=True) -> bool:
         logger.info(
             f"Enable input of custom value for {event}",
             extra={"emoji": ":wrench:"},
@@ -424,7 +424,7 @@ class TwitchBrowser:
             )
         return False
 
-    def __send_text_on_bet(self, event, selector_index, text):
+    def __send_text_on_bet(self, event, selector_index, text) -> bool:
         self.__debug(event, "before__send_text")
         status = self.__send_text(
             f"{Selectors.betVoteInputXP}[{selector_index}]", text, By.XPATH
@@ -439,7 +439,7 @@ class TwitchBrowser:
             return True
         return False
 
-    def __click_on_vote(self, event, selector_index):
+    def __click_on_vote(self, event, selector_index) -> bool:
         status = self.__click_when_exist(
             f"{Selectors.betVoteButtonXP}[{selector_index}]", By.XPATH
         )

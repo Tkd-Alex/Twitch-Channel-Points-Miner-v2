@@ -7,7 +7,7 @@ from random import randrange
 from TwitchChannelPointsMiner.constants.browser import USER_AGENTS
 
 
-def get_streamer_index(streamers, channel_id):
+def get_streamer_index(streamers: list, channel_id) -> int:
     try:
         return next(
             i for i, x in enumerate(streamers) if str(x.channel_id) == str(channel_id)
@@ -34,7 +34,7 @@ def calculate_start_after(closing_bet_after, execution_time):
 
 
 # https://en.wikipedia.org/wiki/Cryptographic_nonce
-def create_nonce(length=30):
+def create_nonce(length=30) -> str:
     nonce = ""
     for i in range(length):
         char_index = randrange(0, 10 + 26 + 26)
@@ -48,7 +48,7 @@ def create_nonce(length=30):
     return nonce
 
 
-def bet_condition(twitch_browser, event, logger):
+def bet_condition(twitch_browser, event, logger) -> bool:
     if twitch_browser.currently_is_betting is True:
         logger.info(
             f"Sorry, unable to start {event}, the browser is currently betting on another event!"
@@ -65,7 +65,7 @@ def bet_condition(twitch_browser, event, logger):
     return True
 
 
-def get_user_agent(browser):
+def get_user_agent(browser) -> str:
     try:
         return USER_AGENTS[platform.system()][
             browser.name if type(browser) != str else browser
@@ -74,7 +74,7 @@ def get_user_agent(browser):
         return USER_AGENTS["Linux"]["FIREFOX"]
 
 
-def remove_emoji(string):
+def remove_emoji(string: str) -> str:
     emoji_pattern = re.compile(
         "["
         "\U0001F600-\U0001F64F"  # emoticons
