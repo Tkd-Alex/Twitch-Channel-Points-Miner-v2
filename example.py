@@ -28,10 +28,10 @@ twitch_miner = TwitchChannelPointsMiner(
         claim_drops=True,               # We can't filter rewards base on stream. Set to False for skip viewing counter increase and you will never obtain a drop reward from this script. Issue #21
         watch_streak=True,              # If a streamer go online change the priotiry of streamers array and catch the watch screak. Issue #11
         bet=BetSettings(
-            strategy=Strategy.SMART,        # Choose you strategy!
-            percentage=5,                   # Place the x% of your channel points
-            percentage_gap=20,              # Gap difference between outcomesA and outcomesB (for SMART stragegy)
-            max_points=50000,               # If the x percentage of your channel points is gt bet_max_points set this value
+            strategy=Strategy.SMART,    # Choose you strategy!
+            percentage=5,               # Place the x% of your channel points
+            percentage_gap=20,          # Gap difference between outcomesA and outcomesB (for SMART stragegy)
+            max_points=50000,           # If the x percentage of your channel points is gt bet_max_points set this value
         )
     )
 )

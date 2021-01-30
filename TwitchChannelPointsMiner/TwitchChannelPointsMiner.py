@@ -25,7 +25,10 @@ from TwitchChannelPointsMiner.classes.TwitchBrowser import (
 )
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
-from TwitchChannelPointsMiner.utils import get_user_agent
+from TwitchChannelPointsMiner.utils import (
+    at_least_one_value_in_settings_is,
+    get_user_agent,
+)
 
 # Suppress warning for urllib3.connectionpool (selenium close connection)
 # Suppress also the selenium logger please
@@ -154,16 +157,14 @@ class TwitchChannelPointsMiner:
                 self.twitch.check_streamer_online(streamer)
                 self.twitch.viewer_is_mod(streamer)
                 if streamer.viewer_is_mod is True:
-                    streamer.settings.make_prediction = False
+                    streamer.settings.make_predictions = False
 
             self.original_streamers = copy.deepcopy(self.streamers)
 
             # If we have at least one streamer with settings = make_predictions True
-            make_predictions = [
-                streamer
-                for streamer in self.streamers
-                if streamer.settings.make_predictions is True
-            ] != []
+            make_predictions = at_least_one_value_in_settings_is(
+                self.streamers, "make_predictions", True
+            )
             # We need a browser to make predictions / bet
             if make_predictions is True:
                 self.twitch_browser = TwitchBrowser(
@@ -177,7 +178,9 @@ class TwitchChannelPointsMiner:
                 target=self.twitch.send_minute_watched_events,
                 args=(
                     self.streamers,
-                    self.watch_streak,
+                    at_least_one_value_in_settings_is(
+                        self.streamers, "watch_streak", True
+                    ),
                 ),
             )
             self.minute_watcher_thread.start()
@@ -199,11 +202,9 @@ class TwitchChannelPointsMiner:
 
             # If we have at least one streamer with settings = claim_drops True
             # Going to subscribe to user-drop-events. Get update for drop-progress
-            claim_drops = [
-                streamer
-                for streamer in self.streamers
-                if streamer.settings.claim_drops is True
-            ] != []
+            claim_drops = at_least_one_value_in_settings_is(
+                self.streamers, "claim_drops", True
+            )
             if claim_drops is True:
                 self.ws_pool.submit(
                     PubsubTopic(
@@ -229,7 +230,7 @@ class TwitchChannelPointsMiner:
                 if streamer.settings.follow_raid is True:
                     self.ws_pool.submit(PubsubTopic("raid", streamer=streamer))
 
-                if streamer.settings.make_prediction is True:
+                if streamer.settings.make_predictions is True:
                     self.ws_pool.submit(
                         PubsubTopic("predictions-channel-v1", streamer=streamer)
                     )
