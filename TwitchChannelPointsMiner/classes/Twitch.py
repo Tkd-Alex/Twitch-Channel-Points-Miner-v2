@@ -170,7 +170,7 @@ class Twitch:
         for campaign in inventory["dropCampaignsInProgress"]:
             for drop in campaign["timeBasedDrops"]:
                 if drop["self"]["dropInstanceID"] is not None:
-                    self.claim_drop(drop["dropInstanceID"])
+                    self.claim_drop(drop["self"]["dropInstanceID"])
                     time.sleep(random.uniform(10, 30))
 
     def __get_inventory(self):
