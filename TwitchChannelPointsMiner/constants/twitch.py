@@ -81,3 +81,12 @@ class GQLOperations:
             }
         },
     }
+    MakePrediction = {
+        "operationName": "MakePrediction",
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "b44682ecc88358817009f20e69d75081b1e58825bb40aa53d5dbadcc17c881d8",
+            }
+        },
+    }
