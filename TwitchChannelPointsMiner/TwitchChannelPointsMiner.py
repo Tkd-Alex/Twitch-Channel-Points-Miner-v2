@@ -134,6 +134,8 @@ class TwitchChannelPointsMiner:
                     # If no settings was provided use the default settings
                     if streamer.settings is None:
                         streamer.settings = Settings.streamer_settings
+                    elif streamer.settings.bet is None:
+                        streamer.settings.bet = Settings.streamer_settings.bet
 
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:
