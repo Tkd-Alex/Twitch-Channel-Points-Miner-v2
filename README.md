@@ -137,7 +137,7 @@ For the bet system the script use Selenium. Could be usefull understand how to M
 import logging
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings
-from TwitchChannelPointsMiner.classes.Bet import Strategy, BetSettings
+from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings
 from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser, BrowserSettings
 
 twitch_miner = TwitchChannelPointsMiner(
@@ -196,7 +196,7 @@ If the browser are currently betting or wait for more data It's impossible to in
 - **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same of select LOWEST_ODDS
 - **SMART**: If the majority in percent chose an option then follow the other users, otherwise choose the option with the highest odds
 
-![Screenshot](./assets/prediction_screen.png)
+![Screenshot](./assets/prediction.png)
 
 Here a concrete example:
 

@@ -1,5 +1,5 @@
-from TwitchChannelPointsMiner.classes.Bet import Bet, BetSettings
-from TwitchChannelPointsMiner.classes.Streamer import Streamer
+from TwitchChannelPointsMiner.classes.entities.Bet import Bet, BetSettings
+from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer
 from TwitchChannelPointsMiner.utils import float_round
 
 

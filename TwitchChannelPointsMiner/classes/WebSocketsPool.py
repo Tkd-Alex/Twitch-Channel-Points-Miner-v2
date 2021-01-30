@@ -7,10 +7,10 @@ import time
 from dateutil import parser
 from millify import millify
 
-from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
+from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
+from TwitchChannelPointsMiner.classes.entities.Message import Message
+from TwitchChannelPointsMiner.classes.entities.Raid import Raid
 from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
-from TwitchChannelPointsMiner.classes.Message import Message
-from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants.twitch import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (

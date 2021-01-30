@@ -11,11 +11,11 @@ import uuid
 from collections import OrderedDict
 from datetime import datetime
 
-from TwitchChannelPointsMiner.classes.Bet import BetSettings
+from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
+from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
+from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
-from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
-from TwitchChannelPointsMiner.classes.Streamer import Streamer
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
 from TwitchChannelPointsMiner.classes.TwitchBrowser import (
     BrowserSettings,

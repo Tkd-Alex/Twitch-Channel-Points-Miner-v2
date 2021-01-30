@@ -3,7 +3,7 @@ import time
 
 from millify import prettify
 
-from TwitchChannelPointsMiner.classes.Stream import Stream
+from TwitchChannelPointsMiner.classes.entities.Stream import Stream
 from TwitchChannelPointsMiner.constants.twitch import URL
 
 logger = logging.getLogger(__name__)
