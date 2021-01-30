@@ -23,10 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 class WebSocketsPool:
-    def __init__(self, twitch, twitch_browser, streamers, events_predictions):
+    def __init__(self, twitch, browser, streamers, events_predictions):
         self.ws = None
         self.twitch = twitch
-        self.twitch_browser = twitch_browser
+        self.browser = browser
         self.streamers = streamers
         self.events_predictions = events_predictions
 
@@ -199,7 +199,7 @@ class WebSocketsPool:
                                     ws.streamers[streamer_index].is_online
                                     and event.closing_bet_after(current_tmsp) > 0
                                     and bet_condition(
-                                        ws.twitch_browser,
+                                        ws.browser,
                                         event,
                                         logger,
                                     )
@@ -209,7 +209,7 @@ class WebSocketsPool:
                                     (
                                         start_bet_status,
                                         execution_time,
-                                    ) = ws.twitch_browser.start_bet(
+                                    ) = ws.browser.start_bet(
                                         ws.events_predictions[event_id]
                                     )
                                     if start_bet_status is True:
@@ -221,7 +221,7 @@ class WebSocketsPool:
 
                                         place_bet_thread = threading.Timer(
                                             start_after,
-                                            ws.twitch_browser.place_bet,
+                                            ws.browser.place_bet,
                                             (ws.events_predictions[event_id],),
                                         )
                                         place_bet_thread.daemon = True
@@ -242,7 +242,7 @@ class WebSocketsPool:
                             # Game over we can't update anymore the values... The bet was placed!
                             if (
                                 ws.events_predictions[event_id].bet_placed is False
-                                and ws.events_predictions[event_id].bet.decision is None
+                                and ws.events_predictions[event_id].bet.decision == {}
                             ):
                                 ws.events_predictions[event_id].bet.update_outcomes(
                                     event_dict["outcomes"]

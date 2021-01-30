@@ -39,7 +39,7 @@ class TwitchWebSocket(WebSocketApp):
         self.pending_topics = []
 
         self.twitch = parent_pool.twitch
-        self.twitch_browser = parent_pool.twitch_browser
+        self.browser = parent_pool.browser
         self.streamers = parent_pool.streamers
         self.events_predictions = parent_pool.events_predictions
 

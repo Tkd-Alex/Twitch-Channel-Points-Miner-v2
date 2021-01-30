@@ -27,7 +27,7 @@ class EventPrediction:
         self.box_fillable = False
         self.bet_confirmed = False
         self.bet_placed = False
-        self.bet = Bet(outcomes)
+        self.bet = Bet(outcomes, streamer.settings.bet)
 
     def __repr__(self):
         return f"EventPrediction(event_id={self.event_id}, title={self.title})"

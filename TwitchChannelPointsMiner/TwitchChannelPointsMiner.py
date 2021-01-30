@@ -11,9 +11,8 @@ import uuid
 from collections import OrderedDict
 from datetime import datetime
 
-from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
-from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer
+from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
@@ -43,18 +42,14 @@ class TwitchChannelPointsMiner:
         logger_settings: LoggerSettings = LoggerSettings(),
         browser_settings: BrowserSettings = BrowserSettings(),
         # Default values for all streamers
-        bet_settings: BetSettings = BetSettings(),
-        make_predictions: bool = True,
-        follow_raid: bool = True,
-        watch_streak: bool = False,
-        drops_events: bool = False,
+        streamer_settings: StreamerSettings = StreamerSettings()
     ):
         self.username = username
 
         # Set as globally config
         Settings.logger = logger_settings
         Settings.browser = browser_settings
-        Settings.bet = bet_settings
+        Settings.streamer_settings = streamer_settings
 
         user_agent = get_user_agent(browser_settings.browser)
         self.twitch = Twitch(self.username, user_agent)
@@ -99,51 +94,72 @@ class TwitchChannelPointsMiner:
             if self.claim_drops_startup is True:
                 self.twitch.claim_all_drops_from_inventory()
 
-            # Clear streamers array
-            # Remove duplicate 3. Preserving Order: Use OrderedDict (askpython .com)
-            streamers = [streamer_name.lower().strip() for streamer_name in streamers]
-            streamers = list(OrderedDict.fromkeys(streamers))
+            streamers_name: list = []
+            streamers_dict: dict = {}
+
+            for streamer in streamers:
+                username = streamer.username if isinstance(streamer, Streamer) else streamer.lower().strip()
+                streamers_name.append(username)
+                streamers_dict[username] = streamer
 
             if followers is True:
-                # Append at the end with lowest priority
                 followers_array = self.twitch.get_followers()
                 logger.info(
                     f"Load {len(followers_array)} followers from your profile!",
                     extra={"emoji": ":clipboard:"},
                 )
-                streamers += [fw for fw in followers_array if fw not in streamers]
+            else:
+                followers_array = []
+
+            streamers_name = list(OrderedDict.fromkeys(streamers_name + followers_array))
 
             logger.info(
                 f"Loading data for {len(streamers)} streamers. Please wait...",
                 extra={"emoji": ":nerd_face:"},
             )
-            for streamer_username in streamers:
+            for username in streamers_name:
                 time.sleep(random.uniform(0.3, 0.7))
-                streamer_username.lower().strip()
                 try:
-                    channel_id = self.twitch.get_channel_id(streamer_username)
-                    streamer = Streamer(streamer_username, channel_id)
+
+                    if isinstance(streamers_dict[username], Streamer) is True:
+                        streamer = streamers_dict[username]
+                    else:
+                        streamer = Streamer(username)
+
+                    streamer.channel_id = self.twitch.get_channel_id(username)
+                    # If no settings was provided use the default settings
+                    if streamer.settings is None:
+                        streamer.settings = Settings.streamer_settings
+
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:
                     logger.info(
-                        f"Streamer {streamer_username} does not exist",
+                        f"Streamer {username} does not exist",
                         extra={"emoji": ":cry:"},
                     )
 
+            # Populate the streamers with default values.
+            # 1. Load channel points and auto-claim bonus
+            # 2. Check if streamers is online
+            # 3. Check if the user is a Streamer. In thi case you can't do prediction
             for streamer in self.streamers:
                 time.sleep(random.uniform(0.3, 0.7))
                 self.twitch.load_channel_points_context(streamer)
                 self.twitch.check_streamer_online(streamer)
                 self.twitch.viewer_is_mod(streamer)
+                if streamer.viewer_is_mod is True:
+                    streamer.settings.make_prediction = False
+
             self.original_streamers = copy.deepcopy(self.streamers)
 
-            if (
-                self.make_predictions is True
-            ):  # We need a browser to make predictions / bet
+            # If we have at least one streamer with settings = make_predictions True
+            make_predictions = [streamer for streamer in self.streamers if streamer.settings.make_predictions is True] != []
+            # We need a browser to make predictions / bet
+            if make_predictions is True:
                 self.twitch_browser = TwitchBrowser(
                     self.twitch.twitch_login.get_auth_token(),
                     self.session_id,
-                    settings=self.browser_settings,
+                    settings=Settings.browser,
                 )
                 self.twitch_browser.init()
 
@@ -154,32 +170,33 @@ class TwitchChannelPointsMiner:
                     self.watch_streak,
                 ),
             )
-            # self.minute_watcher_thread.daemon = True
             self.minute_watcher_thread.start()
 
             self.ws_pool = WebSocketsPool(
                 twitch=self.twitch,
-                twitch_browser=self.twitch_browser,
+                browser=self.twitch_browser,
                 streamers=self.streamers,
                 events_predictions=self.events_predictions,
             )
-            topics = [
-                PubsubTopic(
-                    "community-points-user-v1",
+
+            # Subscribe to community-points-user. Get update for points spent or gains
+            self.ws_pool.submit(PubsubTopic(
+                "community-points-user-v1",
+                user_id=self.twitch.twitch_login.get_user_id(),
+            ))
+
+            # If we have at least one streamer with settings = claim_drops True
+            # Going to subscribe to user-drop-events. Get update for drop-progress
+            claim_drops = [streamer for streamer in self.streamers if streamer.settings.claim_drops is True] != []
+            if claim_drops is True:
+                self.ws_pool.submit(PubsubTopic(
+                    "user-drop-events",
                     user_id=self.twitch.twitch_login.get_user_id(),
-                )
-            ]
+                ))
 
-            if self.drops_events is True:
-                topics.append(
-                    PubsubTopic(
-                        "user-drop-events",
-                        user_id=self.twitch.twitch_login.get_user_id(),
-                    ),
-                )
-
-            if self.make_predictions is True:
-                topics.append(
+            # Going to subscribe to predictions-user-v1. Get update when we place a new prediction (confirm)
+            if make_predictions is True:
+                self.ws_pool.submit(
                     PubsubTopic(
                         "predictions-user-v1",
                         user_id=self.twitch.twitch_login.get_user_id(),
@@ -187,18 +204,15 @@ class TwitchChannelPointsMiner:
                 )
 
             for streamer in self.streamers:
-                topics.append(PubsubTopic("video-playback-by-id", streamer=streamer))
+                self.ws_pool.submit(PubsubTopic("video-playback-by-id", streamer=streamer))
 
-                if self.follow_raid is True:
-                    topics.append(PubsubTopic("raid", streamer=streamer))
+                if streamer.settings.follow_raid is True:
+                    self.ws_pool.submit(PubsubTopic("raid", streamer=streamer))
 
-                if self.make_predictions is True:
-                    topics.append(
+                if streamer.settings.make_prediction is True:
+                    self.ws_pool.submit(
                         PubsubTopic("predictions-channel-v1", streamer=streamer)
                     )
-
-            for topic in topics:
-                self.ws_pool.submit(topic)
 
             while self.running:
                 time.sleep(random.uniform(20, 60))
@@ -240,10 +254,9 @@ class TwitchChannelPointsMiner:
         )
 
         if self.make_predictions:
-            print("")
-            # logger.info(f"{self.bet_settings}", extra={"emoji": ":bar_chart:"})
             for event_id in self.events_predictions:
                 if self.events_predictions[event_id].bet_confirmed is True:
+                    logger.info(f"{self.events_predictions[event_id].streamer.bet.settings}", extra={"emoji": ":bar_chart:"})
                     logger.info(
                         f"{self.events_predictions[event_id].print_recap()}",
                         extra={"emoji": ":bar_chart:"},
@@ -252,7 +265,7 @@ class TwitchChannelPointsMiner:
 
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
-                f"{self.streamers[streamer_index]}, Total Points Gained (after farming - before farming): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
+                f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
                 extra={"emoji": ":robot:"},
             )
             if self.streamers[streamer_index].history != {}:

@@ -35,13 +35,13 @@ class BetSettings:
 
 
 class Bet:
-    def __init__(self, outcomes: list):
+    def __init__(self, outcomes: list, settings: BetSettings):
         self.outcomes = outcomes
         self.__clear_outcomes()
         self.decision: dict = {}
         self.total_users = 0
         self.total_points = 0
-        self.settings = Settings.bet
+        self.settings = settings
 
     def update_outcomes(self, outcomes):
         self.outcomes[0]["total_users"] = int(outcomes[0]["total_users"])

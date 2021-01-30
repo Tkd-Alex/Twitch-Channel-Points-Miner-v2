@@ -61,7 +61,7 @@ class Twitch:
                 "user_id": self.twitch_login.get_user_id(),
             }
 
-            if streamer.stream.game_name() is not None:
+            if streamer.stream.game_name() is not None and streamer.settings.claim_drops is True:
                 event_properties["game"] = streamer.stream.game_name()
 
             streamer.stream.payload = [
@@ -229,7 +229,8 @@ class Twitch:
             if watch_streak is True:
                 for index in streamers_index:
                     if (
-                        streamers[index].stream.watch_streak_missing is True
+                        streamers[index].settings.watch_streak is True
+                        and streamers[index].stream.watch_streak_missing is True
                         and (
                             streamers[index].offline_at == 0
                             or ((time.time() - streamers[index].offline_at) // 60) > 30

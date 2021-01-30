@@ -3,17 +3,32 @@ import time
 
 from millify import prettify
 
+from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.Stream import Stream
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.constants.twitch import URL
 
 logger = logging.getLogger(__name__)
 
+class StreamerSettings(object):
+    def __init__(self,
+        make_predictions: bool = True,
+        follow_raid: bool = True,
+        claim_drops: bool = True,
+        watch_streak: bool = True,
+        bet: BetSettings = BetSettings()
+    ):
+        self.make_predictions = make_predictions
+        self.follow_raid = follow_raid
+        self.claim_drops = claim_drops
+        self.watch_streak = watch_streak
+        self.bet = bet
 
-class Streamer:
-    def __init__(self, username, channel_id):
-        self.username = username
-        self.channel_id = channel_id
+class Streamer(object):
+    def __init__(self, username, settings=None):
+        self.username = username.lower().strip()
+        self.channel_id = 0
+        self.settings = settings
         self.is_online = False
         self.stream_up = 0
         self.online_at = 0
