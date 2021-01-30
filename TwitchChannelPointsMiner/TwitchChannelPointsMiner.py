@@ -15,13 +15,14 @@ from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
-from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
+from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
 from TwitchChannelPointsMiner.classes.TwitchBrowser import (
     BrowserSettings,
     TwitchBrowser,
 )
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
+from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.utils import get_user_agent
 
 # Suppress warning for urllib3.connectionpool (selenium close connection)
@@ -36,22 +37,28 @@ class TwitchChannelPointsMiner:
     def __init__(
         self,
         username: str,
+        claim_drops_startup: bool = False,
+        # Settings for logging and selenium as you can see.
+        # This settings will be global shared trought Settings class
+        logger_settings: LoggerSettings = LoggerSettings(),
+        browser_settings: BrowserSettings = BrowserSettings(),
+        # Default values for all streamers
+        bet_settings: BetSettings = BetSettings(),
         make_predictions: bool = True,
         follow_raid: bool = True,
         watch_streak: bool = False,
-        claim_drops_startup: bool = False,
         drops_events: bool = False,
-        logger_settings: LoggerSettings = LoggerSettings(),
-        browser_settings: BrowserSettings = BrowserSettings(),
-        bet_settings: BetSettings = BetSettings(),
     ):
         self.username = username
-        self.browser_settings = browser_settings
-        self.bet_settings = bet_settings
 
-        self.twitch = Twitch(
-            self.username, get_user_agent(self.browser_settings.browser)
-        )
+        # Set as globally config
+        Settings.logger = logger_settings
+        Settings.browser = browser_settings
+        Settings.bet = bet_settings
+
+        user_agent = get_user_agent(browser_settings.browser)
+        self.twitch = Twitch(self.username, user_agent)
+
         self.twitch_browser = None
         self.follow_raid = follow_raid
         self.watch_streak = watch_streak
@@ -69,12 +76,10 @@ class TwitchChannelPointsMiner:
         self.start_datetime = None
         self.original_streamers = []
 
-        self.logger_settings = logger_settings
-        self.logs_file = configure_loggers(self.username, self.logger_settings)
+        self.logs_file = configure_loggers(self.username, logger_settings)
 
-        signal.signal(signal.SIGINT, self.end)
-        signal.signal(signal.SIGSEGV, self.end)
-        signal.signal(signal.SIGTERM, self.end)
+        for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
+            signal.signal(sign, self.end)
 
     def mine(self, streamers: list = [], followers=False):
         self.run(streamers, followers)
@@ -117,11 +122,7 @@ class TwitchChannelPointsMiner:
                 streamer_username.lower().strip()
                 try:
                     channel_id = self.twitch.get_channel_id(streamer_username)
-                    streamer = Streamer(
-                        streamer_username,
-                        channel_id,
-                        less_printing=self.logger_settings.less,
-                    )
+                    streamer = Streamer(streamer_username, channel_id)
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:
                     logger.info(
@@ -131,9 +132,7 @@ class TwitchChannelPointsMiner:
 
             for streamer in self.streamers:
                 time.sleep(random.uniform(0.3, 0.7))
-                self.twitch.load_channel_points_context(
-                    streamer, less_printing=self.logger_settings.less
-                )
+                self.twitch.load_channel_points_context(streamer)
                 self.twitch.check_streamer_online(streamer)
                 self.twitch.viewer_is_mod(streamer)
             self.original_streamers = copy.deepcopy(self.streamers)
@@ -162,9 +161,7 @@ class TwitchChannelPointsMiner:
                 twitch=self.twitch,
                 twitch_browser=self.twitch_browser,
                 streamers=self.streamers,
-                bet_settings=self.bet_settings,
                 events_predictions=self.events_predictions,
-                less_printing=self.logger_settings.less,
             )
             topics = [
                 PubsubTopic(
@@ -244,10 +241,9 @@ class TwitchChannelPointsMiner:
 
         if self.make_predictions:
             print("")
-            logger.info(f"{self.bet_settings}", extra={"emoji": ":bar_chart:"})
+            # logger.info(f"{self.bet_settings}", extra={"emoji": ":bar_chart:"})
             for event_id in self.events_predictions:
                 if self.events_predictions[event_id].bet_confirmed is True:
-                    self.events_predictions[event_id].set_less_printing(False)
                     logger.info(
                         f"{self.events_predictions[event_id].print_recap()}",
                         extra={"emoji": ":bar_chart:"},
@@ -255,7 +251,6 @@ class TwitchChannelPointsMiner:
             print("")
 
         for streamer_index in range(0, len(self.streamers)):
-            self.streamers[streamer_index].set_less_printing(False)
             logger.info(
                 f"{self.streamers[streamer_index]}, Total Points Gained (after farming - before farming): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
                 extra={"emoji": ":robot:"},

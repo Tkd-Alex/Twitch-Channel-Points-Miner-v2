@@ -4,6 +4,7 @@ from enum import Enum, auto
 
 from millify import millify
 
+from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.utils import float_round
 
 logger = logging.getLogger(__name__)
@@ -34,13 +35,13 @@ class BetSettings:
 
 
 class Bet:
-    def __init__(self, outcomes: list, settings: BetSettings):
+    def __init__(self, outcomes: list):
         self.outcomes = outcomes
         self.__clear_outcomes()
         self.decision: dict = {}
         self.total_users = 0
         self.total_points = 0
-        self.settings = settings
+        self.settings = Settings.bet
 
     def update_outcomes(self, outcomes):
         self.outcomes[0]["total_users"] = int(outcomes[0]["total_users"])

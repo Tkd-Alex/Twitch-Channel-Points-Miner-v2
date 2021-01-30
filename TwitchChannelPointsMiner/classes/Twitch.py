@@ -19,6 +19,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerIsOfflineException,
     TimeBasedDropNotFound,
 )
+from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.constants.twitch import API, CLIENT_ID, GQLOperations
 
@@ -131,8 +132,8 @@ class Twitch:
             except StreamerIsOfflineException:
                 streamer.set_offline()
 
-    def claim_bonus(self, streamer, claim_id, less_printing=False):
-        if less_printing is False:
+    def claim_bonus(self, streamer, claim_id):
+        if Settings.logger.less is False:
             logger.info(
                 f"Claiming the bonus for {streamer}!", extra={"emoji": ":gift:"}
             )
@@ -178,7 +179,7 @@ class Twitch:
         return response["data"]["currentUser"]["inventory"]
 
     # Load the amount of current points for a channel, check if a bonus is available
-    def load_channel_points_context(self, streamer, less_printing=False):
+    def load_channel_points_context(self, streamer):
         json_data = copy.deepcopy(GQLOperations.ChannelPointsContext)
         json_data["variables"] = {"channelLogin": streamer.username}
 
@@ -190,11 +191,7 @@ class Twitch:
         streamer.channel_points = community_points["balance"]
 
         if community_points["availableClaim"] is not None:
-            self.claim_bonus(
-                streamer,
-                community_points["availableClaim"]["id"],
-                less_printing=less_printing,
-            )
+            self.claim_bonus(streamer, community_points["availableClaim"]["id"])
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)

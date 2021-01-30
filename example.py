@@ -2,7 +2,7 @@
 
 import logging
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
-from TwitchChannelPointsMiner.classes.Logger import LoggerSettings
+from TwitchChannelPointsMiner.logger import LoggerSettings
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings
 from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser, BrowserSettings
 
