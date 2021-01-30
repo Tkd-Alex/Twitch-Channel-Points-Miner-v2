@@ -6,23 +6,7 @@ on:
   pull_request:
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '>=3.6'
-
-      - name: Run black
-        uses: psf/black@stable
-        with:
-          args: "--check --diff --exclude='example.py'"
-
-  static-check:
+  static-check-lint:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -37,9 +21,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Pyflakes
+      - name: Install Requirements
         run: |
           pip3 install --upgrade pip
           pip3 install pyflakes
+          pip3 install black
+          pip3 install isort
+
       - name: Detect errors with pyflakes
         run: pyflakes TwitchChannelPointsMiner
+
+      - name: Lint with black
+        run: black TwitchChannelPointsMiner --check --diff
+
+      - name: Lint with isort
+        run: isort TwitchChannelPointsMiner --profile black --check --diff
