@@ -12,7 +12,7 @@ import random
 from datetime import datetime
 from collections import OrderedDict
 
-from TwitchChannelPointsMiner.utils import get_user_agent
+from TwitchChannelPointsMiner.utils import get_user_agent, millify
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
@@ -95,7 +95,7 @@ class TwitchChannelPointsMiner:
                 # Append at the end with lowest priority
                 followers_array = self.twitch.get_followers()
                 logger.info(
-                    f"Load {len(followers_array)} followers from your profile!",
+                    f"Loading {len(followers_array)} followers from your profile!",
                     extra={"emoji": ":clipboard:"},
                 )
                 streamers += [fw for fw in followers_array if fw not in streamers]
@@ -238,7 +238,7 @@ class TwitchChannelPointsMiner:
         for streamer_index in range(0, len(self.streamers)):
             self.streamers[streamer_index].set_less_printing(False)
             logger.info(
-                f"{self.streamers[streamer_index]}, Total Points Gained (after farming - before farming): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
+                f"{self.streamers[streamer_index]}, Total Points Gained (after farming - before farming): {millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
                 extra={"emoji": ":microphone:"},
             )
             if self.streamers[streamer_index].history != {}:

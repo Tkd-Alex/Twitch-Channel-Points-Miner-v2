@@ -4,7 +4,7 @@ import time
 import json
 import random
 
-from millify import millify
+from TwitchChannelPointsMiner.utils import millify
 from dateutil import parser
 
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction

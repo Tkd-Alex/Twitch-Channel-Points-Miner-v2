@@ -2,7 +2,7 @@ import logging
 import copy
 
 from enum import Enum, auto
-from millify import millify
+from TwitchChannelPointsMiner.utils import millify
 
 from TwitchChannelPointsMiner.utils import float_round
 

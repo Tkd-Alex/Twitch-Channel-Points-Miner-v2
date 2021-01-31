@@ -4,7 +4,7 @@ import random
 import os
 import platform
 
-from millify import prettify
+from TwitchChannelPointsMiner.utils import millify
 from pathlib import Path
 from datetime import datetime
 from enum import Enum, auto
@@ -389,7 +389,7 @@ class TwitchBrowser:
 
                         try:
                             logger.info(
-                                f"Going to write: {prettify(decision['amount'], '.')} channel points on input {decision['choice']}",
+                                f"Going to write: {millify(decision['amount'])} channel points on input {decision['choice']}",
                                 extra={"emoji": ":wrench:"},
                             )
                             if (
