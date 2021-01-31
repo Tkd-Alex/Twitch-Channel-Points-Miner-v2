@@ -23,7 +23,7 @@ class EventPrediction:
         self.created_at = created_at
         self.prediction_window_seconds = prediction_window_seconds
         self.status = status
-        self.final_result = {}
+        self.final_result: dict = {}
 
         self.box_fillable = False
         self.bet_confirmed = False
@@ -52,7 +52,7 @@ class EventPrediction:
     def closing_bet_after(self, timestamp):
         return float_round(self.prediction_window_seconds - self.elapsed(timestamp))
 
-    def print_recap(self):
+    def print_recap(self) -> str:
         return f"{self}\n\t\t{self.streamer}\n\t\t{self.bet}\n\t\tResult: {self.final_result}"
 
     def set_less_printing(self, value):

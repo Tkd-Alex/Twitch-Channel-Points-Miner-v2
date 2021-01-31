@@ -2,12 +2,13 @@
 # Original Copyright (c) 2020 Rodney
 # The MIT License (MIT)
 
-import logging
 import getpass
-import pickle
-import requests
+import logging
 import os
+import pickle
+
 import browser_cookie3
+import requests
 
 from TwitchChannelPointsMiner.classes.Exceptions import WrongCookiesException
 

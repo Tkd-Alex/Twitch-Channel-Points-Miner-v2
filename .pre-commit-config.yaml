@@ -21,3 +21,6 @@ repos:
     hooks:
     -   id: flake8
         files: ^TwitchChannelPointsMiner/
+        args:
+            - "--max-line-length=88"
+            - "--extend-ignore=E501"

@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
 
+import copy
 import logging
-import threading
+import random
 import signal
 import sys
+import threading
 import time
 import uuid
-import copy
-import random
-
-from datetime import datetime
 from collections import OrderedDict
+from datetime import datetime
 
+<<<<<<< HEAD
 from TwitchChannelPointsMiner.utils import get_user_agent, millify
+=======
+from TwitchChannelPointsMiner.classes.Bet import BetSettings
+from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
+>>>>>>> upstream/master
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
-from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.Streamer import Streamer
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
-from TwitchChannelPointsMiner.classes.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.TwitchBrowser import (
-    TwitchBrowser,
     BrowserSettings,
+    TwitchBrowser,
 )
-from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
+from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
+from TwitchChannelPointsMiner.utils import get_user_agent
 
 # Suppress warning for urllib3.connectionpool (selenium close connection)
 # Suppress also the selenium logger please
@@ -40,6 +43,8 @@ class TwitchChannelPointsMiner:
         make_predictions: bool = True,
         follow_raid: bool = True,
         watch_streak: bool = False,
+        claim_drops_startup: bool = False,
+        drops_events: bool = False,
         logger_settings: LoggerSettings = LoggerSettings(),
         browser_settings: BrowserSettings = BrowserSettings(),
         bet_settings: BetSettings = BetSettings(),
@@ -48,10 +53,14 @@ class TwitchChannelPointsMiner:
         self.browser_settings = browser_settings
         self.bet_settings = bet_settings
 
-        self.twitch = Twitch(self.username, get_user_agent(self.browser_settings.browser))
+        self.twitch = Twitch(
+            self.username, get_user_agent(self.browser_settings.browser)
+        )
         self.twitch_browser = None
         self.follow_raid = follow_raid
         self.watch_streak = watch_streak
+        self.drops_events = drops_events
+        self.claim_drops_startup = claim_drops_startup
         self.streamers = []
         self.events_predictions = {}
         self.minute_watcher_thread = None
@@ -85,6 +94,9 @@ class TwitchChannelPointsMiner:
             self.start_datetime = datetime.now()
 
             self.twitch.login()
+
+            if self.claim_drops_startup is True:
+                self.twitch.claim_all_drops_from_inventory()
 
             # Clear streamers array
             # Remove duplicate 3. Preserving Order: Use OrderedDict (askpython .com)
@@ -164,6 +176,15 @@ class TwitchChannelPointsMiner:
                     user_id=self.twitch.twitch_login.get_user_id(),
                 )
             ]
+
+            if self.drops_events is True:
+                topics.append(
+                    PubsubTopic(
+                        "user-drop-events",
+                        user_id=self.twitch.twitch_login.get_user_id(),
+                    ),
+                )
+
             if self.make_predictions is True:
                 topics.append(
                     PubsubTopic(
@@ -213,7 +234,9 @@ class TwitchChannelPointsMiner:
 
     def __print_report(self):
         print("\n")
-        logger.info(f"Ending session: '{self.session_id}'", extra={"emoji": ":stop_sign:"})
+        logger.info(
+            f"Ending session: '{self.session_id}'", extra={"emoji": ":stop_sign:"}
+        )
         if self.logs_file is not None:
             logger.info(
                 f"Logs file: {self.logs_file}", extra={"emoji": ":page_facing_up:"}
@@ -238,8 +261,13 @@ class TwitchChannelPointsMiner:
         for streamer_index in range(0, len(self.streamers)):
             self.streamers[streamer_index].set_less_printing(False)
             logger.info(
+<<<<<<< HEAD
                 f"{self.streamers[streamer_index]}, Total Points Gained (after farming - before farming): {millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
                 extra={"emoji": ":microphone:"},
+=======
+                f"{self.streamers[streamer_index]}, Total Points Gained (after farming - before farming): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
+                extra={"emoji": ":robot:"},
+>>>>>>> upstream/master
             )
             if self.streamers[streamer_index].history != {}:
                 logger.info(
