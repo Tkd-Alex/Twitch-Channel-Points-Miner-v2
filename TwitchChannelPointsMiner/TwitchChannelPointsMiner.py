@@ -11,7 +11,7 @@ import uuid
 from collections import OrderedDict
 from datetime import datetime
 
-from TwitchChannelPointsMiner.utils import get_user_agent, millify
+from TwitchChannelPointsMiner.utils import get_user_agent, Millify
 from TwitchChannelPointsMiner.classes.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
