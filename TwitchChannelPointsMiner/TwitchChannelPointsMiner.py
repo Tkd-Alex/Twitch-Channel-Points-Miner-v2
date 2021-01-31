@@ -28,6 +28,7 @@ from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.utils import (
     at_least_one_value_in_settings_is,
     get_user_agent,
+    set_default_settings,
 )
 
 # Suppress warning for urllib3.connectionpool (selenium close connection)
@@ -55,6 +56,10 @@ class TwitchChannelPointsMiner:
         # Set as globally config
         Settings.logger = logger_settings
         Settings.browser = browser_settings
+
+        # Init as default all the missing values
+        streamer_settings.default()
+        streamer_settings.bet.default()
         Settings.streamer_settings = streamer_settings
 
         user_agent = get_user_agent(browser_settings.browser)
@@ -134,11 +139,12 @@ class TwitchChannelPointsMiner:
                         streamer = Streamer(username)
 
                     streamer.channel_id = self.twitch.get_channel_id(username)
-                    # If no settings was provided use the default settings
-                    if streamer.settings is None:
-                        streamer.settings = Settings.streamer_settings
-                    elif streamer.settings.bet is None:
-                        streamer.settings.bet = Settings.streamer_settings.bet
+                    streamer.settings = set_default_settings(
+                        streamer.settings, Settings.streamer_settings
+                    )
+                    streamer.settings.bet = set_default_settings(
+                        streamer.settings, Settings.streamer_settings.bet
+                    )
 
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:

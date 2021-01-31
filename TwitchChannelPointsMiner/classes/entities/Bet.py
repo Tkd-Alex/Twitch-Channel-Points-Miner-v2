@@ -19,15 +19,21 @@ class Strategy(Enum):
 class BetSettings:
     def __init__(
         self,
-        strategy: Strategy = Strategy.SMART,
-        percentage: int = 5,
-        percentage_gap: int = 2,
-        max_points: int = 50000,
+        strategy: Strategy = None,
+        percentage: int = None,
+        percentage_gap: int = None,
+        max_points: int = None,
     ):
         self.strategy = strategy
         self.percentage = percentage
         self.percentage_gap = percentage_gap
         self.max_points = max_points
+
+    def default(self):
+        self.strategy = self.strategy if not None else Strategy.SMART
+        self.percentage = self.percentage if not None else 5
+        self.percentage_gap = self.percentage_gap if not None else 2
+        self.max_points = self.max_points if not None else 50000
 
     def __repr__(self):
         return f"BetSettings(Strategy={self.strategy}, Percentage={self.percentage}, PercentageGap={self.percentage_gap}, MaxPoints={self.max_points}"

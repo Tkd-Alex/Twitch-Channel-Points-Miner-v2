@@ -14,17 +14,24 @@ logger = logging.getLogger(__name__)
 class StreamerSettings(object):
     def __init__(
         self,
-        make_predictions: bool = True,
-        follow_raid: bool = True,
-        claim_drops: bool = True,
-        watch_streak: bool = True,
-        bet: BetSettings = BetSettings(),
+        make_predictions: bool = None,
+        follow_raid: bool = None,
+        claim_drops: bool = None,
+        watch_streak: bool = None,
+        bet: BetSettings = None,
     ):
         self.make_predictions = make_predictions
         self.follow_raid = follow_raid
         self.claim_drops = claim_drops
         self.watch_streak = watch_streak
         self.bet = bet
+
+    def default(self):
+        for name in ["make_predictions", "follow_raid", "claim_drops", "watch_streak"]:
+            if getattr(self, name) is None:
+                setattr(self, name, True)
+        if self.bet is None:
+            self.bet = BetSettings()
 
 
 class Streamer(object):
