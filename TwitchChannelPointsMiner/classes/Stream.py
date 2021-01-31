@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+
 from base64 import b64encode
 
 from TwitchChannelPointsMiner.constants.twitch import DROP_ID

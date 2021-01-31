@@ -6,7 +6,6 @@ import getpass
 import logging
 import os
 import pickle
-
 import browser_cookie3
 import requests
 
