@@ -3,12 +3,12 @@ import re
 import time
 from datetime import datetime, timezone
 from random import randrange
-import millify
+from millify import millify
 
 from TwitchChannelPointsMiner.constants.browser import USER_AGENTS
 
 
-def Millify(input, precision=2):
+def _millify(input, precision=2):
     return millify.millify(input, precision)
 
 
