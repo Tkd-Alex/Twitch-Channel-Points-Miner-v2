@@ -4,13 +4,9 @@ import random
 import threading
 import time
 
-<<<<<<< HEAD
-from TwitchChannelPointsMiner.utils import millify
-=======
->>>>>>> upstream/master
 from dateutil import parser
-from millify import millify
 
+from TwitchChannelPointsMiner.utils import millify
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.Message import Message

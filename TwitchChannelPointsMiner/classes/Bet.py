@@ -1,13 +1,8 @@
 import copy
 import logging
+
 from enum import Enum, auto
-<<<<<<< HEAD
 from TwitchChannelPointsMiner.utils import millify
-=======
-
-from millify import millify
->>>>>>> upstream/master
-
 from TwitchChannelPointsMiner.utils import float_round
 
 logger = logging.getLogger(__name__)

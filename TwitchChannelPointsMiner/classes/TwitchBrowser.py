@@ -1,19 +1,12 @@
 import logging
 import os
 import platform
-<<<<<<< HEAD
-
-from TwitchChannelPointsMiner.utils import millify
-from pathlib import Path
-from datetime import datetime
-=======
 import random
 import time
->>>>>>> upstream/master
+
 from enum import Enum, auto
 from pathlib import Path
 
-from millify import prettify
 from selenium import webdriver
 from selenium.common.exceptions import JavascriptException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
@@ -25,6 +18,7 @@ from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.constants.browser import Javascript, Selectors
 from TwitchChannelPointsMiner.constants.twitch import URL
 from TwitchChannelPointsMiner.utils import bet_condition, get_user_agent
+from TwitchChannelPointsMiner.utils import millify
 
 logger = logging.getLogger(__name__)
 

@@ -11,12 +11,9 @@ import uuid
 from collections import OrderedDict
 from datetime import datetime
 
-<<<<<<< HEAD
 from TwitchChannelPointsMiner.utils import get_user_agent, millify
-=======
 from TwitchChannelPointsMiner.classes.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
->>>>>>> upstream/master
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.classes.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.Streamer import Streamer
@@ -261,13 +258,8 @@ class TwitchChannelPointsMiner:
         for streamer_index in range(0, len(self.streamers)):
             self.streamers[streamer_index].set_less_printing(False)
             logger.info(
-<<<<<<< HEAD
                 f"{self.streamers[streamer_index]}, Total Points Gained (after farming - before farming): {millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
                 extra={"emoji": ":microphone:"},
-=======
-                f"{self.streamers[streamer_index]}, Total Points Gained (after farming - before farming): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
-                extra={"emoji": ":robot:"},
->>>>>>> upstream/master
             )
             if self.streamers[streamer_index].history != {}:
                 logger.info(
