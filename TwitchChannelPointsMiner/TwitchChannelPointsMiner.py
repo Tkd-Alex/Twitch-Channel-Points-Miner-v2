@@ -23,7 +23,6 @@ from TwitchChannelPointsMiner.classes.TwitchBrowser import (
     TwitchBrowser,
 )
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
-from TwitchChannelPointsMiner.utils import get_user_agent
 
 # Suppress warning for urllib3.connectionpool (selenium close connection)
 # Suppress also the selenium logger please
