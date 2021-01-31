@@ -17,8 +17,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.constants.browser import Javascript, Selectors
 from TwitchChannelPointsMiner.constants.twitch import URL
-from TwitchChannelPointsMiner.utils import bet_condition, get_user_agent
-from TwitchChannelPointsMiner.utils import millify
+from TwitchChannelPointsMiner.utils import bet_condition, get_user_agent, Millify
 
 logger = logging.getLogger(__name__)
 
@@ -340,7 +339,7 @@ class TwitchBrowser:
 
                         try:
                             logger.info(
-                                f"Going to write: {millify(decision['amount'])} channel points on input {decision['choice']}",
+                                f"Going to write: {Millify(decision['amount'])} channel points on input {decision['choice']}",
                                 extra={"emoji": ":wrench:"},
                             )
                             if (

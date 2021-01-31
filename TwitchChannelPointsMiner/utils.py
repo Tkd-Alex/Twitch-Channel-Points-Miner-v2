@@ -8,7 +8,7 @@ import millify
 from TwitchChannelPointsMiner.constants.browser import USER_AGENTS
 
 
-def millify(input, precision=2):
+def Millify(input, precision=2):
     return millify.millify(input, precision)
 
 

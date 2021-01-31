@@ -3,8 +3,7 @@ import logging
 
 from enum import Enum, auto
 
-from TwitchChannelPointsMiner.utils import millify
-from TwitchChannelPointsMiner.utils import float_round
+from TwitchChannelPointsMiner.utils import Millify, float_round
 
 logger = logging.getLogger(__name__)
 
@@ -74,11 +73,11 @@ class Bet:
         self.__clear_outcomes()
 
     def __repr__(self):
-        return f"Bet(TotalUsers={millify(self.total_users)}, TotalPoints={millify(self.total_points)}), Decision={self.decision})\n\t\tOutcome0({self.get_outcome(0)})\n\t\tOutcome1({self.get_outcome(1)})"
+        return f"Bet(TotalUsers={Millify(self.total_users)}, TotalPoints={Millify(self.total_points)}), Decision={self.decision})\n\t\tOutcome0({self.get_outcome(0)})\n\t\tOutcome1({self.get_outcome(1)})"
 
     def get_outcome(self, index):
         outcome = self.outcomes[index]
-        return f"{outcome['title']} ({outcome['color']}), Points: {millify(outcome['total_points'])}, Users: {millify(outcome['total_users'])} ({outcome['percentage_users']}%), Odds: {outcome['odds']} ({outcome['odds_percentage']}%)"
+        return f"{outcome['title']} ({outcome['color']}), Points: {Millify(outcome['total_points'])}, Users: {Millify(outcome['total_users'])} ({outcome['percentage_users']}%), Odds: {outcome['odds']} ({outcome['odds_percentage']}%)"
 
     def __clear_outcomes(self):
         for index in range(0, len(self.outcomes)):
