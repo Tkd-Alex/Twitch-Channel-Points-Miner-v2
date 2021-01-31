@@ -7,9 +7,10 @@ import millify
 
 from TwitchChannelPointsMiner.constants.browser import USER_AGENTS
 
-def millify(input, precision=2){
-    millify.millify(input, precision)
-}
+
+def millify(input, precision=2):
+    return millify.millify(input, precision)
+
 
 def get_streamer_index(streamers: list, channel_id) -> int:
     try:
