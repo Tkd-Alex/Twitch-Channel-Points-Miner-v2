@@ -1,5 +1,27 @@
 # Twitch Channel Points Miner - v2
 
+![Banner](./assets/banner.png)
+<p align="center">
+	<a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE">
+		<img alt="License" src="https://img.shields.io/github/license/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
+	</a>
+	<a href="https://www.python.org/download/releases/3.0/">
+		<img alt="Python3" src="https://img.shields.io/badge/built%20with-Python3-red.svg?style=flat" />
+	</a>
+	<a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pulls">
+		<img alt="PRsWelcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" />
+	</a>
+	<a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/stargazers">
+		<img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
+	</a>
+	<a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues?q=is%3Aissue+is%3Aclosed">
+		<img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/Tkd-Alex/Twitch-Channel-Points-Miner-v2">
+	</a>
+	<a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2">
+		<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
+	</a>
+</p>
+
 **Credits**
 - Main idea: https://github.com/gottagofaster236/Twitch-Channel-Points-Miner
 - Bet system (Selenium): https://github.com/ClementRoyer/TwitchAutoCollect-AutoBet
