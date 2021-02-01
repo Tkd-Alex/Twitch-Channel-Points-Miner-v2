@@ -1,10 +1,11 @@
 import copy
 import logging
 from enum import Enum, auto
+from random import uniform
 
 from millify import millify
 
-from TwitchChannelPointsMiner.utils import float_round
+from TwitchChannelPointsMiner.utils import char_decision_as_index, float_round
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ class BetSettings:
         percentage: int = None,
         percentage_gap: int = None,
         max_points: int = None,
+        stealth_mode: bool = None,
     ):
         self.strategy = strategy
         self.percentage = percentage
@@ -34,9 +36,10 @@ class BetSettings:
         self.percentage = self.percentage if not None else 5
         self.percentage_gap = self.percentage_gap if not None else 2
         self.max_points = self.max_points if not None else 50000
+        self.stealth_mode = self.stealth_mode if not None else False
 
     def __repr__(self):
-        return f"BetSettings(Strategy={self.strategy}, Percentage={self.percentage}, PercentageGap={self.percentage_gap}, MaxPoints={self.max_points})"
+        return f"BetSettings(Strategy={self.strategy}, Percentage={self.percentage}, PercentageGap={self.percentage_gap}, MaxPoints={self.max_points}, StealthMode={self.stealth_mode})"
 
 
 class Bet:
@@ -53,6 +56,15 @@ class Bet:
         self.outcomes[1]["total_users"] = int(outcomes[1]["total_users"])
         self.outcomes[0]["total_points"] = int(outcomes[0]["total_points"])
         self.outcomes[1]["total_points"] = int(outcomes[1]["total_points"])
+
+        outcomes[0]["top_predictors"] = sorted(
+            outcomes[0]["top_predictors"], key=lambda x: x["points"], reverse=True
+        )
+        outcomes[1]["top_predictors"] = sorted(
+            outcomes[1]["top_predictors"], key=lambda x: x["points"], reverse=True
+        )
+        self.outcomes[0]["top_points"] = outcomes[0]["top_predictors"]["points"]
+        self.outcomes[1]["top_points"] = outcomes[1]["top_predictors"]["points"]
 
         self.total_users = (
             self.outcomes[0]["total_users"] + self.outcomes[1]["total_users"]
@@ -128,13 +140,18 @@ class Bet:
             )
 
         if self.decision["choice"] is not None:
-            self.decision["id"] = (
-                self.outcomes[0]["id"]
-                if self.decision["choice"] == "A"
-                else self.outcomes[1]["id"]
-            )
+            index = char_decision_as_index(self.decision["choice"])
+            self.decision["id"] = self.outcomes[index]["id"]
             self.decision["amount"] = min(
                 int(balance * (self.settings.percentage / 100)),
                 self.settings.max_points,
             )
+            if (
+                self.settings.stealth_mode is True
+                and self.decision["amount"] >= self.outcomes[index]["top_points"]
+            ):
+                reduce_amount = uniform(1, 5)
+                self.decision["amount"] = (
+                    self.outcomes[index]["top_points"] - reduce_amount
+                )
         return self.decision

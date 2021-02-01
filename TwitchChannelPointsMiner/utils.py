@@ -144,3 +144,7 @@ def set_default_settings(settings, defaults):
         # Get the default values from Settings.streamer_settings
         settings = copy_values_if_none(settings, defaults)
     return settings
+
+
+def char_decision_as_index(char):
+    return 0 if char == "A" else 1
