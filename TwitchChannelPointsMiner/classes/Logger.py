@@ -1,10 +1,10 @@
 import logging
 import os
 import platform
-import emoji
-
 from datetime import datetime
 from pathlib import Path
+
+import emoji
 
 from TwitchChannelPointsMiner.utils import remove_emoji
 

@@ -1,10 +1,9 @@
 import logging
 import time
 
-from TwitchChannelPointsMiner.utils import _millify
-
 from TwitchChannelPointsMiner.classes.Stream import Stream
 from TwitchChannelPointsMiner.constants.twitch import URL
+from TwitchChannelPointsMiner.utils import _millify
 
 logger = logging.getLogger(__name__)
 

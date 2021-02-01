@@ -11,7 +11,6 @@ import uuid
 from collections import OrderedDict
 from datetime import datetime
 
-from TwitchChannelPointsMiner.utils import get_user_agent, _millify
 from TwitchChannelPointsMiner.classes.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 from TwitchChannelPointsMiner.classes.Logger import LoggerSettings, configure_loggers
@@ -23,6 +22,7 @@ from TwitchChannelPointsMiner.classes.TwitchBrowser import (
     TwitchBrowser,
 )
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
+from TwitchChannelPointsMiner.utils import _millify, get_user_agent
 
 # Suppress warning for urllib3.connectionpool (selenium close connection)
 # Suppress also the selenium logger please

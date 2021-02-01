@@ -1,6 +1,5 @@
 import copy
 import logging
-
 from enum import Enum, auto
 
 from TwitchChannelPointsMiner.utils import _millify, float_round

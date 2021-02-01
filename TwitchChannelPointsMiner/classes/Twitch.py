@@ -10,9 +10,9 @@ import os
 import random
 import re
 import time
-import requests
-
 from pathlib import Path
+
+import requests
 
 from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerDoesNotExistException,

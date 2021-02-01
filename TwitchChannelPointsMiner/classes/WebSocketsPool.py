@@ -13,10 +13,10 @@ from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants.twitch import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
+    _millify,
     bet_condition,
     calculate_start_after,
     get_streamer_index,
-    _millify,
 )
 
 logger = logging.getLogger(__name__)
