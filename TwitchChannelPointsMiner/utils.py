@@ -35,10 +35,6 @@ def server_time(message_data):
     )
 
 
-def calculate_start_after(closing_bet_after, execution_time):
-    return round(max(1, closing_bet_after - execution_time), 2)
-
-
 # https://en.wikipedia.org/wiki/Cryptographic_nonce
 def create_nonce(length=30) -> str:
     nonce = ""
