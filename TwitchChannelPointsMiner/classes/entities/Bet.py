@@ -2,7 +2,9 @@ import copy
 import logging
 from enum import Enum, auto
 
-from TwitchChannelPointsMiner.utils import _millify, float_round
+from millify import millify
+
+from TwitchChannelPointsMiner.utils import float_round
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +36,7 @@ class BetSettings:
         self.max_points = self.max_points if not None else 50000
 
     def __repr__(self):
-        return f"BetSettings(Strategy={self.strategy}, Percentage={self.percentage}, PercentageGap={self.percentage_gap}, MaxPoints={self.max_points}"
+        return f"BetSettings(Strategy={self.strategy}, Percentage={self.percentage}, PercentageGap={self.percentage_gap}, MaxPoints={self.max_points})"
 
 
 class Bet:
@@ -78,11 +80,11 @@ class Bet:
         self.__clear_outcomes()
 
     def __repr__(self):
-        return f"Bet(TotalUsers={_millify(self.total_users)}, TotalPoints={_millify(self.total_points)}), Decision={self.decision})\n\t\tOutcome0({self.get_outcome(0)})\n\t\tOutcome1({self.get_outcome(1)})"
+        return f"Bet(TotalUsers={millify(self.total_users)}, TotalPoints={millify(self.total_points)}), Decision={self.decision})\n\t\tOutcome0({self.get_outcome(0)})\n\t\tOutcome1({self.get_outcome(1)})"
 
     def get_outcome(self, index):
         outcome = self.outcomes[index]
-        return f"{outcome['title']} ({outcome['color']}), Points: {_millify(outcome['total_points'])}, Users: {_millify(outcome['total_users'])} ({outcome['percentage_users']}%), Odds: {outcome['odds']} ({outcome['odds_percentage']}%)"
+        return f"{outcome['title']} ({outcome['color']}), Points: {millify(outcome['total_points'])}, Users: {millify(outcome['total_users'])} ({outcome['percentage_users']}%), Odds: {outcome['odds']} ({outcome['odds_percentage']}%)"
 
     def __clear_outcomes(self):
         for index in range(0, len(self.outcomes)):

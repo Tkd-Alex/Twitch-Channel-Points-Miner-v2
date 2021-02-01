@@ -120,7 +120,8 @@ class TwitchChannelPointsMiner:
                     extra={"emoji": ":clipboard:"},
                 )
                 for username in followers_array:
-                    streamers_dict[username] = username.lower().strip()
+                    if username not in streamers_dict:
+                        streamers_dict[username] = username.lower().strip()
             else:
                 followers_array = []
 
@@ -146,7 +147,7 @@ class TwitchChannelPointsMiner:
                         streamer.settings, Settings.streamer_settings
                     )
                     streamer.settings.bet = set_default_settings(
-                        streamer.settings, Settings.streamer_settings.bet
+                        streamer.settings.bet, Settings.streamer_settings.bet
                     )
 
                     self.streamers.append(streamer)

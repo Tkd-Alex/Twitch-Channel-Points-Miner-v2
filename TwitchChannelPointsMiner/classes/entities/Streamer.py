@@ -32,6 +32,9 @@ class StreamerSettings(object):
         if self.bet is None:
             self.bet = BetSettings()
 
+    def __repr__(self):
+        return f"BetSettings(MakePredictions={self.make_predictions}, FollowRaid={self.follow_raid}, ClaimDrops={self.claim_drops}, WatchStreak={self.watch_streak}, Bet={self.bet})"
+
 
 class Streamer(object):
     def __init__(self, username, settings=None):
