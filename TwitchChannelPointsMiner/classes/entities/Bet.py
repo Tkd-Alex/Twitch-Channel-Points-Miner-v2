@@ -44,7 +44,7 @@ class FilterCondition(object):
         return f"FilterCondition(Key={self.key}, Condition={self.condition}, Value={self.value}, Index={self.index})"
 
 
-class BetSettings:
+class BetSettings(object):
     def __init__(
         self,
         strategy: Strategy = None,
@@ -71,7 +71,7 @@ class BetSettings:
         return f"BetSettings(Strategy={self.strategy}, Percentage={self.percentage}, PercentageGap={self.percentage_gap}, MaxPoints={self.max_points}, StealthMode={self.stealth_mode})"
 
 
-class Bet:
+class Bet(object):
     def __init__(self, outcomes: list, settings: BetSettings):
         self.outcomes = outcomes
         self.__clear_outcomes()

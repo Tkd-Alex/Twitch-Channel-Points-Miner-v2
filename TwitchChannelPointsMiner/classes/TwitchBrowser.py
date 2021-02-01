@@ -16,7 +16,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.constants.browser import Javascript, Selectors
 from TwitchChannelPointsMiner.constants.twitch import URL
-from TwitchChannelPointsMiner.utils import _millify, bet_condition, get_user_agent
+from TwitchChannelPointsMiner.utils import (
+    _millify,
+    bet_condition,
+    char_decision_as_index,
+    get_user_agent,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +63,7 @@ class BrowserSettings:
         )
 
 
-class TwitchBrowser:
+class TwitchBrowser(object):
     def __init__(
         self,
         auth_token: str,
@@ -311,7 +316,7 @@ class TwitchBrowser:
                 self.currently_is_betting = self.start_bet(event)
                 if event.box_fillable and self.currently_is_betting:
                     if decision["choice"] is not None:
-                        selector_index = 1 if decision["choice"] == "A" else 2
+                        selector_index = char_decision_as_index(decision["choice"]) + 1
                         logger.info(
                             f"Decision: {event.bet.get_outcome(selector_index - 1)}",
                             extra={"emoji": ":wrench:"},
@@ -334,7 +339,7 @@ class TwitchBrowser:
                                 )
                                 if self.__click_on_vote(event, selector_index) is True:
                                     event.bet_placed = True
-                                    time.sleep(random.uniform(5, 10))
+                                    time.sleep(random.uniform(3, 6))
                         except Exception:
                             logger.error("Exception raised", exc_info=True)
                 else:

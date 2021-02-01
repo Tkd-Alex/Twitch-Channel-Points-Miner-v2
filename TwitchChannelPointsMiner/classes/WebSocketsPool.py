@@ -17,7 +17,7 @@ from TwitchChannelPointsMiner.utils import _millify, bet_condition, get_streamer
 logger = logging.getLogger(__name__)
 
 
-class WebSocketsPool:
+class WebSocketsPool(object):
     def __init__(self, twitch, browser, streamers, events_predictions):
         self.ws = None
         self.twitch = twitch

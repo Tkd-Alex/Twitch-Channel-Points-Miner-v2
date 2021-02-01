@@ -9,7 +9,7 @@ from TwitchChannelPointsMiner.constants.twitch import DROP_ID
 logger = logging.getLogger(__name__)
 
 
-class Stream:
+class Stream(object):
     def __init__(self):
         self.broadcast_id = None
 
