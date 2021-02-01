@@ -158,16 +158,13 @@ For the bet system the script use Selenium. Could be usefull understand how to M
 
 import logging
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
-from TwitchChannelPointsMiner.classes.Logger import LoggerSettings
-from TwitchChannelPointsMiner.classes.Bet import Strategy, BetSettings
+from TwitchChannelPointsMiner.logger import LoggerSettings
+from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings
+from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser, BrowserSettings
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
-    make_predictions=True,              # If you want to Bet / Make prediction | The browser will never start
-    follow_raid=True,                   # Follow raid to obtain more points
-    watch_streak=True,                  # If a streamer go online change the priotiry of streamers array and catch the watch screak. Issue #11
-    drops_events=True,                  # If you want to auto claim game drops from Twitch inventory Issue #21
     claim_drops_startup=False,          # If you want to auto claim all drops from Twitch inventory on startup
     logger_settings=LoggerSettings(
         save=True,                      # If you want to save logs in file (suggested)
@@ -181,17 +178,43 @@ twitch_miner = TwitchChannelPointsMiner(
         show=False,                     # Show the browser during bet else headless mode
         do_screenshot=False,            # Do screenshot during the bet
     ),
-    bet_settings=BetSettings(
-        strategy=Strategy.SMART,        # Choose you strategy!
-        percentage=5,                   # Place the x% of your channel points
-        percentage_gap=20,              # Gap difference between outcomesA and outcomesB (for SMART stragegy)
-        max_points=50000,               # If the x percentage of your channel points is gt bet_max_points set this value
+    streamer_settings=StreamerSettings(
+        make_predictions=True,          # If you want to Bet / Make prediction
+        follow_raid=True,               # Follow raid to obtain more points
+        claim_drops=True,               # We can't filter rewards base on stream. Set to False for skip viewing counter increase and you will never obtain a drop reward from this script. Issue #21
+        watch_streak=True,              # If a streamer go online change the priotiry of streamers array and catch the watch screak. Issue #11
+        bet=BetSettings(
+            strategy=Strategy.SMART,    # Choose you strategy!
+            percentage=5,               # Place the x% of your channel points
+            percentage_gap=20,          # Gap difference between outcomesA and outcomesB (for SMART stragegy)
+            max_points=50000,           # If the x percentage of your channel points is gt bet_max_points set this value
+        )
     )
 )
 
+# You can customize the settings for each streamer. If not settings was provided the script will use the streamer_settings from TwitchChannelPointsMiner.
+# If no streamer_settings provided in TwitchChannelPointsMiner the script will use default settings.
+# The streamers array can be a String -> username or Streamer instance.
+
+# The settings priority are: settings in mine function, settings in TwitchChannelPointsMiner instance, default settings.
+# For example if in the mine function you don't provide any value for 'make_prediction' but you have set it on TwitchChannelPointsMiner instance the script will take the value from here.
+# If you haven't set any value even in the instance the default one will be used
+
 twitch_miner.mine(
-    ["streamer1", "streamer2"],         # Array of streamers (order = priority)
-    followers=False                     # Automatic download the list of your followers
+    [
+        Streamer("streamer-username01", settings=StreamerSettings(make_predictions=True  , follow_raid=False , claim_drops=True  , watch_streak=True , bet=BetSettings(strategy=Strategy.SMART      , percentage=5 , percentage_gap=20 , max_points=234   ) )),
+        Streamer("streamer-username02", settings=StreamerSettings(make_predictions=False , follow_raid=True  , claim_drops=False ,                     bet=BetSettings(strategy=Strategy.PERCENTAGE , percentage=5 , percentage_gap=20 , max_points=1234  ) )),
+        Streamer("streamer-username03", settings=StreamerSettings(make_predictions=True  , follow_raid=False ,                     watch_streak=True , bet=BetSettings(strategy=Strategy.SMART      , percentage=5 , percentage_gap=30 , max_points=50000 ) )),
+        Streamer("streamer-username04", settings=StreamerSettings(make_predictions=False , follow_raid=True  ,                     watch_streak=True                                                                                                        )),
+        Streamer("streamer-username05", settings=StreamerSettings(make_predictions=True  , follow_raid=True  , claim_drops=True ,  watch_streak=True , bet=BetSettings(strategy=Strategy.ODDS       , percentage=7 , percentage_gap=20 , max_points=90    ) )),
+        Streamer("streamer-username06"),
+        Streamer("streamer-username07"),
+        Streamer("streamer-username08"),
+        "streamer-username09",
+        "streamer-username10",
+        "streamer-username11"
+    ],                                 # Array of streamers (order = priority)
+    followers=False                    # Automatic download the list of your followers (unable to set custom settings for you followers list)
 )
 ```
 You can also use all the default values except for your username obv. Short version:
@@ -218,7 +241,7 @@ If the browser are currently betting or wait for more data It's impossible to in
 - **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same of select LOWEST_ODDS
 - **SMART**: If the majority in percent chose an option then follow the other users, otherwise choose the option with the highest odds
 
-![Screenshot](./assets/prediction_screen.png)
+![Screenshot](./assets/prediction.png)
 
 Here a concrete example:
 

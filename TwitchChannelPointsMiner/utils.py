@@ -119,3 +119,32 @@ def remove_emoji(string: str) -> str:
         flags=re.UNICODE,
     )
     return emoji_pattern.sub(r"", string)
+
+
+def at_least_one_value_in_settings_is(array, attr_name, condition=True):
+    return [
+        itme for itme in array if getattr(itme.settings, attr_name) == condition
+    ] != []
+
+
+def copy_values_if_none(settings, defaults):
+    values = [
+        name
+        for name in dir(settings)
+        if name.startswith("__") is False and callable(getattr(settings, name)) is False
+    ]
+    for value in values:
+        if getattr(settings, value) is None:
+            setattr(settings, value, getattr(defaults, value))
+    return settings
+
+
+def set_default_settings(settings, defaults):
+    # If no settings was provided use the default settings ...
+    if settings is None:
+        settings = defaults
+    else:
+        # If settings was provided but maybe are only partial set
+        # Get the default values from Settings.streamer_settings
+        settings = copy_values_if_none(settings, defaults)
+    return settings

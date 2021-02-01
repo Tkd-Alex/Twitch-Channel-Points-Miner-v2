@@ -13,7 +13,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 
-from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
+from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.constants.browser import Javascript, Selectors
 from TwitchChannelPointsMiner.constants.twitch import URL
 from TwitchChannelPointsMiner.utils import _millify, bet_condition, get_user_agent

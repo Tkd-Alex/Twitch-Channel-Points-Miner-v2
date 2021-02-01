@@ -6,10 +6,10 @@ import time
 
 from dateutil import parser
 
-from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
+from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
+from TwitchChannelPointsMiner.classes.entities.Message import Message
+from TwitchChannelPointsMiner.classes.entities.Raid import Raid
 from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
-from TwitchChannelPointsMiner.classes.Message import Message
-from TwitchChannelPointsMiner.classes.Raid import Raid
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants.twitch import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
@@ -23,23 +23,12 @@ logger = logging.getLogger(__name__)
 
 
 class WebSocketsPool:
-    def __init__(
-        self,
-        twitch,
-        twitch_browser,
-        streamers,
-        bet_settings,
-        events_predictions,
-        less_printing: bool = False,
-    ):
+    def __init__(self, twitch, browser, streamers, events_predictions):
         self.ws = None
         self.twitch = twitch
-        self.twitch_browser = twitch_browser
+        self.browser = browser
         self.streamers = streamers
         self.events_predictions = events_predictions
-        self.bet_settings = bet_settings
-
-        self.less_printing = less_printing
 
     """
     API Limits
@@ -155,7 +144,6 @@ class WebSocketsPool:
                             ws.twitch.claim_bonus(
                                 ws.streamers[streamer_index],
                                 message.data["claim"]["id"],
-                                less_printing=ws.less_printing,
                             )
 
                     elif message.topic == "video-playback-by-id":
@@ -206,14 +194,12 @@ class WebSocketsPool:
                                     prediction_window_seconds,
                                     event_status,
                                     event_dict["outcomes"],
-                                    bet_settings=ws.bet_settings,
-                                    less_printing=ws.less_printing,
                                 )
                                 if (
                                     ws.streamers[streamer_index].is_online
                                     and event.closing_bet_after(current_tmsp) > 0
                                     and bet_condition(
-                                        ws.twitch_browser,
+                                        ws.browser,
                                         event,
                                         logger,
                                     )
@@ -223,7 +209,7 @@ class WebSocketsPool:
                                     (
                                         start_bet_status,
                                         execution_time,
-                                    ) = ws.twitch_browser.start_bet(
+                                    ) = ws.browser.start_bet(
                                         ws.events_predictions[event_id]
                                     )
                                     if start_bet_status is True:
@@ -235,7 +221,7 @@ class WebSocketsPool:
 
                                         place_bet_thread = threading.Timer(
                                             start_after,
-                                            ws.twitch_browser.place_bet,
+                                            ws.browser.place_bet,
                                             (ws.events_predictions[event_id],),
                                         )
                                         place_bet_thread.daemon = True

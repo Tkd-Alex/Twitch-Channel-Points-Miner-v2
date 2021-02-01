@@ -1,5 +1,6 @@
-from TwitchChannelPointsMiner.classes.Bet import Bet, BetSettings
-from TwitchChannelPointsMiner.classes.Streamer import Streamer
+from TwitchChannelPointsMiner.classes.entities.Bet import Bet
+from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer
+from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.utils import float_round
 
 
@@ -13,8 +14,6 @@ class EventPrediction:
         prediction_window_seconds,
         status,
         outcomes,
-        bet_settings: BetSettings,
-        less_printing: bool = False,
     ):
         self.streamer = streamer
 
@@ -28,22 +27,16 @@ class EventPrediction:
         self.box_fillable = False
         self.bet_confirmed = False
         self.bet_placed = False
-        self.bet = Bet(outcomes, bet_settings)
-
-        self.less_printing = less_printing
+        self.bet = Bet(outcomes, streamer.settings.bet)
 
     def __repr__(self):
-        return (
-            f"EventPrediction: {self.title}"
-            if self.less_printing is True
-            else f"EventPrediction(event_id={self.event_id}, title={self.title})"
-        )
+        return f"EventPrediction(event_id={self.event_id}, title={self.title})"
 
     def __str__(self):
         return (
             f"EventPrediction: {self.title}"
-            if self.less_printing is True
-            else f"EventPrediction(event_id={self.event_id}, title={self.title})"
+            if Settings.logger.less
+            else self.__repr__()
         )
 
     def elapsed(self, timestamp):
@@ -54,7 +47,3 @@ class EventPrediction:
 
     def print_recap(self) -> str:
         return f"{self}\n\t\t{self.streamer}\n\t\t{self.bet}\n\t\tResult: {self.final_result}"
-
-    def set_less_printing(self, value):
-        self.less_printing = value
-        self.streamer.less_printing = value

@@ -3,13 +3,14 @@ import logging
 import time
 from base64 import b64encode
 
+from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.constants.twitch import DROP_ID
 
 logger = logging.getLogger(__name__)
 
 
 class Stream:
-    def __init__(self, less_printing: bool = False):
+    def __init__(self):
         self.broadcast_id = None
 
         self.title = None
@@ -23,8 +24,6 @@ class Stream:
         self.payload = None
 
         self.init_watch_streak()
-
-        self.less_printing = less_printing
 
     def encode_payload(self) -> dict:
         json_event = json.dumps(self.payload, separators=(",", ":"))
@@ -45,18 +44,10 @@ class Stream:
         logger.debug(f"Update: {self}")
 
     def __repr__(self):
-        return (
-            f"{self.title}"
-            if self.less_printing is True
-            else f"Stream(title={self.title}, game={self.__str_game()}, tags={self.__str_tags()})"
-        )
+        return f"Stream(title={self.title}, game={self.__str_game()}, tags={self.__str_tags()})"
 
     def __str__(self):
-        return (
-            f"{self.title}"
-            if self.less_printing is True
-            else f"Stream(title={self.title}, game={self.__str_game()}, tags={self.__str_tags()})"
-        )
+        return f"{self.title}" if Settings.logger.less else self.__repr__()
 
     def __str_tags(self):
         return (
