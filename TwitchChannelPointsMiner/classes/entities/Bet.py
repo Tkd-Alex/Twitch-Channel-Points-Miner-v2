@@ -105,6 +105,7 @@ class Bet:
                 if key not in [
                     "total_users",
                     "total_points",
+                    "top_points",
                     "percentage_users",
                     "odds",
                     "odds_percentage",
@@ -113,7 +114,7 @@ class Bet:
                     "id",
                 ]:
                     del self.outcomes[index][key]
-            for key in ["percentage_users", "odds", "odds_percentage"]:
+            for key in ["percentage_users", "odds", "odds_percentage", "top_points"]:
                 if key not in self.outcomes[index]:
                     self.outcomes[index][key] = 0
 
