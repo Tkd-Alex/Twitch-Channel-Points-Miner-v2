@@ -26,6 +26,7 @@ from TwitchChannelPointsMiner.classes.TwitchBrowser import (
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.utils import (
+    _millify,
     at_least_one_value_in_settings_is,
     get_user_agent,
     set_default_settings,
@@ -295,7 +296,7 @@ class TwitchChannelPointsMiner:
 
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
-                f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points}",
+                f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
                 extra={"emoji": ":robot:"},
             )
             if self.streamers[streamer_index].history != {}:

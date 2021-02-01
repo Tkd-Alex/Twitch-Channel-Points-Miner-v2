@@ -5,7 +5,6 @@ import threading
 import time
 
 from dateutil import parser
-from millify import millify
 
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.entities.Message import Message
@@ -14,6 +13,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants.twitch import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
+    _millify,
     bet_condition,
     calculate_start_after,
     get_streamer_index,
@@ -254,7 +254,7 @@ class WebSocketsPool:
                             if message.type == "prediction-result":
                                 event_result = message.data["prediction"]["result"]
                                 logger.info(
-                                    f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {millify(event_result['points_won']) if event_result['points_won'] else 0}",
+                                    f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {_millify(event_result['points_won']) if event_result['points_won'] else 0}",
                                     extra={"emoji": ":bar_chart:"},
                                 )
                                 points_won = (

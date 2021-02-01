@@ -1,12 +1,11 @@
 import logging
 import time
 
-from millify import prettify
-
 from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.Stream import Stream
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.constants.twitch import URL
+from TwitchChannelPointsMiner.utils import _millify
 
 logger = logging.getLogger(__name__)
 
@@ -56,11 +55,11 @@ class Streamer(object):
         self.chat_url = f"{URL}/popout/{self.username}/chat?popout="
 
     def __repr__(self):
-        return f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={prettify(self.channel_points, '.')})"
+        return f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={_millify(self.channel_points)})"
 
     def __str__(self):
         return (
-            f"{self.username} ({prettify(self.channel_points, '.')} points)"
+            f"{self.username} ({_millify(self.channel_points)} points)"
             if Settings.logger.less
             else self.__repr__()
         )
@@ -83,7 +82,7 @@ class Streamer(object):
     def print_history(self):
         return ", ".join(
             [
-                f"{key}({self.history[key]['counter']} times, {prettify(self.history[key]['amount'], '.')} gained)"
+                f"{key}({self.history[key]['counter']} times, {_millify(self.history[key]['amount'])} gained)"
                 for key in self.history
             ]
         )

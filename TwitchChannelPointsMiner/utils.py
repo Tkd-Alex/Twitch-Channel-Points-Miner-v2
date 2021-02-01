@@ -4,7 +4,13 @@ import time
 from datetime import datetime, timezone
 from random import randrange
 
+from millify import millify
+
 from TwitchChannelPointsMiner.constants.browser import USER_AGENTS
+
+
+def _millify(input, precision=2):
+    return millify(input, precision)
 
 
 def get_streamer_index(streamers: list, channel_id) -> int:
