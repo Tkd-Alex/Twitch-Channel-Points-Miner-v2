@@ -119,6 +119,8 @@ class TwitchChannelPointsMiner:
                     f"Load {len(followers_array)} followers from your profile!",
                     extra={"emoji": ":clipboard:"},
                 )
+                for username in followers_array:
+                    streamers_dict[username] = username.lower().strip()
             else:
                 followers_array = []
 
@@ -127,7 +129,7 @@ class TwitchChannelPointsMiner:
             )
 
             logger.info(
-                f"Loading data for {len(streamers)} streamers. Please wait...",
+                f"Loading data for {len(streamers_name)} streamers. Please wait...",
                 extra={"emoji": ":nerd_face:"},
             )
             for username in streamers_name:
