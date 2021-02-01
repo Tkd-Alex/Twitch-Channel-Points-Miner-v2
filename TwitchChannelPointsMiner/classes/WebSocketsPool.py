@@ -201,6 +201,7 @@ class WebSocketsPool(object):
                                     is True
                                 ):
                                     # place_bet_thread = threading.Timer(event.closing_bet_after(current_tmsp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
+                                    ws.events_predictions[event_id] = event
                                     start_after = event.closing_bet_after(current_tmsp)
 
                                     place_bet_thread = threading.Timer(

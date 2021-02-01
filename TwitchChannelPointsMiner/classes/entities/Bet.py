@@ -58,6 +58,7 @@ class BetSettings(object):
         self.percentage = percentage
         self.percentage_gap = percentage_gap
         self.max_points = max_points
+        self.stealth_mode = stealth_mode
         self.filter_condition = filter_condition
 
     def default(self):

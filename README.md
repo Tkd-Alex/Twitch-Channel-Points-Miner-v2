@@ -234,7 +234,43 @@ Make sure to write the streamers array in order of priority from left to right. 
 
 If the browser are currently betting or wait for more data It's impossible to interact with another event prediction from another streamer.
 
-### Bet strategy
+### Settings
+
+## LoggerSettings
+- `save`
+- `less`
+- `console_level`
+- `file_level`
+- `emoji`
+## BrowserSettings
+- `timeout`
+- `implicitly_wait`
+- `max_attempts`
+- `do_screenshot`
+- `save_html`
+- `show`
+- `browser`
+- `driver_path`
+## StreamerSettings
+- `make_predictions`
+- `follow_raid`
+- `claim_drops`
+- `watch_streak`
+- `bet`
+## BetSettings
+- `strategy`
+- `percentage`
+- `percentage_gap`
+- `max_points`
+- `stealth_mode`
+- `filter_condition`
+## FilterCondition
+- `key`
+- `condition`
+- `value`
+- `decision`
+
+## Bet strategy
 
 - **MOST_VOTED**: Select the option most voted based on users count
 - **HIGH_ODDS**: Select the option with the highest odds
