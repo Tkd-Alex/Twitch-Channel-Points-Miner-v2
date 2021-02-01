@@ -134,19 +134,19 @@ For the bet system the script use Selenium. Could be usefull understand how to M
 		Outcome1(NO (PINK) Points: 2M, Users: 146 (56.15%), Odds: 1.31 (76.34%))
 		Result: {'type': 'LOSE', 'won': 0}
 
-%d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username, channel_id=0000000, channel_points=67247), Gained (end-start): -7838
+%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username, channel_id=0000000, channel_points=67247), Total points gained (after farming - before farming): -7838
 %d/%m/%y %H:%M:%S - 💰  WATCH(35 times, 350 gained), CLAIM(11 times, 550 gained), PREDICTION(1 times, 6531 gained)
-%d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username1, channel_id=0000000, channel_points=4240), Gained (end-start): 0
-%d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username2, channel_id=0000000, channel_points=61365), Gained (end-start): 977
+%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username1, channel_id=0000000, channel_points=4240), Total points gained (after farming - before farming): 0
+%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username2, channel_id=0000000, channel_points=61365), Total points gained (after farming - before farming): 977
 %d/%m/%y %H:%M:%S - 💰  WATCH(11 times, 132 gained), REFUND(1 times, 605 gained), CLAIM(4 times, 240 gained)
-%d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username3, channel_id=0000000, channel_points=6815), Gained (end-start): 0
-%d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username4, channel_id=0000000, channel_points=16386), Gained (end-start): 0
-%d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username5, channel_id=0000000, channel_points=25960), Gained (end-start): 1680
+%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username3, channel_id=0000000, channel_points=6815), Total points gained (after farming - before farming): 0
+%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username4, channel_id=0000000, channel_points=16386), Total points gained (after farming - before farming): 0
+%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username5, channel_id=0000000, channel_points=25960), Total points gained (after farming - before farming): 1680
 %d/%m/%y %H:%M:%S - 💰  WATCH(53 times, 530 gained), CLAIM(17 times, 850 gained)
-%d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username6, channel_id=0000000, channel_points=9430), Gained (end-start): 1120
+%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username6, channel_id=0000000, channel_points=9430), Total points gained (after farming - before farming): 1120
 %d/%m/%y %H:%M:%S - 💰  WATCH(42 times, 420 gained), WATCH_STREAK(1 times, 450 gained), CLAIM(14 times, 700 gained)
-%d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username7, channel_id=0000000, channel_points=2380), Gained (end-start): 0
-%d/%m/%y %H:%M:%S - 🎤  Streamer(username=streamer-username8, channel_id=0000000, channel_points=10230), Gained (end-start): 0
+%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username7, channel_id=0000000, channel_points=2380), Total points gained (after farming - before farming): 0
+%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username8, channel_id=0000000, channel_points=10230), Total points gained (after farming - before farming): 0
 ```
 
 ## How to use:

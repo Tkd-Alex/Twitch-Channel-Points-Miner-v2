@@ -6,7 +6,6 @@ import time
 from enum import Enum, auto
 from pathlib import Path
 
-from millify import prettify
 from selenium import webdriver
 from selenium.common.exceptions import JavascriptException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
@@ -17,7 +16,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from TwitchChannelPointsMiner.classes.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.constants.browser import Javascript, Selectors
 from TwitchChannelPointsMiner.constants.twitch import URL
-from TwitchChannelPointsMiner.utils import bet_condition, get_user_agent
+from TwitchChannelPointsMiner.utils import _millify, bet_condition, get_user_agent
 
 logger = logging.getLogger(__name__)
 
@@ -339,7 +338,7 @@ class TwitchBrowser:
 
                         try:
                             logger.info(
-                                f"Going to write: {prettify(decision['amount'], '.')} channel points on input {decision['choice']}",
+                                f"Going to write: {_millify(decision['amount'])} channel points on input {decision['choice']}",
                                 extra={"emoji": ":wrench:"},
                             )
                             if (
