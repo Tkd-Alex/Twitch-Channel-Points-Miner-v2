@@ -298,41 +298,49 @@ class TwitchBrowser:
         return False
 
     def place_bet(self, event: EventPrediction):
+        logger.info(
+            f"Place bet for {event} owned by {event.streamer}",
+            extra={"emoji": ":wrench:"},
+        )
         if event.status == "ACTIVE":
-            self.currently_is_betting = self.start_bet(event)
-            if event.box_fillable and self.currently_is_betting:
-                decision = event.bet.calculate(event.streamer.channel_points)
-                if decision["choice"] is not None:
-                    selector_index = 1 if decision["choice"] == "A" else 2
-                    logger.info(
-                        f"Decision: {event.bet.get_outcome(selector_index - 1)}",
-                        extra={"emoji": ":wrench:"},
-                    )
-
-                    try:
+            decision = event.bet.calculate(event.streamer.channel_points)
+            if event.bet.skip() is True:
+                logger.info(f"Skip betting for the event {event}")
+                logger.info(f"Skip settings {event.bet.settings.filter_condition}")
+            else:
+                self.currently_is_betting = self.start_bet(event)
+                if event.box_fillable and self.currently_is_betting:
+                    if decision["choice"] is not None:
+                        selector_index = 1 if decision["choice"] == "A" else 2
                         logger.info(
-                            f"Going to write: {_millify(decision['amount'])} channel points on input {decision['choice']}",
+                            f"Decision: {event.bet.get_outcome(selector_index - 1)}",
                             extra={"emoji": ":wrench:"},
                         )
-                        if (
-                            self.__send_text_on_bet(
-                                event, selector_index, decision["amount"]
-                            )
-                            is True
-                        ):
+
+                        try:
                             logger.info(
-                                f"Going to place the bet for {event}",
+                                f"Going to write: {_millify(decision['amount'])} channel points on input {decision['choice']}",
                                 extra={"emoji": ":wrench:"},
                             )
-                            if self.__click_on_vote(event, selector_index) is True:
-                                event.bet_placed = True
-                                time.sleep(random.uniform(5, 10))
-                    except Exception:
-                        logger.error("Exception raised", exc_info=True)
-            else:
-                logger.info(
-                    f"Sorry, unable to complete the bet. Event box fillable: {event.box_fillable}, the browser is betting: {self.currently_is_betting}"
-                )
+                            if (
+                                self.__send_text_on_bet(
+                                    event, selector_index, decision["amount"]
+                                )
+                                is True
+                            ):
+                                logger.info(
+                                    f"Going to place the bet for {event}",
+                                    extra={"emoji": ":wrench:"},
+                                )
+                                if self.__click_on_vote(event, selector_index) is True:
+                                    event.bet_placed = True
+                                    time.sleep(random.uniform(5, 10))
+                        except Exception:
+                            logger.error("Exception raised", exc_info=True)
+                else:
+                    logger.info(
+                        f"Sorry, unable to complete the bet. Event box fillable: {event.box_fillable}, the browser is betting: {self.currently_is_betting}"
+                    )
         else:
             logger.info(
                 f"Oh no! The event is not active anymore! Current status: {event.status}",
