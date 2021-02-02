@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import copy
 import logging
 import os
 import random
@@ -174,7 +173,9 @@ class TwitchChannelPointsMiner:
                 if streamer.viewer_is_mod is True:
                     streamer.settings.make_predictions = False
 
-            self.original_streamers = copy.deepcopy(self.streamers)
+            self.original_streamers = [
+                streamer.channel_points for streamer in self.streamers
+            ]
 
             # If we have at least one streamer with settings = make_predictions True
             make_predictions = at_least_one_value_in_settings_is(
@@ -307,7 +308,7 @@ class TwitchChannelPointsMiner:
 
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
-                f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
+                f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index])}",
                 extra={"emoji": ":robot:"},
             )
             if self.streamers[streamer_index].history != {}:
