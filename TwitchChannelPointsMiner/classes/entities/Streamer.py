@@ -143,7 +143,7 @@ class Streamer(object):
         time.sleep(random.uniform(1, 3))
         fname = os.path.join(Settings.analytics_path, f"{self.username}.json")
         with self.mutex:
-            data = json.load(open(fname), "r") if os.path.isfile(fname) else {}
+            data = json.load(open(fname, "r")) if os.path.isfile(fname) else {}
             if key not in data:
                 data[key] = []
 
