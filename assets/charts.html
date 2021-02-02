@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twitch-Channel-Points-Miner-v2</title>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 </head>
 
 <body>
@@ -15,21 +16,7 @@
 <script type="text/javascript">
     // https://apexcharts.com/javascript-chart-demos/line-charts/zoomable-timeseries/
     var options = {
-        series: [{
-            name: 'Channel points',
-            data: [
-                [1612273821.4172087 * 1000, 91951],
-                [1612274122.4511287 * 1000, 91963],
-                [1612274341.3979685 * 1000, 94143],
-                [1612274541.9317245 * 1000, 94155],
-                [1612274542.5087166 * 1000, 94215],
-                [1612274842.5968854 * 1000, 94227],
-                [1612275143.2812731 * 1000, 94239],
-                [1612275473.180887 * 1000, 94251],
-                [1612275473.7690933 * 1000, 94311],
-                [1612275923.7695432 * 1000, 94323]
-            ]
-        }],
+        series: [],
         chart: {
             type: 'area',
             stacked: false,
@@ -73,11 +60,27 @@
         },
         tooltip: {
             shared: false
+        },
+        noData: {
+            text: 'Loading...'
         }
     };
 
     var chart = new ApexCharts(document.querySelector("#chart"), options);
     chart.render();
+
+    var streamers = '{{ streamers }}';
+    streamers = streamers.split(',');
+
+    streamers.forEach(streamer => {
+        $.getJSON(`./json/${streamer}`, function (response) {
+            chart.appendSeries({
+                name: streamer.replace(".json", ""),
+                data: response
+            })
+        });
+    });
+
 </script>
 
 </html>

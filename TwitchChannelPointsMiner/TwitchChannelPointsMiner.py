@@ -12,6 +12,7 @@ from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 
+from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.entities.Streamer import (
     Streamer,
@@ -34,9 +35,10 @@ from TwitchChannelPointsMiner.utils import (
 )
 
 # Suppress warning for urllib3.connectionpool (selenium close connection)
-# Suppress also the selenium logger please
+# Suppress Selenium and Flask (werkzeug) logs
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 logging.getLogger("selenium").setLevel(logging.ERROR)
+logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +48,7 @@ class TwitchChannelPointsMiner:
         self,
         username: str,
         claim_drops_startup: bool = False,
+        analytics: bool = True,
         # Settings for logging and selenium as you can see.
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
@@ -83,6 +86,10 @@ class TwitchChannelPointsMiner:
         self.original_streamers = []
 
         self.logs_file = configure_loggers(self.username, logger_settings)
+
+        if analytics is True:
+            http_server = AnalyticsServer()
+            http_server.run()
 
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
