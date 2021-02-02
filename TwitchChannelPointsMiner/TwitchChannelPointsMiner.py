@@ -43,7 +43,7 @@ logging.getLogger("werkzeug").setLevel(logging.ERROR)
 logger = logging.getLogger(__name__)
 
 
-class TwitchChannelPointsMiner:
+class TwitchChannelPointsMiner(object):
     def __init__(
         self,
         username: str,
@@ -277,6 +277,13 @@ class TwitchChannelPointsMiner:
         self.ws_pool.end()
 
         self.minute_watcher_thread.join()
+
+        # Check if all the mutex are unlocked.
+        # Prevent breaks of .json file
+        for streamer in self.streamers:
+            if streamer.mutex.locked():
+                streamer.mutex.acquire()
+                streamer.mutex.release()
 
         self.__print_report()
         time.sleep(3.5)  # Do sleep for ending browser and threads
