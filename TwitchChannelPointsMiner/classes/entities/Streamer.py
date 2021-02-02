@@ -124,7 +124,7 @@ class Streamer(object):
             else ("#ff4560" if event_type == "LOSE" else "#54ff45")
         )
         data = {
-            "x": self.channel_points,
+            "y": self.channel_points,
             "marker": {
                 "size": 4,
                 "fillColor": "#fff",
@@ -144,7 +144,7 @@ class Streamer(object):
         self.__save_json("points", data)
 
     def persistent_series(self):
-        self.__save_json("series", {"x": self.channel_points})
+        self.__save_json("series", {"y": self.channel_points})
 
     def __save_json(self, key, new_data):
         fname = os.path.join(Settings.analytics_path, f"{self.username}.json")
@@ -154,7 +154,7 @@ class Streamer(object):
                 data[key] = []
 
             # https://stackoverflow.com/questions/4676195/why-do-i-need-to-multiply-unix-timestamps-by-1000-in-javascript
-            new_data.update({"y": round(time.time() * 1000)})
+            new_data.update({"x": round(time.time() * 1000)})
             data[key].append(new_data)
             with open(fname, "w") as outfile:
                 json.dump(data, outfile, indent=4)

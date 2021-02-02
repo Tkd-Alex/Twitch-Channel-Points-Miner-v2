@@ -99,7 +99,7 @@
         $.getJSON(`./json/${streamer}`, function (response) {
             chart.appendSeries({
                 name: streamer.replace(".json", ""),
-                data: response
+                data: response["series"]
             })
         });
     });

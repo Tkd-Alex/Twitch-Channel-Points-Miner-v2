@@ -1,10 +1,14 @@
+import logging
 import os
 from multiprocessing import Process
 from pathlib import Path
 
-from flask import Flask, Response, render_template  # , cli
+from flask import Flask, Response, cli, render_template
 
 from TwitchChannelPointsMiner.classes.Settings import Settings
+
+cli.show_server_banner = lambda *_: None
+logger = logging.getLogger(__name__)
 
 
 def streamers_available():
@@ -30,12 +34,12 @@ def index():
     return render_template("charts.html", streamers=",".join(streamers_available()))
 
 
-# cli.show_server_banner = lambda *_: None
-
-
 class AnalyticsServer(Process):
-    def __init__(self):
+    def __init__(self, host="127.0.0.1", port=5000):
         super(AnalyticsServer, self).__init__()
+
+        self.host = host
+        self.port = port
 
         self.app = Flask(
             __name__,
@@ -46,4 +50,8 @@ class AnalyticsServer(Process):
         self.app.add_url_rule("/json/<string:streamer>", "json", read_json)
 
     def run(self):
-        self.app.run()
+        logger.info(
+            f"Running on http:/{self.host}:{self.port}/",
+            extra={"emoji": ":globe_with_meridians:"},
+        )
+        self.app.run(host=self.host, port=self.port, threaded=True)
