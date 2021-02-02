@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from flask import Flask, Response, render_template
+from flask import Flask, Response, render_template  # , cli
 
 from TwitchChannelPointsMiner.classes.Settings import Settings
 
@@ -29,10 +29,15 @@ def index():
     return render_template("charts.html", streamers=",".join(streamers_available()))
 
 
+# cli.show_server_banner = lambda *_: None
+
+
 class AnalyticsServer(object):
     def __init__(self):
         self.app = Flask(
-            __name__, template_folder=os.path.join(Path().absolute(), "assets")
+            __name__,
+            template_folder=os.path.join(Path().absolute(), "assets"),
+            static_folder=os.path.join(Path().absolute(), "assets"),
         )
         self.app.add_url_rule("/", "index", index)
         self.app.add_url_rule("/json/<string:streamer>", "json", read_json)
