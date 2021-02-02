@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import random
 import time
 from threading import Lock
 
@@ -117,9 +116,8 @@ class Streamer(object):
                 else ("#ff4560" if event_type == "LOSE" else "#54ff45")
             )
             data = {
-                "y": self.channel_points,
                 "marker": {
-                    "size": 4,
+                    "size": 5,
                     "fillColor": "#fff",
                     "strokeColor": primary_color,
                     "radius": 2,
@@ -137,17 +135,16 @@ class Streamer(object):
             self.__save_json("points", data)
 
     def persistent_series(self):
-        self.__save_json("series", {"y": self.channel_points})
+        self.__save_json("series")
 
-    def __save_json(self, key, new_data):
-        time.sleep(random.uniform(1, 3))
+    def __save_json(self, key, data={}):
+        # https://stackoverflow.com/questions/4676195/why-do-i-need-to-multiply-unix-timestamps-by-1000-in-javascript
+        data.update({"y": self.channel_points, "x": round(time.time() * 1000)})
         fname = os.path.join(Settings.analytics_path, f"{self.username}.json")
         with self.mutex:
-            data = json.load(open(fname, "r")) if os.path.isfile(fname) else {}
-            if key not in data:
-                data[key] = []
+            json_data = json.load(open(fname, "r")) if os.path.isfile(fname) else {}
+            if key not in json_data:
+                json_data[key] = []
 
-            # https://stackoverflow.com/questions/4676195/why-do-i-need-to-multiply-unix-timestamps-by-1000-in-javascript
-            new_data.update({"x": round(time.time() * 1000)})
-            data[key].append(new_data)
-            json.dump(data, open(fname, "w"), indent=4)
+            json_data[key].append(data)
+            json.dump(json_data, open(fname, "w"), indent=4)

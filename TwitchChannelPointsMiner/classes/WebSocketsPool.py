@@ -144,7 +144,7 @@ class WebSocketsPool:
                                 reason_code, earned
                             )
                             ws.streamers[streamer_index].persistent_points(
-                                reason_code, f"+{earned}"
+                                reason_code, f"+{earned} - {reason_code}"
                             )
                         elif message.type == "claim-available":
                             ws.twitch.claim_bonus(

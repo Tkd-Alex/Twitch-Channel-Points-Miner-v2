@@ -101,6 +101,9 @@
                 name: streamer.replace(".json", ""),
                 data: response["series"]
             })
+            response["points"].forEach(annotation => {
+                chart.addPointAnnotation(annotation, true)
+            })
         });
     });
 
