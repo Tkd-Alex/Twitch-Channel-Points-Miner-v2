@@ -284,18 +284,21 @@ class TwitchChannelPointsMiner:
             extra={"emoji": ":hourglass:"},
         )
 
-        if self.make_predictions:
-            for event_id in self.events_predictions:
-                if self.events_predictions[event_id].bet_confirmed is True:
-                    logger.info(
-                        f"{self.events_predictions[event_id].streamer.bet.settings}",
-                        extra={"emoji": ":bar_chart:"},
-                    )
-                    logger.info(
-                        f"{self.events_predictions[event_id].print_recap()}",
-                        extra={"emoji": ":bar_chart:"},
-                    )
-            print("")
+        for event_id in self.events_predictions:
+            if (
+                self.events_predictions[event_id].bet_confirmed is True
+                and self.events_predictions[event_id].streamer.settings.make_predictions
+                is True
+            ):
+                logger.info(
+                    f"{self.events_predictions[event_id].streamer.settings.bet}",
+                    extra={"emoji": ":bar_chart:"},
+                )
+                logger.info(
+                    f"{self.events_predictions[event_id].print_recap()}",
+                    extra={"emoji": ":bar_chart:"},
+                )
+        print("")
 
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
