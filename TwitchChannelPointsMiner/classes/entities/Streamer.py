@@ -1,5 +1,8 @@
+import json
 import logging
+import os
 import time
+from threading import Lock
 
 from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.Stream import Stream
@@ -57,6 +60,8 @@ class Streamer(object):
         self.streamer_url = f"{URL}/{self.username}"
         self.chat_url = f"{URL}/popout/{self.username}/chat?popout="
 
+        self.mutex = Lock()
+
     def __repr__(self):
         return f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={_millify(self.channel_points)})"
 
@@ -101,3 +106,11 @@ class Streamer(object):
 
     def stream_up_elapsed(self):
         return self.stream_up == 0 or ((time.time() - self.stream_up) > 120)
+
+    def persistent_history(self):
+        fname = os.path.join(Settings.analytics_path, f"{self.username}.json")
+        with self.mutex:
+            data = json.load(open(fname)) if os.path.isfile(fname) else []
+            data.append([time.time, self.channel_points])
+            with open(fname, "w") as outfile:
+                json.dump(data, outfile, indent=4)

@@ -128,11 +128,14 @@ class WebSocketsPool:
             if streamer_index != -1:
                 try:
                     if message.topic == "community-points-user-v1":
+                        if message.type in ["points-earned", "points-spent"]:
+                            balance = message.data["balance"]["balance"]
+                            ws.streamers[streamer_index].channel_points = balance
+                            ws.streamers[streamer_index].persistent_history()
+
                         if message.type == "points-earned":
                             earned = message.data["point_gain"]["total_points"]
                             reason_code = message.data["point_gain"]["reason_code"]
-                            balance = message.data["balance"]["balance"]
-                            ws.streamers[streamer_index].channel_points = balance
                             logger.info(
                                 f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
                                 extra={"emoji": ":rocket:"},

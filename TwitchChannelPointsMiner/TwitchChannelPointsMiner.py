@@ -2,6 +2,7 @@
 
 import copy
 import logging
+import os
 import random
 import signal
 import sys
@@ -10,6 +11,7 @@ import time
 import uuid
 from collections import OrderedDict
 from datetime import datetime
+from pathlib import Path
 
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.entities.Streamer import (
@@ -52,6 +54,9 @@ class TwitchChannelPointsMiner:
         # Default values for all streamers
         streamer_settings: StreamerSettings = StreamerSettings(),
     ):
+        Settings.analytics_path = os.path.join(Path().absolute(), "analytics")
+        Path(Settings.analytics_path).mkdir(parents=True, exist_ok=True)
+
         self.username = username
 
         # Set as globally config
