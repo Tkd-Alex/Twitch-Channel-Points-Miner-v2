@@ -111,6 +111,6 @@ class Streamer(object):
         fname = os.path.join(Settings.analytics_path, f"{self.username}.json")
         with self.mutex:
             data = json.load(open(fname)) if os.path.isfile(fname) else []
-            data.append([time.time, self.channel_points])
+            data.append([time.time(), self.channel_points])
             with open(fname, "w") as outfile:
                 json.dump(data, outfile, indent=4)
