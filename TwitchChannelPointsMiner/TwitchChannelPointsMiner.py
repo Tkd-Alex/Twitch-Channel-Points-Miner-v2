@@ -89,7 +89,7 @@ class TwitchChannelPointsMiner:
 
         if analytics is True:
             http_server = AnalyticsServer()
-            http_server.run()
+            http_server.start()
 
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)

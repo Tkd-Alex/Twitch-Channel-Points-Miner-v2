@@ -1,4 +1,5 @@
 import os
+from multiprocessing import Process
 from pathlib import Path
 
 from flask import Flask, Response, render_template  # , cli
@@ -32,8 +33,10 @@ def index():
 # cli.show_server_banner = lambda *_: None
 
 
-class AnalyticsServer(object):
+class AnalyticsServer(Process):
     def __init__(self):
+        super(AnalyticsServer, self).__init__()
+
         self.app = Flask(
             __name__,
             template_folder=os.path.join(Path().absolute(), "assets"),
