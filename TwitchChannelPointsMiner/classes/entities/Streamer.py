@@ -111,6 +111,7 @@ class Streamer(object):
         fname = os.path.join(Settings.analytics_path, f"{self.username}.json")
         with self.mutex:
             data = json.load(open(fname)) if os.path.isfile(fname) else []
-            data.append([time.time(), self.channel_points])
+            # https://stackoverflow.com/questions/4676195/why-do-i-need-to-multiply-unix-timestamps-by-1000-in-javascript
+            data.append([round(time.time() * 1000), self.channel_points])
             with open(fname, "w") as outfile:
                 json.dump(data, outfile, indent=4)
