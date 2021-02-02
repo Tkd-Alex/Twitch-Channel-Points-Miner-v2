@@ -131,7 +131,7 @@ class WebSocketsPool:
                         if message.type in ["points-earned", "points-spent"]:
                             balance = message.data["balance"]["balance"]
                             ws.streamers[streamer_index].channel_points = balance
-                            ws.streamers[streamer_index].persistent_history()
+                            ws.streamers[streamer_index].persistent_series()
 
                         if message.type == "points-earned":
                             earned = message.data["point_gain"]["total_points"]
@@ -142,6 +142,9 @@ class WebSocketsPool:
                             )
                             ws.streamers[streamer_index].update_history(
                                 reason_code, earned
+                            )
+                            ws.streamers[streamer_index].persistent_points(
+                                reason_code, f"+{earned}"
                             )
                         elif message.type == "claim-available":
                             ws.twitch.claim_bonus(
@@ -256,8 +259,19 @@ class WebSocketsPool:
                         if event_id in ws.events_predictions:
                             if message.type == "prediction-result":
                                 event_result = message.data["prediction"]["result"]
+                                poinst_placed = ws.events_predictions[
+                                    event_id
+                                ].bet.decision["amount"]
+                                points_prefix = (
+                                    "+" if event_result["points_won"] else "-"
+                                )
+                                points_won = (
+                                    event_result["points_won"]
+                                    if event_result["points_won"]
+                                    else (poinst_placed * -1)
+                                )
                                 logger.info(
-                                    f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {_millify(event_result['points_won']) if event_result['points_won'] else 0}",
+                                    f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {points_prefix}{_millify(points_won)}",
                                     extra={"emoji": ":bar_chart:"},
                                 )
                                 points_won = (
@@ -269,6 +283,12 @@ class WebSocketsPool:
                                     "type": event_result["type"],
                                     "won": points_won,
                                 }
+                                ws.events_predictions[
+                                    event_id
+                                ].streamer.persistent_points(
+                                    event_result["type"],
+                                    f"{points_prefix}{points_won} - {event_result['type']}: {ws.events_predictions[event_id].title}",
+                                )
                             elif message.type == "prediction-made":
                                 ws.events_predictions[event_id].bet_confirmed = True
 
