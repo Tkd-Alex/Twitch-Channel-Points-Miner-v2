@@ -177,19 +177,22 @@ class Bet(object):
             logger.info(
                 f"Filter applied on this bet. Current {key} is {compared_value}, must be {condition} {value}"
             )
+            # Check if condition is satisfied
             if condition == Condition.GT:
                 if compared_value > value:
-                    return True
+                    return False
             elif condition == Condition.LT:
                 if compared_value < value:
-                    return True
+                    return False
             elif condition == Condition.GTE:
                 if compared_value >= value:
-                    return True
+                    return False
             elif condition == Condition.LTE:
                 if compared_value <= value:
-                    return True
-        return False
+                    return False
+            return True  # Else skip the bet
+        else:
+            return False  # Default don't skip the bet
 
     def calculate(self, balance: int) -> dict:
         self.decision = {"choice": None, "amount": 0, "id": None}
