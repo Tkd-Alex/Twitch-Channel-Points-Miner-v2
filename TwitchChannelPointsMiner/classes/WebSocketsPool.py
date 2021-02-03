@@ -252,12 +252,24 @@ class WebSocketsPool:
                         event_id = message.data["prediction"]["event_id"]
                         if event_id in ws.events_predictions:
                             event_prediction = ws.events_predictions[event_id]
-                            if message.type == "prediction-result" and event_prediction.bet_confirmed:
+                            if (
+                                message.type == "prediction-result"
+                                and event_prediction.bet_confirmed
+                            ):
                                 event_result = message.data["prediction"]["result"]
-                                result_type = event_result['type']
+                                result_type = event_result["type"]
                                 points_placed = event_prediction.bet.decision["amount"]
-                                points_won = event_result["points_won"] if event_result["points_won"] or result_type == "REFUND" else 0
-                                points_gained = points_won - points_placed if result_type != "REFUND" else 0
+                                points_won = (
+                                    event_result["points_won"]
+                                    if event_result["points_won"]
+                                    or result_type == "REFUND"
+                                    else 0
+                                )
+                                points_gained = (
+                                    points_won - points_placed
+                                    if result_type != "REFUND"
+                                    else 0
+                                )
                                 points_prefix = "+" if points_gained >= 0 else ""
                                 logger.info(
                                     f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {points_prefix}{_millify(points_gained)}",
@@ -266,7 +278,7 @@ class WebSocketsPool:
                                 ws.events_predictions[event_id].final_result = {
                                     "type": event_result["type"],
                                     "points_won": points_won,
-                                    "gained": points_gained
+                                    "gained": points_gained,
                                 }
                                 ws.streamers[streamer_index].update_history(
                                     "PREDICTION-TEST", points_gained

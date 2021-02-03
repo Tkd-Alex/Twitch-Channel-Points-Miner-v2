@@ -87,7 +87,7 @@ class Streamer(object):
             [
                 f"{key}({self.history[key]['counter']} times, {_millify(self.history[key]['amount'])} gained)"
                 for key in self.history
-                if self.history[key]['counter'] != 0
+                if self.history[key]["counter"] != 0
             ]
         )
 
