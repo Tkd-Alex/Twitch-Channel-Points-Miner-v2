@@ -268,7 +268,7 @@ If the browser are currently betting or wait for more data It's impossible to in
 | `follow_raid`      	| bool        	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	                                                                           |
 | `claim_drops`      	| bool        	| True                           	| If this values is True the script will increase the watch-time for the current game. With this you are able to claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) |
 | `watch_streak`     	| bool        	| True                           	| Choose if you want to change priority for this streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                     |
-| `bet`              	| BetSettings 	| Default values for BetSettings 	| Rules to follow for the bet                                                                                                                                                                                                      |
+| `bet`              	| BetSettings 	|  	                                | Rules to follow for the bet                                                                                                                                                                                                      |
 ### BetSettings
 | Key                	| Type            	| Default 	| Description                                                                                                    	                                                                     |
 |--------------------	|-----------------	|---------	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -303,8 +303,10 @@ In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot wi
 | `value`     	| number      	| None    	| Value to compare                                                                 	|
 | `decision`  	| bool        	| None    	| If True the filter apply base on decision of the bet. If False calculate the sum 	|
 
-- Allowed values for `key` are: `PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS`
-- Allowed values for `condition` are: `GT, LT, GTE, LTE`
+- Allowed values for `key` are:
+`PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS`
+- Allowed values for `condition` are:
+`GT, LT, GTE, LTE`
 
 #### Example
 - If you want to place the bet ONLY if the total of users participants in the bet are greater than 200
