@@ -38,17 +38,15 @@ class WebSocketsPool:
     """
 
     def submit(self, topic):
-        if self.ws == [] or len(self.ws[len(self.ws) - 1].topics) >= 50:
+        if self.ws == [] or len(self.ws[-1].topics) >= 50:
             self.append_new_websocket()
 
-        self.ws[len(self.ws) - 1].topics.append(topic)
+        self.ws[-1].topics.append(topic)
 
-        if self.ws[len(self.ws) - 1].is_opened is False:
-            self.ws[len(self.ws) - 1].pending_topics.append(topic)
+        if self.ws[-1].is_opened is False:
+            self.ws[-1].pending_topics.append(topic)
         else:
-            self.ws[len(self.ws) - 1].listen(
-                topic, self.twitch.twitch_login.get_auth_token()
-            )
+            self.ws[-1].listen(topic, self.twitch.twitch_login.get_auth_token())
 
     def append_new_websocket(self):
         self.ws.append(
@@ -60,11 +58,9 @@ class WebSocketsPool:
                 on_close=WebSocketsPool.handle_websocket_reconnection,
             )
         )
-        self.ws[len(self.ws) - 1].reset(self)
+        self.ws[-1].reset(self)
 
-        self.thread_ws = threading.Thread(
-            target=lambda: self.ws[len(self.ws) - 1].run_forever()
-        )
+        self.thread_ws = threading.Thread(target=lambda: self.ws[-1].run_forever())
         self.thread_ws.daemon = True
         self.thread_ws.start()
 
