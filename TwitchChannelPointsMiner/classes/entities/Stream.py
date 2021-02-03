@@ -57,10 +57,10 @@ class Stream(object):
         )
 
     def __str_game(self):
-        return None if self.game == {} else self.game["displayName"]
+        return None if self.game in [{}, None] else self.game["displayName"]
 
     def game_name(self):
-        return None if self.game == {} else self.game["name"]
+        return None if self.game in [{}, None] else self.game["name"]
 
     def update_required(self):
         return self.__last_update == 0 or (time.time() - self.__last_update) >= 120
