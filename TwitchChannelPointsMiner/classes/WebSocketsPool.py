@@ -286,11 +286,25 @@ class WebSocketsPool:
 
                                 # Remove duplicate history records from previous message sent in community-points-user-v1
                                 if result_type == "REFUND":
-                                    logger.info("REMOVE REFUND FROM POINTS MSG")  # TODO remove
-                                    ws.streamers[streamer_index].update_history("REFUND", -points_placed, counter=-1, create_if_missing=False)
+                                    logger.info(
+                                        "REMOVE REFUND FROM POINTS MSG"
+                                    )  # TODO remove
+                                    ws.streamers[streamer_index].update_history(
+                                        "REFUND",
+                                        -points_placed,
+                                        counter=-1,
+                                        create_if_missing=False
+                                    )
                                 else:
-                                    logger.info("REMOVE PREDICTION FROM POINTS MSG")  # TODO remove
-                                    ws.streamers[streamer_index].update_history("PREDICTION", -points_won, counter=-1, create_if_missing=False)
+                                    logger.info(
+                                        "REMOVE PREDICTION FROM POINTS MSG"
+                                    )  # TODO remove
+                                    ws.streamers[streamer_index].update_history(
+                                        "PREDICTION",
+                                        -points_won,
+                                        counter=-1,
+                                        create_if_missing=False
+                                    )
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
 
