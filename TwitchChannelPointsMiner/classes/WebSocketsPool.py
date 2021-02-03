@@ -251,23 +251,35 @@ class WebSocketsPool:
                     elif message.topic == "predictions-user-v1":
                         event_id = message.data["prediction"]["event_id"]
                         if event_id in ws.events_predictions:
-                            if message.type == "prediction-result":
+                            event_prediction = ws.events_predictions[event_id]
+                            if message.type == "prediction-result" and event_prediction.bet_confirmed:
                                 event_result = message.data["prediction"]["result"]
+                                result_type = event_result['type']
+                                points_placed = event_prediction.bet.decision["amount"]
+                                points_won = event_result["points_won"] if event_result["points_won"] or result_type == "REFUND" else 0
+                                points_gained = points_won - points_placed if result_type != "REFUND" else 0
                                 logger.info(
-                                    f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {_millify(event_result['points_won']) if event_result['points_won'] else 0}",
+                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {_millify(points_gained)}",
                                     extra={"emoji": ":bar_chart:"},
-                                )
-                                points_won = (
-                                    event_result["points_won"]
-                                    if event_result["points_won"]
-                                    else 0
                                 )
                                 ws.events_predictions[event_id].final_result = {
                                     "type": event_result["type"],
-                                    "won": points_won,
+                                    "points_won": points_won,
+                                    "gained": points_gained
                                 }
+                                ws.streamers[streamer_index].update_history(
+                                    "PREDICTION-TEST", points_gained
+                                )
+
+                                # Remove duplicate history records from previous message sent in community-points-user-v1
+                                if result_type == "REFUND":
+                                    logger.info("REMOVE REFUND FROM POINTS MSG")  # TODO remove
+                                    ws.streamers[streamer_index].update_history("REFUND", -points_placed, counter=-1, create_if_missing=False)
+                                else:
+                                    logger.info("REMOVE PREDICTION FROM POINTS MSG")  # TODO remove
+                                    ws.streamers[streamer_index].update_history("PREDICTION", -points_won, counter=-1, create_if_missing=False)
                             elif message.type == "prediction-made":
-                                ws.events_predictions[event_id].bet_confirmed = True
+                                event_prediction.bet_confirmed = True
 
                     elif message.topic == "user-drop-events":
                         if message.type == "drop-progress":
