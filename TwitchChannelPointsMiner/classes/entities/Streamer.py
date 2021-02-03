@@ -91,10 +91,8 @@ class Streamer(object):
             ]
         )
 
-    def update_history(self, reason_code, earned, counter=1, create_if_missing=True):
+    def update_history(self, reason_code, earned, counter=1):
         if reason_code not in self.history:
-            if not create_if_missing:
-                return
             self.history[reason_code] = {"counter": 0, "amount": 0}
         self.history[reason_code]["counter"] += counter
         self.history[reason_code]["amount"] += earned

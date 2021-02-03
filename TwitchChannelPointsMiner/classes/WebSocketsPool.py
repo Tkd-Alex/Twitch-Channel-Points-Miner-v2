@@ -293,9 +293,8 @@ class WebSocketsPool:
                                         "REFUND",
                                         -points_placed,
                                         counter=-1,
-                                        create_if_missing=False,
                                     )
-                                else:
+                                elif result_type == "WIN":
                                     logger.info(
                                         "REMOVE PREDICTION FROM POINTS MSG"
                                     )  # TODO remove
@@ -303,7 +302,6 @@ class WebSocketsPool:
                                         "PREDICTION",
                                         -points_won,
                                         counter=-1,
-                                        create_if_missing=False,
                                     )
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
