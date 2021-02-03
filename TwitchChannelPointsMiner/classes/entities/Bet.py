@@ -41,7 +41,7 @@ class FilterCondition(object):
         self.decision = decision
 
     def __repr__(self):
-        return f"FilterCondition(Key={self.key}, Condition={self.condition}, Value={self.value}, Index={self.index})"
+        return f"FilterCondition(Key={self.key}, Condition={self.condition}, Value={self.value}, Decision={self.decision})"
 
 
 class BetSettings(object):
