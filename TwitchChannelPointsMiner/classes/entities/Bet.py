@@ -70,7 +70,7 @@ class BetSettings(object):
     def default(self):
         self.strategy = self.strategy if not None else Strategy.SMART
         self.percentage = self.percentage if not None else 5
-        self.percentage_gap = self.percentage_gap if not None else 2
+        self.percentage_gap = self.percentage_gap if not None else 20
         self.max_points = self.max_points if not None else 50000
         self.stealth_mode = self.stealth_mode if not None else False
 
