@@ -1,6 +1,7 @@
 import platform
 import re
 import time
+from copy import deepcopy
 from datetime import datetime, timezone
 from random import randrange
 
@@ -142,7 +143,7 @@ def copy_values_if_none(settings, defaults):
 def set_default_settings(settings, defaults):
     # If no settings was provided use the default settings ...
     if settings is None:
-        settings = defaults
+        settings = deepcopy(defaults)
     else:
         # If settings was provided but maybe are only partial set
         # Get the default values from Settings.streamer_settings
