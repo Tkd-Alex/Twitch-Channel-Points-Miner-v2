@@ -7,34 +7,46 @@
     <title>Twitch-Channel-Points-Miner-v2</title>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.css" rel="stylesheet"/>
 </head>
 
 <body>
-    <div style="text-align: center">
-        <img width="600px" src="{{url_for('static', filename='banner.png')}}" alt="banner">
+    <div class="container">
+        <div style="text-align: center">
+            <img width="600px" src="{{url_for('static', filename='banner.png')}}" alt="banner">
+            <br>
+
+            <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE">
+                <img alt="License" src="https://img.shields.io/github/license/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
+            </a>
+            <a style="text-decoration: none;" href="https://www.python.org/download/releases/3.0/">
+                <img alt="Python3" src="https://img.shields.io/badge/built%20with-Python3-red.svg?style=flat" />
+            </a>
+            <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pulls">
+                <img alt="PRsWelcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" />
+            </a>
+            <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/stargazers">
+                <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
+            </a>
+            <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues?q=is%3Aissue+is%3Aclosed">
+                <img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/Tkd-Alex/Twitch-Channel-Points-Miner-v2">
+            </a>
+            <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2">
+                <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
+            </a>
+        </div>
         <br>
 
-        <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE">
-            <img alt="License" src="https://img.shields.io/github/license/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
-        </a>
-        <a style="text-decoration: none;" href="https://www.python.org/download/releases/3.0/">
-            <img alt="Python3" src="https://img.shields.io/badge/built%20with-Python3-red.svg?style=flat" />
-        </a>
-        <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pulls">
-            <img alt="PRsWelcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" />
-        </a>
-        <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/stargazers">
-            <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
-        </a>
-        <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues?q=is%3Aissue+is%3Aclosed">
-            <img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/Tkd-Alex/Twitch-Channel-Points-Miner-v2">
-        </a>
-        <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2">
-            <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
-        </a>
+        <div class="tabs">
+            <ul>
+                {% for streamer in streamers.split(',') %}
+                    <li onClick="changeStreamer('{{streamer}}', {{loop.index}})"><a>{{ streamer.replace(".json", "")  }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="chart"></div>
     </div>
-    <br>
-    <div id="chart"></div>
 </body>
 <script type="text/javascript">
     // https://apexcharts.com/javascript-chart-demos/line-charts/zoomable-timeseries/
@@ -43,7 +55,7 @@
         chart: {
             type: 'area',
             stacked: false,
-            height: 350,
+            height: 400,
             zoom: {
                 type: 'x',
                 enabled: true,
@@ -90,22 +102,27 @@
     };
 
     var chart = new ApexCharts(document.querySelector("#chart"), options);
-    chart.render();
 
-    var streamers = '{{ streamers }}';
-    streamers = streamers.split(',');
+    $( document ).ready(function() {
+        chart.render();
+        $("li").eq(0).click();
+    });
 
-    streamers.forEach(streamer => {
+    function changeStreamer(streamer, index) {
+        $("li").removeClass( "is-active" )
+        $("li").eq(index - 1).addClass('is-active');
+
         $.getJSON(`./json/${streamer}`, function (response) {
-            chart.appendSeries({
+            chart.clearAnnotations()
+            chart.updateSeries([{
                 name: streamer.replace(".json", ""),
                 data: response["series"]
-            })
+            }], true)
             response["points"].forEach(annotation => {
                 chart.addPointAnnotation(annotation, true)
             })
         });
-    });
+    }
 
 </script>
 
