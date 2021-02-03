@@ -55,7 +55,9 @@ class WebSocketsPool:
                 url=WEBSOCKET,
                 on_message=WebSocketsPool.on_message,
                 on_open=WebSocketsPool.on_open,
-                on_close=WebSocketsPool.handle_websocket_reconnection,
+                on_error=WebSocketsPool.on_error,
+                on_close=WebSocketsPool.on_close
+                # on_close=WebSocketsPool.handle_reconnection, # Do nothing.
             )
         )
         self.ws[-1].reset(self)
@@ -66,7 +68,6 @@ class WebSocketsPool:
 
     def end(self):
         for index in range(0, len(self.ws)):
-            self.ws[index].keep_running = False
             self.ws[index].close()
 
     @staticmethod
@@ -81,31 +82,35 @@ class WebSocketsPool:
                 ws.ping()
                 time.sleep(random.uniform(25, 30))
 
-                if ws.elapsed_last_pong() > 15 and ws.is_reconneting is False:
+                if ws.elapsed_last_pong() > 10 and ws.is_reconneting is False:
                     logger.info(
-                        f"#{ws.index} - The last pong was received more than 15 minutes ago. Reconnect the WebSocket"
+                        f"#{ws.index} - The last PONG was received more than 10 minutes ago. Reconnect the WebSocket"
                     )
-                    ws.keep_running = True
                     ws.is_reconneting = True
-                    WebSocketsPool.handle_websocket_reconnection(ws)
+                    WebSocketsPool.handle_reconnection(ws)
 
         thread_ws = threading.Thread(target=run)
         thread_ws.daemon = True
         thread_ws.start()
 
     @staticmethod
-    def handle_websocket_reconnection(ws):
-        ws.is_closed = True
-        if ws.keep_running is True:
-            logger.info(
-                f"#{ws.index} - Reconnecting to Twitch PubSub server in 60 seconds"
-            )
-            time.sleep(60)
+    def on_error(ws, error):
+        logger.error(f"#{ws.index} - WebSocket error: {error}")
 
-            self = ws.parent_pool
-            self.ws[ws.index] = None
-            for topic in ws.topics:
-                self.submit(topic)
+    @staticmethod
+    def on_close(ws):
+        logger.info(f"#{ws.index} - WebSocket closed")
+
+    @staticmethod
+    def handle_reconnection(ws):
+        ws.is_closed = True
+        logger.info(f"#{ws.index} - Reconnecting to Twitch PubSub server in 30 seconds")
+        time.sleep(30)
+
+        self = ws.parent_pool
+        self.ws[ws.index] = None
+        for topic in ws.topics:
+            self.submit(topic)
 
     @staticmethod
     def on_message(ws, message):
@@ -312,11 +317,9 @@ class WebSocketsPool:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")
 
         elif response["type"] == "RECONNECT":
-            logger.info(
-                f"#{ws.index} - Reconnection required and keep running is: {ws.keep_running}"
-            )
+            logger.info(f"#{ws.index} - Reconnection required")
             ws.is_reconneting = True
-            WebSocketsPool.handle_websocket_reconnection(ws)
+            WebSocketsPool.handle_reconnection(ws)
 
         elif response["type"] == "PONG":
             ws.last_pong = time.time()

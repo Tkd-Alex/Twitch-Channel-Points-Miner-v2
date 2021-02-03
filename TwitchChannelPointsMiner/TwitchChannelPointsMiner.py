@@ -248,14 +248,16 @@ class TwitchChannelPointsMiner:
             while self.running:
                 time.sleep(random.uniform(20, 60))
                 # Do an external control for WebSocket. Check if the thread is running
+                # Check if is not None because maybe we have already created a new connection on array+1 and now index is None
                 for index in range(0, len(self.ws_pool.ws)):
-                    if self.ws_pool.ws[index].elapsed_last_ping() > 5:
+                    if (
+                        self.ws_pool.ws[index] is not None
+                        and self.ws_pool.ws[index].elapsed_last_ping() > 10
+                    ):
                         logger.info(
-                            f"#{index} - The last ping was sent more than 5 minutes ago. Reconnecting to the WebSocket..."
+                            f"#{index} - The last PING was sent more than 10 minutes ago. Reconnecting to the WebSocket..."
                         )
-                        WebSocketsPool.handle_websocket_reconnection(
-                            self.ws_pool.ws[index]
-                        )
+                        WebSocketsPool.handle_reconnection(self.ws_pool.ws[index])
 
     def end(self, signum, frame):
         logger.info("CTRL+C Detected! Please wait just a moments!")

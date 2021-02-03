@@ -33,7 +33,6 @@ class TwitchWebSocket(WebSocketApp):
 
     def reset(self, parent_pool):
         self.parent_pool = parent_pool
-        self.keep_running = True
         self.is_closed = False
         self.is_opened = False
         self.is_reconneting = False
