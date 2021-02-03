@@ -19,10 +19,7 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import (
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
-from TwitchChannelPointsMiner.classes.TwitchBrowser import (
-    BrowserSettings,
-    TwitchBrowser,
-)
+from TwitchChannelPointsMiner.classes.TwitchBrowser import BrowserSettings
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.utils import (
@@ -175,14 +172,6 @@ class TwitchChannelPointsMiner:
             make_predictions = at_least_one_value_in_settings_is(
                 self.streamers, "make_predictions", True
             )
-            # We need a browser to make predictions / bet
-            if make_predictions is True:
-                self.twitch_browser = TwitchBrowser(
-                    self.twitch.twitch_login.get_auth_token(),
-                    self.session_id,
-                    settings=Settings.browser,
-                )
-                self.twitch_browser.init()
 
             self.minute_watcher_thread = threading.Thread(
                 target=self.twitch.send_minute_watched_events,
@@ -197,7 +186,6 @@ class TwitchChannelPointsMiner:
 
             self.ws_pool = WebSocketsPool(
                 twitch=self.twitch,
-                browser=self.twitch_browser,
                 streamers=self.streamers,
                 events_predictions=self.events_predictions,
             )
@@ -256,9 +244,6 @@ class TwitchChannelPointsMiner:
 
     def end(self, signum, frame):
         logger.info("CTRL+C Detected! Please wait just a moments!")
-
-        if self.twitch_browser is not None:
-            self.twitch_browser.browser.quit()
 
         self.running = self.twitch.running = False
         self.ws_pool.end()

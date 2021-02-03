@@ -35,10 +35,6 @@ def server_time(message_data):
     )
 
 
-def calculate_start_after(closing_bet_after, execution_time):
-    return round(max(1, closing_bet_after - execution_time), 2)
-
-
 # https://en.wikipedia.org/wiki/Cryptographic_nonce
 def create_nonce(length=30) -> str:
     nonce = ""
@@ -52,23 +48,6 @@ def create_nonce(length=30) -> str:
             char = chr(ord("A") + char_index - 26 - 10)
         nonce += char
     return nonce
-
-
-def bet_condition(twitch_browser, event, logger) -> bool:
-    if twitch_browser.currently_is_betting is True:
-        logger.info(
-            f"Sorry, unable to start {event}, the browser is currently betting on another event!"
-        )
-        return False
-    elif twitch_browser.browser.current_url != "about:blank":
-        logger.info(
-            "Sorry, but the browser is not currently on 'about:blank' screen. Unable to start bet!"
-        )
-        return False
-    elif event.streamer.viewer_is_mod is True:
-        logger.info(f"Sorry, you are moderator of {event.streamer}, so you can't bet!")
-        return False
-    return True
 
 
 def get_user_agent(browser) -> str:

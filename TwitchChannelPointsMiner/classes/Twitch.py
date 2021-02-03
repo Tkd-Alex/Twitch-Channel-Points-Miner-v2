@@ -11,6 +11,7 @@ import random
 import re
 import time
 from pathlib import Path
+from secrets import token_hex
 
 import requests
 
@@ -204,7 +205,7 @@ class Twitch:
                 "eventID": event.event_id,
                 "outcomeID": decision["id"],
                 "points": decision["amount"],
-                "transactionID": "412118d3********79ac856",  # How we can calculate this?
+                "transactionID": token_hex(16),
             }
         }
         return self.post_gql_request(json_data)

@@ -12,21 +12,15 @@ from TwitchChannelPointsMiner.classes.entities.Raid import Raid
 from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants.twitch import WEBSOCKET
-from TwitchChannelPointsMiner.utils import (
-    _millify,
-    bet_condition,
-    calculate_start_after,
-    get_streamer_index,
-)
+from TwitchChannelPointsMiner.utils import _millify, get_streamer_index
 
 logger = logging.getLogger(__name__)
 
 
 class WebSocketsPool:
-    def __init__(self, twitch, browser, streamers, events_predictions):
+    def __init__(self, twitch, streamers, events_predictions):
         self.ws = None
         self.twitch = twitch
-        self.browser = browser
         self.streamers = streamers
         self.events_predictions = events_predictions
 
@@ -198,30 +192,20 @@ class WebSocketsPool:
                                 if (
                                     ws.streamers[streamer_index].is_online
                                     and event.closing_bet_after(current_tmsp) > 0
-                                    and bet_condition(
-                                        ws.browser,
-                                        event,
-                                        logger,
-                                    )
-                                    is True
                                 ):
-                                    ws.events_predictions[event_id] = event
-                                    (
-                                        start_bet_status,
-                                        execution_time,
-                                    ) = ws.browser.start_bet(
-                                        ws.events_predictions[event_id]
-                                    )
-                                    if start_bet_status is True:
-                                        # place_bet_thread = threading.Timer(event.closing_bet_after(current_tmsp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                        start_after = calculate_start_after(
-                                            event.closing_bet_after(current_tmsp),
-                                            execution_time,
+                                    if event.streamer.viewer_is_mod is True:
+                                        logger.info(
+                                            f"Sorry, you are moderator of {event.streamer}, so you can't bet!"
+                                        )
+                                    else:
+                                        ws.events_predictions[event_id] = event
+                                        start_after = event.closing_bet_after(
+                                            current_tmsp
                                         )
 
                                         place_bet_thread = threading.Timer(
                                             start_after,
-                                            ws.browser.place_bet,
+                                            ws.twitch.make_predictions,
                                             (ws.events_predictions[event_id],),
                                         )
                                         place_bet_thread.daemon = True
@@ -231,8 +215,6 @@ class WebSocketsPool:
                                             f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
                                             extra={"emoji": ":alarm_clock:"},
                                         )
-                                    else:
-                                        del ws.events_predictions[event_id]
 
                         elif (
                             message.type == "event-updated"
