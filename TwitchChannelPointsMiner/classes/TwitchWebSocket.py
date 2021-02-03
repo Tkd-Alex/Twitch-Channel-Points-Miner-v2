@@ -10,6 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class TwitchWebSocket(WebSocketApp):
+    def __init__(self, index, *args, **kw):
+        super().__init__(*args, **kw)
+        self.index = index
+
     def listen(self, topic, auth_token=None):
         data = {"topics": [str(topic)]}
         if topic.is_user_topic() and auth_token is not None:
@@ -24,7 +28,7 @@ class TwitchWebSocket(WebSocketApp):
 
     def send(self, request):
         request_str = json.dumps(request, separators=(",", ":"))
-        logger.debug(f"Send: {request_str}")
+        logger.debug(f"#{self.index} - Send: {request_str}")
         super().send(request_str)
 
     def reset(self, parent_pool):

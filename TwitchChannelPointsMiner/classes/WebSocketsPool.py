@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class WebSocketsPool:
     def __init__(self, twitch, browser, streamers, events_predictions):
-        self.ws = None
+        self.ws: list = []
         self.twitch = twitch
         self.browser = browser
         self.streamers = streamers
@@ -38,32 +38,40 @@ class WebSocketsPool:
     """
 
     def submit(self, topic):
-        if self.ws is None or len(self.ws.topics) >= 50:
-            self.create_new_websocket()
+        if self.ws == [] or len(self.ws[len(self.ws) - 1].topics) >= 50:
+            self.append_new_websocket()
 
-        self.ws.topics.append(topic)
+        self.ws[len(self.ws) - 1].topics.append(topic)
 
-        if not self.ws.is_opened:
-            self.ws.pending_topics.append(topic)
+        if not self.ws[len(self.ws) - 1].is_opened:
+            self.ws[len(self.ws) - 1].pending_topics.append(topic)
         else:
-            self.ws.listen(topic, self.twitch.twitch_login.get_auth_token())
+            self.ws[len(self.ws) - 1].listen(
+                topic, self.twitch.twitch_login.get_auth_token()
+            )
 
-    def create_new_websocket(self):
-        self.ws = TwitchWebSocket(
-            WEBSOCKET,
-            on_message=WebSocketsPool.on_message,
-            on_open=WebSocketsPool.on_open,
-            on_close=WebSocketsPool.handle_websocket_reconnection,
+    def append_new_websocket(self):
+        self.ws.append(
+            TwitchWebSocket(
+                index=len(self.ws),
+                url=WEBSOCKET,
+                on_message=WebSocketsPool.on_message,
+                on_open=WebSocketsPool.on_open,
+                on_close=WebSocketsPool.handle_websocket_reconnection,
+            )
         )
-        self.ws.reset(self)
+        self.ws[len(self.ws) - 1].reset(self)
 
-        self.thread_ws = threading.Thread(target=lambda: self.ws.run_forever())
+        self.thread_ws = threading.Thread(
+            target=lambda: self.ws[len(self.ws) - 1].run_forever()
+        )
         self.thread_ws.daemon = True
         self.thread_ws.start()
 
     def end(self):
-        self.ws.keep_running = False
-        self.ws.close()
+        for index in range(0, len(self.ws)):
+            self.ws[index].keep_running = False
+            self.ws[index].close()
 
     @staticmethod
     def on_open(ws):
@@ -79,7 +87,7 @@ class WebSocketsPool:
 
                 if ws.elapsed_last_pong() > 15 and ws.is_reconneting is False:
                     logger.info(
-                        "The last pong was received more than 15 minutes ago. Reconnect the WebSocket"
+                        f"#{ws.index} - The last pong was received more than 15 minutes ago. Reconnect the WebSocket"
                     )
                     ws.keep_running = True
                     ws.is_reconneting = True
@@ -93,18 +101,19 @@ class WebSocketsPool:
     def handle_websocket_reconnection(ws):
         ws.is_closed = True
         if ws.keep_running is True:
-            logger.info("Reconnecting to Twitch PubSub server in 60 seconds")
+            logger.info(
+                f"#{ws.index} - Reconnecting to Twitch PubSub server in 60 seconds"
+            )
             time.sleep(60)
 
             self = ws.parent_pool
-            if self.ws == ws:
-                self.ws = None
+            self.ws[ws.index] = None
             for topic in ws.topics:
                 self.submit(topic)
 
     @staticmethod
     def on_message(ws, message):
-        logger.debug(f"Received: {message.strip()}")
+        logger.debug(f"#{ws.index} - Received: {message.strip()}")
         response = json.loads(message)
 
         if response["type"] == "MESSAGE":
@@ -307,7 +316,9 @@ class WebSocketsPool:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")
 
         elif response["type"] == "RECONNECT":
-            logger.info(f"Reconnection required and keep running is: {ws.keep_running}")
+            logger.info(
+                f"#{ws.index} - Reconnection required and keep running is: {ws.keep_running}"
+            )
             ws.is_reconneting = True
             WebSocketsPool.handle_websocket_reconnection(ws)
 
