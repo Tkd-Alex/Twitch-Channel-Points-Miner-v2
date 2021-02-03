@@ -314,7 +314,7 @@ In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot wi
 - If you want to place the bet ONLY if the winning odd of your decision is greater than or equal 1.3
 `FilterCondition(key=OutcomeKeys.ODDS, condition=Condition.GTE, value=1.3, decision=True)`
 - If you want to place the bet ONLY if the sum of highest bet is lower than 2000
-`FilterCondition(key=OutcomeKeys.TOP_POINTS, condition=Condition.LT, value=200, decision=2000)`
+`FilterCondition(key=OutcomeKeys.TOP_POINTS, condition=Condition.LT, value=2000, decision=False)`
 
 ## Migrating from old repository (the original one):
 If you already have a `twitch-cookies.pkl` and you don't want to login again please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
