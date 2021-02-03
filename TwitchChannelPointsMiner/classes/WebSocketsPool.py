@@ -293,7 +293,7 @@ class WebSocketsPool:
                                         "REFUND",
                                         -points_placed,
                                         counter=-1,
-                                        create_if_missing=False
+                                        create_if_missing=False,
                                     )
                                 else:
                                     logger.info(
@@ -303,7 +303,7 @@ class WebSocketsPool:
                                         "PREDICTION",
                                         -points_won,
                                         counter=-1,
-                                        create_if_missing=False
+                                        create_if_missing=False,
                                     )
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
