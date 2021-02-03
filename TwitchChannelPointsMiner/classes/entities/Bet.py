@@ -89,15 +89,16 @@ class Bet(object):
             self.outcomes[index][OutcomeKeys.TOTAL_POINTS] = int(
                 outcomes[index][OutcomeKeys.TOTAL_POINTS]
             )
-
-            outcomes[index]["top_predictors"] = sorted(
-                outcomes[index]["top_predictors"],
-                key=lambda x: x["points"],
-                reverse=True,
-            )
-
-            top_points = outcomes[index]["top_predictors"]["points"]
-            self.outcomes[index][OutcomeKeys.TOP_POINTS] = top_points
+            if outcomes[index]["top_predictors"] != []:
+                # Sort by points placed by other users
+                outcomes[index]["top_predictors"] = sorted(
+                    outcomes[index]["top_predictors"],
+                    key=lambda x: x["points"],
+                    reverse=True,
+                )
+                # Get the first elements (most placed)
+                top_points = outcomes[index]["top_predictors"][0]["points"]
+                self.outcomes[index][OutcomeKeys.TOP_POINTS] = top_points
 
         self.total_users = (
             self.outcomes[0][OutcomeKeys.TOTAL_USERS]
@@ -174,7 +175,7 @@ class Bet(object):
                 else self.outcomes[char_decision_as_index(self.decision["choice"])][key]
             )
             logger.info(
-                f"Filter applied on this bet: {compared_value} {condition} {value}"
+                f"Filter applied on this bet. Current {key} is {compared_value}, must be {condition} {value}"
             )
             if condition == Condition.GT:
                 if compared_value > value:
