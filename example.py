@@ -33,10 +33,9 @@ twitch_miner = TwitchChannelPointsMiner(
             percentage_gap=20,                  # Gap difference between outcomesA and outcomesB (for SMART stragegy)
             max_points=50000,                   # If the x percentage of your channel points is gt bet_max_points set this value
             filter_condition=FilterCondition(
-                key=OutcomeKeys.TOTAL_USERS,    # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
-                condition=Condition.LTE,        # The key must be [GT, LT, GTE, LTE] than value
-                value=800,                      #
-                decision=False                  # If the filter should apply to the decision or on the sum
+                by=OutcomeKeys.TOTAL_USERS,    # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
+                where=Condition.LTE,           # The key must be [GT, LT, GTE, LTE] than value
+                value=800
             )
         )
     )

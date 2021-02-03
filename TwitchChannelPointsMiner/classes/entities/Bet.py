@@ -40,14 +40,13 @@ class OutcomeKeys(object):
 
 
 class FilterCondition(object):
-    def __init__(self, key=None, condition=None, value=None, decision=None):
-        self.key = key
-        self.condition = condition
+    def __init__(self, by=None, where=None, value=None, decision=None):
+        self.by = by
+        self.where = where
         self.value = value
-        self.decision = decision
 
     def __repr__(self):
-        return f"FilterCondition(Key={self.key}, Condition={self.condition}, Value={self.value}, Decision={self.decision})"
+        return f"FilterCondition(By={self.key}, Where={self.condition}, Value={self.value})"
 
 
 class BetSettings(object):
@@ -171,15 +170,16 @@ class Bet(object):
 
     def skip(self) -> bool:
         if self.settings.filter_condition is not None:
-            key = self.settings.filter_condition.key
-            condition = self.settings.filter_condition.condition
+            # key == by , condition == where
+            key = self.settings.filter_condition.by
+            condition = self.settings.filter_condition.where
             value = self.settings.filter_condition.value
-
             compared_value = (
                 (self.outcomes[0][key] + self.outcomes[1][key])
-                if self.settings.filter_condition.decision is False
+                if key in [OutcomeKeys.TOTAL_USERS, OutcomeKeys.TOTAL_POINTS]
                 else self.outcomes[char_decision_as_index(self.decision["choice"])][key]
             )
+
             logger.info(
                 f"Filter applied on this bet. Current {key} is {compared_value}, must be {condition} {value}"
             )

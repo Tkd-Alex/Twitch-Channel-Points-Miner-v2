@@ -189,10 +189,9 @@ twitch_miner = TwitchChannelPointsMiner(
             percentage_gap=20,                  # Gap difference between outcomesA and outcomesB (for SMART stragegy)
             max_points=50000,                   # If the x percentage of your channel points is gt bet_max_points set this value
             filter_condition=FilterCondition(
-                key=OutcomeKeys.TOTAL_USERS,    # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
-                condition=Condition.LTE,        # The key must be [GT, LT, GTE, LTE] than value
-                value=800,                      #
-                decision=False                  # If the filter should apply to the decision or on the sum
+                by=OutcomeKeys.TOTAL_USERS,     # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
+                where=Condition.LTE,            # The key must be [GT, LT, GTE, LTE] than value
+                value=800
             )
         )
     )
@@ -298,23 +297,29 @@ In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot wi
 ### FilterCondition
 | Key         	| Type        	| Default 	| Description                                                                      	|
 |-------------	|-------------	|---------	|----------------------------------------------------------------------------------	|
-| `key`       	| OutcomeKeys 	| None    	| Key to apply the filter                                                          	|
-| `condition` 	| Condition   	| None    	| Condition that should match for place bet                                        	|
+| `by`       	| OutcomeKeys 	| None    	| Key to apply the filter                                                          	|
+| `where`      	| Condition   	| None    	| Condition that should match for place bet                                        	|
 | `value`     	| number      	| None    	| Value to compare                                                                 	|
-| `decision`  	| bool        	| None    	| If True the filter apply base on decision of the bet. If False calculate the sum 	|
 
-- Allowed values for `key` are:
-`PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS`
-- Allowed values for `condition` are:
-`GT, LT, GTE, LTE`
+Allowed values for `key` are:
+- `PERCENTAGE_USERS` (no sum) [Would never want a sum as it'd always be 100%]
+- `ODDS_PERCENTAGE` (no sum) [Doesn't make sense to sum odds]
+- `ODDS` (no sum) [Doesn't make sense to sum odds]
+- `DECISION_USERS` (no sum)
+- `DECISION_POINTS` (no points)
+- `TOP_POINTS` (no sum) [Doesn't make sense to the top points of both sides]
+- `TOTAL_USERS` (sum)
+- `TOTAL_POINTS` (sum)
+
+Allowed values for `condition` are: `GT, LT, GTE, LTE`
 
 #### Example
 - If you want to place the bet ONLY if the total of users participants in the bet are greater than 200
-`FilterCondition(key=OutcomeKeys.TOTAL_USERS, condition=Condition.GT, value=200, decision=False)`
+`FilterCondition(by=OutcomeKeys.TOTAL_USERS, where=Condition.GT, value=200)`
 - If you want to place the bet ONLY if the winning odd of your decision is greater than or equal 1.3
-`FilterCondition(key=OutcomeKeys.ODDS, condition=Condition.GTE, value=1.3, decision=True)`
-- If you want to place the bet ONLY if the sum of highest bet is lower than 2000
-`FilterCondition(key=OutcomeKeys.TOP_POINTS, condition=Condition.LT, value=2000, decision=False)`
+`FilterCondition(by=OutcomeKeys.ODDS, where=Condition.GTE, value=1.3)`
+- If you want to place the bet ONLY if highest bet is lower than 2000
+`FilterCondition(by=OutcomeKeys.TOP_POINTS, where=Condition.LT, value=2000)`
 
 ## Migrating from old repository (the original one):
 If you already have a `twitch-cookies.pkl` and you don't want to login again please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
