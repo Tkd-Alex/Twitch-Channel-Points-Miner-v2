@@ -267,7 +267,7 @@ class WebSocketsPool:
                                 points_won = (
                                     event_result["points_won"]
                                     if event_result["points_won"]
-                                    else (poinst_placed * -1)
+                                    else poinst_placed
                                 )
                                 logger.info(
                                     f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {points_prefix}{_millify(points_won)}",
