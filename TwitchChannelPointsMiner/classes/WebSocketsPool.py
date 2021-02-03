@@ -43,7 +43,7 @@ class WebSocketsPool:
 
         self.ws[len(self.ws) - 1].topics.append(topic)
 
-        if not self.ws[len(self.ws) - 1].is_opened:
+        if self.ws[len(self.ws) - 1].is_opened is False:
             self.ws[len(self.ws) - 1].pending_topics.append(topic)
         else:
             self.ws[len(self.ws) - 1].listen(
