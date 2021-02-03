@@ -69,9 +69,7 @@ def bet_condition(twitch_browser, event, logger) -> bool:
 
 def get_user_agent(browser) -> str:
     try:
-        return USER_AGENTS[platform.system()][
-            browser.name if type(browser) != str else browser
-        ]
+        return USER_AGENTS[platform.system()][browser]
     except KeyError:
         return USER_AGENTS["Linux"]["FIREFOX"]
 

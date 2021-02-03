@@ -30,6 +30,9 @@ class Browser(Enum):
     CHROME = auto()
     FIREFOX = auto()
 
+    def __str__(self):
+        return self.name
+
 
 class BrowserSettings:
     def __init__(

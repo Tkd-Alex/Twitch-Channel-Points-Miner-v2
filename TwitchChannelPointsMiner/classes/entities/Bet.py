@@ -16,12 +16,18 @@ class Strategy(Enum):
     PERCENTAGE = auto()
     SMART = auto()
 
+    def __str__(self):
+        return self.name
+
 
 class Condition(Enum):
     GT = auto()
     LT = auto()
     GTE = auto()
     LTE = auto()
+
+    def __str__(self):
+        return self.name
 
 
 class OutcomeKeys(object):
