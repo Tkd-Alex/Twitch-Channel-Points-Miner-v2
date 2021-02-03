@@ -243,41 +243,41 @@ If the browser are currently betting or wait for more data It's impossible to in
 ## Settings
 
 ### LoggerSettings
-| Key             	| Type            	| Value allowed 	| Default                        	| Description                                                                          	|
-|-----------------	|-----------------	|---------------	|--------------------------------	|--------------------------------------------------------------------------------------	|
-| `save`          	| bool            	| True, False   	| True                           	| If you want to save logs in file (suggested)                                         	|
-| `less`          	| bool            	| True, False   	| False                          	| Reduce the logging format and message verbosity #10                                   |
-| `console_level` 	| int / logging.* 	|               	| logging.INFO                   	| Level of logs in terminal - Use logging.DEBUG for more helpful messages.             	|
-| `file_level`    	| int / logging.* 	|               	| logging.DEBUG                  	| Level of logs in file save - If you think the log file it's too big use logging.INFO 	|
-| `emoji`         	| bool            	| True, False   	| For Windows is False else True 	| On Windows we have a problem to print emoji. Set to false if you have a problem      	|
+| Key             	| Type            	| Default                        	| Description                                                                          	                                      |
+|-----------------	|-----------------	|--------------------------------	|---------------------------------------------------------------------------------------------------------------------------- |
+| `save`          	| bool            	| True                           	| If you want to save logs in file (suggested)                                         	                                      |
+| `less`          	| bool            	| False                          	| Reduce the logging format and message verbosity [#10](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/10) |
+| `console_level` 	| level 	        | logging.INFO                   	| Level of logs in terminal - Use logging.DEBUG for more helpful messages.             	                                      |
+| `file_level`    	| level 	        | logging.DEBUG                  	| Level of logs in file save - If you think the log file it's too big use logging.INFO 	                                      |
+| `emoji`         	| bool            	| For Windows is False else True 	| On Windows we have a problem to print emoji. Set to false if you have a problem      	                                      |
 ### BrowserSettings
-| Key               	| Type    	| Value allowed   	| Default 	| Description                                                                                     	|
-|-------------------	|---------	|-----------------	|---------	|-------------------------------------------------------------------------------------------------	|
-| `timeout`         	| float   	| Positive        	| 10      	| If no element was found by Selenium raise exception after timeouts. Increase on slow connection 	|
-| `implicitly_wait` 	| int     	| Positive        	| 5       	| Wait x seconds after continue Selenium execution                                                	|
-| `max_attempts`    	| int     	| Positive        	| 3       	| Number of max attempt for place bet                                                             	|
-| `do_screenshot`   	| bool    	| True, False     	| False   	| Save screenshot before/after do some Selenium action - Help debug                      	        |
-| `save_html`       	| bool    	| True, False     	| False   	| Save html content before/after do some Selenium action - Help debug                    	        |
-| `show`            	| bool    	| True, False     	| True    	| Choose if you want to see or not the browser - Help debug                              	        |
-| `browser`         	| Browser 	| CHROME, FIREFOX 	| FIREFOX 	| Choose your favourite browser                                                                   	|
-| `driver_path`     	| str     	| /path/          	| None    	| Write the path of chromedriver or geckodriver                                                   	|
+| Key               	| Type    	| Default 	| Description                                                                                     	|
+|-------------------	|---------	|---------	|-------------------------------------------------------------------------------------------------	|
+| `timeout`         	| float   	| 10      	| If no element was found by Selenium raise exception after timeouts. Increase on slow connection 	|
+| `implicitly_wait` 	| int     	| 5       	| Wait x seconds after continue Selenium execution                                                	|
+| `max_attempts`    	| int     	| 3       	| Number of max attempt for place bet                                                             	|
+| `do_screenshot`   	| bool    	| False   	| Save screenshot before/after do some Selenium action - Help debug                      	        |
+| `save_html`       	| bool    	| False   	| Save html content before/after do some Selenium action - Help debug                    	        |
+| `show`            	| bool    	| True    	| Choose if you want to see or not the browser - Help debug                              	        |
+| `browser`         	| Browser 	| FIREFOX 	| Choose your favourite browser                                                                   	|
+| `driver_path`     	| str     	| None    	| Write the path of chromedriver or geckodriver                                                   	|
 ### StreamerSettings
-| Key                	| Type        	| Value allowed 	| Default                        	| Description                                                                                                                                          	   |
-|--------------------	|-------------	|---------------	|--------------------------------	|--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `make_predictions` 	| bool        	| True, False   	| True                           	| Choose if you want to make predictions / bet or not                                                                                                  	   |
-| `follow_raid`      	| bool        	| True, False   	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	   |
-| `claim_drops`      	| bool        	| True, False   	| True                           	| If this values is True the script will increase the watch-time for the current game. With this you are able to claim the drops from Twitch Inventory #21 |
-| `watch_streak`     	| bool        	| True, False   	| True                           	| Choose if you want to change priority for this streamers and try to catch the Watch Streak event #11                                                     |
-| `bet`              	| BetSettings 	|               	| Default values for BetSettings 	| Rules to follow for the bet                                                                                                                              |
+| Key                	| Type        	| Default                        	| Description                                                                                                                                          	                                                                           |
+|--------------------	|-------------	|--------------------------------	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `make_predictions` 	| bool        	| True                           	| Choose if you want to make predictions / bet or not                                                                                                  	                                                                           |
+| `follow_raid`      	| bool        	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	                                                                           |
+| `claim_drops`      	| bool        	| True                           	| If this values is True the script will increase the watch-time for the current game. With this you are able to claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) |
+| `watch_streak`     	| bool        	| True                           	| Choose if you want to change priority for this streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                     |
+| `bet`              	| BetSettings 	| Default values for BetSettings 	| Rules to follow for the bet                                                                                                                                                                                                      |
 ### BetSettings
-| Key                	| Type            	| Value allowed                            	| Default 	| Description                                                                                                    	|
-|--------------------	|-----------------	|------------------------------------------	|---------	|----------------------------------------------------------------------------------------------------------------	|
-| `strategy`         	| Strategy        	| MOST_VOTED, HIGH_ODDS, PERCENTAGE, SMART 	| SMART   	| Choose your strategy! See above for more info                                                                  	|
-| `percentage`       	| int             	| Positive                                 	| 5       	| Place the x% of your channel points                                                                            	|
-| `percentage_gap`   	| int             	| Positive                                 	| 20      	| Gap difference between outcomesA and outcomesB (for SMART stragegy)                                            	|
-| `max_points`       	| int             	| Positive                                 	| 50000   	| If the x percentage of your channel points is GT bet_max_points set this value                                 	|
-| `stealth_mode`     	| bool            	| True, False                              	| False   	| If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points #33 	|
-| `filter_condition` 	| FilterCondition 	|                                          	| None    	| Based on this filter the script will skip some bet #29                                                            |
+| Key                	| Type            	| Default 	| Description                                                                                                    	                                                                     |
+|--------------------	|-----------------	|---------	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `strategy`         	| Strategy        	| SMART   	| Choose your strategy! See above for more info                                                                  	                                                                     |
+| `percentage`       	| int             	| 5       	| Place the x% of your channel points                                                                            	                                                                     |
+| `percentage_gap`   	| int             	| 20      	| Gap difference between outcomesA and outcomesB (for SMART stragegy)                                            	                                                                     |
+| `max_points`       	| int             	| 50000   	| If the x percentage of your channel points is GT bet_max_points set this value                                 	                                                                     |
+| `stealth_mode`     	| bool            	| False   	| If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points [#33](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/33) |
+| `filter_condition` 	| FilterCondition 	| None    	| Based on this filter the script will skip some bet [#29](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/29)                                                         |
 
 #### Bet strategy
 
@@ -296,12 +296,15 @@ Here a concrete example:
 - **SMART**: Calculate the percentage based on the users. The percentage are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percatage are highter thant `percentage_gap` select the highest percentage, else the highest odds.
 In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 ### FilterCondition
-| Key         	| Type        	| Value allowed                                                                  	| Default 	| Description                                                                      	|
-|-------------	|-------------	|--------------------------------------------------------------------------------	|---------	|----------------------------------------------------------------------------------	|
-| `key`       	| OutcomeKeys 	| PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS 	| None    	| Key to apply the filter                                                          	|
-| `condition` 	| Condition   	| GT, LT, GTE, LTE                                                               	| None    	| Condition that should match for place bet                                        	|
-| `value`     	| number      	|                                                                                	| None    	| Value to compare                                                                 	|
-| `decision`  	| bool        	| True, False                                                                    	| None    	| If True the filter apply base on decision of the bet. If False calculate the sum 	|
+| Key         	| Type        	| Default 	| Description                                                                      	|
+|-------------	|-------------	|---------	|----------------------------------------------------------------------------------	|
+| `key`       	| OutcomeKeys 	| None    	| Key to apply the filter                                                          	|
+| `condition` 	| Condition   	| None    	| Condition that should match for place bet                                        	|
+| `value`     	| number      	| None    	| Value to compare                                                                 	|
+| `decision`  	| bool        	| None    	| If True the filter apply base on decision of the bet. If False calculate the sum 	|
+
+- Allowed values for `key` are: `PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS`
+- Allowed values for `condition` are: `GT, LT, GTE, LTE`
 
 #### Example
 - If you want to place the bet ONLY if the total of users participants in the bet are greater than 200
