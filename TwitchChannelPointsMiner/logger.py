@@ -81,7 +81,7 @@ def configure_loggers(username, settings):
         Path(logs_path).mkdir(parents=True, exist_ok=True)
         logs_file = os.path.join(
             logs_path,
-            f"{username}.{datetime.now().strftime('%d%m%Y-%H%M%S')}.log",
+            f"{username}.{datetime.now().strftime('%Y%m%d-%H%M%S')}.log",
         )
         file_handler = logging.FileHandler(logs_file, "w", "utf-8")
         file_handler.setFormatter(
