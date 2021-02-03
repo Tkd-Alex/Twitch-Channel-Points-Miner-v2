@@ -1,8 +1,7 @@
-from TwitchChannelPointsMiner.classes.entities.Chat import Chat
-
-import requests
-from multiprocessing import Process
 import logging
+
+from TwitchChannelPointsMiner.classes.entities.Chat import Chat
+from multiprocessing import Process
 
 logger = logging.getLogger(__name__)
 

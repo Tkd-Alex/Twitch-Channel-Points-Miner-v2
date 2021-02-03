@@ -1,6 +1,5 @@
 
 import irc.bot
-import requests
 
 class Chat(irc.bot.SingleServerIRCBot):
     def __init__(self, username, token, channel):
