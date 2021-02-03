@@ -189,10 +189,10 @@ twitch_miner = TwitchChannelPointsMiner(
             percentage_gap=20,                  # Gap difference between outcomesA and outcomesB (for SMART stragegy)
             max_points=50000,                   # If the x percentage of your channel points is gt bet_max_points set this value
             filter_condition=FilterCondition(
-                key=OutcomeKeys.TOTAL_USERS,
-                condition=Condition.LTE,
-                value=800,
-                decision=False
+                key=OutcomeKeys.TOTAL_USERS,    # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
+                condition=Condition.LTE,        # The key must be [GT, LT, GTE, LTE] than value
+                value=800,                      #
+                decision=False                  # If the filter should apply to the decision or on the sum
             )
         )
     )
@@ -240,15 +240,17 @@ Make sure to write the streamers array in order of priority from left to right. 
 
 If the browser are currently betting or wait for more data It's impossible to interact with another event prediction from another streamer.
 
-### Settings
+## Settings
 
-## LoggerSettings
-- `save`
-- `less`
-- `console_level`
-- `file_level`
-- `emoji`
-## BrowserSettings
+### LoggerSettings
+| Key             	| Type            	| Value allowed 	| Default                        	| Description                                                                          	|
+|-----------------	|-----------------	|---------------	|--------------------------------	|--------------------------------------------------------------------------------------	|
+| `save`          	| Bool            	| True, False   	| True                           	| If you want to save logs in file (suggested)                                         	|
+| `less`          	| Bool            	| True, False   	| False                          	| Reduce the logging format and message verbosity                                      	|
+| `console_level` 	| int / logging.* 	|               	| logging.INFO                   	| Level of logs in terminal - Use logging.DEBUG for more helpful messages.             	|
+| `file_level`    	| int / logging.* 	|               	| logging.DEBUG                  	| Level of logs in file save - If you think the log file it's too big use logging.INFO 	|
+| `emoji`         	| Bool            	| True, False   	| For Windows is False else True 	| On Windows we have a problem to print emoji. Set to false if you have a problem      	|
+### BrowserSettings
 - `timeout`
 - `implicitly_wait`
 - `max_attempts`
@@ -257,26 +259,26 @@ If the browser are currently betting or wait for more data It's impossible to in
 - `show`
 - `browser`
 - `driver_path`
-## StreamerSettings
+### StreamerSettings
 - `make_predictions`
 - `follow_raid`
 - `claim_drops`
 - `watch_streak`
 - `bet`
-## BetSettings
+### BetSettings
 - `strategy`
 - `percentage`
 - `percentage_gap`
 - `max_points`
 - `stealth_mode`
 - `filter_condition`
-## FilterCondition
+### FilterCondition
 - `key`
 - `condition`
 - `value`
 - `decision`
 
-## Bet strategy
+### Bet strategy
 
 - **MOST_VOTED**: Select the option most voted based on users count
 - **HIGH_ODDS**: Select the option with the highest odds
