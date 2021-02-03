@@ -258,8 +258,9 @@ class WebSocketsPool:
                                 points_placed = event_prediction.bet.decision["amount"]
                                 points_won = event_result["points_won"] if event_result["points_won"] or result_type == "REFUND" else 0
                                 points_gained = points_won - points_placed if result_type != "REFUND" else 0
+                                points_prefix = "+" if points_gained >= 0 else ""
                                 logger.info(
-                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {_millify(points_gained)}",
+                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {points_prefix}{_millify(points_gained)}",
                                     extra={"emoji": ":bar_chart:"},
                                 )
                                 ws.events_predictions[event_id].final_result = {
