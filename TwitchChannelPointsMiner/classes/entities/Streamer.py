@@ -1,14 +1,15 @@
 import logging
 import time
 
-from TwitchChannelPointsMiner.classes.TwitchChat import TwitchChat, ChatSettings
 from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.Stream import Stream
 from TwitchChannelPointsMiner.classes.Settings import Settings
+from TwitchChannelPointsMiner.classes.TwitchChat import ChatSettings, TwitchChat
 from TwitchChannelPointsMiner.constants.twitch import URL
 from TwitchChannelPointsMiner.utils import _millify
 
 logger = logging.getLogger(__name__)
+
 
 class StreamerSettings(object):
     def __init__(
@@ -18,7 +19,7 @@ class StreamerSettings(object):
         claim_drops: bool = None,
         watch_streak: bool = None,
         bet: BetSettings = None,
-        chat_client: ChatSettings = None
+        chat_client: ChatSettings = None,
     ):
         self.make_predictions = make_predictions
         self.follow_raid = follow_raid
@@ -108,11 +109,15 @@ class Streamer(object):
         return self.stream_up == 0 or ((time.time() - self.stream_up) > 120)
 
     def leave_chat(self):
-        if(self.chat is not None):
+        if self.chat is not None:
             self.chat.terminate()
 
     def join_chat(self):
-        if(self.settings.chat_client is not None):
-            self.chat = TwitchChat(self.settings.chat_client.username, self.settings.chat_client.token, self.username)
+        if self.settings.chat_client is not None:
+            self.chat = TwitchChat(
+                self.settings.chat_client.username,
+                self.settings.chat_client.token,
+                self.username,
+            )
             logger.info(f"Connecting to {self.username}'s chat!")
             self.chat.start()

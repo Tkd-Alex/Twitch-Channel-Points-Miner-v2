@@ -1,9 +1,10 @@
 import logging
-
-from TwitchChannelPointsMiner.classes.entities.Chat import Chat
 from multiprocessing import Process
 
+from TwitchChannelPointsMiner.classes.entities.Chat import Chat
+
 logger = logging.getLogger(__name__)
+
 
 class ChatSettings(object):
     def __init__(
@@ -13,6 +14,7 @@ class ChatSettings(object):
     ):
         self.username = username
         self.token = token
+
 
 class TwitchChat(Process):
     def __deepcopy__(self, memo):
@@ -27,7 +29,7 @@ class TwitchChat(Process):
     def run(self):
         # Create IRC bot connection
         try:
-            IRC = Chat( self.username, self.token, self.channel )
+            IRC = Chat(self.username, self.token, self.channel)
             IRC.start()
         except KeyboardInterrupt:
-           None # dont handle KeyboardInterruption here 
+            None  # dont handle KeyboardInterruption here

@@ -261,7 +261,7 @@ class TwitchChannelPointsMiner:
             self.twitch_browser.browser.quit()
 
         for streamer in self.streamers:
-            if(streamer is not None):
+            if streamer is not None:
                 streamer.leave_chat()
 
         self.running = self.twitch.running = False
