@@ -259,9 +259,8 @@ class WebSocketsPool:
                         if event_id in ws.events_predictions:
                             if message.type == "prediction-result":
                                 event_result = message.data["prediction"]["result"]
-                                poinst_placed = ws.events_predictions[
-                                    event_id
-                                ].bet.decision["amount"]
+                                bet = ws.events_predictions[event_id].bet
+                                poinst_placed = bet.decision["amount"]
                                 points_prefix = (
                                     "+" if event_result["points_won"] else "-"
                                 )
@@ -274,18 +273,12 @@ class WebSocketsPool:
                                     f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {points_prefix}{_millify(points_won)}",
                                     extra={"emoji": ":bar_chart:"},
                                 )
-                                points_won = (
-                                    event_result["points_won"]
-                                    if event_result["points_won"]
-                                    else 0
-                                )
                                 ws.events_predictions[event_id].final_result = {
                                     "type": event_result["type"],
-                                    "won": points_won,
+                                    "won": f"{points_prefix}{_millify(points_won)}",
                                 }
-                                ws.events_predictions[
-                                    event_id
-                                ].streamer.persistent_points(
+                                # ws.events_predictions[event_id].streamer
+                                ws.streamers[streamer_index].persistent_points(
                                     event_result["type"],
                                     f"{points_prefix}{points_won} - {event_result['type']}: {ws.events_predictions[event_id].title}",
                                 )

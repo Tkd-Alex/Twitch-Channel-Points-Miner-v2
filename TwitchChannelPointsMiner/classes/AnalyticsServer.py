@@ -51,7 +51,7 @@ class AnalyticsServer(Process):
 
     def run(self):
         logger.info(
-            f"Running on http:/{self.host}:{self.port}/",
+            f"Analytics running on http://{self.host}:{self.port}/",
             extra={"emoji": ":globe_with_meridians:"},
         )
         self.app.run(host=self.host, port=self.port, threaded=True)

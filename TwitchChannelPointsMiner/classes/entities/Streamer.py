@@ -139,7 +139,7 @@ class Streamer(object):
 
     def __save_json(self, key, data={}):
         # https://stackoverflow.com/questions/4676195/why-do-i-need-to-multiply-unix-timestamps-by-1000-in-javascript
-        data.update({"y": self.channel_points, "x": round(time.time() * 1000)})
+        data.update({"x": round(time.time() * 1000), "y": self.channel_points})
         fname = os.path.join(Settings.analytics_path, f"{self.username}.json")
         with self.mutex:
             json_data = json.load(open(fname, "r")) if os.path.isfile(fname) else {}
