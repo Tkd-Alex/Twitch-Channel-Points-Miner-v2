@@ -38,7 +38,7 @@ class WebSocketsPool:
     """
 
     def submit(self, topic):
-        if self.ws == [] or len(self.ws[-1].topics) >= 50:
+        if self.ws == [] or self.ws[-1] is None or len(self.ws[-1].topics) >= 50:
             self.append_new_websocket()
 
         self.ws[-1].topics.append(topic)
