@@ -23,6 +23,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.constants.twitch import API, CLIENT_ID, GQLOperations
+from TwitchChannelPointsMiner.utils import _millify
 
 logger = logging.getLogger(__name__)
 
@@ -199,6 +200,17 @@ class Twitch:
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
+        selector_index = 0 if decision["choice"] == "A" else 1
+
+        logger.info(
+            f"Going to complete bet for {event} owned by {event.streamer}",
+            extra={"emoji": ":four_leaf_clover:"},
+        )
+        logger.info(
+            f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
+            extra={"emoji": ":four_leaf_clover:"},
+        )
+
         json_data = copy.deepcopy(GQLOperations.MakePrediction)
         json_data["variables"] = {
             "input": {
