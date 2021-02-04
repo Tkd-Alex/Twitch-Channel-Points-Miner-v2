@@ -19,7 +19,6 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import (
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
-from TwitchChannelPointsMiner.classes.TwitchBrowser import BrowserSettings
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.utils import (
@@ -45,7 +44,6 @@ class TwitchChannelPointsMiner:
         # Settings for logging and selenium as you can see.
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
-        browser_settings: BrowserSettings = BrowserSettings(),
         # Default values for all streamers
         streamer_settings: StreamerSettings = StreamerSettings(),
     ):
@@ -53,17 +51,15 @@ class TwitchChannelPointsMiner:
 
         # Set as globally config
         Settings.logger = logger_settings
-        Settings.browser = browser_settings
 
         # Init as default all the missing values
         streamer_settings.default()
         streamer_settings.bet.default()
         Settings.streamer_settings = streamer_settings
 
-        user_agent = get_user_agent(browser_settings.browser)
+        user_agent = get_user_agent("FIREFOX")
         self.twitch = Twitch(self.username, user_agent)
 
-        self.twitch_browser = None
         self.claim_drops_startup = claim_drops_startup
         self.streamers = []
         self.events_predictions = {}
@@ -251,7 +247,7 @@ class TwitchChannelPointsMiner:
         self.minute_watcher_thread.join()
 
         self.__print_report()
-        time.sleep(3.5)  # Do sleep for ending browser and threads
+        time.sleep(3.5)  # Do sleep for ending threads ...
 
         sys.exit(0)
 

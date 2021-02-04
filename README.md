@@ -161,7 +161,6 @@ from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
-from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser, BrowserSettings
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
@@ -172,11 +171,6 @@ twitch_miner = TwitchChannelPointsMiner(
         file_level=logging.DEBUG,       # Level of logs - If you think the log file it's too big use logging.INFO
         emoji=True,                     # On Windows we have a problem to print emoji. Set to false if you have a problem
         less=False                      # If you think that the logs are too much verborse set this to True
-    ),
-    browser_settings=BrowserSettings(
-        browser=Browser.FIREFOX,        # Choose if you want to use Chrome or Firefox as browser
-        show=False,                     # Show the browser during bet else headless mode
-        do_screenshot=False,            # Do screenshot during the bet
     ),
     streamer_settings=StreamerSettings(
         make_predictions=True,          # If you want to Bet / Make prediction
@@ -232,8 +226,6 @@ twitch_miner.mine(["streamer1", "streamer2"], followers=True)   # Mixed
 
 Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow have the highest priority.
 
-If the browser are currently betting or wait for more data It's impossible to interact with another event prediction from another streamer.
-
 ### Bet strategy
 
 - **MOST_VOTED**: Select the option most voted based on users count
@@ -268,26 +260,12 @@ Other users have find multiple problems on Windows my suggestion are:
 
 Other usefully infos can be founded here: https://github.com/gottagofaster236/Twitch-Channel-Points-Miner/issues/31
 
-## Use Chrome instead Firefox
-If you prefer Chrome instead Firefox please download the WebDriver matching with your Chrome version and OS from this link: https://chromedriver.chromium.org/downloads.
-Extract the archivie, copy the chromedriver file in this project folder.
-Edit your run.py file and the browser_settings should something like this:
-```python
-browser_settings=BrowserSettings(
-    browser=Browser.CHROME,
-    driver_path="/path/of/your/chromedriver"  # If no path was provided the script will try to search automatically
-),
-```
-
 ## Issue / Debug
 When you open a new issue please use the correct template.
 Please provide at least the following information/files:
-- Browser (if you have the prediction feature enabled)
 - Operation System
 - Python Version
 - logs/ `LoggerSettings(file_level=logging.DEBUG)`
-- htmls/ `BrowserSettings(save_html=True)`
-- screenshots/ `BrowserSettings(do_screenshot=True)`
 
 Make sure also to have the latest commit.
 

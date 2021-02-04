@@ -5,7 +5,6 @@ from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
-from TwitchChannelPointsMiner.classes.TwitchBrowser import Browser, BrowserSettings
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
@@ -16,11 +15,6 @@ twitch_miner = TwitchChannelPointsMiner(
         file_level=logging.DEBUG,       # Level of logs - If you think the log file it's too big use logging.INFO
         emoji=True,                     # On Windows we have a problem to print emoji. Set to false if you have a problem
         less=False                      # If you think that the logs are too much verborse set this to True
-    ),
-    browser_settings=BrowserSettings(
-        browser=Browser.FIREFOX,        # Choose if you want to use Chrome or Firefox as browser
-        show=False,                     # Show the browser during bet else headless mode
-        do_screenshot=False,            # Do screenshot during the bet
     ),
     streamer_settings=StreamerSettings(
         make_predictions=True,          # If you want to Bet / Make prediction

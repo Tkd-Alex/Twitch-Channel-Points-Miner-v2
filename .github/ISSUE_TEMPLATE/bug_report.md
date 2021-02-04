@@ -20,13 +20,8 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-You can enable the screenshot using: `BrowserSettings(do_screenshot=True)`
-
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows]
- - Browser [e.g. chrome, firefox]
  - Python version [e.g. 3.x]
 
 **Additional context**

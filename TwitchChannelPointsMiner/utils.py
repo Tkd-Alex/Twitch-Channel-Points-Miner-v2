@@ -50,11 +50,9 @@ def create_nonce(length=30) -> str:
     return nonce
 
 
-def get_user_agent(browser) -> str:
+def get_user_agent(browser: str) -> str:
     try:
-        return USER_AGENTS[platform.system()][
-            browser.name if type(browser) != str else browser
-        ]
+        return USER_AGENTS[platform.system()][browser]
     except KeyError:
         return USER_AGENTS["Linux"]["FIREFOX"]
 
