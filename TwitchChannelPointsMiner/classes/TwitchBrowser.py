@@ -16,7 +16,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.constants.browser import Javascript, Selectors
 from TwitchChannelPointsMiner.constants.twitch import URL
-from TwitchChannelPointsMiner.utils import _millify, bet_condition, get_user_agent
+from TwitchChannelPointsMiner.utils import _millify, get_user_agent
 
 logger = logging.getLogger(__name__)
 
@@ -265,7 +265,7 @@ class TwitchBrowser:
 
     def start_bet(self, event: EventPrediction):
         start_time = time.time()
-        if bet_condition(self, event, logger) is True:
+        if 1 == 1:  # bet_condition(self, event, logger) is True:
             for attempt in range(0, self.settings.max_attempts):
                 logger.info(
                     f"Starting betting for {event} owned by {event.streamer}",
