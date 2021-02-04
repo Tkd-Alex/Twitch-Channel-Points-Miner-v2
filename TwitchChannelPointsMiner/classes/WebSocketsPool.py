@@ -52,6 +52,7 @@ class WebSocketsPool:
         self.ws.append(
             TwitchWebSocket(
                 index=len(self.ws),
+                parent_pool=self,
                 url=WEBSOCKET,
                 on_message=WebSocketsPool.on_message,
                 on_open=WebSocketsPool.on_open,
@@ -60,7 +61,6 @@ class WebSocketsPool:
                 # on_close=WebSocketsPool.handle_reconnection, # Do nothing.
             )
         )
-        self.ws[-1].reset(self)
 
         self.thread_ws = threading.Thread(target=lambda: self.ws[-1].run_forever())
         self.thread_ws.daemon = True
@@ -68,7 +68,9 @@ class WebSocketsPool:
 
     def end(self):
         for index in range(0, len(self.ws)):
-            self.ws[index].close()
+            if self.ws[index] is not None:
+                self.ws[index].forced_close = True
+                self.ws[index].close()
 
     @staticmethod
     def on_open(ws):
@@ -100,17 +102,26 @@ class WebSocketsPool:
     @staticmethod
     def on_close(ws):
         logger.info(f"#{ws.index} - WebSocket closed")
+        # On close please reconnect automatically
+        WebSocketsPool.handle_reconnection(ws)
 
     @staticmethod
     def handle_reconnection(ws):
+        # Close the current WebSocket.
+        # anyway, we replace the ws with None
         ws.is_closed = True
-        logger.info(f"#{ws.index} - Reconnecting to Twitch PubSub server in 30 seconds")
-        time.sleep(30)
+        ws.keep_running = False
+        # Reconnect only if ws.forced_close is False (replace the keep_running)
+        if ws.forced_close is False:
+            logger.info(
+                f"#{ws.index} - Reconnecting to Twitch PubSub server in 30 seconds"
+            )
+            time.sleep(30)
 
-        self = ws.parent_pool
-        self.ws[ws.index] = None
-        for topic in ws.topics:
-            self.submit(topic)
+            self = ws.parent_pool
+            self.ws[ws.index] = None
+            for topic in ws.topics:
+                self.submit(topic)
 
     @staticmethod
     def on_message(ws, message):

@@ -10,9 +10,35 @@ logger = logging.getLogger(__name__)
 
 
 class TwitchWebSocket(WebSocketApp):
-    def __init__(self, index, *args, **kw):
+    def __init__(self, index, parent_pool, *args, **kw):
         super().__init__(*args, **kw)
         self.index = index
+
+        self.parent_pool = parent_pool
+        self.is_closed = False
+        self.is_opened = False
+
+        self.is_reconneting = False
+        self.forced_close = False
+
+        # Custom attribute
+        self.topics = []
+        self.pending_topics = []
+
+        self.twitch = parent_pool.twitch
+        self.browser = parent_pool.browser
+        self.streamers = parent_pool.streamers
+        self.events_predictions = parent_pool.events_predictions
+
+        self.last_message_timestamp = None
+        self.last_message_type_channel = None
+
+        self.last_pong = time.time()
+        self.last_ping = time.time()
+
+    # def close(self):
+    #     self.forced_close = True
+    #     super().close()
 
     def listen(self, topic, auth_token=None):
         data = {"topics": [str(topic)]}
@@ -30,27 +56,6 @@ class TwitchWebSocket(WebSocketApp):
         request_str = json.dumps(request, separators=(",", ":"))
         logger.debug(f"#{self.index} - Send: {request_str}")
         super().send(request_str)
-
-    def reset(self, parent_pool):
-        self.parent_pool = parent_pool
-        self.is_closed = False
-        self.is_opened = False
-        self.is_reconneting = False
-
-        # Custom attribute
-        self.topics = []
-        self.pending_topics = []
-
-        self.twitch = parent_pool.twitch
-        self.browser = parent_pool.browser
-        self.streamers = parent_pool.streamers
-        self.events_predictions = parent_pool.events_predictions
-
-        self.last_message_timestamp = None
-        self.last_message_type_channel = None
-
-        self.last_pong = time.time()
-        self.last_ping = time.time()
 
     def elapsed_last_pong(self):
         return (time.time() - self.last_pong) // 60
