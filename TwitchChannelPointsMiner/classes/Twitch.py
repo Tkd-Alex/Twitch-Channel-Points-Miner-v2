@@ -94,7 +94,7 @@ class Twitch:
             },
         )
         logger.debug(
-            f"Data: {json_data}, Status code: {response.status_code}, Content: {response.json()}"
+            f"Data: {json_data}, Status code: {response.status_code}, Content: {response.text}"
         )
         return response.json()
 
