@@ -87,13 +87,14 @@ class Streamer(object):
             [
                 f"{key}({self.history[key]['counter']} times, {_millify(self.history[key]['amount'])} gained)"
                 for key in self.history
+                if self.history[key]["counter"] != 0
             ]
         )
 
-    def update_history(self, reason_code, earned):
+    def update_history(self, reason_code, earned, counter=1):
         if reason_code not in self.history:
             self.history[reason_code] = {"counter": 0, "amount": 0}
-        self.history[reason_code]["counter"] += 1
+        self.history[reason_code]["counter"] += counter
         self.history[reason_code]["amount"] += earned
 
         if reason_code == "WATCH_STREAK":
