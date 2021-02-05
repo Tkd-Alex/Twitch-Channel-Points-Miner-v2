@@ -30,11 +30,11 @@ class EventPrediction:
         self.bet = Bet(outcomes, streamer.settings.bet)
 
     def __repr__(self):
-        return f"EventPrediction(event_id={self.event_id}, title={self.title})"
+        return f"EventPrediction(event_id={self.event_id}, streamer={self.streamer}, title={self.title})"
 
     def __str__(self):
         return (
-            f"EventPrediction: {self.title}"
+            f"EventPrediction: {self.streamer} - {self.title}"
             if Settings.logger.less
             else self.__repr__()
         )
