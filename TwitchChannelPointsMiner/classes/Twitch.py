@@ -28,7 +28,7 @@ from TwitchChannelPointsMiner.utils import _millify
 logger = logging.getLogger(__name__)
 
 
-class Twitch:
+class Twitch(object):
     def __init__(self, username, user_agent):
         cookies_path = os.path.join(Path().absolute(), "cookies")
         Path(cookies_path).mkdir(parents=True, exist_ok=True)
@@ -96,7 +96,7 @@ class Twitch:
             },
         )
         logger.debug(
-            f"Data: {json_data}, Status code: {response.status_code}, Content: {response.json()}"
+            f"Data: {json_data}, Status code: {response.status_code}, Content: {response.text}"
         )
         return response.json()
 

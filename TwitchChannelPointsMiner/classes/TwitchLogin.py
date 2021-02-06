@@ -15,7 +15,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import WrongCookiesException
 logger = logging.getLogger(__name__)
 
 
-class TwitchLogin:
+class TwitchLogin(object):
     def __init__(self, client_id, username, user_agent):
         self.client_id = client_id
         self.token = None

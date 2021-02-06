@@ -1,4 +1,4 @@
-class PubsubTopic:
+class PubsubTopic(object):
     def __init__(self, topic, user_id=None, streamer=None):
         self.topic = topic
         self.user_id = user_id

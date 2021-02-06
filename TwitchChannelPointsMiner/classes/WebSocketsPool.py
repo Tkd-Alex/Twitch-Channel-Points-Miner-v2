@@ -32,32 +32,39 @@ class WebSocketsPool:
     """
 
     def submit(self, topic):
-        if self.ws is None or len(self.ws.topics) >= 50:
-            self.create_new_websocket()
+        if self.ws == [] or self.ws[-1] is None or len(self.ws[-1].topics) >= 50:
+            self.append_new_websocket()
 
-        self.ws.topics.append(topic)
+        self.ws[-1].topics.append(topic)
 
-        if not self.ws.is_opened:
-            self.ws.pending_topics.append(topic)
+        if self.ws[-1].is_opened is False:
+            self.ws[-1].pending_topics.append(topic)
         else:
-            self.ws.listen(topic, self.twitch.twitch_login.get_auth_token())
+            self.ws[-1].listen(topic, self.twitch.twitch_login.get_auth_token())
 
-    def create_new_websocket(self):
-        self.ws = TwitchWebSocket(
-            WEBSOCKET,
-            on_message=WebSocketsPool.on_message,
-            on_open=WebSocketsPool.on_open,
-            on_close=WebSocketsPool.handle_websocket_reconnection,
+    def append_new_websocket(self):
+        self.ws.append(
+            TwitchWebSocket(
+                index=len(self.ws),
+                parent_pool=self,
+                url=WEBSOCKET,
+                on_message=WebSocketsPool.on_message,
+                on_open=WebSocketsPool.on_open,
+                on_error=WebSocketsPool.on_error,
+                on_close=WebSocketsPool.on_close
+                # on_close=WebSocketsPool.handle_reconnection, # Do nothing.
+            )
         )
-        self.ws.reset(self)
 
-        self.thread_ws = threading.Thread(target=lambda: self.ws.run_forever())
+        self.thread_ws = threading.Thread(target=lambda: self.ws[-1].run_forever())
         self.thread_ws.daemon = True
         self.thread_ws.start()
 
     def end(self):
-        self.ws.keep_running = False
-        self.ws.close()
+        for index in range(0, len(self.ws)):
+            if self.ws[index] is not None:
+                self.ws[index].forced_close = True
+                self.ws[index].close()
 
     @staticmethod
     def on_open(ws):
@@ -71,34 +78,48 @@ class WebSocketsPool:
                 ws.ping()
                 time.sleep(random.uniform(25, 30))
 
-                if ws.elapsed_last_pong() > 15 and ws.is_reconneting is False:
+                if ws.elapsed_last_pong() > 10 and ws.is_reconneting is False:
                     logger.info(
-                        "The last pong was received more than 15 minutes ago. Reconnect the WebSocket"
+                        f"#{ws.index} - The last PONG was received more than 10 minutes ago. Reconnect the WebSocket"
                     )
-                    ws.keep_running = True
                     ws.is_reconneting = True
-                    WebSocketsPool.handle_websocket_reconnection(ws)
+                    WebSocketsPool.handle_reconnection(ws)
 
         thread_ws = threading.Thread(target=run)
         thread_ws.daemon = True
         thread_ws.start()
 
     @staticmethod
-    def handle_websocket_reconnection(ws):
+    def on_error(ws, error):
+        logger.error(f"#{ws.index} - WebSocket error: {error}")
+
+    @staticmethod
+    def on_close(ws):
+        logger.info(f"#{ws.index} - WebSocket closed")
+        # On close please reconnect automatically
+        WebSocketsPool.handle_reconnection(ws)
+
+    @staticmethod
+    def handle_reconnection(ws):
+        # Close the current WebSocket.
+        # anyway, we replace the ws with None
         ws.is_closed = True
-        if ws.keep_running is True:
-            logger.info("Reconnecting to Twitch PubSub server in 60 seconds")
-            time.sleep(60)
+        ws.keep_running = False
+        # Reconnect only if ws.forced_close is False (replace the keep_running)
+        if ws.forced_close is False:
+            logger.info(
+                f"#{ws.index} - Reconnecting to Twitch PubSub server in 30 seconds"
+            )
+            time.sleep(30)
 
             self = ws.parent_pool
-            if self.ws == ws:
-                self.ws = None
+            self.ws[ws.index] = None
             for topic in ws.topics:
                 self.submit(topic)
 
     @staticmethod
     def on_message(ws, message):
-        logger.debug(f"Received: {message.strip()}")
+        logger.debug(f"#{ws.index} - Received: {message.strip()}")
         response = json.loads(message)
 
         if response["type"] == "MESSAGE":
@@ -178,7 +199,7 @@ class WebSocketsPool:
                                     event_dict["prediction_window_seconds"]
                                 )
                                 prediction_window_seconds -= (
-                                    25 if prediction_window_seconds <= 180 else 60
+                                    30 if prediction_window_seconds <= 120 else 60
                                 )
                                 event = EventPrediction(
                                     ws.streamers[streamer_index],
@@ -233,23 +254,54 @@ class WebSocketsPool:
                     elif message.topic == "predictions-user-v1":
                         event_id = message.data["prediction"]["event_id"]
                         if event_id in ws.events_predictions:
-                            if message.type == "prediction-result":
+                            event_prediction = ws.events_predictions[event_id]
+                            if (
+                                message.type == "prediction-result"
+                                and event_prediction.bet_confirmed
+                            ):
                                 event_result = message.data["prediction"]["result"]
-                                logger.info(
-                                    f"{ws.events_predictions[event_id]} - Result: {event_result['type']}, Points won: {_millify(event_result['points_won']) if event_result['points_won'] else 0}",
-                                    extra={"emoji": ":bar_chart:"},
-                                )
+                                result_type = event_result["type"]
+                                points_placed = event_prediction.bet.decision["amount"]
                                 points_won = (
                                     event_result["points_won"]
                                     if event_result["points_won"]
+                                    or result_type == "REFUND"
                                     else 0
+                                )
+                                points_gained = (
+                                    points_won - points_placed
+                                    if result_type != "REFUND"
+                                    else 0
+                                )
+                                points_prefix = "+" if points_gained >= 0 else ""
+                                logger.info(
+                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {points_prefix}{_millify(points_gained)}",
+                                    extra={"emoji": ":bar_chart:"},
                                 )
                                 ws.events_predictions[event_id].final_result = {
                                     "type": event_result["type"],
-                                    "won": points_won,
+                                    "points_won": points_won,
+                                    "gained": points_gained,
                                 }
+                                ws.streamers[streamer_index].update_history(
+                                    "PREDICTION", points_gained
+                                )
+
+                                # Remove duplicate history records from previous message sent in community-points-user-v1
+                                if result_type == "REFUND":
+                                    ws.streamers[streamer_index].update_history(
+                                        "REFUND",
+                                        -points_placed,
+                                        counter=-1,
+                                    )
+                                elif result_type == "WIN":
+                                    ws.streamers[streamer_index].update_history(
+                                        "PREDICTION",
+                                        -points_won,
+                                        counter=-1,
+                                    )
                             elif message.type == "prediction-made":
-                                ws.events_predictions[event_id].bet_confirmed = True
+                                event_prediction.bet_confirmed = True
 
                     elif message.topic == "user-drop-events":
                         if message.type == "drop-progress":
@@ -289,9 +341,9 @@ class WebSocketsPool:
             raise RuntimeError(f"Error while trying to listen for a topic: {response}")
 
         elif response["type"] == "RECONNECT":
-            logger.info(f"Reconnection required and keep running is: {ws.keep_running}")
+            logger.info(f"#{ws.index} - Reconnection required")
             ws.is_reconneting = True
-            WebSocketsPool.handle_websocket_reconnection(ws)
+            WebSocketsPool.handle_reconnection(ws)
 
         elif response["type"] == "PONG":
             ws.last_pong = time.time()
