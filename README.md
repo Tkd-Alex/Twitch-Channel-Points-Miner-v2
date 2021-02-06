@@ -179,7 +179,7 @@ twitch_miner = TwitchChannelPointsMiner(
             stealth_mode=True,                  # If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points #33
             filter_condition=FilterCondition(
                 by=OutcomeKeys.TOTAL_USERS,    # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
-                where=Condition.LTE,           # The key must be [GT, LT, GTE, LTE] than value
+                where=Condition.LTE,           # 'by' must be [GT, LT, GTE, LTE] than value
                 value=800
             )
         )
@@ -290,7 +290,7 @@ In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot wi
 | `where`      	| Condition   	| None    	| Condition that should match for place bet                                        	|
 | `value`     	| number      	| None    	| Value to compare                                                                 	|
 
-Allowed values for `key` are:
+Allowed values for `by` are:
 - `PERCENTAGE_USERS` (no sum) [Would never want a sum as it'd always be 100%]
 - `ODDS_PERCENTAGE` (no sum) [Doesn't make sense to sum odds]
 - `ODDS` (no sum) [Doesn't make sense to sum odds]
@@ -300,7 +300,7 @@ Allowed values for `key` are:
 - `TOTAL_USERS` (sum)
 - `TOTAL_POINTS` (sum)
 
-Allowed values for `condition` are: `GT, LT, GTE, LTE`
+Allowed values for `where` are: `GT, LT, GTE, LTE`
 
 #### Example
 - If you want to place the bet ONLY if the total of users participants in the bet are greater than 200
