@@ -26,7 +26,8 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
 - Automatic download the followers list and use as input
 - Better 'Watch Streak' strategy in priority system [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)
 - Auto claim game drops from Twitch inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) Read more about game drops [here](https://help.twitch.tv/s/article/mission-based-drops)
-- Place the bet / make prediction and won or lose (good luck) your channel points! - Without Browser! Thanks to @lay295 [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/41)
+- Place the bet / make prediction and won or lose (🍀) your channel points!
+No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/41) ([@lay295](https://github.com/lay295))
 
 ### Full logs
 ```
