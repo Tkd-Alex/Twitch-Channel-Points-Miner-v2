@@ -26,7 +26,7 @@ from TwitchChannelPointsMiner.constants.twitch import API, CLIENT_ID, GQLOperati
 logger = logging.getLogger(__name__)
 
 
-class Twitch:
+class Twitch(object):
     def __init__(self, username, user_agent):
         cookies_path = os.path.join(Path().absolute(), "cookies")
         Path(cookies_path).mkdir(parents=True, exist_ok=True)

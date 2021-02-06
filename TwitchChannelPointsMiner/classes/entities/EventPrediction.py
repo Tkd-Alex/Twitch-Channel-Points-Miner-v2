@@ -4,7 +4,7 @@ from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.utils import float_round
 
 
-class EventPrediction:
+class EventPrediction(object):
     def __init__(
         self,
         streamer: Streamer,

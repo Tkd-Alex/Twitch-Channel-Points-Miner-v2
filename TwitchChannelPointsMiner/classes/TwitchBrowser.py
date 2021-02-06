@@ -7,7 +7,7 @@ from enum import Enum, auto
 from pathlib import Path
 
 from selenium import webdriver
-from selenium.common.exceptions import JavascriptException, TimeoutException
+from selenium.common.exceptions import JavascriptException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
@@ -16,7 +16,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.constants.browser import Javascript, Selectors
 from TwitchChannelPointsMiner.constants.twitch import URL
-from TwitchChannelPointsMiner.utils import _millify, bet_condition, get_user_agent
+from TwitchChannelPointsMiner.utils import (
+    _millify,
+    bet_condition,
+    char_decision_as_index,
+    get_user_agent,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +29,9 @@ logger = logging.getLogger(__name__)
 class Browser(Enum):
     CHROME = auto()
     FIREFOX = auto()
+
+    def __str__(self):
+        return self.name
 
 
 class BrowserSettings:
@@ -58,7 +66,7 @@ class BrowserSettings:
         )
 
 
-class TwitchBrowser:
+class TwitchBrowser(object):
     def __init__(
         self,
         auth_token: str,
@@ -264,7 +272,6 @@ class TwitchBrowser:
         return False
 
     def start_bet(self, event: EventPrediction):
-        start_time = time.time()
         if bet_condition(self, event, logger) is True:
             for attempt in range(0, self.settings.max_attempts):
                 logger.info(
@@ -272,7 +279,7 @@ class TwitchBrowser:
                     extra={"emoji": ":wrench:"},
                 )
                 self.browser.get(event.streamer.chat_url)
-                time.sleep(random.uniform(3, 5))
+                time.sleep(random.uniform(1, 3))
                 self.__click_when_exist(
                     Selectors.cookiePolicy,
                     By.CSS_SELECTOR,
@@ -284,12 +291,12 @@ class TwitchBrowser:
                 self.__execute_script(Javascript.clearStyleChat, suppress_error=True)
 
                 if self.__bet_chains_methods(event) is True:
-                    return self.currently_is_betting, time.time() - start_time
+                    return self.currently_is_betting
                 logger.error(
                     f"Attempt {attempt+1} failed!", extra={"emoji": ":wrench:"}
                 )
             self.__blank()  # If we fail return to blank page
-        return False, time.time() - start_time
+        return False
 
     def __bet_chains_methods(self, event) -> bool:
         if self.__open_coins_menu(event) is True:
@@ -300,37 +307,19 @@ class TwitchBrowser:
 
     def place_bet(self, event: EventPrediction):
         logger.info(
-            f"Going to complete bet for {event} owned by {event.streamer}",
+            f"Place bet for {event} owned by {event.streamer}",
             extra={"emoji": ":wrench:"},
         )
         if event.status == "ACTIVE":
-            if event.box_fillable and self.currently_is_betting:
-
-                div_bet_is_open = False
-                self.__debug(event, "place_bet")
-                try:
-                    WebDriverWait(self.browser, 1).until(
-                        expected_conditions.visibility_of_element_located(
-                            (By.XPATH, Selectors.betMainDivXP)
-                        )
-                    )
-                    div_bet_is_open = True
-                except TimeoutException:
-                    logger.info(
-                        "The bet div was not found, maybe It was closed. Attempting to open again... Hopefully in time!",
-                        extra={"emoji": ":wrench:"},
-                    )
-                    div_bet_is_open = self.__bet_chains_methods(event)
-                    if div_bet_is_open is True:
-                        logger.info(
-                            "Success! Bet div is now open, we can complete the bet!",
-                            extra={"emoji": ":wrench:"},
-                        )
-
-                if div_bet_is_open is True:
-                    decision = event.bet.calculate(event.streamer.channel_points)
+            decision = event.bet.calculate(event.streamer.channel_points)
+            if event.bet.skip() is True:
+                logger.info(f"Skip betting for the event {event}")
+                logger.info(f"Skip settings {event.bet.settings.filter_condition}")
+            else:
+                self.currently_is_betting = self.start_bet(event)
+                if event.box_fillable and self.currently_is_betting:
                     if decision["choice"] is not None:
-                        selector_index = 1 if decision["choice"] == "A" else 2
+                        selector_index = char_decision_as_index(decision["choice"]) + 1
                         logger.info(
                             f"Decision: {event.bet.get_outcome(selector_index - 1)}",
                             extra={"emoji": ":wrench:"},
@@ -353,17 +342,13 @@ class TwitchBrowser:
                                 )
                                 if self.__click_on_vote(event, selector_index) is True:
                                     event.bet_placed = True
-                                    time.sleep(random.uniform(5, 10))
+                                    time.sleep(random.uniform(3, 6))
                         except Exception:
                             logger.error("Exception raised", exc_info=True)
                 else:
                     logger.info(
-                        "Sorry, unable to complete the bet. The bet div is still closed!"
+                        f"Sorry, unable to complete the bet. Event box fillable: {event.box_fillable}, the browser is betting: {self.currently_is_betting}"
                     )
-            else:
-                logger.info(
-                    f"Sorry, unable to complete the bet. Event box fillable: {event.box_fillable}, the browser is betting: {self.currently_is_betting}"
-                )
         else:
             logger.info(
                 f"Oh no! The event is not active anymore! Current status: {event.status}",

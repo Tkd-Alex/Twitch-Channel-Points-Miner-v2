@@ -36,10 +36,6 @@ def server_time(message_data):
     )
 
 
-def calculate_start_after(closing_bet_after, execution_time):
-    return round(max(1, closing_bet_after - execution_time), 2)
-
-
 # https://en.wikipedia.org/wiki/Cryptographic_nonce
 def create_nonce(length=30) -> str:
     nonce = ""
@@ -74,9 +70,7 @@ def bet_condition(twitch_browser, event, logger) -> bool:
 
 def get_user_agent(browser) -> str:
     try:
-        return USER_AGENTS[platform.system()][
-            browser.name if type(browser) != str else browser
-        ]
+        return USER_AGENTS[platform.system()][browser]
     except KeyError:
         return USER_AGENTS["Linux"]["FIREFOX"]
 
@@ -149,3 +143,7 @@ def set_default_settings(settings, defaults):
         # Get the default values from Settings.streamer_settings
         settings = copy_values_if_none(settings, defaults)
     return settings
+
+
+def char_decision_as_index(char):
+    return 0 if char == "A" else 1
