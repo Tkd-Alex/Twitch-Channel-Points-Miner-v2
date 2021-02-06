@@ -11,7 +11,7 @@ from TwitchChannelPointsMiner.classes.entities.Message import Message
 from TwitchChannelPointsMiner.classes.entities.Raid import Raid
 from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
-from TwitchChannelPointsMiner.constants.twitch import WEBSOCKET
+from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import _millify, get_streamer_index
 
 logger = logging.getLogger(__name__)

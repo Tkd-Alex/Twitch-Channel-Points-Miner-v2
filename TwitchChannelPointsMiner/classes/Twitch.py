@@ -22,7 +22,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
 )
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
-from TwitchChannelPointsMiner.constants.twitch import API, CLIENT_ID, GQLOperations
+from TwitchChannelPointsMiner.constants import API, CLIENT_ID, GQLOperations
 from TwitchChannelPointsMiner.utils import _millify
 
 logger = logging.getLogger(__name__)

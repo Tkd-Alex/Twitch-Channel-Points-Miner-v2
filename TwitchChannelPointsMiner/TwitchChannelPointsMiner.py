@@ -28,11 +28,6 @@ from TwitchChannelPointsMiner.utils import (
     set_default_settings,
 )
 
-# Suppress warning for urllib3.connectionpool (selenium close connection)
-# Suppress also the selenium logger please
-logging.getLogger("urllib3").setLevel(logging.ERROR)
-logging.getLogger("selenium").setLevel(logging.ERROR)
-
 logger = logging.getLogger(__name__)
 
 
@@ -41,7 +36,6 @@ class TwitchChannelPointsMiner:
         self,
         username: str,
         claim_drops_startup: bool = False,
-        # Settings for logging and selenium as you can see.
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
         # Default values for all streamers

@@ -7,7 +7,7 @@ from random import randrange
 
 from millify import millify
 
-from TwitchChannelPointsMiner.constants.browser import USER_AGENTS
+from TwitchChannelPointsMiner.constants import USER_AGENTS
 
 
 def _millify(input, precision=2):

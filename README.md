@@ -26,9 +26,7 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
 - Automatic download the followers list and use as input
 - Better 'Watch Streak' strategy in priority system [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)
 - Auto claim game drops from Twitch inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) Read more about game drops [here](https://help.twitch.tv/s/article/mission-based-drops)
-- Place the bet / make prediction and won or lose (good luck) your channel points!
-
-For the bet system the script use Selenium. Could be usefull understand how to MakePrediction usign a [POST] request. I've also write a [poc](/TwitchChannelPointsMiner/classes/Twitch.py#L160) but I don't know how to calculate/create the transactionID. Any helps are welcome
+- Place the bet / make prediction and won or lose (good luck) your channel points! - Without Browser! Thanks to @lay295 [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/41)
 
 ### Full logs
 ```
@@ -45,10 +43,8 @@ For the bet system the script use Selenium. Could be usefull understand how to M
 %d/%m/%y %H:%M:%S - INFO - [__enable_custom_bet_value]: 🔧  Enable input of custom value for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
 %d/%m/%y %H:%M:%S - INFO - [on_message]: ⏰  Place the bet after: 89.99s for: EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx-15c61914ef69, title=Please star this repo)
 %d/%m/%y %H:%M:%S - INFO - [on_message]: 🚀  +12 → Streamer(username=streamer-username, channel_id=0000000, channel_points=61377) - Reason: WATCH.
-%d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to complete bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo) owned by Streamer(username=streamer-username, channel_id=0000000, channel_points=61365)
-%d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Decision: YES (PINK), Points: 156k, Users: 46 (61.33%), Odds: 1.57 (63.69%)
-%d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to write: 4296 channel points on input B
-%d/%m/%y %H:%M:%S - INFO - [place_bet]: 🔧  Going to place the bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo)
+%d/%m/%y %H:%M:%S - INFO - [make_predictions]: 🍀  Going to complete bet for EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx-15c61914ef69, title=Please star this repo) owned by Streamer(username=streamer-username, channel_id=0000000, channel_points=61377)
+%d/%m/%y %H:%M:%S - INFO - [make_predictions]: 🍀  Place 5k channel points on: SI (BLUE), Points: 848k, Users: 190 (70.63%), Odds: 1.24 (80.65%)
 %d/%m/%y %H:%M:%S - INFO - [on_message]: 🚀  +6675 → Streamer(username=streamer-username, channel_id=0000000, channel_points=64206) - Reason: PREDICTION.
 %d/%m/%y %H:%M:%S - INFO - [on_message]: 📊  EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title=Please star this repo) - Result: WIN, Points won: 6675
 %d/%m/%y %H:%M:%S - INFO - [on_message]: 🚀  +12 → Streamer(username=streamer-username, channel_id=0000000, channel_points=64218) - Reason: WATCH.
@@ -78,10 +74,8 @@ For the bet system the script use Selenium. Could be usefull understand how to M
 %d/%m %H:%M:%S - 🔧  Enable input of custom value for EventPrediction: Please star this repo
 %d/%m %H:%M:%S - ⏰  Place the bet after: 89.99s EventPrediction: Please star this repo
 %d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
-%d/%m %H:%M:%S - 🔧  Going to complete bet for EventPrediction: Please star this repo owned by streamer-username (xxx points)
-%d/%m %H:%M:%S - 🔧  Decision: YES (PINK), Points: 156k, Users: 46 (61.33%), Odds: 1.57 (63.69%)
-%d/%m %H:%M:%S - 🔧  Going to write: 4296 channel points on input B
-%d/%m %H:%M:%S - 🔧  Going to place the bet for EventPrediction: Please star this repo
+%d/%m %H:%M:%S - 🍀  Going to complete bet for EventPrediction: Please star this repo owned by streamer-username (xxx points)
+%d/%m %H:%M:%S - 🍀  Place 5k channel points on: SI (BLUE), Points: 848k, Users: 190 (70.63%), Odds: 1.24 (80.65%)
 %d/%m %H:%M:%S - 🚀  +6675 → streamer-username (xxx points) - Reason: PREDICTION.
 %d/%m %H:%M:%S - 📊  EventPrediction: Please star this repo - Result: WIN, Points won: 6675
 %d/%m %H:%M:%S - 🚀  +12 → streamer-username (xxx points) - Reason: WATCH.
@@ -302,7 +296,6 @@ If you already have a `twitch-cookies.pkl` and you don't want to login again ple
 Other users have find multiple problems on Windows my suggestion are:
  - Stop use Windows :stuck_out_tongue_closed_eyes:
  - Suppress the emoji in logs with `logger_settings=LoggerSettings(emoji=False)`
- - Download the geckodriver from here: https://github.com/mozilla/geckodriver/releases/ and extract in the same folder of this project. For other issue with geckodriver just googling: https://stackoverflow.com/questions/40208051/selenium-using-python-geckodriver-executable-needs-to-be-in-path
 
 Other usefully infos can be founded here: https://github.com/gottagofaster236/Twitch-Channel-Points-Miner/issues/31
 ## Issue / Debug
