@@ -12,7 +12,11 @@ from TwitchChannelPointsMiner.classes.entities.Raid import Raid
 from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
-from TwitchChannelPointsMiner.utils import _millify, get_streamer_index
+from TwitchChannelPointsMiner.utils import (
+    _millify,
+    check_internet_connection,
+    get_streamer_index,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +36,7 @@ class WebSocketsPool:
     """
 
     def submit(self, topic):
+        # Check if we need to create a new WebSocket instance
         if self.ws == [] or self.ws[-1] is None or len(self.ws[-1].topics) >= 50:
             self.append_new_websocket()
 
@@ -111,6 +116,13 @@ class WebSocketsPool:
                 f"#{ws.index} - Reconnecting to Twitch PubSub server in 30 seconds"
             )
             time.sleep(30)
+
+            while check_internet_connection() is False:
+                random_sleep = random.randint(1, 3)
+                logger.warning(
+                    f"#{ws.index} - No internet connection available! Retry after {random_sleep}m"
+                )
+                time.sleep(random_sleep * 60)
 
             self = ws.parent_pool
             self.ws[ws.index] = None

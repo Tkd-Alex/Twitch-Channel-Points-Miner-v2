@@ -1,5 +1,6 @@
 import platform
 import re
+import socket
 import time
 from copy import deepcopy
 from datetime import datetime, timezone
@@ -130,3 +131,12 @@ def set_default_settings(settings, defaults):
 
 def char_decision_as_index(char):
     return 0 if char == "A" else 1
+
+
+def check_internet_connection(host="8.8.8.8", port=53, timeout=3):
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True
+    except socket.error:
+        return False
