@@ -19,10 +19,6 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import (
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
-from TwitchChannelPointsMiner.classes.TwitchBrowser import (
-    BrowserSettings,
-    TwitchBrowser,
-)
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.utils import (
@@ -32,11 +28,6 @@ from TwitchChannelPointsMiner.utils import (
     set_default_settings,
 )
 
-# Suppress warning for urllib3.connectionpool (selenium close connection)
-# Suppress also the selenium logger please
-logging.getLogger("urllib3").setLevel(logging.ERROR)
-logging.getLogger("selenium").setLevel(logging.ERROR)
-
 logger = logging.getLogger(__name__)
 
 
@@ -45,10 +36,8 @@ class TwitchChannelPointsMiner:
         self,
         username: str,
         claim_drops_startup: bool = False,
-        # Settings for logging and selenium as you can see.
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
-        browser_settings: BrowserSettings = BrowserSettings(),
         # Default values for all streamers
         streamer_settings: StreamerSettings = StreamerSettings(),
     ):
@@ -56,17 +45,15 @@ class TwitchChannelPointsMiner:
 
         # Set as globally config
         Settings.logger = logger_settings
-        Settings.browser = browser_settings
 
         # Init as default all the missing values
         streamer_settings.default()
         streamer_settings.bet.default()
         Settings.streamer_settings = streamer_settings
 
-        user_agent = get_user_agent(browser_settings.browser)
+        user_agent = get_user_agent("FIREFOX")
         self.twitch = Twitch(self.username, user_agent)
 
-        self.twitch_browser = None
         self.claim_drops_startup = claim_drops_startup
         self.streamers = []
         self.events_predictions = {}
@@ -175,14 +162,6 @@ class TwitchChannelPointsMiner:
             make_predictions = at_least_one_value_in_settings_is(
                 self.streamers, "make_predictions", True
             )
-            # We need a browser to make predictions / bet
-            if make_predictions is True:
-                self.twitch_browser = TwitchBrowser(
-                    self.twitch.twitch_login.get_auth_token(),
-                    self.session_id,
-                    settings=Settings.browser,
-                )
-                self.twitch_browser.init()
 
             self.minute_watcher_thread = threading.Thread(
                 target=self.twitch.send_minute_watched_events,
@@ -197,7 +176,6 @@ class TwitchChannelPointsMiner:
 
             self.ws_pool = WebSocketsPool(
                 twitch=self.twitch,
-                browser=self.twitch_browser,
                 streamers=self.streamers,
                 events_predictions=self.events_predictions,
             )
@@ -262,16 +240,13 @@ class TwitchChannelPointsMiner:
     def end(self, signum, frame):
         logger.info("CTRL+C Detected! Please wait just a moments!")
 
-        if self.twitch_browser is not None:
-            self.twitch_browser.browser.quit()
-
         self.running = self.twitch.running = False
         self.ws_pool.end()
 
         self.minute_watcher_thread.join()
 
         self.__print_report()
-        time.sleep(3.5)  # Do sleep for ending browser and threads
+        time.sleep(3.5)  # Do sleep for ending threads ...
 
         sys.exit(0)
 

@@ -7,7 +7,7 @@ from random import randrange
 
 from millify import millify
 
-from TwitchChannelPointsMiner.constants.browser import USER_AGENTS
+from TwitchChannelPointsMiner.constants import USER_AGENTS
 
 
 def _millify(input, precision=2):
@@ -51,24 +51,7 @@ def create_nonce(length=30) -> str:
     return nonce
 
 
-def bet_condition(twitch_browser, event, logger) -> bool:
-    if twitch_browser.currently_is_betting is True:
-        logger.info(
-            f"Sorry, unable to start {event}, the browser is currently betting on another event!"
-        )
-        return False
-    elif twitch_browser.browser.current_url != "about:blank":
-        logger.info(
-            "Sorry, but the browser is not currently on 'about:blank' screen. Unable to start bet!"
-        )
-        return False
-    elif event.streamer.viewer_is_mod is True:
-        logger.info(f"Sorry, you are moderator of {event.streamer}, so you can't bet!")
-        return False
-    return True
-
-
-def get_user_agent(browser) -> str:
+def get_user_agent(browser: str) -> str:
     try:
         return USER_AGENTS[platform.system()][browser]
     except KeyError:

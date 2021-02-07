@@ -11,6 +11,7 @@ import random
 import re
 import time
 from pathlib import Path
+from secrets import token_hex
 
 import requests
 
@@ -21,7 +22,8 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
 )
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
-from TwitchChannelPointsMiner.constants.twitch import API, CLIENT_ID, GQLOperations
+from TwitchChannelPointsMiner.constants import API, CLIENT_ID, GQLOperations
+from TwitchChannelPointsMiner.utils import _millify
 
 logger = logging.getLogger(__name__)
 
@@ -198,13 +200,24 @@ class Twitch(object):
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
+        selector_index = 0 if decision["choice"] == "A" else 1
+
+        logger.info(
+            f"Going to complete bet for {event} owned by {event.streamer}",
+            extra={"emoji": ":four_leaf_clover:"},
+        )
+        logger.info(
+            f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
+            extra={"emoji": ":four_leaf_clover:"},
+        )
+
         json_data = copy.deepcopy(GQLOperations.MakePrediction)
         json_data["variables"] = {
             "input": {
                 "eventID": event.event_id,
                 "outcomeID": decision["id"],
                 "points": decision["amount"],
-                "transactionID": "412118d3********79ac856",  # How we can calculate this?
+                "transactionID": token_hex(16),
             }
         }
         return self.post_gql_request(json_data)

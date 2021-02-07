@@ -4,7 +4,7 @@ import time
 from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.Stream import Stream
 from TwitchChannelPointsMiner.classes.Settings import Settings
-from TwitchChannelPointsMiner.constants.twitch import URL
+from TwitchChannelPointsMiner.constants import URL
 from TwitchChannelPointsMiner.utils import _millify
 
 logger = logging.getLogger(__name__)

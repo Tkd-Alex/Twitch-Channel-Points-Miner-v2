@@ -11,17 +11,16 @@ from TwitchChannelPointsMiner.classes.entities.Message import Message
 from TwitchChannelPointsMiner.classes.entities.Raid import Raid
 from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
-from TwitchChannelPointsMiner.constants.twitch import WEBSOCKET
-from TwitchChannelPointsMiner.utils import _millify, bet_condition, get_streamer_index
+from TwitchChannelPointsMiner.constants import WEBSOCKET
+from TwitchChannelPointsMiner.utils import _millify, get_streamer_index
 
 logger = logging.getLogger(__name__)
 
 
-class WebSocketsPool(object):
-    def __init__(self, twitch, browser, streamers, events_predictions):
-        self.ws: list = []
+class WebSocketsPool:
+    def __init__(self, twitch, streamers, events_predictions):
+        self.ws = []
         self.twitch = twitch
-        self.browser = browser
         self.streamers = streamers
         self.events_predictions = events_predictions
 
@@ -214,29 +213,29 @@ class WebSocketsPool(object):
                                 if (
                                     ws.streamers[streamer_index].is_online
                                     and event.closing_bet_after(current_tmsp) > 0
-                                    and bet_condition(
-                                        ws.browser,
-                                        event,
-                                        logger,
-                                    )
-                                    is True
                                 ):
-                                    # place_bet_thread = threading.Timer(event.closing_bet_after(current_tmsp), ws.twitch.make_predictions, (ws.events_predictions[event_id],))
-                                    ws.events_predictions[event_id] = event
-                                    start_after = event.closing_bet_after(current_tmsp)
+                                    if event.streamer.viewer_is_mod is True:
+                                        logger.info(
+                                            f"Sorry, you are moderator of {event.streamer}, so you can't bet!"
+                                        )
+                                    else:
+                                        ws.events_predictions[event_id] = event
+                                        start_after = event.closing_bet_after(
+                                            current_tmsp
+                                        )
 
-                                    place_bet_thread = threading.Timer(
-                                        start_after,
-                                        ws.browser.place_bet,
-                                        (ws.events_predictions[event_id],),
-                                    )
-                                    place_bet_thread.daemon = True
-                                    place_bet_thread.start()
+                                        place_bet_thread = threading.Timer(
+                                            start_after,
+                                            ws.twitch.make_predictions,
+                                            (ws.events_predictions[event_id],),
+                                        )
+                                        place_bet_thread.daemon = True
+                                        place_bet_thread.start()
 
-                                    logger.info(
-                                        f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
-                                        extra={"emoji": ":alarm_clock:"},
-                                    )
+                                        logger.info(
+                                            f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
+                                            extra={"emoji": ":alarm_clock:"},
+                                        )
 
                         elif (
                             message.type == "event-updated"
