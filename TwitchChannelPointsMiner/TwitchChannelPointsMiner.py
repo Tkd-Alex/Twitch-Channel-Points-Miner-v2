@@ -272,8 +272,18 @@ class TwitchChannelPointsMiner:
             ):
                 logger.info(
                     f"{self.events_predictions[event_id].streamer.settings.bet}",
-                    extra={"emoji": ":bar_chart:"},
+                    extra={"emoji": ":gear:"},
                 )
+                if (
+                    self.events_predictions[
+                        event_id
+                    ].streamer.settings.bet.filter_condition
+                    is not None
+                ):
+                    logger.info(
+                        f"{self.events_predictions[event_id].streamer.settings.bet.filter_condition}",
+                        extra={"emoji": ":pushpin:"},
+                    )
                 logger.info(
                     f"{self.events_predictions[event_id].print_recap()}",
                     extra={"emoji": ":bar_chart:"},
