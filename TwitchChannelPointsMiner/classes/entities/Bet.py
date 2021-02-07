@@ -31,12 +31,18 @@ class Condition(Enum):
 
 
 class OutcomeKeys(object):
+    # Real key on Bet dict ['']
     PERCENTAGE_USERS = "percentage_users"
     ODDS_PERCENTAGE = "odds_percentage"
     ODDS = "odds"
     TOP_POINTS = "top_points"
+    # Real key on Bet dict [''] - Sum()
     TOTAL_USERS = "total_users"
     TOTAL_POINTS = "total_points"
+    # TOTAL_ and DECISION refer to same key / values
+    # But we have different name for help us in filter
+    DECISION_USERS = "total_users"
+    DECISION_POINTS = "total_points"
 
 
 class FilterCondition(object):
@@ -46,7 +52,7 @@ class FilterCondition(object):
         self.value = value
 
     def __repr__(self):
-        return f"FilterCondition(By={self.key}, Where={self.condition}, Value={self.value})"
+        return f"FilterCondition(By={self.by}, Where={self.where}, Value={self.value})"
 
 
 class BetSettings(object):

@@ -295,7 +295,7 @@ Allowed values for `by` are:
 - `ODDS_PERCENTAGE` (no sum) [Doesn't make sense to sum odds]
 - `ODDS` (no sum) [Doesn't make sense to sum odds]
 - `DECISION_USERS` (no sum)
-- `DECISION_POINTS` (no points)
+- `DECISION_POINTS` (no sum)
 - `TOP_POINTS` (no sum) [Doesn't make sense to the top points of both sides]
 - `TOTAL_USERS` (sum)
 - `TOTAL_POINTS` (sum)
