@@ -241,4 +241,5 @@ class Bet(object):
                 self.decision["amount"] = (
                     self.outcomes[index][OutcomeKeys.TOP_POINTS] - reduce_amount
                 )
+            self.decision["amount"] = int(self.decision["amount"])
         return self.decision
