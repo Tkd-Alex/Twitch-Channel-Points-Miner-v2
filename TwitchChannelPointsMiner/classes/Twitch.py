@@ -234,6 +234,12 @@ class Twitch(object):
                 )
             ]
 
+            for index in streamers_index:
+                if (streamers[index].stream.update_elapsed() / 60) > 10:
+                    # Why this user It's currently online but the last updated was more than 10minutes ago?
+                    # Please perform a manually update and check if the user it's online
+                    self.check_streamer_online(streamers[index])
+
             """
             Check if we need need to change priority based on watch streak
             Viewers receive points for returning for x consecutive streams.
@@ -266,7 +272,12 @@ class Twitch(object):
                 while len(streamers_watching) < 2 and len(streamers_index) > 1:
                     another_streamer_index = streamers_index.pop(0)
                     if another_streamer_index not in streamers_watching:
-                        streamers_watching.append(another_streamer_index)
+                        try:
+                            streamers_watching.append(another_streamer_index)
+                        except requests.exceptions.ConnectionError as e:
+                            logger.error(
+                                f"Error while trying to perform a force for streamer's update: {e}"
+                            )
 
             """
             Twitch has a limit - you can't watch more than 2 channels at one time.
