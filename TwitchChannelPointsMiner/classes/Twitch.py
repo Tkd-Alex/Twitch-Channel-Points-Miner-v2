@@ -206,21 +206,26 @@ class Twitch(object):
             f"Going to complete bet for {event} owned by {event.streamer}",
             extra={"emoji": ":four_leaf_clover:"},
         )
-        logger.info(
-            f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
-            extra={"emoji": ":four_leaf_clover:"},
-        )
 
-        json_data = copy.deepcopy(GQLOperations.MakePrediction)
-        json_data["variables"] = {
-            "input": {
-                "eventID": event.event_id,
-                "outcomeID": decision["id"],
-                "points": decision["amount"],
-                "transactionID": token_hex(16),
+        if event.bet.skip() is True:
+            logger.info(f"Skip betting for the event {event}")
+            logger.info(f"Skip settings {event.bet.settings.filter_condition}")
+        else:
+            logger.info(
+                f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
+                extra={"emoji": ":four_leaf_clover:"},
+            )
+
+            json_data = copy.deepcopy(GQLOperations.MakePrediction)
+            json_data["variables"] = {
+                "input": {
+                    "eventID": event.event_id,
+                    "outcomeID": decision["id"],
+                    "points": decision["amount"],
+                    "transactionID": token_hex(16),
+                }
             }
-        }
-        return self.post_gql_request(json_data)
+            return self.post_gql_request(json_data)
 
     def send_minute_watched_events(self, streamers, watch_streak=False, chunk_size=3):
         while self.running:
