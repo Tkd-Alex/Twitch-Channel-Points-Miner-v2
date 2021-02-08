@@ -17,6 +17,29 @@
 > It can wait for a streamer to go live (+_450 points_ when the stream starts), it will automatically click the bonus button (_+50 points_), and it will follow raids (_+250 points_).
 
 Read more about channels point [here](https://help.twitch.tv/s/article/channel-points-guide)
+
+# README Contents
+1. 🤝 [Community](#community)
+2. 🚀 [Main difference from the original repository](#main-difference-from-the-original-repository)
+3. 🧾 [Logs feature](#logs-feature)
+    - [Full logs](#full-logs)
+    - [Less logs](#less-logs)
+    - [Final report](#final-report)
+4. 🧐 [How to use](#how-to-use)
+    - [Limits](#limits)
+5. 🔧 [Settings](#settings)
+    - [LoggerSettings](#loggersettings)
+    - [StreamerSettings](#streamersettings)
+    - [BetSettings](#betsettings)
+        - [Bet strategy](#bet-strategy)
+    - [FilterCondition](#filtercondition)
+        - [Example](#example)
+6. 🍪 [Migrating from old repository (the original one)](#migrating-from-old-repository-the-original-one)
+7. 🪟 [Windows](#windows)
+8. 🐛 [Issue / Debug](#issue--debug)
+9. ⚠️ [Disclaimer](#disclaimer)
+
+
 ## Community
 If you have any type of issue, you need help, or you just want to suggest a new feature please open a GitHub Issue. Don't write me on [Instagram](https://www.instagram.com/tkd_alex/), [Telegram](https://t.me/TkdAlex), [Discord](https://discordapp.com/users/641397388132483121), [Twitter](https://twitter.com/TkdAxel) (but you can follow me 😆) or somewhere else. If you don't have an account on this platform you can create, It's free. I do not want to be rude, but if you have a problem, maybe another user can have also the same problem and your issue can help the community. Same for the new feature, your idea can help other users, and It's beautiful to discuss between us.
 
