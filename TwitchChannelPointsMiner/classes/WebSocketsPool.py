@@ -198,9 +198,8 @@ class WebSocketsPool:
                                 prediction_window_seconds = float(
                                     event_dict["prediction_window_seconds"]
                                 )
-                                prediction_window_seconds -= (
-                                    30 if prediction_window_seconds <= 120 else 60
-                                )
+                                # Reduce prediction window by 3/6s - Collect more accurate data for decision
+                                prediction_window_seconds -= random.uniform(3, 6)
                                 event = EventPrediction(
                                     ws.streamers[streamer_index],
                                     event_id,
