@@ -2,8 +2,7 @@ import json
 import logging
 import time
 
-from websocket import WebSocketApp
-from websocket.exceptions import WebSocketConnectionClosedException
+from websocket import WebSocketApp, WebSocketConnectionClosedException
 
 from TwitchChannelPointsMiner.utils import create_nonce
 
