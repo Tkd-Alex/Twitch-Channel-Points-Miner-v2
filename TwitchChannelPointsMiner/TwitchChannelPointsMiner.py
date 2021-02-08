@@ -264,32 +264,36 @@ class TwitchChannelPointsMiner:
             extra={"emoji": ":hourglass:"},
         )
 
-        for event_id in self.events_predictions:
-            if (
-                self.events_predictions[event_id].bet_confirmed is True
-                and self.events_predictions[event_id].streamer.settings.make_predictions
-                is True
-            ):
-                logger.info(
-                    f"{self.events_predictions[event_id].streamer.settings.bet}",
-                    extra={"emoji": ":wrench:"},
-                )
+        if self.events_predictions != {}:
+            print("")
+            for event_id in self.events_predictions:
                 if (
-                    self.events_predictions[
+                    self.events_predictions[event_id].bet_confirmed is True
+                    and self.events_predictions[
                         event_id
-                    ].streamer.settings.bet.filter_condition
-                    is not None
+                    ].streamer.settings.make_predictions
+                    is True
                 ):
                     logger.info(
-                        f"{self.events_predictions[event_id].streamer.settings.bet.filter_condition}",
-                        extra={"emoji": ":pushpin:"},
+                        f"{self.events_predictions[event_id].streamer.settings.bet}",
+                        extra={"emoji": ":wrench:"},
                     )
-                logger.info(
-                    f"{self.events_predictions[event_id].print_recap()}",
-                    extra={"emoji": ":bar_chart:"},
-                )
-        print("")
+                    if (
+                        self.events_predictions[
+                            event_id
+                        ].streamer.settings.bet.filter_condition
+                        is not None
+                    ):
+                        logger.info(
+                            f"{self.events_predictions[event_id].streamer.settings.bet.filter_condition}",
+                            extra={"emoji": ":pushpin:"},
+                        )
+                    logger.info(
+                        f"{self.events_predictions[event_id].print_recap()}",
+                        extra={"emoji": ":bar_chart:"},
+                    )
 
+        print("")
         for streamer_index in range(0, len(self.streamers)):
             logger.info(
                 f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
