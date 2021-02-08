@@ -244,9 +244,9 @@ class TwitchChannelPointsMiner:
         self.ws_pool.end()
 
         self.minute_watcher_thread.join()
+        time.sleep(1)
 
         self.__print_report()
-        time.sleep(3.5)  # Do sleep for ending threads ...
 
         sys.exit(0)
 
