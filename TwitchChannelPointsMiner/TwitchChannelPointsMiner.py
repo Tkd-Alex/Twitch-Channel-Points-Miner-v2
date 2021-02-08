@@ -272,7 +272,7 @@ class TwitchChannelPointsMiner:
             ):
                 logger.info(
                     f"{self.events_predictions[event_id].streamer.settings.bet}",
-                    extra={"emoji": ":gear:"},
+                    extra={"emoji": ":wrench:"},
                 )
                 if (
                     self.events_predictions[
