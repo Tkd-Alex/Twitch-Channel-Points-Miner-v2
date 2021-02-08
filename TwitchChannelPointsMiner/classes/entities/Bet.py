@@ -39,10 +39,9 @@ class OutcomeKeys(object):
     # Real key on Bet dict [''] - Sum()
     TOTAL_USERS = "total_users"
     TOTAL_POINTS = "total_points"
-    # TOTAL_ and DECISION refer to same key / values
-    # But we have different name for help us in filter
-    DECISION_USERS = "total_users"
-    DECISION_POINTS = "total_points"
+    # This key does not exist
+    DECISION_USERS = "decision_users"
+    DECISION_POINTS = "decision_points"
 
 
 class FilterCondition(object):
@@ -52,7 +51,7 @@ class FilterCondition(object):
         self.value = value
 
     def __repr__(self):
-        return f"FilterCondition(By={self.by}, Where={self.where}, Value={self.value})"
+        return f"FilterCondition(By={self.by.upper()}, Where={self.where}, Value={self.value})"
 
 
 class BetSettings(object):
@@ -180,14 +179,22 @@ class Bet(object):
             key = self.settings.filter_condition.by
             condition = self.settings.filter_condition.where
             value = self.settings.filter_condition.value
-            compared_value = (
-                (self.outcomes[0][key] + self.outcomes[1][key])
-                if key in [OutcomeKeys.TOTAL_USERS, OutcomeKeys.TOTAL_POINTS]
-                else self.outcomes[char_decision_as_index(self.decision["choice"])][key]
+
+            fixed_key = (
+                key
+                if key not in [OutcomeKeys.DECISION_USERS, OutcomeKeys.DECISION_POINTS]
+                else key.replace("decision", "total")
             )
+            if key in [OutcomeKeys.TOTAL_USERS, OutcomeKeys.TOTAL_POINTS]:
+                compared_value = (
+                    self.outcomes[0][fixed_key] + self.outcomes[1][fixed_key]
+                )
+            else:
+                outcome_index = char_decision_as_index(self.decision["choice"])
+                compared_value = self.outcomes[outcome_index][fixed_key]
 
             logger.info(
-                f"Filter applied on this bet. Current {key} is {compared_value}, must be {condition} {value}"
+                f"Filter applied on this bet. Current {key.upper()} is {compared_value}, must be {condition} {value}"
             )
             # Check if condition is satisfied
             if condition == Condition.GT:
