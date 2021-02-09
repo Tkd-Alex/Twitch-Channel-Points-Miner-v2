@@ -203,16 +203,17 @@ class Twitch(object):
         selector_index = 0 if decision["choice"] == "A" else 1
 
         logger.info(
-            f"Going to complete bet for {event} owned by {event.streamer}",
+            f"Going to complete bet for {event}",
             extra={"emoji": ":four_leaf_clover:"},
         )
         if event.status == "ACTIVE":
-            if event.bet.skip() is True:
+            skip, compared_value = event.bet.skip()
+            if skip is True:
                 logger.info(
                     f"Skip betting for the event {event}", extra={"emoji": ":pushpin:"}
                 )
                 logger.info(
-                    f"Skip settings {event.bet.settings.filter_condition}",
+                    f"Skip settings {event.bet.settings.filter_condition}, current value is: {compared_value}",
                     extra={"emoji": ":pushpin:"},
                 )
             else:

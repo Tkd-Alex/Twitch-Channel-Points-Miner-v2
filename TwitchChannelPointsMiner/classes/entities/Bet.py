@@ -1,13 +1,10 @@
 import copy
-import logging
 from enum import Enum, auto
 from random import uniform
 
 from millify import millify
 
 from TwitchChannelPointsMiner.utils import char_decision_as_index, float_round
-
-logger = logging.getLogger(__name__)
 
 
 class Strategy(Enum):
@@ -193,25 +190,22 @@ class Bet(object):
                 outcome_index = char_decision_as_index(self.decision["choice"])
                 compared_value = self.outcomes[outcome_index][fixed_key]
 
-            logger.info(
-                f"Filter applied on this bet. Current {key.upper()} is {compared_value}, must be {condition} {value}"
-            )
             # Check if condition is satisfied
             if condition == Condition.GT:
                 if compared_value > value:
-                    return False
+                    return False, compared_value
             elif condition == Condition.LT:
                 if compared_value < value:
-                    return False
+                    return False, compared_value
             elif condition == Condition.GTE:
                 if compared_value >= value:
-                    return False
+                    return False, compared_value
             elif condition == Condition.LTE:
                 if compared_value <= value:
-                    return False
-            return True  # Else skip the bet
+                    return False, compared_value
+            return True, compared_value  # Else skip the bet
         else:
-            return False  # Default don't skip the bet
+            return False, 0  # Default don't skip the bet
 
     def calculate(self, balance: int) -> dict:
         self.decision = {"choice": None, "amount": 0, "id": None}

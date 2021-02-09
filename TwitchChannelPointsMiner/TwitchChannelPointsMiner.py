@@ -295,12 +295,13 @@ class TwitchChannelPointsMiner:
 
         print("")
         for streamer_index in range(0, len(self.streamers)):
-            logger.info(
-                f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
-                extra={"emoji": ":robot:"},
-            )
             if self.streamers[streamer_index].history != {}:
                 logger.info(
-                    f"{self.streamers[streamer_index].print_history()}",
-                    extra={"emoji": ":moneybag:"},
+                    f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
+                    extra={"emoji": ":robot:"},
                 )
+                if self.streamers[streamer_index].history != {}:
+                    logger.info(
+                        f"{self.streamers[streamer_index].print_history()}",
+                        extra={"emoji": ":moneybag:"},
+                    )
