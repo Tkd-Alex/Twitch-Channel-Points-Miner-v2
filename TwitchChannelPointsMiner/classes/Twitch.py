@@ -23,7 +23,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.constants import API, CLIENT_ID, GQLOperations
-from TwitchChannelPointsMiner.utils import _millify
+from TwitchChannelPointsMiner.utils import _millify, internet_connection_available
 
 logger = logging.getLogger(__name__)
 
@@ -74,50 +74,63 @@ class Twitch(object):
             ]
 
     def get_spade_url(self, streamer):
-        headers = {"User-Agent": self.user_agent}
-        main_page_request = requests.get(streamer.streamer_url, headers=headers)
-        response = main_page_request.text
-        settings_url = re.search(
-            "(https://static.twitchcdn.net/config/settings.*?js)", response
-        ).group(1)
+        try:
+            headers = {"User-Agent": self.user_agent}
+            main_page_request = requests.get(streamer.streamer_url, headers=headers)
+            response = main_page_request.text
+            settings_url = re.search(
+                "(https://static.twitchcdn.net/config/settings.*?js)", response
+            ).group(1)
 
-        settings_request = requests.get(settings_url, headers=headers)
-        response = settings_request.text
-        streamer.stream.spade_url = re.search('"spade_url":"(.*?)"', response).group(1)
+            settings_request = requests.get(settings_url, headers=headers)
+            response = settings_request.text
+            streamer.stream.spade_url = re.search(
+                '"spade_url":"(.*?)"', response
+            ).group(1)
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Something went wrong during extraction of 'spade_url': {e}")
 
     def post_gql_request(self, json_data):
-        response = requests.post(
-            GQLOperations.url,
-            json=json_data,
-            headers={
-                "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
-                "Client-Id": CLIENT_ID,
-                "User-Agent": self.user_agent,
-            },
-        )
-        logger.debug(
-            f"Data: {json_data}, Status code: {response.status_code}, Content: {response.text}"
-        )
-        return response.json()
+        try:
+            response = requests.post(
+                GQLOperations.url,
+                json=json_data,
+                headers={
+                    "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
+                    "Client-Id": CLIENT_ID,
+                    "User-Agent": self.user_agent,
+                },
+            )
+            logger.debug(
+                f"Data: {json_data}, Status code: {response.status_code}, Content: {response.text}"
+            )
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(
+                f"Error with GQLOperations ({json_data['operationName']}): {e}"
+            )
+            return {}
 
     def get_broadcast_id(self, streamer):
         json_data = copy.deepcopy(GQLOperations.WithIsStreamLiveQuery)
         json_data["variables"] = {"id": streamer.channel_id}
         response = self.post_gql_request(json_data)
-        stream = response["data"]["user"]["stream"]
-        if stream is not None:
-            return stream["id"]
-        else:
-            raise StreamerIsOfflineException
+        if response != {}:
+            stream = response["data"]["user"]["stream"]
+            if stream is not None:
+                return stream["id"]
+            else:
+                raise StreamerIsOfflineException
 
     def get_stream_info(self, streamer):
         json_data = copy.deepcopy(GQLOperations.VideoPlayerStreamInfoOverlayChannel)
         json_data["variables"] = {"channel": streamer.username}
         response = self.post_gql_request(json_data)
-        if response["data"]["user"]["stream"] is None:
-            raise StreamerIsOfflineException
-        else:
-            return response["data"]["user"]
+        if response != {}:
+            if response["data"]["user"]["stream"] is None:
+                raise StreamerIsOfflineException
+            else:
+                return response["data"]["user"]
 
     def check_streamer_online(self, streamer):
         if time.time() < streamer.offline_at + 60:
@@ -181,7 +194,7 @@ class Twitch(object):
 
     def __get_inventory(self):
         response = self.post_gql_request(GQLOperations.Inventory)
-        return response["data"]["currentUser"]["inventory"]
+        return response["data"]["currentUser"]["inventory"] if response != {} else {}
 
     # Load the amount of current points for a channel, check if a bonus is available
     def load_channel_points_context(self, streamer):
@@ -189,14 +202,15 @@ class Twitch(object):
         json_data["variables"] = {"channelLogin": streamer.username}
 
         response = self.post_gql_request(json_data)
-        if response["data"]["community"] is None:
-            raise StreamerDoesNotExistException
-        channel = response["data"]["community"]["channel"]
-        community_points = channel["self"]["communityPoints"]
-        streamer.channel_points = community_points["balance"]
+        if response != {}:
+            if response["data"]["community"] is None:
+                raise StreamerDoesNotExistException
+            channel = response["data"]["community"]["channel"]
+            community_points = channel["self"]["communityPoints"]
+            streamer.channel_points = community_points["balance"]
 
-        if community_points["availableClaim"] is not None:
-            self.claim_bonus(streamer, community_points["availableClaim"]["id"])
+            if community_points["availableClaim"] is not None:
+                self.claim_bonus(streamer, community_points["availableClaim"]["id"])
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
@@ -299,8 +313,17 @@ class Twitch(object):
                     )
                     if response.status_code == 204:
                         streamers[index].stream.update_minute_watched()
-                except requests.exceptions.ConnectionError as e:
+                except requests.exceptions.RequestException as e:
                     logger.error(f"Error while trying to watch a minute: {e}")
+
+                    # The success rate It's very hight usually. Why we have failed?
+                    # Check internet connection ...
+                    while internet_connection_available() is False:
+                        random_sleep = random.randint(1, 3)
+                        logger.warning(
+                            f"No internet connection available! Retry after {random_sleep}m"
+                        )
+                        time.sleep(random_sleep * 60)
 
                 # Create chunk of sleep of speed-up the break loop after CTRL+C
                 sleep_time = max(next_iteration - time.time(), 0) / chunk_size

@@ -14,8 +14,8 @@ from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
     _millify,
-    check_internet_connection,
     get_streamer_index,
+    internet_connection_available,
 )
 
 logger = logging.getLogger(__name__)
@@ -63,6 +63,7 @@ class WebSocketsPool:
 
         self.thread_ws = threading.Thread(target=lambda: self.ws[-1].run_forever())
         self.thread_ws.daemon = True
+        self.thread_ws.name = f"WebSocket #{self.ws[-1].index}"
         self.thread_ws.start()
 
     def end(self):
@@ -85,7 +86,7 @@ class WebSocketsPool:
 
                 if ws.elapsed_last_pong() > 10 and ws.is_reconneting is False:
                     logger.info(
-                        f"#{ws.index} - The last PONG was received more than 10 minutes ago. Reconnect the WebSocket"
+                        f"#{ws.index} - The last PONG was received more than 10 minutes ago"
                     )
                     ws.is_reconneting = True
                     WebSocketsPool.handle_reconnection(ws)
@@ -117,7 +118,7 @@ class WebSocketsPool:
             )
             time.sleep(30)
 
-            while check_internet_connection() is False:
+            while internet_connection_available() is False:
                 random_sleep = random.randint(1, 3)
                 logger.warning(
                     f"#{ws.index} - No internet connection available! Retry after {random_sleep}m"
