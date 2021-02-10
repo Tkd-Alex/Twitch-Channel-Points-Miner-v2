@@ -28,6 +28,11 @@ from TwitchChannelPointsMiner.utils import (
     set_default_settings,
 )
 
+# Suppress:
+#   - chardet.charsetprober - [feed]
+#   - chardet.charsetprober - [get_confidence]
+logging.getLogger("chardet.charsetprober").setLevel(logging.ERROR)
+
 logger = logging.getLogger(__name__)
 
 
