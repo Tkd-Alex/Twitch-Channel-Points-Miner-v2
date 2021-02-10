@@ -46,4 +46,4 @@ class EventPrediction(object):
         return float_round(self.prediction_window_seconds - self.elapsed(timestamp))
 
     def print_recap(self) -> str:
-        return f"{self}\n\t\t{self.streamer}\n\t\t{self.bet}\n\t\tResult: {self.final_result}"
+        return f"{self}\n\t\t{self.bet}\n\t\tResult: {self.final_result}"

@@ -217,24 +217,40 @@ class Twitch(object):
         selector_index = 0 if decision["choice"] == "A" else 1
 
         logger.info(
-            f"Going to complete bet for {event} owned by {event.streamer}",
+            f"Going to complete bet for {event}",
             extra={"emoji": ":four_leaf_clover:"},
         )
-        logger.info(
-            f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
-            extra={"emoji": ":four_leaf_clover:"},
-        )
+        if event.status == "ACTIVE":
+            skip, compared_value = event.bet.skip()
+            if skip is True:
+                logger.info(
+                    f"Skip betting for the event {event}", extra={"emoji": ":pushpin:"}
+                )
+                logger.info(
+                    f"Skip settings {event.bet.settings.filter_condition}, current value is: {compared_value}",
+                    extra={"emoji": ":pushpin:"},
+                )
+            else:
+                logger.info(
+                    f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
+                    extra={"emoji": ":four_leaf_clover:"},
+                )
 
-        json_data = copy.deepcopy(GQLOperations.MakePrediction)
-        json_data["variables"] = {
-            "input": {
-                "eventID": event.event_id,
-                "outcomeID": decision["id"],
-                "points": decision["amount"],
-                "transactionID": token_hex(16),
-            }
-        }
-        return self.post_gql_request(json_data)
+                json_data = copy.deepcopy(GQLOperations.MakePrediction)
+                json_data["variables"] = {
+                    "input": {
+                        "eventID": event.event_id,
+                        "outcomeID": decision["id"],
+                        "points": decision["amount"],
+                        "transactionID": token_hex(16),
+                    }
+                }
+                return self.post_gql_request(json_data)
+        else:
+            logger.info(
+                f"Oh no! The event is not active anymore! Current status: {event.status}",
+                extra={"emoji": ":disappointed_relieved:"},
+            )
 
     def send_minute_watched_events(self, streamers, watch_streak=False, chunk_size=3):
         while self.running:

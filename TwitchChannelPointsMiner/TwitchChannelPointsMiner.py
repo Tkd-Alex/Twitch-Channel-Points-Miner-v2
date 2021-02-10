@@ -29,6 +29,11 @@ from TwitchChannelPointsMiner.utils import (
     set_default_settings,
 )
 
+# Suppress:
+#   - chardet.charsetprober - [feed]
+#   - chardet.charsetprober - [get_confidence]
+logging.getLogger("chardet.charsetprober").setLevel(logging.ERROR)
+
 logger = logging.getLogger(__name__)
 
 
@@ -247,9 +252,9 @@ class TwitchChannelPointsMiner:
         self.ws_pool.end()
 
         self.minute_watcher_thread.join()
+        time.sleep(1)
 
         self.__print_report()
-        time.sleep(3.5)  # Do sleep for ending threads ...
 
         sys.exit(0)
 
@@ -267,29 +272,44 @@ class TwitchChannelPointsMiner:
             extra={"emoji": ":hourglass:"},
         )
 
-        for event_id in self.events_predictions:
-            if (
-                self.events_predictions[event_id].bet_confirmed is True
-                and self.events_predictions[event_id].streamer.settings.make_predictions
-                is True
-            ):
-                logger.info(
-                    f"{self.events_predictions[event_id].streamer.settings.bet}",
-                    extra={"emoji": ":bar_chart:"},
-                )
-                logger.info(
-                    f"{self.events_predictions[event_id].print_recap()}",
-                    extra={"emoji": ":bar_chart:"},
-                )
-        print("")
+        if self.events_predictions != {}:
+            print("")
+            for event_id in self.events_predictions:
+                if (
+                    self.events_predictions[event_id].bet_confirmed is True
+                    and self.events_predictions[
+                        event_id
+                    ].streamer.settings.make_predictions
+                    is True
+                ):
+                    logger.info(
+                        f"{self.events_predictions[event_id].streamer.settings.bet}",
+                        extra={"emoji": ":wrench:"},
+                    )
+                    if (
+                        self.events_predictions[
+                            event_id
+                        ].streamer.settings.bet.filter_condition
+                        is not None
+                    ):
+                        logger.info(
+                            f"{self.events_predictions[event_id].streamer.settings.bet.filter_condition}",
+                            extra={"emoji": ":pushpin:"},
+                        )
+                    logger.info(
+                        f"{self.events_predictions[event_id].print_recap()}",
+                        extra={"emoji": ":bar_chart:"},
+                    )
 
+        print("")
         for streamer_index in range(0, len(self.streamers)):
-            logger.info(
-                f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
-                extra={"emoji": ":robot:"},
-            )
             if self.streamers[streamer_index].history != {}:
                 logger.info(
-                    f"{self.streamers[streamer_index].print_history()}",
-                    extra={"emoji": ":moneybag:"},
+                    f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
+                    extra={"emoji": ":robot:"},
                 )
+                if self.streamers[streamer_index].history != {}:
+                    logger.info(
+                        f"{self.streamers[streamer_index].print_history()}",
+                        extra={"emoji": ":moneybag:"},
+                    )

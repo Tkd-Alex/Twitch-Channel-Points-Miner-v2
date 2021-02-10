@@ -18,6 +18,33 @@
 
 Read more about channels point [here](https://help.twitch.tv/s/article/channel-points-guide)
 
+# README Contents
+1. 🤝 [Community](#community)
+2. 🚀 [Main difference from the original repository](#main-difference-from-the-original-repository)
+3. 🧾 [Logs feature](#logs-feature)
+    - [Full logs](#full-logs)
+    - [Less logs](#less-logs)
+    - [Final report](#final-report)
+4. 🧐 [How to use](#how-to-use)
+    - [Limits](#limits)
+5. 🔧 [Settings](#settings)
+    - [LoggerSettings](#loggersettings)
+    - [StreamerSettings](#streamersettings)
+    - [BetSettings](#betsettings)
+        - [Bet strategy](#bet-strategy)
+    - [FilterCondition](#filtercondition)
+        - [Example](#example)
+6. 🍪 [Migrating from old repository (the original one)](#migrating-from-old-repository-the-original-one)
+7. 🪟 [Windows](#windows)
+8. 🐛 [Issue / Debug](#issue--debug)
+9. ⚠️ [Disclaimer](#disclaimer)
+
+
+## Community
+If you have any type of issue, you need help, or you just want to suggest a new feature please open a GitHub Issue. Don't write me on [Instagram](https://www.instagram.com/tkd_alex/), [Telegram](https://t.me/TkdAlex), [Discord](https://discordapp.com/users/641397388132483121), [Twitter](https://twitter.com/TkdAxel) (but you can follow me 😆) or somewhere else. If you don't have an account on this platform you can create, It's free. I do not want to be rude, but if you have a problem, maybe another user can have also the same problem and your issue can help the community. Same for the new feature, your idea can help other users, and It's beautiful to discuss between us.
+
+If you want to help on this project please leave a star 🌟 and share with your friends! 😎
+
 ## Main difference from the original repository:
 
 - Improve the logging
@@ -29,6 +56,7 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
 - Place the bet / make prediction and won or lose (🍀) your channel points!
 No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/41) ([@lay295](https://github.com/lay295))
 
+## Logs feature
 ### Full logs
 ```
 %d/%m/%y %H:%M:%S - INFO - [run]: 💣  Start session: '9eb934b0-1684-4a62-b3e2-ba097bd67d35'
@@ -298,13 +326,17 @@ Other users have find multiple problems on Windows my suggestion are:
  - Stop use Windows :stuck_out_tongue_closed_eyes:
  - Suppress the emoji in logs with `logger_settings=LoggerSettings(emoji=False)`
 
-Other usefully infos can be founded here: https://github.com/gottagofaster236/Twitch-Channel-Points-Miner/issues/31
+Other usefully infos can be founded here:
+- https://github.com/gottagofaster236/Twitch-Channel-Points-Miner/issues/31
+- https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/55
+
+You can also follow this [video tutorial](https://www.youtube.com/watch?v=hoPyNwAk97U&t=1s). It's for the first version of the miner, but the setup It's the same.
 ## Issue / Debug
-When you open a new issue please use the correct template.
+When you open a new issue please use the correct **template**.
 Please provide at least the following information/files:
 - Operation System
 - Python Version
-- logs/ `LoggerSettings(file_level=logging.DEBUG)`
+- Log debug file `LoggerSettings(file_level=logging.DEBUG)`
 
 Make sure also to have the latest commit.
 
