@@ -14,6 +14,7 @@ from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
     _millify,
+    currently_connected_topics,
     get_streamer_index,
     internet_connection_available,
 )
@@ -40,12 +41,17 @@ class WebSocketsPool:
         if self.ws == [] or self.ws[-1] is None or len(self.ws[-1].topics) >= 50:
             self.append_new_websocket()
 
-        self.ws[-1].topics.append(topic)
-
         if self.ws[-1].is_opened is False:
             self.ws[-1].pending_topics.append(topic)
         else:
-            self.ws[-1].listen(topic, self.twitch.twitch_login.get_auth_token())
+            if topic not in currently_connected_topics(self.ws):
+                self.ws[-1].listen(topic, self.twitch.twitch_login.get_auth_token())
+            else:
+                logger.warning(
+                    f"#{self.ws[-1].index} - Another WebSocket It's currently connected to: {topic}"
+                )
+
+        self.ws[-1].topics.append(topic)
 
     def append_new_websocket(self):
         self.ws.append(
@@ -78,7 +84,13 @@ class WebSocketsPool:
             ws.is_opened = True
             ws.ping()
             for topic in ws.pending_topics:
-                ws.listen(topic, ws.twitch.twitch_login.get_auth_token())
+                # I know: ws.parent_pool.ws it's really strange
+                if topic not in currently_connected_topics(ws.parent_pool.ws):
+                    ws.listen(topic, ws.twitch.twitch_login.get_auth_token())
+                else:
+                    logger.warning(
+                        f"#{ws.index} - Another WebSocket It's currently connected to: {topic}"
+                    )
 
             while not ws.is_closed:
                 ws.ping()
