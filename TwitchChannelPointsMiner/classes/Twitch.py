@@ -48,30 +48,31 @@ class Twitch(object):
     def update_stream(self, streamer):
         if streamer.stream.update_required() is True:
             stream_info = self.get_stream_info(streamer)
-            streamer.stream.update(
-                broadcast_id=stream_info["stream"]["id"],
-                title=stream_info["broadcastSettings"]["title"],
-                game=stream_info["broadcastSettings"]["game"],
-                tags=stream_info["stream"]["tags"],
-                viewers_count=stream_info["stream"]["viewersCount"],
-            )
+            if stream_info is not None:
+                streamer.stream.update(
+                    broadcast_id=stream_info["stream"]["id"],
+                    title=stream_info["broadcastSettings"]["title"],
+                    game=stream_info["broadcastSettings"]["game"],
+                    tags=stream_info["stream"]["tags"],
+                    viewers_count=stream_info["stream"]["viewersCount"],
+                )
 
-            event_properties = {
-                "channel_id": streamer.channel_id,
-                "broadcast_id": streamer.stream.broadcast_id,
-                "player": "site",
-                "user_id": self.twitch_login.get_user_id(),
-            }
+                event_properties = {
+                    "channel_id": streamer.channel_id,
+                    "broadcast_id": streamer.stream.broadcast_id,
+                    "player": "site",
+                    "user_id": self.twitch_login.get_user_id(),
+                }
 
-            if (
-                streamer.stream.game_name() is not None
-                and streamer.settings.claim_drops is True
-            ):
-                event_properties["game"] = streamer.stream.game_name()
+                if (
+                    streamer.stream.game_name() is not None
+                    and streamer.settings.claim_drops is True
+                ):
+                    event_properties["game"] = streamer.stream.game_name()
 
-            streamer.stream.payload = [
-                {"event": "minute-watched", "properties": event_properties}
-            ]
+                streamer.stream.payload = [
+                    {"event": "minute-watched", "properties": event_properties}
+                ]
 
     def get_spade_url(self, streamer):
         try:
@@ -231,21 +232,22 @@ class Twitch(object):
                     extra={"emoji": ":pushpin:"},
                 )
             else:
-                logger.info(
-                    f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
-                    extra={"emoji": ":four_leaf_clover:"},
-                )
+                if decision["amount"] > 0:
+                    logger.info(
+                        f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
+                        extra={"emoji": ":four_leaf_clover:"},
+                    )
 
-                json_data = copy.deepcopy(GQLOperations.MakePrediction)
-                json_data["variables"] = {
-                    "input": {
-                        "eventID": event.event_id,
-                        "outcomeID": decision["id"],
-                        "points": decision["amount"],
-                        "transactionID": token_hex(16),
+                    json_data = copy.deepcopy(GQLOperations.MakePrediction)
+                    json_data["variables"] = {
+                        "input": {
+                            "eventID": event.event_id,
+                            "outcomeID": decision["id"],
+                            "points": decision["amount"],
+                            "transactionID": token_hex(16),
+                        }
                     }
-                }
-                return self.post_gql_request(json_data)
+                    return self.post_gql_request(json_data)
         else:
             logger.info(
                 f"Oh no! The event is not active anymore! Current status: {event.status}",
@@ -330,7 +332,7 @@ class Twitch(object):
                     if response.status_code == 204:
                         streamers[index].stream.update_minute_watched()
                 except requests.exceptions.RequestException as e:
-                    logger.error(f"Error while trying to watch a minute: {e}")
+                    logger.error(f"Error while trying to send minute watched: {e}")
 
                     # The success rate It's very hight usually. Why we have failed?
                     # Check internet connection ...

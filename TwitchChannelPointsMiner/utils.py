@@ -140,11 +140,3 @@ def internet_connection_available(host="8.8.8.8", port=53, timeout=3):
         return True
     except socket.error:
         return False
-
-
-def currently_connected_topics(ws_pool):
-    merged_topics = []
-    for ws in ws_pool:
-        if ws is not None:
-            merged_topics += ws.topics
-    return merged_topics

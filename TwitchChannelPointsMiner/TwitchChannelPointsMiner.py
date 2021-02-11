@@ -236,12 +236,12 @@ class TwitchChannelPointsMiner:
                 # Check if is not None because maybe we have already created a new connection on array+1 and now index is None
                 for index in range(0, len(self.ws_pool.ws)):
                     if (
-                        self.ws_pool.ws[index] is not None
-                        and self.ws_pool.ws[index].elapsed_last_ping() > 15
+                        self.ws_pool.ws[index].is_reconneting is False
+                        and self.ws_pool.ws[index].elapsed_last_ping() > 10
                         and internet_connection_available() is True
                     ):
                         logger.info(
-                            f"#{index} - The last PING was sent more than 15 minutes ago. Reconnecting to the WebSocket..."
+                            f"#{index} - The last PING was sent more than 10 minutes ago. Reconnecting to the WebSocket..."
                         )
                         WebSocketsPool.handle_reconnection(self.ws_pool.ws[index])
 
