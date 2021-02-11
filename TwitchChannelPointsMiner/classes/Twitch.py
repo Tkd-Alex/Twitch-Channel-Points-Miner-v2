@@ -10,6 +10,7 @@ import os
 import random
 import re
 import time
+from datetime import datetime
 from pathlib import Path
 from secrets import token_hex
 
@@ -177,11 +178,130 @@ class Twitch(object):
             for drop in campaign["timeBasedDrops"]:
                 if drop["self"]["dropInstanceID"] is not None:
                     self.claim_drop(drop["self"]["dropInstanceID"])
-                    time.sleep(random.uniform(10, 30))
+                    time.sleep(random.uniform(5, 10))
 
     def __get_inventory(self):
         response = self.post_gql_request(GQLOperations.Inventory)
         return response["data"]["currentUser"]["inventory"]
+
+    def __get_drops_dashboard(self, status=None):
+        response = self.post_gql_request(GQLOperations.ViewerDropsDashboard)
+        campaigns = response["data"]["currentUser"]["dropCampaigns"]
+        if status is not None:
+            campaigns = [camp for camp in campaigns if camp["status"] == status.upper()]
+        return campaigns
+
+    # I'm not sure that this method It's fully working. We don't need it for the moment
+    def __get_campaigns_details(self, campaigns):
+        json_data = []
+        for campaign in campaigns:
+            json_data.append(copy.deepcopy(GQLOperations.DropCampaignDetails))
+            json_data[-1]["variables"] = {
+                "dropID": campaign["id"],
+                "channelLogin": f"{self.twitch_login.get_user_id()}",
+            }
+
+        response = self.post_gql_request(json_data)
+        return [res["data"]["user"]["dropCampaign"] for res in response]
+
+    def sync_drops_campaigns(self, streamers):
+        while self.running:
+            campaigns_details = self.__get_campaigns_details(
+                self.__get_drops_dashboard(status="ACTIVE")
+            )
+
+            # Going to clear array and structure. Remove all the timeBasedDrops expired or not started yet
+            current_dt = datetime.now()
+            for index in range(0, len(campaigns_details)):
+                drops = campaigns_details[index]["timeBasedDrops"]
+                campaigns_details[index]["timeBasedDrops"] = [
+                    drop
+                    for drop in drops
+                    if datetime.strptime(drop["startAt"], "%Y-%m-%dT%H:%M:%SZ")
+                    < current_dt
+                    < datetime.strptime(drop["endAt"], "%Y-%m-%dT%H:%M:%SZ")
+                ]
+                print(
+                    campaigns_details[index]["id"],
+                    len(drops),
+                    len(campaigns_details[index]["timeBasedDrops"]),
+                )
+
+            campaigns_details = [
+                camp for camp in campaigns_details if camp["timeBasedDrops"] != []
+            ]
+
+            # Check if user It's currently streaming the same game present in campaigns_details
+            for index in range(0, len(streamers)):
+                if (
+                    streamers[index].settings.claim_drops is True
+                    and streamers[index].is_online is True
+                    and streamers[index].stream.drops_tags is True
+                ):
+                    streamers[index].stream.drops_campaigns = []
+                    # yes! The streamer[index] have the drops_tags enabled and we It's currently stream a game with campaign active!
+                    for campaign in campaigns_details:
+                        if campaign["game"] == streamers[index].stream.game:
+                            streamers[index].stream.drops_campaigns.append(campaign)
+
+                    """
+                    drops_available = sum(
+                        [
+                            len(camp["timeBasedDrops"])
+                            for camp in streamers[index].stream.drops_campaigns
+                        ]
+                    )
+                    logger.info(
+                        f"{streamers[index]} : {streamers[index].stream} - Active campaigns {len(streamers[index].stream.drops_campaigns)} - Drops available: {drops_available}"
+                    )
+                    """
+
+            active_campaigns_id = [camp["id"] for camp in campaigns_details]
+
+            inventory = self.__get_inventory()
+            print("\n")
+            for campaign in inventory["dropCampaignsInProgress"]:
+                # We are currently take part of this campaign.
+                if campaign["id"] in active_campaigns_id:
+                    active_campaigns_id.remove(campaign["id"])
+
+                for drop in campaign["timeBasedDrops"]:
+                    percentage = int(
+                        (
+                            drop["self"]["currentMinutesWatched"]
+                            / drop["requiredMinutesWatched"]
+                        )
+                        * 100
+                    )
+                    benefit = [bf["benefit"]["name"] for bf in drop["benefitEdges"]]
+                    logger.info(
+                        f"Campaign {campaign['name']} ({campaign['id']}) - Game: {campaign['game']['name']}"
+                    )
+                    logger.info(f"Drop: {drop['name']} ({drop['id']})")
+
+                    end_at = datetime.strptime(drop["endAt"], "%Y-%m-%dT%H:%M:%SZ")
+                    start_at = datetime.strptime(drop["startAt"], "%Y-%m-%dT%H:%M:%SZ")
+                    logger.info(f"endAt: {end_at}, startAt: {start_at}")
+                    if datetime.now() > end_at:
+                        logger.info("The event it's over.")
+                    elif datetime.now() < start_at:
+                        logger.info("The event it's not started")
+                    else:
+                        logger.info("You should able to collect this drop")
+
+                    logger.info(
+                        f"PreconditionMet: {drop['self']['hasPreconditionsMet']}, Required: {drop['requiredMinutesWatched']}, Watched: {drop['self']['currentMinutesWatched']}, Percentage: {percentage}%"
+                    )
+                    logger.info(f"Benefit: {', '.join(benefit)}")
+                    print("\n")
+
+            logger.info(f"We could start all of this campaigns: {active_campaigns_id}")
+            logger.info(
+                f"Campaign active: {len(active_campaigns_id)}, in progress on our inventory: {len(inventory['dropCampaignsInProgress'])}"
+            )
+
+            # time.sleep(30)  # Debugging time for the moment
+            exit(1)
 
     # Load the amount of current points for a channel, check if a bonus is available
     def load_channel_points_context(self, streamer):

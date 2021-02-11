@@ -9,7 +9,8 @@ from dateutil import parser
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.entities.Message import Message
 from TwitchChannelPointsMiner.classes.entities.Raid import Raid
-from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
+
+# from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import _millify, get_streamer_index
@@ -302,6 +303,7 @@ class WebSocketsPool:
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
 
+                    """
                     elif message.topic == "user-drop-events":
                         if message.type == "drop-progress":
                             current = message.data["current_progress_min"]
@@ -329,6 +331,7 @@ class WebSocketsPool:
                                         f"Drop event {percentage_state}% for {ws.streamers[streamer_index]}!",
                                         extra={"emoji": ":package:"},
                                     )
+                    """
 
                 except Exception:
                     logger.error(

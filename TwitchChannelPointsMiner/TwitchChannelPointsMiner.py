@@ -179,6 +179,12 @@ class TwitchChannelPointsMiner:
             )
             self.minute_watcher_thread.start()
 
+            self.sync_drops_campaigns_thread = threading.Thread(
+                target=self.twitch.sync_drops_campaigns,
+                args=(self.streamers,),
+            )
+            self.sync_drops_campaigns_thread.start()
+
             self.ws_pool = WebSocketsPool(
                 twitch=self.twitch,
                 streamers=self.streamers,
@@ -193,6 +199,7 @@ class TwitchChannelPointsMiner:
                 )
             )
 
+            """
             # If we have at least one streamer with settings = claim_drops True
             # Going to subscribe to user-drop-events. Get update for drop-progress
             claim_drops = at_least_one_value_in_settings_is(
@@ -205,6 +212,7 @@ class TwitchChannelPointsMiner:
                         user_id=self.twitch.twitch_login.get_user_id(),
                     )
                 )
+            """
 
             # Going to subscribe to predictions-user-v1. Get update when we place a new prediction (confirm)
             if make_predictions is True:
