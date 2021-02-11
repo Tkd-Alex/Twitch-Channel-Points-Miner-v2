@@ -50,8 +50,7 @@ class WebSocketsPool:
                 logger.warning(
                     f"#{self.ws[-1].index} - Another WebSocket It's currently connected to: {topic}"
                 )
-
-        self.ws[-1].topics.append(topic)
+            self.ws[-1].topics.append(topic)
 
     def append_new_websocket(self):
         self.ws.append(
@@ -91,6 +90,7 @@ class WebSocketsPool:
                     logger.warning(
                         f"#{ws.index} - Another WebSocket It's currently connected to: {topic}"
                     )
+                ws.topics.append(topic)
 
             while not ws.is_closed:
                 ws.ping()
