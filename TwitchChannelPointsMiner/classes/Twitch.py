@@ -319,11 +319,14 @@ class Twitch(object):
 
     def get_channel_id(self, streamer_username):
         json_response = self.__do_helix_request(f"/users?login={streamer_username}")
-        data = json_response["data"]
-        if len(data) >= 1:
-            return data[0]["id"]
-        else:
+        if "data" not in json_response:
             raise StreamerDoesNotExistException
+        else:
+            data = json_response["data"]
+            if len(data) >= 1:
+                return data[0]["id"]
+            else:
+                raise StreamerDoesNotExistException
 
     def get_followers(self, first=100):
         followers = []
