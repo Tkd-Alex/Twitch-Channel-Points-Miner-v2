@@ -21,7 +21,11 @@ class Campaign(object):
         return f"Campaign(id={self.id}, name={self.name}, game={self.game}, in_inventory={self.in_inventory})"
 
     def clear_drops(self):
-        self.drops = [drop for drop in self.drops if drop.dt_match is True]
+        self.drops = [
+            drop
+            for drop in self.drops
+            if drop.dt_match is True and drop.is_claimed is False
+        ]
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

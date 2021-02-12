@@ -14,6 +14,7 @@ class Drop(object):
         self.current_minutes_watched = 0
         self.drop_instance_id = None
         self.is_claimed = False
+        self.is_claimable = False
 
         self.end_at = datetime.strptime(dict["endAt"], "%Y-%m-%dT%H:%M:%SZ")
         self.start_at = datetime.strptime(dict["startAt"], "%Y-%m-%dT%H:%M:%SZ")
@@ -33,6 +34,9 @@ class Drop(object):
             else int(
                 (self.current_minutes_watched / self.current_minutes_watched) * 100
             )
+        )
+        self.is_claimable = (
+            self.is_claimed is False and self.drop_instance_id is not None
         )
 
     def __repr__(self):

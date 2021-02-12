@@ -17,7 +17,7 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import (
     StreamerSettings,
 )
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
-from TwitchChannelPointsMiner.classes.Settings import Settings
+from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
@@ -41,6 +41,7 @@ class TwitchChannelPointsMiner:
         self,
         username: str,
         claim_drops_startup: bool = False,
+        priority=[Priority.ORDER, Priority.STREAK, Priority.DROPS],
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
         # Default values for all streamers
@@ -60,6 +61,8 @@ class TwitchChannelPointsMiner:
         self.twitch = Twitch(self.username, user_agent)
 
         self.claim_drops_startup = claim_drops_startup
+        self.priority = priority
+
         self.streamers = []
         self.events_predictions = {}
         self.minute_watcher_thread = None
@@ -170,12 +173,7 @@ class TwitchChannelPointsMiner:
 
             self.minute_watcher_thread = threading.Thread(
                 target=self.twitch.send_minute_watched_events,
-                args=(
-                    self.streamers,
-                    at_least_one_value_in_settings_is(
-                        self.streamers, "watch_streak", True
-                    ),
-                ),
+                args=(self.streamers, self.priority),
             )
             self.minute_watcher_thread.start()
 
