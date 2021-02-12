@@ -450,11 +450,11 @@ class Twitch(object):
                                         print(
                                             f"{round((drop.percentage_progress / 25), 4).is_integer()} ======================================================================================================================"
                                         )
-                                        logger.info(streamers[index])
-                                        logger.info(streamers[index].stream)
-                                        logger.info(campaign)
-                                        logger.info(drop)
-                                        logger.info(drop.progress_bar())
+                                        logger.info(f"{streamers[index]}")
+                                        logger.info(f"{streamers[index].stream}")
+                                        logger.info(f"{campaign}")
+                                        logger.info(f"{drop}")
+                                        logger.info(f"{drop.progress_bar()}")
                                         print(
                                             "==========================================================================================================================="
                                         )
