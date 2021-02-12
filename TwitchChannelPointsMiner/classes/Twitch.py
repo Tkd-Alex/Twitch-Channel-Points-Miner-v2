@@ -184,7 +184,6 @@ class Twitch(object):
             campaigns = [camp for camp in campaigns if camp["status"] == status.upper()]
         return campaigns
 
-    # I'm not sure that this method It's fully working. We don't need it for the moment
     def __get_campaigns_details(self, campaigns):
         json_data = []
         for campaign in campaigns:
@@ -197,11 +196,12 @@ class Twitch(object):
         response = self.post_gql_request(json_data)
         return [res["data"]["user"]["dropCampaign"] for res in response]
 
-    def sync_drops_campaigns(self, streamers):
+    def sync_drops_inventory(self, streamers, chunk_size=3):
         campaigns_update = 0
         while self.running:
-            # Get update from dashboard each 30minutes
-            if campaigns_update == 0 or ((time.time() - campaigns_update) / 60) > 30:
+            # Get update from dashboard each 60minutes
+            if campaigns_update == 0 or ((time.time() - campaigns_update) / 60) > 60:
+                # Get full details from current ACTIVE campaigns
                 campaigns_details = self.__get_campaigns_details(
                     self.__get_drops_dashboard(status="ACTIVE")
                 )
@@ -225,7 +225,7 @@ class Twitch(object):
                 for in_progress in inventory["dropCampaignsInProgress"]:
                     if in_progress["id"] == campaigns[i].id:
                         campaigns[i].in_inventory = True
-                        logger.info(campaigns[i])
+                        # logger.info(campaigns[i])
                         # Iterate all the drops from inventory
                         for drop in in_progress["timeBasedDrops"]:
                             # Iterate all the drops from out campaigns array
@@ -241,8 +241,12 @@ class Twitch(object):
                                     # If after update we all conditions are meet we can claim the drop
                                     if campaigns[i].drops[j].is_claimable is True:
                                         self.claim_drop(campaigns[i].drops[j])
-                                    logger.info(campaigns[i].drops[j])
+                                    # logger.info(campaigns[i].drops[j])
+                                    # logger.info(campaigns[i].drops[j].progress_bar())
                                     break  # Found it!
+                        # print("\n")
+                        # Remove all the claime drops
+                        campaigns[i].clear_drops()
                         break  # Found it!
 
             """
@@ -264,13 +268,23 @@ class Twitch(object):
                     and streamers[index].is_online is True
                     and streamers[index].stream.drops_tags is True
                 ):
-                    streamers[index].stream.drops_campaigns = []
                     # yes! The streamer[index] have the drops_tags enabled and we It's currently stream a game with campaign active!
-                    for campaign in campaigns:
-                        if campaign.game == streamers[index].stream.game:
-                            streamers[index].stream.drops_campaigns.append(campaign)
+                    streamers[index].stream.drops_campaigns = [
+                        campaign
+                        for campaign in campaigns
+                        if campaign.drops != []
+                        and campaign.game == streamers[index].stream.game
+                    ]
 
-            time.sleep(60)
+            self.__chuncked_sleep(60, chunk_size=chunk_size)
+
+    # Create chunk of sleep of speed-up the break loop after CTRL+C
+    def __chuncked_sleep(self, seconds, chunk_size=3):
+        sleep_time = max(seconds, 0) / chunk_size
+        for i in range(0, chunk_size):
+            time.sleep(sleep_time)
+            if self.running is False:
+                break
 
     # Load the amount of current points for a channel, check if a bonus is available
     def load_channel_points_context(self, streamer):
@@ -337,7 +351,7 @@ class Twitch(object):
             streamers_index = [
                 i
                 for i in range(0, len(streamers))
-                if streamers[i].is_online
+                if streamers[i].is_online is True
                 and (
                     streamers[i].online_at == 0
                     or (time.time() - streamers[i].online_at) > 30
@@ -346,10 +360,10 @@ class Twitch(object):
 
             streamers_watching = []
             for prior in priority:
-                if prior == Priority.ORDER and len(streamers_watching) <= 2:
+                if prior == Priority.ORDER and len(streamers_watching) < 2:
                     # Get the first 2 items, they are already in order
-                    streamers_watching.append(streamers_index[:2])
-                elif prior == Priority.STREAK and len(streamers_watching) <= 2:
+                    streamers_watching += streamers_index[:2]
+                elif prior == Priority.STREAK and len(streamers_watching) < 2:
                     """
                     Check if we need need to change priority based on watch streak
                     Viewers receive points for returning for x consecutive streams.
@@ -375,7 +389,7 @@ class Twitch(object):
                             if len(streamers_watching) == 2:
                                 break
 
-                elif prior == Priority.DROPS and len(streamers_watching) <= 2:
+                elif prior == Priority.DROPS and len(streamers_watching) < 2:
                     for index in streamers_index:
                         # For the truth we don't need al of this If - condition
                         # because the drops_campaigns can be fulled only if claim_drops is True and drops_tags is True
@@ -393,7 +407,7 @@ class Twitch(object):
                                 ]
                             )
                             logger.debug(
-                                f"{streamers[index]} it's currenty stream: {streamers[index].stream}"
+                                f"{streamers[index]} it's currently stream: {streamers[index].stream}"
                             )
                             logger.debug(
                                 f"Campaign currently active here: {len(streamers[index].stream.drops_campaigns)}, drops available: {drops_available}"
@@ -422,15 +436,35 @@ class Twitch(object):
                     )
                     if response.status_code == 204:
                         streamers[index].stream.update_minute_watched()
+
+                        """
+                        Remember, you can only earn progress towards a time-based Drop on one participating channel at a time.  [ ! ! ! ]
+                        You can also check your progress towards Drops within a campaign anytime by viewing the Drops Inventory.
+                        For time-based Drops, if you are unable to claim the Drop in time, you will be able to claim it from the inventory page until the Drops campaign ends.
+                        """
+
+                        for campaign in streamers[index].stream.drops_campaigns:
+                            for drop in campaign.drops:
+                                if drop.has_preconditions_met is not False:
+                                    if 1 == 1:
+                                        print(
+                                            f"{round((drop.percentage_progress / 25), 4).is_integer()} ======================================================================================================================"
+                                        )
+                                        logger.info(streamers[index])
+                                        logger.info(streamers[index].stream)
+                                        logger.info(campaign)
+                                        logger.info(drop)
+                                        logger.info(drop.progress_bar())
+                                        print(
+                                            "==========================================================================================================================="
+                                        )
+
                 except requests.exceptions.ConnectionError as e:
                     logger.error(f"Error while trying to watch a minute: {e}")
 
-                # Create chunk of sleep of speed-up the break loop after CTRL+C
-                sleep_time = max(next_iteration - time.time(), 0) / chunk_size
-                for i in range(0, chunk_size):
-                    time.sleep(sleep_time)
-                    if self.running is False:
-                        break
+                self.__chuncked_sleep(
+                    next_iteration - time.time(), chunk_size=chunk_size
+                )
 
             if streamers_watching == []:
                 time.sleep(60)

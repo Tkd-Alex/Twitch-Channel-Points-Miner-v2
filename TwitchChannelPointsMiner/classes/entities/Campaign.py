@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from TwitchChannelPointsMiner.classes.entities.Drop import Drop
+from TwitchChannelPointsMiner.classes.Settings import Settings
 
 
 class Campaign(object):
@@ -19,6 +20,13 @@ class Campaign(object):
 
     def __repr__(self):
         return f"Campaign(id={self.id}, name={self.name}, game={self.game}, in_inventory={self.in_inventory})"
+
+    def __str__(self):
+        return (
+            f"{self.name}, Game: {self.game['displayName']} - Drops: {len(self.drops)} pcs. - In progress: {self.in_inventory}"
+            if Settings.logger.less
+            else self.__repr__()
+        )
 
     def clear_drops(self):
         self.drops = [
