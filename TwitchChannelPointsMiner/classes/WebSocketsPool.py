@@ -81,19 +81,22 @@ class WebSocketsPool:
         def run():
             ws.is_opened = True
             ws.ping()
+
             for topic in ws.pending_topics:
                 ws.listen(topic, ws.twitch.twitch_login.get_auth_token())
 
             while ws.is_closed is False:
-                ws.ping()
-                time.sleep(random.uniform(25, 30))
+                # Else: the ws is currently in reconnecting phase, you can't do ping or other operation.
+                # Probably this ws will be closed very soon with ws.is_closed = True
+                if ws.is_reconneting is False:
+                    ws.ping()  # We need ping for keep the connection alive
+                    time.sleep(random.uniform(25, 30))
 
-                if ws.elapsed_last_pong() > 5 and ws.is_reconneting is False:
-                    logger.info(
-                        f"#{ws.index} - The last PONG was received more than 5 minutes ago"
-                    )
-                    ws.is_reconneting = True
-                    WebSocketsPool.handle_reconnection(ws)
+                    if ws.elapsed_last_pong() > 5:
+                        logger.info(
+                            f"#{ws.index} - The last PONG was received more than 5 minutes ago"
+                        )
+                        WebSocketsPool.handle_reconnection(ws)
 
         thread_ws = threading.Thread(target=run)
         thread_ws.daemon = True
@@ -117,6 +120,11 @@ class WebSocketsPool:
         ws.is_closed = True
         ws.keep_running = False
         # Reconnect only if ws.forced_close is False (replace the keep_running)
+
+        # Set the current socket as reconnecting status
+        # So the exsternal ping check will be locked
+        ws.is_reconneting = True
+
         if ws.forced_close is False:
             logger.info(
                 f"#{ws.index} - Reconnecting to Twitch PubSub server in ~60 seconds"
@@ -365,7 +373,6 @@ class WebSocketsPool:
 
         elif response["type"] == "RECONNECT":
             logger.info(f"#{ws.index} - Reconnection required")
-            ws.is_reconneting = True
             WebSocketsPool.handle_reconnection(ws)
 
         elif response["type"] == "PONG":
