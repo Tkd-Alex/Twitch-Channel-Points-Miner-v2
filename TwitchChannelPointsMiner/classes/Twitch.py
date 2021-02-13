@@ -171,7 +171,11 @@ class Twitch(object):
 
         json_data = copy.deepcopy(GQLOperations.DropsPage_ClaimDropRewards)
         json_data["variables"] = {"input": {"dropInstanceID": drop.drop_instance_id}}
-        self.post_gql_request(json_data)
+        response = self.post_gql_request(json_data)
+        try:
+            return response["data"]["claimDropRewards"]["status"] == "ELIGIBLE_FOR_ALL"
+        except (ValueError, KeyError):
+            return False
 
     def search_drop_in_inventory(self, streamer, drop_id):
         inventory = self.__get_inventory()
@@ -217,6 +221,7 @@ class Twitch(object):
         while self.running:
             # Get update from dashboard each 60minutes
             if campaigns_update == 0 or ((time.time() - campaigns_update) / 60) > 60:
+                campaigns_update = time.time()
                 # Get full details from current ACTIVE campaigns
                 campaigns_details = self.__get_campaigns_details(
                     self.__get_drops_dashboard(status="ACTIVE")
@@ -241,7 +246,6 @@ class Twitch(object):
                 for in_progress in inventory["dropCampaignsInProgress"]:
                     if in_progress["id"] == campaigns[i].id:
                         campaigns[i].in_inventory = True
-                        # logger.info(campaigns[i])
                         # Iterate all the drops from inventory
                         for drop in in_progress["timeBasedDrops"]:
                             # Iterate all the drops from out campaigns array
@@ -256,26 +260,14 @@ class Twitch(object):
                                     campaigns[i].drops[j].update(drop["self"])
                                     # If after update we all conditions are meet we can claim the drop
                                     if campaigns[i].drops[j].is_claimable is True:
-                                        self.claim_drop(campaigns[i].drops[j])
-                                    # logger.info(campaigns[i].drops[j])
-                                    # logger.info(campaigns[i].drops[j].progress_bar())
+                                        campaigns[i].drops[
+                                            j
+                                        ].is_claimed = self.claim_drop(
+                                            campaigns[i].drops[j]
+                                        )
                                     break  # Found it!
-                        # print("\n")
-                        # Remove all the claime drops
-                        campaigns[i].clear_drops()
+                        campaigns[i].clear_drops()  # Remove all the claime drops
                         break  # Found it!
-
-            """
-            campaign_not_started = [
-                campaign for campaign in campaigns if campaign.in_inventory is False
-            ]
-            logger.info(
-                f"We could start all of this campaigns: {len(campaign_not_started)}"
-            )
-            logger.info(
-                f"Campaign active in dashboard: {len(campaigns)}, in progress on our inventory: {len(inventory['dropCampaignsInProgress'])}"
-            )
-            """
 
             # Check if user It's currently streaming the same game present in campaigns_details
             for index in range(0, len(streamers)):
@@ -388,6 +380,7 @@ class Twitch(object):
                 if prior == Priority.ORDER and len(streamers_watching) < 2:
                     # Get the first 2 items, they are already in order
                     streamers_watching += streamers_index[:2]
+
                 elif prior == Priority.STREAK and len(streamers_watching) < 2:
                     """
                     Check if we need need to change priority based on watch streak
@@ -471,17 +464,16 @@ class Twitch(object):
                             for drop in campaign.drops:
                                 if drop.has_preconditions_met is not False:
                                     if 1 == 1:
-                                        print(
-                                            f"{round((drop.percentage_progress / 25), 4).is_integer()} ======================================================================================================================"
+                                        print("=" * 125)
+                                        logger.info(
+                                            f"Drops should be printed: {drop.is_printable}"
                                         )
                                         logger.info(f"{streamers[index]}")
                                         logger.info(f"{streamers[index].stream}")
                                         logger.info(f"{campaign}")
                                         logger.info(f"{drop}")
                                         logger.info(f"{drop.progress_bar()}")
-                                        print(
-                                            "==========================================================================================================================="
-                                        )
+                                        print("=" * 125)
 
                 except requests.exceptions.ConnectionError as e:
                     logger.error(f"Error while trying to send minute watched: {e}")

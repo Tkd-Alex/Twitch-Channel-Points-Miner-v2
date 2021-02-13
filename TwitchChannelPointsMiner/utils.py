@@ -140,3 +140,7 @@ def internet_connection_available(host="8.8.8.8", port=53, timeout=3):
         return True
     except socket.error:
         return False
+
+
+def percentage(a, b):
+    return 0 if a == 0 else int((a / b) * 100)
