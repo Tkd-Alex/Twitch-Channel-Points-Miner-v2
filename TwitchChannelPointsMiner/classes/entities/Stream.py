@@ -66,7 +66,10 @@ class Stream(object):
         return None if self.game in [{}, None] else self.game["name"]
 
     def update_required(self):
-        return self.__last_update == 0 or (time.time() - self.__last_update) >= 120
+        return self.__last_update == 0 or self.update_elapsed() >= 120
+
+    def update_elapsed(self):
+        return 0 if self.__last_update == 0 else (time.time() - self.__last_update)
 
     def init_watch_streak(self):
         self.watch_streak_missing = True
