@@ -16,6 +16,18 @@ logger = logging.getLogger(__name__)
 
 
 class TwitchLogin(object):
+    __self__ = [
+        "client_id",
+        "token",
+        "login_check_result",
+        "session",
+        "session",
+        "username",
+        "user_id",
+        "email",
+        "cookies",
+    ]
+
     def __init__(self, client_id, username, user_agent):
         self.client_id = client_id
         self.token = None

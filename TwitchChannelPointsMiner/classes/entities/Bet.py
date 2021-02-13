@@ -42,6 +42,12 @@ class OutcomeKeys(object):
 
 
 class FilterCondition(object):
+    __slots__ = [
+        "by",
+        "where",
+        "value",
+    ]
+
     def __init__(self, by=None, where=None, value=None, decision=None):
         self.by = by
         self.where = where
@@ -52,6 +58,15 @@ class FilterCondition(object):
 
 
 class BetSettings(object):
+    __slots__ = [
+        "strategy",
+        "percentage",
+        "percentage_gap",
+        "max_points",
+        "stealth_mode",
+        "filter_condition",
+    ]
+
     def __init__(
         self,
         strategy: Strategy = None,
@@ -80,6 +95,8 @@ class BetSettings(object):
 
 
 class Bet(object):
+    __slots__ = ["outcomes", "decision", "total_users", "total_points", "settings"]
+
     def __init__(self, outcomes: list, settings: BetSettings):
         self.outcomes = outcomes
         self.__clear_outcomes()

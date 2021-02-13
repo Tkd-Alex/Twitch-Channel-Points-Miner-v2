@@ -11,6 +11,14 @@ logger = logging.getLogger(__name__)
 
 
 class StreamerSettings(object):
+    __slots__ = [
+        "make_predictions",
+        "follow_raid",
+        "claim_drops",
+        "watch_streak",
+        "bet",
+    ]
+
     def __init__(
         self,
         make_predictions: bool = None,
@@ -37,6 +45,24 @@ class StreamerSettings(object):
 
 
 class Streamer(object):
+    __slots__ = [
+        "username",
+        "channel_id",
+        "settings",
+        "is_online",
+        "stream_up",
+        "online_at",
+        "offline_at",
+        "channel_points",
+        "minute_watched_requests",
+        "viewer_is_mod",
+        "stream",
+        "raid",
+        "history",
+        "streamer_url",
+        "chat_url",
+    ]
+
     def __init__(self, username, settings=None):
         self.username = username.lower().strip()
         self.channel_id = 0

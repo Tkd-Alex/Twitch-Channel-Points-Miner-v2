@@ -9,4 +9,4 @@ class Priority(Enum):
 
 # Empty object shared between class
 class Settings(object):
-    pass
+    __slots__ = ["logger", "streamer_settings"]
