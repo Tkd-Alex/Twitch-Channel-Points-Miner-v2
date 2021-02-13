@@ -23,7 +23,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.constants import API, CLIENT_ID, GQLOperations
-from TwitchChannelPointsMiner.utils import _millify
+from TwitchChannelPointsMiner.utils import _millify, internet_connection_available
 
 logger = logging.getLogger(__name__)
 
@@ -48,76 +48,90 @@ class Twitch(object):
     def update_stream(self, streamer):
         if streamer.stream.update_required() is True:
             stream_info = self.get_stream_info(streamer)
-            streamer.stream.update(
-                broadcast_id=stream_info["stream"]["id"],
-                title=stream_info["broadcastSettings"]["title"],
-                game=stream_info["broadcastSettings"]["game"],
-                tags=stream_info["stream"]["tags"],
-                viewers_count=stream_info["stream"]["viewersCount"],
-            )
+            if stream_info is not None:
+                streamer.stream.update(
+                    broadcast_id=stream_info["stream"]["id"],
+                    title=stream_info["broadcastSettings"]["title"],
+                    game=stream_info["broadcastSettings"]["game"],
+                    tags=stream_info["stream"]["tags"],
+                    viewers_count=stream_info["stream"]["viewersCount"],
+                )
 
-            event_properties = {
-                "channel_id": streamer.channel_id,
-                "broadcast_id": streamer.stream.broadcast_id,
-                "player": "site",
-                "user_id": self.twitch_login.get_user_id(),
-            }
+                event_properties = {
+                    "channel_id": streamer.channel_id,
+                    "broadcast_id": streamer.stream.broadcast_id,
+                    "player": "site",
+                    "user_id": self.twitch_login.get_user_id(),
+                }
 
-            if (
-                streamer.stream.game_name() is not None
-                and streamer.settings.claim_drops is True
-            ):
-                event_properties["game"] = streamer.stream.game_name()
+                if (
+                    streamer.stream.game_name() is not None
+                    and streamer.settings.claim_drops is True
+                ):
+                    event_properties["game"] = streamer.stream.game_name()
 
-            streamer.stream.payload = [
-                {"event": "minute-watched", "properties": event_properties}
-            ]
+                streamer.stream.payload = [
+                    {"event": "minute-watched", "properties": event_properties}
+                ]
 
     def get_spade_url(self, streamer):
-        headers = {"User-Agent": self.user_agent}
-        main_page_request = requests.get(streamer.streamer_url, headers=headers)
-        response = main_page_request.text
-        settings_url = re.search(
-            "(https://static.twitchcdn.net/config/settings.*?js)", response
-        ).group(1)
+        try:
+            headers = {"User-Agent": self.user_agent}
+            main_page_request = requests.get(streamer.streamer_url, headers=headers)
+            response = main_page_request.text
+            settings_url = re.search(
+                "(https://static.twitchcdn.net/config/settings.*?js)", response
+            ).group(1)
 
-        settings_request = requests.get(settings_url, headers=headers)
-        response = settings_request.text
-        streamer.stream.spade_url = re.search('"spade_url":"(.*?)"', response).group(1)
+            settings_request = requests.get(settings_url, headers=headers)
+            response = settings_request.text
+            streamer.stream.spade_url = re.search(
+                '"spade_url":"(.*?)"', response
+            ).group(1)
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Something went wrong during extraction of 'spade_url': {e}")
 
     def post_gql_request(self, json_data):
-        response = requests.post(
-            GQLOperations.url,
-            json=json_data,
-            headers={
-                "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
-                "Client-Id": CLIENT_ID,
-                "User-Agent": self.user_agent,
-            },
-        )
-        logger.debug(
-            f"Data: {json_data}, Status code: {response.status_code}, Content: {response.text}"
-        )
-        return response.json()
+        try:
+            response = requests.post(
+                GQLOperations.url,
+                json=json_data,
+                headers={
+                    "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
+                    "Client-Id": CLIENT_ID,
+                    "User-Agent": self.user_agent,
+                },
+            )
+            logger.debug(
+                f"Data: {json_data}, Status code: {response.status_code}, Content: {response.text}"
+            )
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(
+                f"Error with GQLOperations ({json_data['operationName']}): {e}"
+            )
+            return {}
 
     def get_broadcast_id(self, streamer):
         json_data = copy.deepcopy(GQLOperations.WithIsStreamLiveQuery)
         json_data["variables"] = {"id": streamer.channel_id}
         response = self.post_gql_request(json_data)
-        stream = response["data"]["user"]["stream"]
-        if stream is not None:
-            return stream["id"]
-        else:
-            raise StreamerIsOfflineException
+        if response != {}:
+            stream = response["data"]["user"]["stream"]
+            if stream is not None:
+                return stream["id"]
+            else:
+                raise StreamerIsOfflineException
 
     def get_stream_info(self, streamer):
         json_data = copy.deepcopy(GQLOperations.VideoPlayerStreamInfoOverlayChannel)
         json_data["variables"] = {"channel": streamer.username}
         response = self.post_gql_request(json_data)
-        if response["data"]["user"]["stream"] is None:
-            raise StreamerIsOfflineException
-        else:
-            return response["data"]["user"]
+        if response != {}:
+            if response["data"]["user"]["stream"] is None:
+                raise StreamerIsOfflineException
+            else:
+                return response["data"]["user"]
 
     def check_streamer_online(self, streamer):
         if time.time() < streamer.offline_at + 60:
@@ -181,7 +195,7 @@ class Twitch(object):
 
     def __get_inventory(self):
         response = self.post_gql_request(GQLOperations.Inventory)
-        return response["data"]["currentUser"]["inventory"]
+        return response["data"]["currentUser"]["inventory"] if response != {} else {}
 
     # Load the amount of current points for a channel, check if a bonus is available
     def load_channel_points_context(self, streamer):
@@ -189,14 +203,15 @@ class Twitch(object):
         json_data["variables"] = {"channelLogin": streamer.username}
 
         response = self.post_gql_request(json_data)
-        if response["data"]["community"] is None:
-            raise StreamerDoesNotExistException
-        channel = response["data"]["community"]["channel"]
-        community_points = channel["self"]["communityPoints"]
-        streamer.channel_points = community_points["balance"]
+        if response != {}:
+            if response["data"]["community"] is None:
+                raise StreamerDoesNotExistException
+            channel = response["data"]["community"]["channel"]
+            community_points = channel["self"]["communityPoints"]
+            streamer.channel_points = community_points["balance"]
 
-        if community_points["availableClaim"] is not None:
-            self.claim_bonus(streamer, community_points["availableClaim"]["id"])
+            if community_points["availableClaim"] is not None:
+                self.claim_bonus(streamer, community_points["availableClaim"]["id"])
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
@@ -217,21 +232,22 @@ class Twitch(object):
                     extra={"emoji": ":pushpin:"},
                 )
             else:
-                logger.info(
-                    f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
-                    extra={"emoji": ":four_leaf_clover:"},
-                )
+                if decision["amount"] > 0:
+                    logger.info(
+                        f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
+                        extra={"emoji": ":four_leaf_clover:"},
+                    )
 
-                json_data = copy.deepcopy(GQLOperations.MakePrediction)
-                json_data["variables"] = {
-                    "input": {
-                        "eventID": event.event_id,
-                        "outcomeID": decision["id"],
-                        "points": decision["amount"],
-                        "transactionID": token_hex(16),
+                    json_data = copy.deepcopy(GQLOperations.MakePrediction)
+                    json_data["variables"] = {
+                        "input": {
+                            "eventID": event.event_id,
+                            "outcomeID": decision["id"],
+                            "points": decision["amount"],
+                            "transactionID": token_hex(16),
+                        }
                     }
-                }
-                return self.post_gql_request(json_data)
+                    return self.post_gql_request(json_data)
         else:
             logger.info(
                 f"Oh no! The event is not active anymore! Current status: {event.status}",
@@ -249,6 +265,12 @@ class Twitch(object):
                     or (time.time() - streamers[i].online_at) > 30
                 )
             ]
+
+            for index in streamers_index:
+                if (streamers[index].stream.update_elapsed() / 60) > 10:
+                    # Why this user It's currently online but the last updated was more than 10minutes ago?
+                    # Please perform a manually update and check if the user it's online
+                    self.check_streamer_online(streamers[index])
 
             """
             Check if we need need to change priority based on watch streak
@@ -282,7 +304,12 @@ class Twitch(object):
                 while len(streamers_watching) < 2 and len(streamers_index) > 1:
                     another_streamer_index = streamers_index.pop(0)
                     if another_streamer_index not in streamers_watching:
-                        streamers_watching.append(another_streamer_index)
+                        try:
+                            streamers_watching.append(another_streamer_index)
+                        except requests.exceptions.ConnectionError as e:
+                            logger.error(
+                                f"Error while trying to perform a force for streamer's update: {e}"
+                            )
 
             """
             Twitch has a limit - you can't watch more than 2 channels at one time.
@@ -304,8 +331,17 @@ class Twitch(object):
                     )
                     if response.status_code == 204:
                         streamers[index].stream.update_minute_watched()
-                except requests.exceptions.ConnectionError as e:
-                    logger.error(f"Error while trying to watch a minute: {e}")
+                except requests.exceptions.RequestException as e:
+                    logger.error(f"Error while trying to send minute watched: {e}")
+
+                    # The success rate It's very hight usually. Why we have failed?
+                    # Check internet connection ...
+                    while internet_connection_available() is False:
+                        random_sleep = random.randint(1, 3)
+                        logger.warning(
+                            f"No internet connection available! Retry after {random_sleep}m"
+                        )
+                        time.sleep(random_sleep * 60)
 
                 # Create chunk of sleep of speed-up the break loop after CTRL+C
                 sleep_time = max(next_iteration - time.time(), 0) / chunk_size

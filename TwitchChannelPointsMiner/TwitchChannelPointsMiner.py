@@ -25,6 +25,7 @@ from TwitchChannelPointsMiner.utils import (
     _millify,
     at_least_one_value_in_settings_is,
     get_user_agent,
+    internet_connection_available,
     set_default_settings,
 )
 
@@ -177,6 +178,7 @@ class TwitchChannelPointsMiner:
                     ),
                 ),
             )
+            self.minute_watcher_thread.name = "Minute watcher"
             self.minute_watcher_thread.start()
 
             self.ws_pool = WebSocketsPool(
@@ -234,8 +236,9 @@ class TwitchChannelPointsMiner:
                 # Check if is not None because maybe we have already created a new connection on array+1 and now index is None
                 for index in range(0, len(self.ws_pool.ws)):
                     if (
-                        self.ws_pool.ws[index] is not None
+                        self.ws_pool.ws[index].is_reconneting is False
                         and self.ws_pool.ws[index].elapsed_last_ping() > 10
+                        and internet_connection_available() is True
                     ):
                         logger.info(
                             f"#{index} - The last PING was sent more than 10 minutes ago. Reconnecting to the WebSocket..."

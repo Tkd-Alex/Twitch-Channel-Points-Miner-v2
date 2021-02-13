@@ -12,7 +12,11 @@ from TwitchChannelPointsMiner.classes.entities.Raid import Raid
 from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
-from TwitchChannelPointsMiner.utils import _millify, get_streamer_index
+from TwitchChannelPointsMiner.utils import (
+    _millify,
+    get_streamer_index,
+    internet_connection_available,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -32,58 +36,67 @@ class WebSocketsPool:
     """
 
     def submit(self, topic):
-        if self.ws == [] or self.ws[-1] is None or len(self.ws[-1].topics) >= 50:
-            self.append_new_websocket()
+        # Check if we need to create a new WebSocket instance
+        if self.ws == [] or len(self.ws[-1].topics) >= 50:
+            self.ws.append(self.__new(len(self.ws)))
+            self.__start(-1)
 
-        self.ws[-1].topics.append(topic)
+        self.__submit(-1, topic)
 
-        if self.ws[-1].is_opened is False:
-            self.ws[-1].pending_topics.append(topic)
+    def __submit(self, index, topic):
+        # Topic in topics should never happen. Anyway prevent any types of duplicates
+        if topic not in self.ws[index].topics:
+            self.ws[index].topics.append(topic)
+
+        if self.ws[index].is_opened is False:
+            self.ws[index].pending_topics.append(topic)
         else:
-            self.ws[-1].listen(topic, self.twitch.twitch_login.get_auth_token())
+            self.ws[index].listen(topic, self.twitch.twitch_login.get_auth_token())
 
-    def append_new_websocket(self):
-        self.ws.append(
-            TwitchWebSocket(
-                index=len(self.ws),
-                parent_pool=self,
-                url=WEBSOCKET,
-                on_message=WebSocketsPool.on_message,
-                on_open=WebSocketsPool.on_open,
-                on_error=WebSocketsPool.on_error,
-                on_close=WebSocketsPool.on_close
-                # on_close=WebSocketsPool.handle_reconnection, # Do nothing.
-            )
+    def __new(self, index):
+        return TwitchWebSocket(
+            index=index,
+            parent_pool=self,
+            url=WEBSOCKET,
+            on_message=WebSocketsPool.on_message,
+            on_open=WebSocketsPool.on_open,
+            on_error=WebSocketsPool.on_error,
+            on_close=WebSocketsPool.on_close
+            # on_close=WebSocketsPool.handle_reconnection, # Do nothing.
         )
 
-        self.thread_ws = threading.Thread(target=lambda: self.ws[-1].run_forever())
-        self.thread_ws.daemon = True
-        self.thread_ws.start()
+    def __start(self, index):
+        thread_ws = threading.Thread(target=lambda: self.ws[index].run_forever())
+        thread_ws.daemon = True
+        thread_ws.name = f"WebSocket #{self.ws[index].index}"
+        thread_ws.start()
 
     def end(self):
         for index in range(0, len(self.ws)):
-            if self.ws[index] is not None:
-                self.ws[index].forced_close = True
-                self.ws[index].close()
+            self.ws[index].forced_close = True
+            self.ws[index].close()
 
     @staticmethod
     def on_open(ws):
         def run():
             ws.is_opened = True
             ws.ping()
+
             for topic in ws.pending_topics:
                 ws.listen(topic, ws.twitch.twitch_login.get_auth_token())
 
-            while not ws.is_closed:
-                ws.ping()
-                time.sleep(random.uniform(25, 30))
+            while ws.is_closed is False:
+                # Else: the ws is currently in reconnecting phase, you can't do ping or other operation.
+                # Probably this ws will be closed very soon with ws.is_closed = True
+                if ws.is_reconneting is False:
+                    ws.ping()  # We need ping for keep the connection alive
+                    time.sleep(random.uniform(25, 30))
 
-                if ws.elapsed_last_pong() > 10 and ws.is_reconneting is False:
-                    logger.info(
-                        f"#{ws.index} - The last PONG was received more than 10 minutes ago. Reconnect the WebSocket"
-                    )
-                    ws.is_reconneting = True
-                    WebSocketsPool.handle_reconnection(ws)
+                    if ws.elapsed_last_pong() > 5:
+                        logger.info(
+                            f"#{ws.index} - The last PONG was received more than 5 minutes ago"
+                        )
+                        WebSocketsPool.handle_reconnection(ws)
 
         thread_ws = threading.Thread(target=run)
         thread_ws.daemon = True
@@ -91,6 +104,8 @@ class WebSocketsPool:
 
     @staticmethod
     def on_error(ws, error):
+        # Connection lost | [WinError 10054] An existing connection was forcibly closed by the remote host
+        # Connection already closed | Connection is already closed (raise WebSocketConnectionClosedException)
         logger.error(f"#{ws.index} - WebSocket error: {error}")
 
     @staticmethod
@@ -102,20 +117,37 @@ class WebSocketsPool:
     @staticmethod
     def handle_reconnection(ws):
         # Close the current WebSocket.
-        # anyway, we replace the ws with None
         ws.is_closed = True
         ws.keep_running = False
         # Reconnect only if ws.forced_close is False (replace the keep_running)
+
+        # Set the current socket as reconnecting status
+        # So the exsternal ping check will be locked
+        ws.is_reconneting = True
+
         if ws.forced_close is False:
             logger.info(
-                f"#{ws.index} - Reconnecting to Twitch PubSub server in 30 seconds"
+                f"#{ws.index} - Reconnecting to Twitch PubSub server in ~60 seconds"
             )
             time.sleep(30)
 
+            while internet_connection_available() is False:
+                random_sleep = random.randint(1, 3)
+                logger.warning(
+                    f"#{ws.index} - No internet connection available! Retry after {random_sleep}m"
+                )
+                time.sleep(random_sleep * 60)
+
+            # Why not create a new ws on the same array index? Let's try.
             self = ws.parent_pool
-            self.ws[ws.index] = None
+            self.ws[ws.index] = self.__new(ws.index)  # Create a new connection.
+            # self.ws[ws.index].topics = ws.topics
+
+            self.__start(ws.index)  # Start a new thread.
+            time.sleep(30)
+
             for topic in ws.topics:
-                self.submit(topic)
+                self.__submit(ws.index, topic)
 
     @staticmethod
     def on_message(ws, message):
@@ -341,7 +373,6 @@ class WebSocketsPool:
 
         elif response["type"] == "RECONNECT":
             logger.info(f"#{ws.index} - Reconnection required")
-            ws.is_reconneting = True
             WebSocketsPool.handle_reconnection(ws)
 
         elif response["type"] == "PONG":
