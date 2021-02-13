@@ -66,10 +66,12 @@ def remove_emoji(string: str) -> str:
         "\U0001F300-\U0001F5FF"  # symbols & pictographs
         "\U0001F680-\U0001F6FF"  # transport & map symbols
         "\U0001F1E0-\U0001F1FF"  # flags (iOS)
-        "\U00002500-\U00002BEF"  # chinese char
+        "\U00002500-\U00002587"  # chinese char
+        "\U00002589-\U00002BEF"  # I need Unicode Character “█” (U+2588)
         "\U00002702-\U000027B0"
         "\U00002702-\U000027B0"
-        "\U000024C2-\U0001F251"
+        "\U000024C2-\U00002587"
+        "\U00002589-\U0001F251"
         "\U0001f926-\U0001f937"
         "\U00010000-\U0010ffff"
         "\u2640-\u2642"
@@ -102,7 +104,7 @@ def remove_emoji(string: str) -> str:
 
 def at_least_one_value_in_settings_is(array, attr_name, condition=True):
     return [
-        itme for itme in array if getattr(itme.settings, attr_name) == condition
+        item for item in array if getattr(item.settings, attr_name) == condition
     ] != []
 
 
