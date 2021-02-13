@@ -38,6 +38,21 @@ logger = logging.getLogger(__name__)
 
 
 class TwitchChannelPointsMiner:
+    __slots__ = [
+        "username",
+        "twitch",
+        "claim_drops_startup",
+        "streamers",
+        "events_predictions",
+        "minute_watcher_thread",
+        "ws_pool",
+        "session_id",
+        "running",
+        "start_datetime",
+        "original_streamers",
+        "logs_file",
+    ]
+
     def __init__(
         self,
         username: str,

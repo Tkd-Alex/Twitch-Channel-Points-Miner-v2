@@ -22,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 
 class WebSocketsPool:
+    __slots__ = ["ws", "twitch", "streamers", "events_predictions"]
+
     def __init__(self, twitch, streamers, events_predictions):
         self.ws = []
         self.twitch = twitch

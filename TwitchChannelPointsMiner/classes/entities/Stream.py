@@ -10,6 +10,21 @@ logger = logging.getLogger(__name__)
 
 
 class Stream(object):
+    __slots__ = [
+        "broadcast_id",
+        "title",
+        "game",
+        "tags",
+        "drops_enabled",
+        "viewers_count",
+        "__last_update",
+        "spade_url",
+        "payload",
+        "watch_streak_missing",
+        "minute_watched",
+        "__minute_watched_timestamp",
+    ]
+
     def __init__(self):
         self.broadcast_id = None
 

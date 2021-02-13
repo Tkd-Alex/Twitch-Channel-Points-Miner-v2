@@ -5,6 +5,20 @@ from TwitchChannelPointsMiner.utils import float_round
 
 
 class EventPrediction(object):
+    __slots__ = [
+        "streamer",
+        "event_id",
+        "title",
+        "created_at",
+        "prediction_window_seconds",
+        "status",
+        "final_result",
+        "box_fillable",
+        "bet_confirmed",
+        "bet_placed",
+        "bet",
+    ]
+
     def __init__(
         self,
         streamer: Streamer,

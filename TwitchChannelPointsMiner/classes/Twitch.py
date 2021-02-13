@@ -29,6 +29,8 @@ logger = logging.getLogger(__name__)
 
 
 class Twitch(object):
+    __slots__ = ["cookies_file", "user_agent", "twitch_login", "running"]
+
     def __init__(self, username, user_agent):
         cookies_path = os.path.join(Path().absolute(), "cookies")
         Path(cookies_path).mkdir(parents=True, exist_ok=True)
