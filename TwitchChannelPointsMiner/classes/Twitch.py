@@ -197,7 +197,7 @@ class Twitch(object):
         response = self.post_gql_request(GQLOperations.ViewerDropsDashboard)
         campaigns = response["data"]["currentUser"]["dropCampaigns"]
         if status is not None:
-            campaigns = [camp for camp in campaigns if camp["status"] == status.upper()]
+            campaigns = list(filter(lambda x: x["status"] == status.upper(), campaigns))
         return campaigns
 
     def __get_campaigns_details(self, campaigns):
@@ -210,7 +210,7 @@ class Twitch(object):
             }
 
         response = self.post_gql_request(json_data)
-        return [res["data"]["user"]["dropCampaign"] for res in response]
+        return list(map(lambda x: x["data"]["user"]["dropCampaign"], response))
 
     def sync_drops_inventory(self, streamers, chunk_size=3):
         campaigns_update = 0
@@ -285,12 +285,13 @@ class Twitch(object):
                     and streamers[index].stream.drops_tags is True
                 ):
                     # yes! The streamer[index] have the drops_tags enabled and we It's currently stream a game with campaign active!
-                    streamers[index].stream.drops_campaigns = [
-                        campaign
-                        for campaign in campaigns
-                        if campaign.drops != []
-                        and campaign.game == streamers[index].stream.game
-                    ]
+                    streamers[index].stream.drops_campaigns = list(
+                        filter(
+                            lambda x: x.drops != []
+                            and x.game == streamers[index].stream.game,
+                            campaigns,
+                        )
+                    )
 
             self.__chuncked_sleep(60, chunk_size=chunk_size)
 
