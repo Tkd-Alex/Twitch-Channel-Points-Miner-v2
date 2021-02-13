@@ -374,7 +374,7 @@ class Twitch(object):
 
             json_response = self.__do_helix_request(query)
             pagination = json_response["pagination"]
-            followers += [fw["to_name"].lower() for fw in json_response["data"]]
+            followers += [fw["to_login"].lower() for fw in json_response["data"]]
             time.sleep(random.uniform(0.3, 0.7))
 
             if pagination == {}:
