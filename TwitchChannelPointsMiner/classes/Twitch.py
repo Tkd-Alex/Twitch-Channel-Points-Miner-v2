@@ -211,68 +211,90 @@ class Twitch(object):
     def sync_drops_inventory(self, streamers, chunk_size=3):
         campaigns_update = 0
         while self.running:
-            # Get update from dashboard each 60minutes
-            if campaigns_update == 0 or ((time.time() - campaigns_update) / 60) > 60:
-                campaigns_update = time.time()
-                # Get full details from current ACTIVE campaigns
-                campaigns_details = self.__get_campaigns_details(
-                    self.__get_drops_dashboard(status="ACTIVE")
-                )
-                campaigns = []
-
-                # Going to clear array and structure. Remove all the timeBasedDrops expired or not started yet
-                for index in range(0, len(campaigns_details)):
-                    campaign = Campaign(campaigns_details[index])
-                    if campaign.dt_match is True:
-                        # Remove all the drops already claimed or with dt not matching
-                        campaign.clear_drops()
-                        if campaign.drops != []:
-                            campaigns.append(campaign)
-
-            # Get data from inventory and sync current status with streamers.drops_campaigns
-            inventory = self.__get_inventory()
-            # Iterate all campaigns from dashboard (only active, with working drops)
-            # In this array we have also the campaigns never started from us (not in nventory)
-            for i in range(0, len(campaigns)):
-                # Iterate all campaigns currently in progress from out inventory
-                for progress in inventory["dropCampaignsInProgress"]:
-                    if progress["id"] == campaigns[i].id:
-                        campaigns[i].in_inventory = True
-                        # Iterate all the drops from inventory
-                        for drop in progress["timeBasedDrops"]:
-                            # Iterate all the drops from out campaigns array
-                            # After id match update with
-                            #   - currentMinutesWatched
-                            #   - hasPreconditionsMet
-                            #   - dropInstanceID
-                            #   - isClaimed
-                            for j in range(0, len(campaigns[i].drops)):
-                                current_id = campaigns[i].drops[j].id
-                                if drop["id"] == current_id:
-                                    campaigns[i].drops[j].update(drop["self"])
-                                    # If after update we all conditions are meet we can claim the drop
-                                    if campaigns[i].drops[j].is_claimable is True:
-                                        claimed = self.claim_drop(campaigns[i].drops[j])
-                                        campaigns[i].drops[j].is_claimed = claimed
-                                    break  # Found it!
-                        campaigns[i].clear_drops()  # Remove all the claime drops
-                        break  # Found it!
-
-            # Check if user It's currently streaming the same game present in campaigns_details
-            for index in range(0, len(streamers)):
+            try:
+                # Get update from dashboard each 60minutes
                 if (
-                    streamers[index].settings.claim_drops is True
-                    and streamers[index].is_online is True
-                    and streamers[index].stream.drops_tags is True
+                    campaigns_update == 0
+                    or ((time.time() - campaigns_update) / 60) > 60
                 ):
-                    # yes! The streamer[index] have the drops_tags enabled and we It's currently stream a game with campaign active!
-                    streamers[index].stream.drops_campaigns = list(
-                        filter(
-                            lambda x: x.drops != []
-                            and x.game == streamers[index].stream.game,
-                            campaigns,
-                        )
+                    campaigns_update = time.time()
+                    # Get full details from current ACTIVE campaigns
+                    campaigns_details = self.__get_campaigns_details(
+                        self.__get_drops_dashboard(status="ACTIVE")
                     )
+                    if campaigns_details not in [{}, None, []]:
+                        campaigns = []
+
+                        # Going to clear array and structure. Remove all the timeBasedDrops expired or not started yet
+                        for index in range(0, len(campaigns_details)):
+                            campaign = Campaign(campaigns_details[index])
+                            if campaign.dt_match is True:
+                                # Remove all the drops already claimed or with dt not matching
+                                campaign.clear_drops()
+                                if campaign.drops != []:
+                                    campaigns.append(campaign)
+
+                # Get data from inventory and sync current status with streamers.drops_campaigns
+                inventory = self.__get_inventory()
+                if inventory not in [{}, None, []]:
+                    # Iterate all campaigns from dashboard (only active, with working drops)
+                    # In this array we have also the campaigns never started from us (not in nventory)
+                    for i in range(0, len(campaigns)):
+                        # Iterate all campaigns currently in progress from out inventory
+                        for progress in inventory["dropCampaignsInProgress"]:
+                            if progress["id"] == campaigns[i].id:
+                                campaigns[i].in_inventory = True
+                                # Iterate all the drops from inventory
+                                for drop in progress["timeBasedDrops"]:
+                                    # Iterate all the drops from out campaigns array
+                                    # After id match update with
+                                    #   - currentMinutesWatched
+                                    #   - hasPreconditionsMet
+                                    #   - dropInstanceID
+                                    #   - isClaimed
+                                    for j in range(0, len(campaigns[i].drops)):
+                                        current_id = campaigns[i].drops[j].id
+                                        if drop["id"] == current_id:
+                                            campaigns[i].drops[j].update(drop["self"])
+                                            # If after update we all conditions are meet we can claim the drop
+                                            if (
+                                                campaigns[i].drops[j].is_claimable
+                                                is True
+                                            ):
+                                                claimed = self.claim_drop(
+                                                    campaigns[i].drops[j]
+                                                )
+                                                campaigns[i].drops[
+                                                    j
+                                                ].is_claimed = claimed
+                                            break  # Found it!
+                                campaigns[
+                                    i
+                                ].clear_drops()  # Remove all the claime drops
+                                break  # Found it!
+
+                    # Check if user It's currently streaming the same game present in campaigns_details
+                    for index in range(0, len(streamers)):
+                        if (
+                            streamers[index].settings.claim_drops is True
+                            and streamers[index].is_online is True
+                            and streamers[index].stream.drops_tags is True
+                        ):
+                            # yes! The streamer[index] have the drops_tags enabled and we It's currently stream a game with campaign active!
+                            streamers[index].stream.drops_campaigns = list(
+                                filter(
+                                    lambda x: x.drops != []
+                                    and x.game == streamers[index].stream.game,
+                                    campaigns,
+                                )
+                            )
+                else:
+                    logger.error("Error! Inventory is empty")
+                    self.__check_connection_handler(chunk_size)
+
+            except requests.exceptions.ConnectionError as e:
+                logger.error(f"Error while syncing inventory: {e}")
+                self.__check_connection_handler(chunk_size)
 
             self.__chuncked_sleep(60, chunk_size=chunk_size)
 
@@ -466,15 +488,7 @@ class Twitch(object):
 
                 except requests.exceptions.ConnectionError as e:
                     logger.error(f"Error while trying to send minute watched: {e}")
-
-                    # The success rate It's very hight usually. Why we have failed?
-                    # Check internet connection ...
-                    while internet_connection_available() is False:
-                        random_sleep = random.randint(1, 3)
-                        logger.warning(
-                            f"No internet connection available! Retry after {random_sleep}m"
-                        )
-                        self.__chuncked_sleep(random_sleep * 60, chunk_size=chunk_size)
+                    self.__check_connection_handler(chunk_size)
 
                 self.__chuncked_sleep(
                     next_iteration - time.time(), chunk_size=chunk_size
@@ -482,6 +496,16 @@ class Twitch(object):
 
             if streamers_watching == []:
                 self.__chuncked_sleep(60, chunk_size=chunk_size)
+
+    def __check_connection_handler(self, chunk_size):
+        # The success rate It's very hight usually. Why we have failed?
+        # Check internet connection ...
+        while internet_connection_available() is False:
+            random_sleep = random.randint(1, 3)
+            logger.warning(
+                f"No internet connection available! Retry after {random_sleep}m"
+            )
+            self.__chuncked_sleep(random_sleep * 60, chunk_size=chunk_size)
 
     def get_channel_id(self, streamer_username):
         json_response = self.__do_helix_request(f"/users?login={streamer_username}")
