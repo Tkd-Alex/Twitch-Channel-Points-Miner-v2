@@ -16,6 +16,7 @@ from secrets import token_hex
 import requests
 
 from TwitchChannelPointsMiner.classes.entities.Campaign import Campaign
+from TwitchChannelPointsMiner.classes.entities.Drop import Drop
 from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerDoesNotExistException,
     StreamerIsOfflineException,
@@ -188,9 +189,11 @@ class Twitch(object):
     def claim_all_drops_from_inventory(self):
         inventory = self.__get_inventory()
         for campaign in inventory["dropCampaignsInProgress"]:
-            for drop in campaign["timeBasedDrops"]:
-                if drop["self"]["dropInstanceID"] is not None:
-                    self.claim_drop(drop["self"]["dropInstanceID"])
+            for drop_dict in campaign["timeBasedDrops"]:
+                drop = Drop(drop_dict)
+                drop.update(drop_dict["self"])
+                if drop.is_claimable is True:
+                    drop.is_claimed = self.claim_drop(drop)
                     time.sleep(random.uniform(5, 10))
 
     def __get_inventory(self):
@@ -243,11 +246,11 @@ class Twitch(object):
             # In this array we have also the campaigns never started from us (not in nventory)
             for i in range(0, len(campaigns)):
                 # Iterate all campaigns currently in progress from out inventory
-                for in_progress in inventory["dropCampaignsInProgress"]:
-                    if in_progress["id"] == campaigns[i].id:
+                for progress in inventory["dropCampaignsInProgress"]:
+                    if progress["id"] == campaigns[i].id:
                         campaigns[i].in_inventory = True
                         # Iterate all the drops from inventory
-                        for drop in in_progress["timeBasedDrops"]:
+                        for drop in progress["timeBasedDrops"]:
                             # Iterate all the drops from out campaigns array
                             # After id match update with
                             #   - currentMinutesWatched
@@ -260,11 +263,8 @@ class Twitch(object):
                                     campaigns[i].drops[j].update(drop["self"])
                                     # If after update we all conditions are meet we can claim the drop
                                     if campaigns[i].drops[j].is_claimable is True:
-                                        campaigns[i].drops[
-                                            j
-                                        ].is_claimed = self.claim_drop(
-                                            campaigns[i].drops[j]
-                                        )
+                                        claimed = self.claim_drop(campaigns[i].drops[j])
+                                        campaigns[i].drops[j].is_claimed = claimed
                                     break  # Found it!
                         campaigns[i].clear_drops()  # Remove all the claime drops
                         break  # Found it!
