@@ -143,6 +143,7 @@ cython_debug/
 # Custom files
 run.py
 chromedriver*
+streamers.json
 
 # Folders
 cookies/*

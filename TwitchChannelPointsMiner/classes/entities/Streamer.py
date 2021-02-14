@@ -43,6 +43,25 @@ class StreamerSettings(object):
     def __repr__(self):
         return f"BetSettings(MakePredictions={self.make_predictions}, FollowRaid={self.follow_raid}, ClaimDrops={self.claim_drops}, WatchStreak={self.watch_streak}, Bet={self.bet})"
 
+    def to_dict(self):
+        return {
+            "make_predictions": self.make_predictions,
+            "follow_raid": self.follow_raid,
+            "claim_drops": self.claim_drops,
+            "watch_streak": self.watch_streak,
+            "bet": self.bet.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            make_predictions=data["make_predictions"],
+            follow_raid=data["follow_raid"],
+            claim_drops=data["claim_drops"],
+            watch_streak=data["watch_streak"],
+            bet=BetSettings.from_dict(data["bet"]),
+        )
+
 
 class Streamer(object):
     __slots__ = [
@@ -128,3 +147,10 @@ class Streamer(object):
 
     def stream_up_elapsed(self):
         return self.stream_up == 0 or ((time.time() - self.stream_up) > 120)
+
+    # Should be done by channel_id ?
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.username == other.username
+        else:
+            return False
