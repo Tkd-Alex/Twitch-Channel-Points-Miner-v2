@@ -16,10 +16,10 @@ from secrets import token_hex
 import requests
 
 from TwitchChannelPointsMiner.classes.entities.Campaign import Campaign
+from TwitchChannelPointsMiner.classes.entities.Drop import Drop
 from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerDoesNotExistException,
     StreamerIsOfflineException,
-    TimeBasedDropNotFound,
 )
 from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
@@ -82,15 +82,13 @@ class Twitch(object):
             headers = {"User-Agent": self.user_agent}
             main_page_request = requests.get(streamer.streamer_url, headers=headers)
             response = main_page_request.text
-            settings_url = re.search(
-                "(https://static.twitchcdn.net/config/settings.*?js)", response
-            ).group(1)
+            regex_settings = "(https://static.twitchcdn.net/config/settings.*?js)"
+            settings_url = re.search(regex_settings, response).group(1)
 
             settings_request = requests.get(settings_url, headers=headers)
             response = settings_request.text
-            streamer.stream.spade_url = re.search(
-                '"spade_url":"(.*?)"', response
-            ).group(1)
+            regex_spade = '"spade_url":"(.*?)"'
+            streamer.stream.spade_url = re.search(regex_spade, response).group(1)
         except requests.exceptions.RequestException as e:
             logger.error(f"Something went wrong during extraction of 'spade_url': {e}")
 
@@ -177,20 +175,14 @@ class Twitch(object):
         except (ValueError, KeyError):
             return False
 
-    def search_drop_in_inventory(self, streamer, drop_id):
-        inventory = self.__get_inventory()
-        for campaign in inventory["dropCampaignsInProgress"]:
-            for drop in campaign["timeBasedDrops"]:
-                if drop["id"] == drop_id:
-                    return drop["self"]
-        raise TimeBasedDropNotFound
-
     def claim_all_drops_from_inventory(self):
         inventory = self.__get_inventory()
         for campaign in inventory["dropCampaignsInProgress"]:
-            for drop in campaign["timeBasedDrops"]:
-                if drop["self"]["dropInstanceID"] is not None:
-                    self.claim_drop(drop["self"]["dropInstanceID"])
+            for drop_dict in campaign["timeBasedDrops"]:
+                drop = Drop(drop_dict)
+                drop.update(drop_dict["self"])
+                if drop.is_claimable is True:
+                    drop.is_claimed = self.claim_drop(drop)
                     time.sleep(random.uniform(5, 10))
 
     def __get_inventory(self):
@@ -243,11 +235,11 @@ class Twitch(object):
             # In this array we have also the campaigns never started from us (not in nventory)
             for i in range(0, len(campaigns)):
                 # Iterate all campaigns currently in progress from out inventory
-                for in_progress in inventory["dropCampaignsInProgress"]:
-                    if in_progress["id"] == campaigns[i].id:
+                for progress in inventory["dropCampaignsInProgress"]:
+                    if progress["id"] == campaigns[i].id:
                         campaigns[i].in_inventory = True
                         # Iterate all the drops from inventory
-                        for drop in in_progress["timeBasedDrops"]:
+                        for drop in progress["timeBasedDrops"]:
                             # Iterate all the drops from out campaigns array
                             # After id match update with
                             #   - currentMinutesWatched
@@ -260,11 +252,8 @@ class Twitch(object):
                                     campaigns[i].drops[j].update(drop["self"])
                                     # If after update we all conditions are meet we can claim the drop
                                     if campaigns[i].drops[j].is_claimable is True:
-                                        campaigns[i].drops[
-                                            j
-                                        ].is_claimed = self.claim_drop(
-                                            campaigns[i].drops[j]
-                                        )
+                                        claimed = self.claim_drop(campaigns[i].drops[j])
+                                        campaigns[i].drops[j].is_claimed = claimed
                                     break  # Found it!
                         campaigns[i].clear_drops()  # Remove all the claime drops
                         break  # Found it!
@@ -415,19 +404,18 @@ class Twitch(object):
                             and streamers[index].stream.drops_tags is True
                             and streamers[index].stream.drops_campaigns != []
                         ):
+                            stream = streamers[index].stream
                             drops_available = sum(
                                 [
                                     len(campaign.drops)
-                                    for campaign in streamers[
-                                        index
-                                    ].stream.drops_campaigns
+                                    for campaign in stream.drops_campaigns
                                 ]
                             )
                             logger.debug(
-                                f"{streamers[index]} it's currently stream: {streamers[index].stream}"
+                                f"{streamers[index]} it's currently stream: {stream}"
                             )
                             logger.debug(
-                                f"Campaign currently active here: {len(streamers[index].stream.drops_campaigns)}, drops available: {drops_available}"
+                                f"Campaign currently active here: {len(stream.drops_campaigns)}, drops available: {drops_available}"
                             )
                             streamers_watching.append(index)
                             if len(streamers_watching) == 2:
@@ -486,7 +474,7 @@ class Twitch(object):
                         logger.warning(
                             f"No internet connection available! Retry after {random_sleep}m"
                         )
-                        time.sleep(random_sleep * 60)
+                        self.__chuncked_sleep(random_sleep * 60, chunk_size=chunk_size)
 
                 self.__chuncked_sleep(
                     next_iteration - time.time(), chunk_size=chunk_size

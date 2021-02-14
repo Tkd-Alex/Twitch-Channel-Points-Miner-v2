@@ -66,10 +66,12 @@ def remove_emoji(string: str) -> str:
         "\U0001F300-\U0001F5FF"  # symbols & pictographs
         "\U0001F680-\U0001F6FF"  # transport & map symbols
         "\U0001F1E0-\U0001F1FF"  # flags (iOS)
-        "\U00002500-\U00002BEF"  # chinese char
+        "\U00002500-\U00002587"  # chinese char
+        "\U00002589-\U00002BEF"  # I need Unicode Character “█” (U+2588)
         "\U00002702-\U000027B0"
         "\U00002702-\U000027B0"
-        "\U000024C2-\U0001F251"
+        "\U000024C2-\U00002587"
+        "\U00002589-\U0001F251"
         "\U0001f926-\U0001f937"
         "\U00010000-\U0010ffff"
         "\u2640-\u2642"
@@ -101,17 +103,20 @@ def remove_emoji(string: str) -> str:
 
 
 def at_least_one_value_in_settings_is(array, attr_name, condition=True):
-    return [
-        itme for itme in array if getattr(itme.settings, attr_name) == condition
-    ] != []
+    return (
+        list(filter(lambda x: getattr(x.settings, attr_name) == condition, array)) != []
+    )
 
 
 def copy_values_if_none(settings, defaults):
-    values = [
-        name
-        for name in dir(settings)
-        if name.startswith("__") is False and callable(getattr(settings, name)) is False
-    ]
+    values = list(
+        filter(
+            lambda x: x.startswith("__") is False
+            and callable(getattr(settings, x)) is False,
+            dir(settings),
+        )
+    )
+
     for value in values:
         if getattr(settings, value) is None:
             setattr(settings, value, getattr(defaults, value))
@@ -120,13 +125,13 @@ def copy_values_if_none(settings, defaults):
 
 def set_default_settings(settings, defaults):
     # If no settings was provided use the default settings ...
-    if settings is None:
-        settings = deepcopy(defaults)
-    else:
-        # If settings was provided but maybe are only partial set
-        # Get the default values from Settings.streamer_settings
-        settings = copy_values_if_none(settings, defaults)
-    return settings
+    # If settings was provided but maybe are only partial set
+    # Get the default values from Settings.streamer_settings
+    return (
+        deepcopy(defaults)
+        if settings is None
+        else copy_values_if_none(settings, defaults)
+    )
 
 
 def char_decision_as_index(char):
