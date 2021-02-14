@@ -292,7 +292,7 @@ class Twitch(object):
                     logger.error("Error! Inventory is empty")
                     self.__check_connection_handler(chunk_size)
 
-            except requests.exceptions.ConnectionError as e:
+            except (ValueError, KeyError, requests.exceptions.ConnectionError) as e:
                 logger.error(f"Error while syncing inventory: {e}")
                 self.__check_connection_handler(chunk_size)
 
