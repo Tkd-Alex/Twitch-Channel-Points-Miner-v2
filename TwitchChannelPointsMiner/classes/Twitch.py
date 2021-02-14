@@ -20,7 +20,6 @@ from TwitchChannelPointsMiner.classes.entities.Drop import Drop
 from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerDoesNotExistException,
     StreamerIsOfflineException,
-    TimeBasedDropNotFound,
 )
 from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
@@ -83,15 +82,13 @@ class Twitch(object):
             headers = {"User-Agent": self.user_agent}
             main_page_request = requests.get(streamer.streamer_url, headers=headers)
             response = main_page_request.text
-            settings_url = re.search(
-                "(https://static.twitchcdn.net/config/settings.*?js)", response
-            ).group(1)
+            regex_settings = "(https://static.twitchcdn.net/config/settings.*?js)"
+            settings_url = re.search(regex_settings, response).group(1)
 
             settings_request = requests.get(settings_url, headers=headers)
             response = settings_request.text
-            streamer.stream.spade_url = re.search(
-                '"spade_url":"(.*?)"', response
-            ).group(1)
+            regex_spade = '"spade_url":"(.*?)"'
+            streamer.stream.spade_url = re.search(regex_spade, response).group(1)
         except requests.exceptions.RequestException as e:
             logger.error(f"Something went wrong during extraction of 'spade_url': {e}")
 
@@ -177,14 +174,6 @@ class Twitch(object):
             return response["data"]["claimDropRewards"]["status"] == "ELIGIBLE_FOR_ALL"
         except (ValueError, KeyError):
             return False
-
-    def search_drop_in_inventory(self, streamer, drop_id):
-        inventory = self.__get_inventory()
-        for campaign in inventory["dropCampaignsInProgress"]:
-            for drop in campaign["timeBasedDrops"]:
-                if drop["id"] == drop_id:
-                    return drop["self"]
-        raise TimeBasedDropNotFound
 
     def claim_all_drops_from_inventory(self):
         inventory = self.__get_inventory()
@@ -415,19 +404,18 @@ class Twitch(object):
                             and streamers[index].stream.drops_tags is True
                             and streamers[index].stream.drops_campaigns != []
                         ):
+                            stream = streamers[index].stream
                             drops_available = sum(
                                 [
                                     len(campaign.drops)
-                                    for campaign in streamers[
-                                        index
-                                    ].stream.drops_campaigns
+                                    for campaign in stream.drops_campaigns
                                 ]
                             )
                             logger.debug(
-                                f"{streamers[index]} it's currently stream: {streamers[index].stream}"
+                                f"{streamers[index]} it's currently stream: {stream}"
                             )
                             logger.debug(
-                                f"Campaign currently active here: {len(streamers[index].stream.drops_campaigns)}, drops available: {drops_available}"
+                                f"Campaign currently active here: {len(stream.drops_campaigns)}, drops available: {drops_available}"
                             )
                             streamers_watching.append(index)
                             if len(streamers_watching) == 2:
@@ -485,7 +473,7 @@ class Twitch(object):
                         logger.warning(
                             f"No internet connection available! Retry after {random_sleep}m"
                         )
-                        time.sleep(random_sleep * 60)
+                        self.__chuncked_sleep(random_sleep * 60, chunk_size=chunk_size)
 
                 self.__chuncked_sleep(
                     next_iteration - time.time(), chunk_size=chunk_size

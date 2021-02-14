@@ -150,12 +150,11 @@ class TwitchChannelPointsMiner:
             for username in streamers_name:
                 time.sleep(random.uniform(0.3, 0.7))
                 try:
-
-                    if isinstance(streamers_dict[username], Streamer) is True:
-                        streamer = streamers_dict[username]
-                    else:
-                        streamer = Streamer(username)
-
+                    streamer = (
+                        streamers_dict[username]
+                        if isinstance(streamers_dict[username], Streamer) is True
+                        else Streamer(username)
+                    )
                     streamer.channel_id = self.twitch.get_channel_id(username)
                     streamer.settings = set_default_settings(
                         streamer.settings, Settings.streamer_settings
@@ -163,7 +162,6 @@ class TwitchChannelPointsMiner:
                     streamer.settings.bet = set_default_settings(
                         streamer.settings.bet, Settings.streamer_settings.bet
                     )
-
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:
                     logger.info(
@@ -194,6 +192,7 @@ class TwitchChannelPointsMiner:
                 target=self.twitch.sync_drops_inventory,
                 args=(self.streamers,),
             )
+            self.sync_drops_inventory_thread.name = "Sync drops inventory"
             self.sync_drops_inventory_thread.start()
             time.sleep(30)
 
@@ -217,21 +216,6 @@ class TwitchChannelPointsMiner:
                     user_id=self.twitch.twitch_login.get_user_id(),
                 )
             )
-
-            """
-            # If we have at least one streamer with settings = claim_drops True
-            # Going to subscribe to user-drop-events. Get update for drop-progress
-            claim_drops = at_least_one_value_in_settings_is(
-                self.streamers, "claim_drops", True
-            )
-            if claim_drops is True:
-                self.ws_pool.submit(
-                    PubsubTopic(
-                        "user-drop-events",
-                        user_id=self.twitch.twitch_login.get_user_id(),
-                    )
-                )
-            """
 
             # Going to subscribe to predictions-user-v1. Get update when we place a new prediction (confirm)
             if make_predictions is True:
