@@ -32,7 +32,9 @@ from TwitchChannelPointsMiner.utils import (
 # Suppress:
 #   - chardet.charsetprober - [feed]
 #   - chardet.charsetprober - [get_confidence]
+#   - requests - [Starting new HTTPS connection (1)]
 logging.getLogger("chardet.charsetprober").setLevel(logging.ERROR)
+logging.getLogger("requests").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
