@@ -188,13 +188,19 @@ class TwitchChannelPointsMiner:
                 self.streamers, "make_predictions", True
             )
 
-            self.sync_drops_inventory_thread = threading.Thread(
-                target=self.twitch.sync_drops_inventory,
-                args=(self.streamers,),
-            )
-            self.sync_drops_inventory_thread.name = "Sync drops inventory"
-            self.sync_drops_inventory_thread.start()
-            time.sleep(30)
+            # If we have at least one streamer with settings = claim_drops True
+            # Spawn a thread for sync inventory and dashboard
+            if (
+                at_least_one_value_in_settings_is(self.streamers, "claim_drops", True)
+                is True
+            ):
+                self.sync_drops_inventory_thread = threading.Thread(
+                    target=self.twitch.sync_drops_inventory,
+                    args=(self.streamers,),
+                )
+                self.sync_drops_inventory_thread.name = "Sync drops inventory"
+                self.sync_drops_inventory_thread.start()
+                time.sleep(30)
 
             self.minute_watcher_thread = threading.Thread(
                 target=self.twitch.send_minute_watched_events,
@@ -260,10 +266,13 @@ class TwitchChannelPointsMiner:
         self.running = self.twitch.running = False
         self.ws_pool.end()
 
-        self.minute_watcher_thread.join()
-        self.sync_drops_inventory_thread.join()
-        time.sleep(1)
+        if self.minute_watcher_thread is not None:
+            self.minute_watcher_thread.join()
 
+        if self.sync_drops_inventory_thread is not None:
+            self.sync_drops_inventory_thread.join()
+
+        time.sleep(1)
         self.__print_report()
 
         sys.exit(0)

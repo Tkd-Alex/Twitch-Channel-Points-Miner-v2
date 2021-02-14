@@ -102,10 +102,11 @@ def remove_emoji(string: str) -> str:
     return emoji_pattern.sub(r"", string)
 
 
-def at_least_one_value_in_settings_is(array, attr_name, condition=True):
-    return (
-        list(filter(lambda x: getattr(x.settings, attr_name) == condition, array)) != []
-    )
+def at_least_one_value_in_settings_is(items, attr, value=True):
+    for item in items:
+        if getattr(item.settings, attr) == value:
+            return True
+    return False
 
 
 def copy_values_if_none(settings, defaults):
