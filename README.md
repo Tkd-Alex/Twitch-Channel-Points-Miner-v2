@@ -45,6 +45,10 @@ If you have any type of issue, you need help, or you just want to suggest a new 
 
 If you want to help on this project please leave a star 🌟 and share with your friends! 😎
 
+A coffee is always a sign of LOVE ❤️
+
+<a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 ## Main difference from the original repository:
 
 - Improve the logging
