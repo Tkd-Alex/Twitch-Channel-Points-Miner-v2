@@ -462,18 +462,19 @@ class Twitch(object):
 
                         for campaign in streamers[index].stream.drops_campaigns:
                             for drop in campaign.drops:
-                                if drop.has_preconditions_met is not False:
-                                    if 1 == 1:
-                                        print("=" * 125)
-                                        logger.info(
-                                            f"Drops should be printed: {drop.is_printable}"
-                                        )
-                                        logger.info(f"{streamers[index]}")
-                                        logger.info(f"{streamers[index].stream}")
-                                        logger.info(f"{campaign}")
-                                        logger.info(f"{drop}")
-                                        logger.info(f"{drop.progress_bar()}")
-                                        print("=" * 125)
+                                # We could add .has_preconditions_met condition inside is_printable
+                                if (
+                                    drop.has_preconditions_met is not False
+                                    and drop.is_printable is True
+                                ):
+                                    # print("=" * 125)
+                                    logger.info(
+                                        f"{streamers[index]} is streaming {streamers[index].stream}"
+                                    )
+                                    logger.info(f"Campaign: {campaign}")
+                                    logger.info(f"Drop: {drop}")
+                                    logger.info(f"{drop.progress_bar()}")
+                                    # print("=" * 125)
 
                 except requests.exceptions.ConnectionError as e:
                     logger.error(f"Error while trying to send minute watched: {e}")
