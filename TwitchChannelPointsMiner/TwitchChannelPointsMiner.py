@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import copy
-import json
 import logging
 import random
 import signal
@@ -94,10 +93,10 @@ class TwitchChannelPointsMiner:
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
 
-    def mine(self, streamers: list = [], followers=False):
+    def mine(self, streamers: list = [], followers=False, streamers_json=None):
         self.run(streamers, followers)
 
-    def run(self, streamers: list = [], followers=False):
+    def run(self, streamers: list = [], followers=False, streamers_json=None):
         if self.running:
             logger.error("You can't start multiple sessions of this instance!")
         else:
@@ -112,7 +111,6 @@ class TwitchChannelPointsMiner:
             if self.claim_drops_startup is True:
                 self.twitch.claim_all_drops_from_inventory()
 
-            streamers_sett: list = []
             streamers_name: list = []
             streamers_dict: dict = {}
 
@@ -155,6 +153,8 @@ class TwitchChannelPointsMiner:
                         streamer = Streamer(username)
 
                     streamer.channel_id = self.twitch.get_channel_id(username)
+
+                    Settings.append(streamer)  # Store in .json the original settings
                     streamer.settings = set_default_settings(
                         streamer.settings, Settings.streamer_settings
                     )
@@ -169,6 +169,8 @@ class TwitchChannelPointsMiner:
                         extra={"emoji": ":cry:"},
                     )
 
+            Settings.write("streamers.json")
+
             # Populate the streamers with default values.
             # 1. Load channel points and auto-claim bonus
             # 2. Check if streamers is online
@@ -180,16 +182,6 @@ class TwitchChannelPointsMiner:
                 self.twitch.viewer_is_mod(streamer)
                 if streamer.viewer_is_mod is True:
                     streamer.settings.make_predictions = False
-
-                streamers_sett.append(
-                    {
-                        "username": streamer.username,
-                        "settings": streamer.settings.to_dict(),
-                    }
-                )
-
-            with open("streamers.json", "w") as fp:
-                json.dump(streamers_sett, fp, sort_keys=True, indent=4)
 
             self.original_streamers = copy.deepcopy(self.streamers)
 

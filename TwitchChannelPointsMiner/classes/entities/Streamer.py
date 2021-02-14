@@ -49,7 +49,7 @@ class StreamerSettings(object):
             "follow_raid": self.follow_raid,
             "claim_drops": self.claim_drops,
             "watch_streak": self.watch_streak,
-            "bet": self.bet.to_dict(),
+            "bet": None if self.bet is None else self.bet.to_dict(),
         }
 
     @classmethod
