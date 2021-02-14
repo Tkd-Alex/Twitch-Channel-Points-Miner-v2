@@ -129,7 +129,7 @@ class BetSettings(object):
     @classmethod
     def from_dict(cls, data):
         return cls(
-            strategy=Strategy[data["strategy"]],
+            strategy=None if data["strategy"] is None else Strategy[data["strategy"]],
             percentage=data["percentage"],
             percentage_gap=data["percentage_gap"],
             max_points=data["max_points"],

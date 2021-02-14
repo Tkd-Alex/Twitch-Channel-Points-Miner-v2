@@ -1,4 +1,6 @@
 import json
+import os
+from pathlib import Path
 
 
 class Settings(object):
@@ -7,8 +9,14 @@ class Settings(object):
 
     @classmethod
     def write(cls, fname):
-        with open(fname, "w") as fp:
-            json.dump(cls.streamers_settings, fp, sort_keys=True, indent=4)
+        fname = (
+            fname
+            if fname is not None
+            else os.path.join(Path().absolute(), "settings.json")
+        )
+        if cls.streamers_settings != cls.read(fname):
+            with open(fname, "w") as fp:
+                json.dump(cls.streamers_settings, fp, sort_keys=True, indent=4)
 
     @classmethod
     def append(cls, streamer):
@@ -21,10 +29,11 @@ class Settings(object):
             }
         )
 
+    # Get StreamerSettings as args, prevent circular imports
     @staticmethod
-    def parse(data):
-        return None
+    def parse(data, StreamerSettings):
+        return None if data is None else StreamerSettings.from_dict(data)
 
     @staticmethod
     def read(fname):
-        return json.load(open(fname, "r"))
+        return json.load(open(fname, "r")) if os.path.isfile(fname) else []

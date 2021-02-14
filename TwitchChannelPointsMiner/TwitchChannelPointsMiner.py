@@ -8,7 +8,6 @@ import sys
 import threading
 import time
 import uuid
-from collections import OrderedDict
 from datetime import datetime
 
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
@@ -44,6 +43,7 @@ class TwitchChannelPointsMiner:
         "username",
         "twitch",
         "claim_drops_startup",
+        "refresh_streamers",
         "streamers",
         "events_predictions",
         "minute_watcher_thread",
@@ -59,6 +59,7 @@ class TwitchChannelPointsMiner:
         self,
         username: str,
         claim_drops_startup: bool = False,
+        refresh_streamers: int = 60,  # Minutes
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
         # Default values for all streamers
@@ -78,6 +79,7 @@ class TwitchChannelPointsMiner:
         self.twitch = Twitch(self.username, user_agent)
 
         self.claim_drops_startup = claim_drops_startup
+        self.refresh_streamers = refresh_streamers
         self.streamers = []
         self.events_predictions = {}
         self.minute_watcher_thread = None
@@ -93,10 +95,12 @@ class TwitchChannelPointsMiner:
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
 
-    def mine(self, streamers: list = [], followers=False, streamers_json=None):
-        self.run(streamers, followers)
+    def mine(self, streamers: list = [], streamers_json=None, followers=False):
+        self.run(
+            streamers=streamers, streamers_json=streamers_json, followers=followers
+        )
 
-    def run(self, streamers: list = [], followers=False, streamers_json=None):
+    def run(self, streamers: list = [], streamers_json=None, followers=False):
         if self.running:
             logger.error("You can't start multiple sessions of this instance!")
         else:
@@ -111,78 +115,11 @@ class TwitchChannelPointsMiner:
             if self.claim_drops_startup is True:
                 self.twitch.claim_all_drops_from_inventory()
 
-            streamers_name: list = []
-            streamers_dict: dict = {}
-
-            for streamer in streamers:
-                username = (
-                    streamer.username
-                    if isinstance(streamer, Streamer)
-                    else streamer.lower().strip()
-                )
-                streamers_name.append(username)
-                streamers_dict[username] = streamer
-
-            if followers is True:
-                followers_array = self.twitch.get_followers()
-                logger.info(
-                    f"Load {len(followers_array)} followers from your profile!",
-                    extra={"emoji": ":clipboard:"},
-                )
-                for username in followers_array:
-                    if username not in streamers_dict:
-                        streamers_dict[username] = username.lower().strip()
-            else:
-                followers_array = []
-
-            streamers_name = list(
-                OrderedDict.fromkeys(streamers_name + followers_array)
+            self.streamers = self.__reload_streamers(
+                streamers=streamers,
+                streamers_json=streamers_json,
+                followers=followers,
             )
-
-            logger.info(
-                f"Loading data for {len(streamers_name)} streamers. Please wait...",
-                extra={"emoji": ":nerd_face:"},
-            )
-            for username in streamers_name:
-                time.sleep(random.uniform(0.3, 0.7))
-                try:
-
-                    if isinstance(streamers_dict[username], Streamer) is True:
-                        streamer = streamers_dict[username]
-                    else:
-                        streamer = Streamer(username)
-
-                    streamer.channel_id = self.twitch.get_channel_id(username)
-
-                    Settings.append(streamer)  # Store in .json the original settings
-                    streamer.settings = set_default_settings(
-                        streamer.settings, Settings.streamer_settings
-                    )
-                    streamer.settings.bet = set_default_settings(
-                        streamer.settings.bet, Settings.streamer_settings.bet
-                    )
-
-                    self.streamers.append(streamer)
-                except StreamerDoesNotExistException:
-                    logger.info(
-                        f"Streamer {username} does not exist",
-                        extra={"emoji": ":cry:"},
-                    )
-
-            Settings.write("streamers.json")
-
-            # Populate the streamers with default values.
-            # 1. Load channel points and auto-claim bonus
-            # 2. Check if streamers is online
-            # 3. Check if the user is a Streamer. In thi case you can't do prediction
-            for streamer in self.streamers:
-                time.sleep(random.uniform(0.3, 0.7))
-                self.twitch.load_channel_points_context(streamer)
-                self.twitch.check_streamer_online(streamer)
-                self.twitch.viewer_is_mod(streamer)
-                if streamer.viewer_is_mod is True:
-                    streamer.settings.make_predictions = False
-
             self.original_streamers = copy.deepcopy(self.streamers)
 
             # If we have at least one streamer with settings = make_predictions True
@@ -251,6 +188,7 @@ class TwitchChannelPointsMiner:
                         PubsubTopic("predictions-channel-v1", streamer=streamer)
                     )
 
+            refresh_streamers = time.time()
             while self.running:
                 time.sleep(random.uniform(20, 60))
                 # Do an external control for WebSocket. Check if the thread is running
@@ -265,6 +203,140 @@ class TwitchChannelPointsMiner:
                             f"#{index} - The last PING was sent more than 10 minutes ago. Reconnecting to the WebSocket..."
                         )
                         WebSocketsPool.handle_reconnection(self.ws_pool.ws[index])
+
+                if (time.time() - refresh_streamers) / 60 > self.refresh_streamers:
+                    self.refresh_streamers = time.time()
+                    self.streamers = self.__reload_streamers(
+                        streamers=streamers,
+                        streamers_json=streamers_json,
+                        followers=followers,
+                    )
+                    # We can't do again copy.deepcopy :(
+                    for index in range(self.streamers):
+                        if index in self.original_streamers:
+                            if self.original_streamers[index] != self.streamers[index]:
+                                self.original_streamers.insert(
+                                    index, copy.deepcopy(self.streamers[index])
+                                )
+                        else:
+                            self.original_streamers.append(
+                                copy.deepcopy(self.streamers[index])
+                            )
+
+    def __reload_streamers(
+        self, streamers: list = [], streamers_json=None, followers: bool = False
+    ):
+        streamers_array = []
+        Settings.streamers_settings = []
+
+        # Init value to empty list or dict is self.streamers == [].
+        # else init with current values.
+        if self.streamers == []:
+            streamers_name: list = []
+            streamers_dict: dict = {}
+        else:
+            for streamer in self.streamers:
+                streamers_name.append(streamer.username)
+                streamers_dict[streamer.username] = streamer
+
+        # In the run.py a username can insert a "username" string or Streamer istance
+        for streamer in streamers:
+            username = (
+                streamer.username
+                if isinstance(streamer, Streamer)
+                else streamer.lower().strip()
+            )
+            streamers_name.append(username)
+            streamers_dict[username] = (
+                streamer
+                if isinstance(streamer, Streamer) is True
+                else Streamer(streamer)
+            )
+        logger.info(
+            f"Load {len(streamers)} streamers from: STREAMERS",
+            extra={"emoji": ":clipboard:"},
+        )
+
+        # Steps.
+        #   1. Read json file and iterate.
+        #   2. If this user It's already in list just parse the json file and update the settings
+        #   3. If this user It's not in list append the new Streamer
+        if streamers_json is not None:
+            json_streamers = Settings.read(streamers_json)
+            for streamer_dict in json_streamers:
+                username = streamer_dict["username"]
+                streamer = Streamer(
+                    username,
+                    settings=Settings.parse(
+                        streamer_dict["settings"], StreamerSettings
+                    ),
+                )
+                if username not in streamers_dict:
+                    streamers_name.append(username)
+                    streamers_dict[username] = streamer
+                else:
+                    streamers_dict[username].settings = streamer.settings
+            logger.info(
+                f"Load {len(json_streamers)} streamers from: JSON FILE",
+                extra={"emoji": ":clipboard:"},
+            )
+
+        if followers is True:
+            followers_array = self.twitch.get_followers()
+            for username in followers_array:
+                if username not in streamers_dict:
+                    streamers_dict[username] = Streamer(username.lower().strip())
+                    streamers_name.append(username)
+            logger.info(
+                f"Load {len(followers_array)} streamers from: FOLLOWERS",
+                extra={"emoji": ":clipboard:"},
+            )
+
+        logger.info(
+            f"Loading data for {len(streamers_name)} streamers. Please wait...",
+            extra={"emoji": ":nerd_face:"},
+        )
+        for username in streamers_name:
+            if streamer.init_processed is False:
+                time.sleep(random.uniform(0.3, 0.7))
+                try:
+                    streamer = streamers_dict[username]
+                    streamer.channel_id = self.twitch.get_channel_id(username)
+
+                    Settings.append(streamer)  # Store in .json the original settings
+                    # Init all the missing settings with a default value
+                    streamer.settings = set_default_settings(
+                        streamer.settings, Settings.streamer_settings
+                    )
+                    streamer.settings.bet = set_default_settings(
+                        streamer.settings.bet, Settings.streamer_settings.bet
+                    )
+
+                    streamers_array.append(streamer)
+                except StreamerDoesNotExistException:
+                    logger.info(
+                        f"Streamer {username} does not exist",
+                        extra={"emoji": ":cry:"},
+                    )
+
+        Settings.write(streamers_json)
+
+        # Populate the streamers with default values.
+        # 1. Load channel points and auto-claim bonus
+        # 2. Check if streamers is online
+        # 3. Check if the user is a Streamer. In this case you can't do prediction
+        for streamer in streamers_array:
+            if streamer.init_processed is False:
+                time.sleep(random.uniform(0.3, 0.7))
+                self.twitch.load_channel_points_context(streamer)
+                self.twitch.check_streamer_online(streamer)
+                self.twitch.viewer_is_mod(streamer)
+                if streamer.viewer_is_mod is True:
+                    streamer.settings.make_predictions = False
+
+                streamer.init_processed = True
+
+        return streamers_array
 
     def end(self, signum, frame):
         logger.info("CTRL+C Detected! Please wait just a moments!")

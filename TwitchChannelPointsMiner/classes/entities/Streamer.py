@@ -59,7 +59,7 @@ class StreamerSettings(object):
             follow_raid=data["follow_raid"],
             claim_drops=data["claim_drops"],
             watch_streak=data["watch_streak"],
-            bet=BetSettings.from_dict(data["bet"]),
+            bet=None if data["bet"] is None else BetSettings.from_dict(data["bet"]),
         )
 
 
@@ -80,6 +80,7 @@ class Streamer(object):
         "history",
         "streamer_url",
         "chat_url",
+        "init_processed",
     ]
 
     def __init__(self, username, settings=None):
@@ -101,6 +102,7 @@ class Streamer(object):
 
         self.streamer_url = f"{URL}/{self.username}"
         self.chat_url = f"{URL}/popout/{self.username}/chat?popout="
+        self.init_processed = False
 
     def __repr__(self):
         return f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={_millify(self.channel_points)})"
