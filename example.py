@@ -46,7 +46,7 @@ twitch_miner = TwitchChannelPointsMiner(
 # If you haven't set any value even in the instance the default one will be used
 
 twitch_miner.mine(
-    [
+    streamers=[
         Streamer("streamer-username01", settings=StreamerSettings(make_predictions=True  , follow_raid=False , claim_drops=True  , watch_streak=True , bet=BetSettings(strategy=Strategy.SMART      , percentage=5 , stealth_mode=True,  percentage_gap=20 , max_points=234   , filter_condition=FilterCondition(by=OutcomeKeys.TOTAL_USERS,      where=Condition.LTE, value=800 ) ) )),
         Streamer("streamer-username02", settings=StreamerSettings(make_predictions=False , follow_raid=True  , claim_drops=False ,                     bet=BetSettings(strategy=Strategy.PERCENTAGE , percentage=5 , stealth_mode=False, percentage_gap=20 , max_points=1234  , filter_condition=FilterCondition(by=OutcomeKeys.TOTAL_POINTS,     where=Condition.GTE, value=250 ) ) )),
         Streamer("streamer-username03", settings=StreamerSettings(make_predictions=True  , follow_raid=False ,                     watch_streak=True , bet=BetSettings(strategy=Strategy.SMART      , percentage=5 , stealth_mode=False, percentage_gap=30 , max_points=50000 , filter_condition=FilterCondition(by=OutcomeKeys.ODDS,             where=Condition.LT,  value=300 ) ) )),
@@ -59,5 +59,6 @@ twitch_miner.mine(
         "streamer-username10",
         "streamer-username11"
     ],                                 # Array of streamers (order = priority)
-    followers=False                    # Automatic download the list of your followers (unable to set custom settings for you followers list)
+    followers=False,                   # Automatic download the list of your followers (unable to set custom settings for you followers list)
+    streamers_json="settings.json"     # .json file path. Where store and/or load/update streamers settings
 )
