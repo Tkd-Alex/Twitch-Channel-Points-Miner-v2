@@ -36,8 +36,7 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
         - [Example](#example)
 6. 🍪 [Migrating from old repository (the original one)](#migrating-from-old-repository-the-original-one)
 7. 🪟 [Windows](#windows)
-8. 🐛 [Contributing](#contributing)
-9. ⚠️ [Disclaimer](#disclaimer)
+8. ⚠️ [Disclaimer](#disclaimer)
 
 
 ## Community
@@ -48,6 +47,8 @@ If you want to help on this project please leave a star 🌟 and share with your
 A coffee is always a sign of LOVE ❤️
 
 <a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
+If you have any issue, or you want to contribute you are welcome! But please before read the [CONTRIBUTING.md](/CONTRIBUTING.md)
 
 ## Main difference from the original repository:
 
@@ -335,10 +336,6 @@ Other usefully infos can be founded here:
 - https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/55
 
 You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
-## Issue / Debug
-Read [CONTRIBUTING.md](/CONTRIBUTING.md)
-
-Make sure also to have the latest commit.
 
 ## Disclaimer
 This project comes with no gurantee or warranty. You are responsible for whatever happens from using this project. It is possible to get soft or hard banned by using this project if you are not careful. This is a personal project and is in no way affiliated with Twitch.
