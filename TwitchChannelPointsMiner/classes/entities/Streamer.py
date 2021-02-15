@@ -112,7 +112,7 @@ class Streamer(object):
         return ", ".join(
             [
                 f"{key}({self.history[key]['counter']} times, {_millify(self.history[key]['amount'])} gained)"
-                for key in self.history
+                for key in sorted(self.history)
                 if self.history[key]["counter"] != 0
             ]
         )
