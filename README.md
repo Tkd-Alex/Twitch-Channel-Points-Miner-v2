@@ -36,7 +36,7 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
         - [Example](#example)
 6. 🍪 [Migrating from old repository (the original one)](#migrating-from-old-repository-the-original-one)
 7. 🪟 [Windows](#windows)
-8. 🐛 [Issue / Debug](#issue--debug)
+8. 🐛 [Contributing](#contributing)
 9. ⚠️ [Disclaimer](#disclaimer)
 
 
@@ -336,11 +336,7 @@ Other usefully infos can be founded here:
 
 You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
 ## Issue / Debug
-When you open a new issue please use the correct **template**.
-Please provide at least the following information/files:
-- Operation System
-- Python Version
-- Log debug file `LoggerSettings(file_level=logging.DEBUG)`
+Read [CONTRIBUTING.md](/CONTRIBUTING.md)
 
 Make sure also to have the latest commit.
 
