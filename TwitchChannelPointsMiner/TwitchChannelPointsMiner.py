@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import copy
 import logging
 import random
 import signal
@@ -51,7 +50,7 @@ class TwitchChannelPointsMiner:
         "session_id",
         "running",
         "start_datetime",
-        "original_streamers",
+        "base_points",
         "logs_file",
     ]
 
@@ -88,7 +87,7 @@ class TwitchChannelPointsMiner:
         self.session_id = str(uuid.uuid4())
         self.running = False
         self.start_datetime = None
-        self.original_streamers = []
+        self.base_points = {}
 
         self.logs_file = configure_loggers(self.username, logger_settings)
 
@@ -120,7 +119,7 @@ class TwitchChannelPointsMiner:
                 streamers_json=streamers_json,
                 followers=followers,
             )
-            self.original_streamers = copy.deepcopy(self.streamers)
+            self.__save_original()
 
             # If we have at least one streamer with settings = make_predictions True
             make_predictions = at_least_one_value_in_settings_is(
@@ -211,17 +210,7 @@ class TwitchChannelPointsMiner:
                         streamers_json=streamers_json,
                         followers=followers,
                     )
-                    # We can't do again copy.deepcopy :(
-                    for index in range(self.streamers):
-                        if index in self.original_streamers:
-                            if self.original_streamers[index] != self.streamers[index]:
-                                self.original_streamers.insert(
-                                    index, copy.deepcopy(self.streamers[index])
-                                )
-                        else:
-                            self.original_streamers.append(
-                                copy.deepcopy(self.streamers[index])
-                            )
+                    self.__save_original()
 
     def __reload_streamers(
         self, streamers: list = [], streamers_json=None, followers: bool = False
@@ -229,15 +218,13 @@ class TwitchChannelPointsMiner:
         streamers_array = []
         Settings.streamers_settings = []
 
-        # Init value to empty list or dict is self.streamers == [].
-        # else init with current values.
-        if self.streamers == []:
-            streamers_name: list = []
-            streamers_dict: dict = {}
-        else:
-            for streamer in self.streamers:
-                streamers_name.append(streamer.username)
-                streamers_dict[streamer.username] = streamer
+        streamers_name: list = (
+            []
+        )  # Use for remove duplicate with followers + keep order from array
+        streamers_dict: dict = {}  # Use for prevent duplicate and easy access
+        for streamer in self.streamers:
+            streamers_name.append(streamer.username)
+            streamers_dict[streamer.username] = streamer
 
         # In the run.py a username can insert a "username" string or Streamer istance
         for streamer in streamers:
@@ -246,14 +233,15 @@ class TwitchChannelPointsMiner:
                 if isinstance(streamer, Streamer)
                 else streamer.lower().strip()
             )
-            streamers_name.append(username)
-            streamers_dict[username] = (
-                streamer
-                if isinstance(streamer, Streamer) is True
-                else Streamer(streamer)
-            )
+            if username not in streamers_dict:
+                streamers_name.append(username)
+                streamers_dict[username] = (
+                    streamer
+                    if isinstance(streamer, Streamer) is True
+                    else Streamer(streamer)
+                )
         logger.info(
-            f"Load {len(streamers)} streamers from: STREAMERS",
+            f"Load {len(streamers)} streamers from: [STREAMERS]",
             extra={"emoji": ":clipboard:"},
         )
 
@@ -275,9 +263,10 @@ class TwitchChannelPointsMiner:
                     streamers_name.append(username)
                     streamers_dict[username] = streamer
                 else:
+                    # Get settings form json
                     streamers_dict[username].settings = streamer.settings
             logger.info(
-                f"Load {len(json_streamers)} streamers from: JSON FILE",
+                f"Load {len(json_streamers)} streamers from: [JSON FILE]",
                 extra={"emoji": ":clipboard:"},
             )
 
@@ -288,36 +277,44 @@ class TwitchChannelPointsMiner:
                     streamers_dict[username] = Streamer(username.lower().strip())
                     streamers_name.append(username)
             logger.info(
-                f"Load {len(followers_array)} streamers from: FOLLOWERS",
+                f"Load {len(followers_array)} streamers from: [FOLLOWERS]",
                 extra={"emoji": ":clipboard:"},
             )
 
+        count = len(
+            [
+                username
+                for username in streamers_dict
+                if streamers_dict[username].init_processed is False
+            ]
+        )
         logger.info(
-            f"Loading data for {len(streamers_name)} streamers. Please wait...",
+            f"Loading data for new {count} streamers. Please wait...",
             extra={"emoji": ":nerd_face:"},
         )
         for username in streamers_name:
-            if streamer.init_processed is False:
-                time.sleep(random.uniform(0.3, 0.7))
-                try:
-                    streamer = streamers_dict[username]
+            try:
+                streamer = streamers_dict[username]
+                Settings.append(streamer)  # Store in .json the original settings
+                logger.info(f"{streamer} - INIT PROCESSED: {streamer.init_processed}")
+                if streamer.init_processed is False:
+                    time.sleep(random.uniform(0.3, 0.7))
                     streamer.channel_id = self.twitch.get_channel_id(username)
 
-                    Settings.append(streamer)  # Store in .json the original settings
-                    # Init all the missing settings with a default value
-                    streamer.settings = set_default_settings(
-                        streamer.settings, Settings.streamer_settings
-                    )
-                    streamer.settings.bet = set_default_settings(
-                        streamer.settings.bet, Settings.streamer_settings.bet
-                    )
+                # Init all the missing settings with a default value
+                streamer.settings = set_default_settings(
+                    streamer.settings, Settings.streamer_settings
+                )
+                streamer.settings.bet = set_default_settings(
+                    streamer.settings.bet, Settings.streamer_settings.bet
+                )
 
-                    streamers_array.append(streamer)
-                except StreamerDoesNotExistException:
-                    logger.info(
-                        f"Streamer {username} does not exist",
-                        extra={"emoji": ":cry:"},
-                    )
+                streamers_array.append(streamer)
+            except StreamerDoesNotExistException:
+                logger.info(
+                    f"Streamer {username} does not exist",
+                    extra={"emoji": ":cry:"},
+                )
 
         Settings.write(streamers_json)
 
@@ -337,6 +334,11 @@ class TwitchChannelPointsMiner:
                 streamer.init_processed = True
 
         return streamers_array
+
+    def __save_original(self):
+        for streamer in self.streamers:
+            if streamer.username not in self.base_points:
+                self.base_points[streamer.username] = streamer.channel_points
 
     def end(self, signum, frame):
         logger.info("CTRL+C Detected! Please wait just a moments!")
@@ -395,14 +397,13 @@ class TwitchChannelPointsMiner:
                     )
 
         print("")
-        for streamer_index in range(0, len(self.streamers)):
-            if self.streamers[streamer_index].history != {}:
+        for streamer in self.streamers:
+            if streamer.history != {}:
                 logger.info(
-                    f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(self.streamers[streamer_index].channel_points - self.original_streamers[streamer_index].channel_points)}",
+                    f"{repr(streamer)}, Total Points Gained (after farming - before farming): {_millify(streamer.channel_points - self.base_points[streamer.username])}",
                     extra={"emoji": ":robot:"},
                 )
-                if self.streamers[streamer_index].history != {}:
-                    logger.info(
-                        f"{self.streamers[streamer_index].print_history()}",
-                        extra={"emoji": ":moneybag:"},
-                    )
+                logger.info(
+                    f"{streamer.print_history()}",
+                    extra={"emoji": ":moneybag:"},
+                )
