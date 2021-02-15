@@ -1,6 +1,9 @@
 import json
+import logging
 import os
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(object):
@@ -36,4 +39,8 @@ class Settings(object):
 
     @staticmethod
     def read(fname):
-        return json.load(open(fname, "r")) if os.path.isfile(fname) else []
+        try:
+            return json.load(open(fname, "r")) if os.path.isfile(fname) else []
+        except json.decoder.JSONDecodeError:
+            logger.error(f"Failed to read {fname}", exc_info=True)
+            return []

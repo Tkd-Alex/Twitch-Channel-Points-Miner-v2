@@ -8,6 +8,7 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, Streame
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
+    refresh_streamers=60,                       # Refresh the streamers list (followers and .json file) each x minutes
     claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in file (suggested)
