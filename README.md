@@ -334,7 +334,7 @@ Other usefully infos can be founded here:
 - https://github.com/gottagofaster236/Twitch-Channel-Points-Miner/issues/31
 - https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/55
 
-You can also follow this [video tutorial](https://www.youtube.com/watch?v=hoPyNwAk97U&t=1s). It's for the first version of the miner, but the setup It's the same.
+You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
 ## Issue / Debug
 When you open a new issue please use the correct **template**.
 Please provide at least the following information/files:
