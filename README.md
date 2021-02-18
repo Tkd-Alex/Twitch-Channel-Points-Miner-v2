@@ -20,7 +20,7 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
 
 # README Contents
 1. 🤝 [Community](#community)
-2. 🚀 [Main difference from the original repository](#main-difference-from-the-original-repository)
+2. 🚀 [Main differences from the original repository](#main-differences-from-the-original-repository)
 3. 🧾 [Logs feature](#logs-feature)
     - [Full logs](#full-logs)
     - [Less logs](#less-logs)
@@ -50,7 +50,7 @@ A coffee is always a sign of LOVE ❤️
 
 If you have any issue, or you want to contribute you are welcome! But please before read the [CONTRIBUTING.md](/CONTRIBUTING.md)
 
-## Main difference from the original repository:
+## Main differences from the original repository:
 
 - Improve the logging
 - Final report with all the datas
@@ -288,7 +288,7 @@ Here a concrete example:
 - **MOST_VOTED**: 21 Users have select **'over 7.5'**, instead of 9 'under 7.5'
 - **HIGH_ODDS**: The highest odd is 2.27 on **'over 7.5'** vs 1.79 on 'under 7.5'
 - **PERCENTAGE**: The highest percentage is 56% for **'under 7.5'**
-- **SMART**: Calculate the percentage based on the users. The percentage are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percatage are highter thant `percentage_gap` select the highest percentage, else the highest odds.
+- **SMART**: Calculate the percentage based on the users. The percentages are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percentages are higher than `percentage_gap` select the highest percentage, else the highest odds.
 In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 ### FilterCondition
 | Key         	| Type        	| Default 	| Description                                                                      	|
