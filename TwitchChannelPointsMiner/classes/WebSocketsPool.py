@@ -32,7 +32,7 @@ class WebSocketsPool:
 
     """
     API Limits
-    - Clients can listen on up to 50 topics per connection. Trying to listen on more topics will result in an error message.
+    - Clients can listen to up to 50 topics per connection. Trying to listen to more topics will result in an error message.
     - We recommend that a single client IP address establishes no more than 10 simultaneous connections.
     The two limits above are likely to be relaxed for approved third-party applications, as we start to better understand third-party requirements.
     """
@@ -124,7 +124,7 @@ class WebSocketsPool:
         # Reconnect only if ws.forced_close is False (replace the keep_running)
 
         # Set the current socket as reconnecting status
-        # So the exsternal ping check will be locked
+        # So the external ping check will be locked
         ws.is_reconneting = True
 
         if ws.forced_close is False:
