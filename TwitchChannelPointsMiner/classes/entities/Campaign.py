@@ -50,3 +50,19 @@ class Campaign(object):
             return self.id == other.id
         else:
             return False
+
+    def sync_drops(self, drops, callback):
+        # Iterate all the drops from inventory
+        for drop in drops:
+            # Iterate all the drops from out campaigns array
+            # After id match update with:
+            # [currentMinutesWatched, hasPreconditionsMet, dropInstanceID, isClaimed]
+            for i in range(len(self.drops)):
+                current_id = self.drops[i].id
+                if drop["id"] == current_id:
+                    self.drops[i].update(drop["self"])
+                    # If after update we all conditions are meet we can claim the drop
+                    if self.drops[i].is_claimable is True:
+                        claimed = callback(self.drops[i])
+                        self.drops[i].is_claimed = claimed
+                    break

@@ -30,7 +30,7 @@ class Drop(object):
         )
         self.minutes_required = dict["requiredMinutesWatched"]
 
-        self.has_preconditions_met = False
+        self.has_preconditions_met = None  # [True, False], None we don't know
         self.current_minutes_watched = 0
         self.drop_instance_id = None
         self.is_claimed = False

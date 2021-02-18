@@ -126,3 +126,11 @@ class Streamer(object):
 
     def stream_up_elapsed(self):
         return self.stream_up == 0 or ((time.time() - self.stream_up) > 120)
+
+    def drops_condition(self):
+        return (
+            self.settings.claim_drops is True
+            and self.is_online is True
+            and self.stream.drops_tags is True
+            and self.stream.campaigns_ids != []
+        )

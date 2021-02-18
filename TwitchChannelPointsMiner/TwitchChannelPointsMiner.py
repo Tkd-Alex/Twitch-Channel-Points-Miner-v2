@@ -48,7 +48,7 @@ class TwitchChannelPointsMiner:
         "streamers",
         "events_predictions",
         "minute_watcher_thread",
-        "sync_drops_inventory_thread",
+        "sync_campaigns_thread",
         "ws_pool",
         "session_id",
         "running",
@@ -86,7 +86,7 @@ class TwitchChannelPointsMiner:
         self.streamers = []
         self.events_predictions = {}
         self.minute_watcher_thread = None
-        self.sync_drops_inventory_thread = None
+        self.sync_campaigns_thread = None
         self.ws_pool = None
 
         self.session_id = str(uuid.uuid4())
@@ -196,12 +196,12 @@ class TwitchChannelPointsMiner:
                 at_least_one_value_in_settings_is(self.streamers, "claim_drops", True)
                 is True
             ):
-                self.sync_drops_inventory_thread = threading.Thread(
-                    target=self.twitch.sync_drops_inventory,
+                self.sync_campaigns_thread = threading.Thread(
+                    target=self.twitch.sync_campaigns,
                     args=(self.streamers,),
                 )
-                self.sync_drops_inventory_thread.name = "Sync drops inventory"
-                self.sync_drops_inventory_thread.start()
+                self.sync_campaigns_thread.name = "Sync drops inventory"
+                self.sync_campaigns_thread.start()
                 time.sleep(30)
 
             self.minute_watcher_thread = threading.Thread(
@@ -271,8 +271,8 @@ class TwitchChannelPointsMiner:
         if self.minute_watcher_thread is not None:
             self.minute_watcher_thread.join()
 
-        if self.sync_drops_inventory_thread is not None:
-            self.sync_drops_inventory_thread.join()
+        if self.sync_campaigns_thread is not None:
+            self.sync_campaigns_thread.join()
 
         time.sleep(1)
         self.__print_report()
