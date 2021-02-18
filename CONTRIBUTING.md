@@ -97,7 +97,7 @@ For content changes, make sure that you:
 When you open a pull request, you must fill out the "Ready for review" template before we can review your PR. This template helps reviewers understand your changes and the purpose of your pull request.
 
 ### Python Styleguide
-All Python code is lined with [Black](https://github.com/psf/black) using the default settings. Your code will not be accepted if it is not blackened.
+All Python code is formatted with [Black](https://github.com/psf/black) using the default settings. Your code will not be accepted if it is not blackened.
 You can use the pre-commit hook.
 ```
 pip install pre-commit
