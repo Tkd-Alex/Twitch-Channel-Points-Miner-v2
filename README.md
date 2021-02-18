@@ -40,25 +40,25 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
 
 
 ## Community
-If you have any type of issue, you need help, or you just want to suggest a new feature please open a GitHub Issue. Don't write me on [Instagram](https://www.instagram.com/tkd_alex/), [Telegram](https://t.me/TkdAlex), [Discord](https://discordapp.com/users/641397388132483121), [Twitter](https://twitter.com/TkdAxel) (but you can follow me 😆) or somewhere else. If you don't have an account on this platform you can create, It's free. I do not want to be rude, but if you have a problem, maybe another user can have also the same problem and your issue can help the community. Same for the new feature, your idea can help other users, and It's beautiful to discuss between us.
+If you have any type of issue, you need help, or you just want to suggest a new feature, please open a GitHub Issue. Don't write me on [Instagram](https://www.instagram.com/tkd_alex/), [Telegram](https://t.me/TkdAlex), [Discord](https://discordapp.com/users/641397388132483121), [Twitter](https://twitter.com/TkdAxel) (but you can follow me 😆) or somewhere else. If you don't have an account on this platform, you can create it. It's free. I do not want to be rude, but if you have a problem, maybe another user can also have the same problem, and your issue can help the community. Same for the new feature, your idea can help other users, and It's beautiful to discuss between us.
 
-If you want to help on this project please leave a star 🌟 and share with your friends! 😎
+If you want to help on this project, please leave a star 🌟 and share it with your friends! 😎
 
 A coffee is always a sign of LOVE ❤️
 
 <a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
-If you have any issue, or you want to contribute you are welcome! But please before read the [CONTRIBUTING.md](/CONTRIBUTING.md)
+If you have any issues or you want to contribute, you are welcome! But please before read the [CONTRIBUTING.md](/CONTRIBUTING.md)
 
 ## Main difference from the original repository:
 
 - Improve the logging
-- Final report with all the datas
+- Final report with all the data
 - Rewrite the entire code using classe instead of module with global variables
-- Automatic download the followers list and use as input
+- Automatic download the follower's list and use it as input
 - Better 'Watch Streak' strategy in priority system [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)
 - Auto claim game drops from Twitch inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) Read more about game drops [here](https://help.twitch.tv/s/article/mission-based-drops)
-- Place the bet / make prediction and won or lose (🍀) your channel points!
+- Place the bet / make a prediction and win or lose (🍀) your channel points!
 No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/41) ([@lay295](https://github.com/lay295))
 
 ## Logs feature
@@ -178,13 +178,13 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, Streame
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
-    claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
+    claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on the startup
     logger_settings=LoggerSettings(
-        save=True,                              # If you want to save logs in file (suggested)
+        save=True,                              # If you want to save logs in a file (suggested)
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info)
-        file_level=logging.DEBUG,               # Level of logs - If you think the log file it's too big use logging.INFO
-        emoji=True,                             # On Windows we have a problem to print emoji. Set to false if you have a problem
-        less=False                              # If you think that the logs are too much verborse set this to True
+        file_level=logging.DEBUG,               # Level of logs - If you think the log file it's too big, use logging.INFO
+        emoji=True,                             # On Windows, we have a problem printing emoji. Set to false if you have a problem
+        less=False                              # If you think that the logs are too verbose, set this to True
     ),
     streamer_settings=StreamerSettings(
         make_predictions=True,                  # If you want to Bet / Make prediction
@@ -206,12 +206,12 @@ twitch_miner = TwitchChannelPointsMiner(
     )
 )
 
-# You can customize the settings for each streamer. If not settings was provided the script will use the streamer_settings from TwitchChannelPointsMiner.
-# If no streamer_settings provided in TwitchChannelPointsMiner the script will use default settings.
+# You can customize the settings for each streamer. If not settings were provided, the script would use the streamer_settings from TwitchChannelPointsMiner.
+# If no streamer_settings are provided in TwitchChannelPointsMiner the script will use default settings.
 # The streamers array can be a String -> username or Streamer instance.
 
 # The settings priority are: settings in mine function, settings in TwitchChannelPointsMiner instance, default settings.
-# For example if in the mine function you don't provide any value for 'make_prediction' but you have set it on TwitchChannelPointsMiner instance the script will take the value from here.
+# For example, if in the mine function you don't provide any value for 'make_prediction' but you have set it on TwitchChannelPointsMiner instance, the script will take the value from here.
 # If you haven't set any value even in the instance the default one will be used
 
 twitch_miner.mine(
@@ -244,7 +244,7 @@ twitch_miner.mine(["streamer1", "streamer2"], followers=True)   # Mixed
 ### Limits
 > Twitch has a limit - you can't watch more than 2 channels at one time. We take the first two streamers from the list as they have the highest priority.
 
-Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow have the highest priority.
+Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow has the highest priority.
 
 ## Settings
 
@@ -254,15 +254,15 @@ Make sure to write the streamers array in order of priority from left to right. 
 | `save`          	| bool            	| True                           	| If you want to save logs in file (suggested)                                         	                                      |
 | `less`          	| bool            	| False                          	| Reduce the logging format and message verbosity [#10](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/10) |
 | `console_level` 	| level 	        | logging.INFO                   	| Level of logs in terminal - Use logging.DEBUG for more helpful messages.             	                                      |
-| `file_level`    	| level 	        | logging.DEBUG                  	| Level of logs in file save - If you think the log file it's too big use logging.INFO 	                                      |
-| `emoji`         	| bool            	| For Windows is False else True 	| On Windows we have a problem to print emoji. Set to false if you have a problem      	                                      |
+| `file_level`    	| level 	        | logging.DEBUG                  	| Level of logs in file save - If you think the log file it's too big, use logging.INFO 	                                      |
+| `emoji`         	| bool            	| For Windows is False else True 	| On Windows, we have a problem printing emoji. Set to false if you have a problem      	                                      |
 ### StreamerSettings
 | Key                	| Type        	| Default                        	| Description                                                                                                                                          	                                                                           |
 |--------------------	|-------------	|--------------------------------	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `make_predictions` 	| bool        	| True                           	| Choose if you want to make predictions / bet or not                                                                                                  	                                                                           |
 | `follow_raid`      	| bool        	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	                                                                           |
-| `claim_drops`      	| bool        	| True                           	| If this values is True the script will increase the watch-time for the current game. With this you are able to claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) |
-| `watch_streak`     	| bool        	| True                           	| Choose if you want to change priority for this streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                     |
+| `claim_drops`      	| bool        	| True                           	| If this value is True, the script will increase the watch-time for the current game. With this, you are able to claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) |
+| `watch_streak`     	| bool        	| True                           	| Choose if you want to change a priority for these streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                     |
 | `bet`              	| BetSettings 	|  	                                | Rules to follow for the bet                                                                                                                                                                                                      |
 ### BetSettings
 | Key                	| Type            	| Default 	| Description                                                                                                    	                                                                     |
@@ -278,8 +278,8 @@ Make sure to write the streamers array in order of priority from left to right. 
 
 - **MOST_VOTED**: Select the option most voted based on users count
 - **HIGH_ODDS**: Select the option with the highest odds
-- **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same of select LOWEST_ODDS
-- **SMART**: If the majority in percent chose an option then follow the other users, otherwise choose the option with the highest odds
+- **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same as select LOWEST_ODDS
+- **SMART**: If the majority in percent chose an option, then follow the other users, otherwise choose the option with the highest odds
 
 ![Screenshot](./assets/prediction.png)
 
@@ -288,7 +288,7 @@ Here a concrete example:
 - **MOST_VOTED**: 21 Users have select **'over 7.5'**, instead of 9 'under 7.5'
 - **HIGH_ODDS**: The highest odd is 2.27 on **'over 7.5'** vs 1.79 on 'under 7.5'
 - **PERCENTAGE**: The highest percentage is 56% for **'under 7.5'**
-- **SMART**: Calculate the percentage based on the users. The percentage are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percatage are highter thant `percentage_gap` select the highest percentage, else the highest odds.
+- **SMART**: Calculate the percentage based on the users. The percentage are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percentages is higher than `percentage_gap` select the highest percentage, else the highest odds.
 In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 ### FilterCondition
 | Key         	| Type        	| Default 	| Description                                                                      	|
@@ -310,15 +310,15 @@ Allowed values for `by` are:
 Allowed values for `where` are: `GT, LT, GTE, LTE`
 
 #### Example
-- If you want to place the bet ONLY if the total of users participants in the bet are greater than 200
+- If you want to place the bet ONLY if the total of users participants in the bet is greater than 200
 `FilterCondition(by=OutcomeKeys.TOTAL_USERS, where=Condition.GT, value=200)`
-- If you want to place the bet ONLY if the winning odd of your decision is greater than or equal 1.3
+- If you want to place the bet ONLY if the winning odd of your decision is greater than or equal to 1.3
 `FilterCondition(by=OutcomeKeys.ODDS, where=Condition.GTE, value=1.3)`
-- If you want to place the bet ONLY if highest bet is lower than 2000
+- If you want to place the bet ONLY if the highest bet is lower than 2000
 `FilterCondition(by=OutcomeKeys.TOP_POINTS, where=Condition.LT, value=2000)`
 
-## Migrating from old repository (the original one):
-If you already have a `twitch-cookies.pkl` and you don't want to login again please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
+## Migrating from an old repository (the original one):
+If you already have a `twitch-cookies.pkl` and you don't want to login again, please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
 ```
 .
 +-- run.py
@@ -331,11 +331,11 @@ Other users have find multiple problems on Windows my suggestion are:
  - Stop use Windows :stuck_out_tongue_closed_eyes:
  - Suppress the emoji in logs with `logger_settings=LoggerSettings(emoji=False)`
 
-Other usefully infos can be founded here:
+Other useful info can be founded here:
 - https://github.com/gottagofaster236/Twitch-Channel-Points-Miner/issues/31
 - https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/55
 
 You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
 
 ## Disclaimer
-This project comes with no gurantee or warranty. You are responsible for whatever happens from using this project. It is possible to get soft or hard banned by using this project if you are not careful. This is a personal project and is in no way affiliated with Twitch.
+This project comes with no guarantee or warranty. You are responsible for whatever happens from using this project. It is possible to get soft or hard banned by using this project if you are not careful. This is a personal project and is in no way affiliated with Twitch.
