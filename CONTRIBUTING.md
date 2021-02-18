@@ -69,14 +69,14 @@ You can browse existing issues to find something that needs help!
 ### Labels
 Labels can help you find an issue you'd like to help with.
 - The `bug` label is used when something isn't working
-- The `documentation` label if used when you suggest improvements or additions to documentation (README.md update)
+- The `documentation` label is used when you suggest improvements or additions to documentation (README.md update)
 - The `duplicate` label is used when this issue or pull request already exists
 - The `enhancement` label is used when you ask for / or propose a new feature or request
 - The `help wanted` is used when labeling when you need help with something
-- The `improvements` label if used when you would suggest improvements on already existing features
-- The `invalid` label if used for a non-valid issue
-- The `question` label, if used for further information is requested
-- The `wontfix` label if used if we will not work on it
+- The `improvements` label is used when you would suggest improvements on already existing features
+- The `invalid` label is used for a non-valid issue
+- The `question` label, is used for further information is requested
+- The `wontfix` label is used if we will not work on it
 
 ## Opening a pull request
 You can use the GitHub user interface :pencil2: for some small changes, like fixing a typo or updating a readme. You can also fork the repo and then clone it locally to view changes and run your tests on your machine.
