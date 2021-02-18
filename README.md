@@ -149,18 +149,13 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 		Result: {'type': 'LOSE', 'won': 0}
 
 %d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username, channel_id=0000000, channel_points=67247), Total points gained (after farming - before farming): -7838
-%d/%m/%y %H:%M:%S - 💰  WATCH(35 times, 350 gained), CLAIM(11 times, 550 gained), PREDICTION(1 times, 6531 gained)
-%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username1, channel_id=0000000, channel_points=4240), Total points gained (after farming - before farming): 0
+%d/%m/%y %H:%M:%S - 💰  CLAIM(11 times, 550 gained), PREDICTION(1 times, 6531 gained), WATCH(35 times, 350 gained)
 %d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username2, channel_id=0000000, channel_points=61365), Total points gained (after farming - before farming): 977
-%d/%m/%y %H:%M:%S - 💰  WATCH(11 times, 132 gained), REFUND(1 times, 605 gained), CLAIM(4 times, 240 gained)
-%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username3, channel_id=0000000, channel_points=6815), Total points gained (after farming - before farming): 0
-%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username4, channel_id=0000000, channel_points=16386), Total points gained (after farming - before farming): 0
+%d/%m/%y %H:%M:%S - 💰  CLAIM(4 times, 240 gained), REFUND(1 times, 605 gained), WATCH(11 times, 132 gained)
 %d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username5, channel_id=0000000, channel_points=25960), Total points gained (after farming - before farming): 1680
-%d/%m/%y %H:%M:%S - 💰  WATCH(53 times, 530 gained), CLAIM(17 times, 850 gained)
+%d/%m/%y %H:%M:%S - 💰  CLAIM(17 times, 850 gained), WATCH(53 times, 530 gained)
 %d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username6, channel_id=0000000, channel_points=9430), Total points gained (after farming - before farming): 1120
-%d/%m/%y %H:%M:%S - 💰  WATCH(42 times, 420 gained), WATCH_STREAK(1 times, 450 gained), CLAIM(14 times, 700 gained)
-%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username7, channel_id=0000000, channel_points=2380), Total points gained (after farming - before farming): 0
-%d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username8, channel_id=0000000, channel_points=10230), Total points gained (after farming - before farming): 0
+%d/%m/%y %H:%M:%S - 💰  CLAIM(14 times, 700 gained), WATCH(42 times, 420 gained), WATCH_STREAK(1 times, 450 gained)
 ```
 
 ## How to use:
