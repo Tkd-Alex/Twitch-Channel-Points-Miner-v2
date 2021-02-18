@@ -200,7 +200,7 @@ class TwitchChannelPointsMiner:
                     target=self.twitch.sync_campaigns,
                     args=(self.streamers,),
                 )
-                self.sync_campaigns_thread.name = "Sync drops inventory"
+                self.sync_campaigns_thread.name = "Sync campaigns/inventory"
                 self.sync_campaigns_thread.start()
                 time.sleep(30)
 

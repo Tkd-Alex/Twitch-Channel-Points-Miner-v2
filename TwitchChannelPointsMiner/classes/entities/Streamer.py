@@ -63,8 +63,8 @@ class Streamer(object):
     ]
 
     def __init__(self, username, settings=None):
-        self.username = username.lower().strip()
-        self.channel_id = 0
+        self.username: str = username.lower().strip()
+        self.channel_id: str = ""
         self.settings = settings
         self.is_online = False
         self.stream_up = 0

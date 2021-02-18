@@ -15,6 +15,7 @@ class Campaign(object):
         "start_at",
         "dt_match",
         "drops",
+        "channels",
     ]
 
     def __init__(self, dict):
@@ -22,6 +23,11 @@ class Campaign(object):
         self.game = dict["game"]
         self.name = dict["name"]
         self.status = dict["status"]
+        self.channels = (
+            []
+            if dict["allow"]["channels"] is None
+            else list(map(lambda x: x["id"], dict["allow"]["channels"]))
+        )
         self.in_inventory = False
 
         self.end_at = datetime.strptime(dict["endAt"], "%Y-%m-%dT%H:%M:%SZ")
