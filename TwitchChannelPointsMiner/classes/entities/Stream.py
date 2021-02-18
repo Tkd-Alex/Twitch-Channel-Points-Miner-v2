@@ -17,12 +17,13 @@ class Stream(object):
         "tags",
         "drops_tags",
         "campaigns",
+        "campaigns_ids",
         "viewers_count",
-        "__last_update",
         "spade_url",
         "payload",
         "watch_streak_missing",
         "minute_watched",
+        "__last_update",
         "__minute_watched_timestamp",
     ]
 
