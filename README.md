@@ -45,6 +45,10 @@ If you have any type of issue, you need help, or you just want to suggest a new 
 
 If you want to help on this project please leave a star 🌟 and share with your friends! 😎
 
+A coffee is always a sign of LOVE ❤️
+
+<a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 ## Main difference from the original repository:
 
 - Improve the logging
@@ -330,7 +334,7 @@ Other usefully infos can be founded here:
 - https://github.com/gottagofaster236/Twitch-Channel-Points-Miner/issues/31
 - https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/55
 
-You can also follow this [video tutorial](https://www.youtube.com/watch?v=hoPyNwAk97U&t=1s). It's for the first version of the miner, but the setup It's the same.
+You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
 ## Issue / Debug
 When you open a new issue please use the correct **template**.
 Please provide at least the following information/files:

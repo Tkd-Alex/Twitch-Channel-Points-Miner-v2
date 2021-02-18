@@ -341,7 +341,7 @@ class Twitch(object):
                     extra={"emoji": ":pushpin:"},
                 )
             else:
-                if decision["amount"] > 0:
+                if decision["amount"] >= 10:
                     logger.info(
                         f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
                         extra={"emoji": ":four_leaf_clover:"},
