@@ -172,12 +172,18 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 import logging
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings
+from TwitchChannelPointsMiner.classes.Settings import Priority
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
     claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
+    priority=[                                  # Custom priority in this case for example:
+        Priority.DROPS,                         # - we want first of all to collect all drops
+        Priority.STREAK,                        # - after all drops are collected do priority on watch-streak
+        Priority.ORDER                          # - when we have all of drops claimed and no watch-streak avaialable use the order priority
+    ],
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in file (suggested)
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info)
@@ -198,7 +204,7 @@ twitch_miner = TwitchChannelPointsMiner(
             stealth_mode=True,                  # If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points #33
             filter_condition=FilterCondition(
                 by=OutcomeKeys.TOTAL_USERS,    # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
-                where=Condition.LTE,           # 'by' must be [GT, LT, GTE, LTE] than value
+                where=Condition.LTE,           # The key must be [GT, LT, GTE, LTE] than value
                 value=800
             )
         )

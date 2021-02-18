@@ -3,12 +3,18 @@
 import logging
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings
+from TwitchChannelPointsMiner.classes.Settings import Priority
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
     claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
+    priority=[                                  # Custom priority in this case for example:
+        Priority.DROPS,                         # - we want first of all to collect all drops
+        Priority.STREAK,                        # - after all drops are collected do priority on watch-streak
+        Priority.ORDER                          # - when we have all of drops claimed and no watch-streak avaialable use the order priority
+    ],
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in file (suggested)
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info)
