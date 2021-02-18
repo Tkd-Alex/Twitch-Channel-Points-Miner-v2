@@ -66,7 +66,7 @@ class TwitchChannelPointsMiner:
     ):
         self.username = username
 
-        # Set as globally config
+        # Set as global config
         Settings.logger = logger_settings
 
         # Init as default all the missing values
@@ -169,7 +169,7 @@ class TwitchChannelPointsMiner:
 
             # Populate the streamers with default values.
             # 1. Load channel points and auto-claim bonus
-            # 2. Check if streamers is online
+            # 2. Check if streamers are online
             # 3. Check if the user is a Streamer. In thi case you can't do prediction
             for streamer in self.streamers:
                 time.sleep(random.uniform(0.3, 0.7))
@@ -263,7 +263,7 @@ class TwitchChannelPointsMiner:
                         WebSocketsPool.handle_reconnection(self.ws_pool.ws[index])
 
     def end(self, signum, frame):
-        logger.info("CTRL+C Detected! Please wait just a moments!")
+        logger.info("CTRL+C Detected! Please wait just a moment!")
 
         self.running = self.twitch.running = False
         self.ws_pool.end()
