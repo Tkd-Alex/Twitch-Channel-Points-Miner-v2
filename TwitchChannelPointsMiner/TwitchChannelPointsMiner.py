@@ -28,6 +28,8 @@ from TwitchChannelPointsMiner.utils import (
     internet_connection_available,
     set_default_settings,
 )
+from colorama import init
+init()
 
 # Suppress:
 #   - chardet.charsetprober - [feed]
