@@ -179,7 +179,8 @@ twitch_miner = TwitchChannelPointsMiner(
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info)
         file_level=logging.DEBUG,               # Level of logs - If you think the log file it's too big, use logging.INFO
         emoji=True,                             # On Windows, we have a problem printing emoji. Set to false if you have a problem
-        less=False                              # If you think that the logs are too verbose, set this to True
+        less=False,                             # If you think that the logs are too verbose, set this to True
+        colored=True                            # If you want to print colored text
     ),
     streamer_settings=StreamerSettings(
         make_predictions=True,                  # If you want to Bet / Make prediction
@@ -249,8 +250,9 @@ Make sure to write the streamers array in order of priority from left to right. 
 | `save`          	| bool            	| True                           	| If you want to save logs in file (suggested)                                         	                                      |
 | `less`          	| bool            	| False                          	| Reduce the logging format and message verbosity [#10](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/10) |
 | `console_level` 	| level 	        | logging.INFO                   	| Level of logs in terminal - Use logging.DEBUG for more helpful messages.             	                                      |
-| `file_level`    	| level 	        | logging.DEBUG                  	| Level of logs in file save - If you think the log file it's too big, use logging.INFO 	                                      |
-| `emoji`         	| bool            	| For Windows is False else True 	| On Windows, we have a problem printing emoji. Set to false if you have a problem      	                                      |
+| `file_level`    	| level 	        | logging.DEBUG                  	| Level of logs in file save - If you think the log file it's too big, use logging.INFO 	                                  |
+| `emoji`         	| bool            	| For Windows is False else True 	| On Windows, we have a problem printing emoji. Set to false if you have a problem      	                                  |
+| `colored`         | bool            	| True 	                            | If you want to print colored text      	                                                                                  |
 ### StreamerSettings
 | Key                	| Type        	| Default                        	| Description                                                                                                                                          	                                                                           |
 |--------------------	|-------------	|--------------------------------	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

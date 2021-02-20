@@ -38,7 +38,7 @@ class GlobalFormatter(logging.Formatter):
             # Full remove using a method from utils.
             record.msg = remove_emoji(record.msg)
 
-        if hasattr(record, "color"):
+        if self.print_colored and hasattr(record, "color"):
             record.msg = f"{record.color}{record.msg}{Style.RESET_ALL}"
 
         return super().format(record)
