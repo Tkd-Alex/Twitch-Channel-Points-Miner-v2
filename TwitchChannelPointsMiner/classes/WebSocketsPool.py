@@ -4,7 +4,7 @@ import random
 import threading
 import time
 
-from colorama import Fore, Style
+from colorama import Fore
 from dateutil import parser
 
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
@@ -308,21 +308,10 @@ class WebSocketsPool:
                                     else 0
                                 )
                                 points_prefix = "+" if points_gained >= 0 else ""
-                                if result_type == "WIN":
-                                    logger.info(
-                                        Fore.GREEN +
-                                        f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {points_prefix}{_millify(points_gained)}" +
-                                        Style.RESET_ALL,
-                                        extra={"emoji": ":bar_chart:"},
-                                    )
-                                else:
-                                    logger.info(
-                                        Fore.RED +
-                                        f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {points_prefix}{_millify(points_gained)}" +
-                                        Style.RESET_ALL,
-                                        extra={"emoji": ":bar_chart:"},
-                                    )
-
+                                logger.info(
+                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {points_prefix}{_millify(points_gained)}",
+                                    extra={"emoji": ":bar_chart:", "color": Fore.GREEN if result_type == "WIN" else Fore.RED},
+                                )
                                 ws.events_predictions[event_id].final_result = {
                                     "type": event_result["type"],
                                     "points_won": points_won,

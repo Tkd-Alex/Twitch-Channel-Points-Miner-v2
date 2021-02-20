@@ -5,13 +5,15 @@ from datetime import datetime
 from pathlib import Path
 
 import emoji
+from colorama import Style
 
 from TwitchChannelPointsMiner.utils import remove_emoji
 
 
-class EmojiFormatter(logging.Formatter):
-    def __init__(self, *, fmt, datefmt=None, print_emoji=True):
+class GlobalFormatter(logging.Formatter):
+    def __init__(self, *, fmt, datefmt=None, print_emoji=True, print_colored=False):
         self.print_emoji = print_emoji
+        self.print_colored = print_colored
         logging.Formatter.__init__(self, fmt=fmt, datefmt=datefmt)
 
     def format(self, record):
@@ -36,6 +38,9 @@ class EmojiFormatter(logging.Formatter):
             # Full remove using a method from utils.
             record.msg = remove_emoji(record.msg)
 
+        if hasattr(record, "color"):
+            record.msg = f"{record.color}{record.msg}{Style.RESET_ALL}"
+
         return super().format(record)
 
 
@@ -47,12 +52,14 @@ class LoggerSettings:
         console_level: int = logging.INFO,
         file_level: int = logging.DEBUG,
         emoji: bool = platform.system() != "Windows",
+        colored: bool = False,
     ):
         self.save = save
         self.less = less
         self.console_level = console_level
         self.file_level = file_level
         self.emoji = emoji
+        self.colored = colored
 
 
 def configure_loggers(username, settings):
@@ -62,7 +69,7 @@ def configure_loggers(username, settings):
     console_handler = logging.StreamHandler()
     console_handler.setLevel(settings.console_level)
     console_handler.setFormatter(
-        EmojiFormatter(
+        GlobalFormatter(
             fmt=(
                 "%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s"
                 if settings.less is False
@@ -72,6 +79,7 @@ def configure_loggers(username, settings):
                 "%d/%m/%y %H:%M:%S" if settings.less is False else "%d/%m %H:%M:%S"
             ),
             print_emoji=settings.emoji,
+            print_colored=settings.colored,
         )
     )
     root_logger.addHandler(console_handler)
@@ -85,10 +93,11 @@ def configure_loggers(username, settings):
         )
         file_handler = logging.FileHandler(logs_file, "w", "utf-8")
         file_handler.setFormatter(
-            EmojiFormatter(
+            GlobalFormatter(
                 fmt="%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s",
                 datefmt="%d/%m/%y %H:%M:%S",
                 print_emoji=settings.emoji,
+                print_colored=settings.colored,
             )
         )
         file_handler.setLevel(settings.file_level)
