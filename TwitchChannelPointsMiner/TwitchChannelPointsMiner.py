@@ -29,6 +29,7 @@ from TwitchChannelPointsMiner.utils import (
     set_default_settings,
 )
 from colorama import init
+
 init()
 
 # Suppress:

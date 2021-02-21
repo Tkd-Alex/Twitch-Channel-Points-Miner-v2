@@ -310,7 +310,12 @@ class WebSocketsPool:
                                 points_prefix = "+" if points_gained >= 0 else ""
                                 logger.info(
                                     f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {points_prefix}{_millify(points_gained)}",
-                                    extra={"emoji": ":bar_chart:", "color": Fore.GREEN if result_type == "WIN" else Fore.RED},
+                                    extra={
+                                        "emoji": ":bar_chart:",
+                                        "color": Fore.GREEN
+                                        if result_type == "WIN"
+                                        else Fore.RED,
+                                    }
                                 )
                                 ws.events_predictions[event_id].final_result = {
                                     "type": event_result["type"],
