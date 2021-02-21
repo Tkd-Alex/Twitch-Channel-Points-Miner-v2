@@ -315,7 +315,7 @@ class WebSocketsPool:
                                         "color": Fore.GREEN
                                         if result_type == "WIN"
                                         else Fore.RED,
-                                    }
+                                    },
                                 )
                                 ws.events_predictions[event_id].final_result = {
                                     "type": event_result["type"],
