@@ -95,7 +95,8 @@ class BetSettings(object):
 
 
 class Bet(object):
-    __slots__ = ["outcomes", "decision", "total_users", "total_points", "settings"]
+    __slots__ = ["outcomes", "decision",
+                 "total_users", "total_points", "settings"]
 
     def __init__(self, outcomes: list, settings: BetSettings):
         self.outcomes = outcomes
@@ -144,7 +145,8 @@ class Bet(object):
                     / self.total_users
                 )
                 self.outcomes[index][OutcomeKeys.ODDS] = float_round(
-                    self.total_points / self.outcomes[index][OutcomeKeys.TOTAL_POINTS]
+                    self.total_points /
+                    self.outcomes[index][OutcomeKeys.TOTAL_POINTS]
                 )
                 self.outcomes[index][OutcomeKeys.ODDS_PERCENTAGE] = float_round(
                     100 / self.outcomes[index][OutcomeKeys.ODDS]
@@ -227,11 +229,13 @@ class Bet(object):
     def calculate(self, balance: int) -> dict:
         self.decision = {"choice": None, "amount": 0, "id": None}
         if self.settings.strategy == Strategy.MOST_VOTED:
-            self.decision["choice"] = self.__return_choice(OutcomeKeys.TOTAL_USERS)
+            self.decision["choice"] = self.__return_choice(
+                OutcomeKeys.TOTAL_USERS)
         elif self.settings.strategy == Strategy.HIGH_ODDS:
             self.decision["choice"] = self.__return_choice(OutcomeKeys.ODDS)
         elif self.settings.strategy == Strategy.PERCENTAGE:
-            self.decision["choice"] = self.__return_choice(OutcomeKeys.ODDS_PERCENTAGE)
+            self.decision["choice"] = self.__return_choice(
+                OutcomeKeys.ODDS_PERCENTAGE)
         elif self.settings.strategy == Strategy.SMART:
             difference = abs(
                 self.outcomes[0][OutcomeKeys.PERCENTAGE_USERS]
@@ -257,7 +261,8 @@ class Bet(object):
             ):
                 reduce_amount = uniform(1, 5)
                 self.decision["amount"] = (
-                    self.outcomes[index][OutcomeKeys.TOP_POINTS] - reduce_amount
+                    self.outcomes[index][OutcomeKeys.TOP_POINTS] -
+                    reduce_amount
                 )
             self.decision["amount"] = int(self.decision["amount"])
         return self.decision

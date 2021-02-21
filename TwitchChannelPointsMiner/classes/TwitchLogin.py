@@ -55,7 +55,8 @@ class TwitchLogin(object):
 
         while True:
             # self.username = input('Enter Twitch username: ')
-            password = getpass.getpass(f"Enter Twitch password for {self.username}: ")
+            password = getpass.getpass(
+                f"Enter Twitch password for {self.username}: ")
 
             post_data["username"] = self.username
             post_data["password"] = password
@@ -65,7 +66,8 @@ class TwitchLogin(object):
                 login_response = self.send_login_request(post_data)
 
                 if "captcha_proof" in login_response:
-                    post_data["captcha"] = dict(proof=login_response["captcha_proof"])
+                    post_data["captcha"] = dict(
+                        proof=login_response["captcha_proof"])
 
                 if "error_code" in login_response:
                     err_code = login_response["error_code"]
@@ -75,7 +77,8 @@ class TwitchLogin(object):
                                 "Two factor authentication enabled, please enter token below."
                             )
                         else:
-                            logger.info("Invalid two factor token, please try again.")
+                            logger.info(
+                                "Invalid two factor token, please try again.")
 
                         twofa = input("2FA token: ")
                         post_data["authy_token"] = twofa.strip()
@@ -97,7 +100,8 @@ class TwitchLogin(object):
                         continue
 
                     elif err_code == 3001:  # invalid password
-                        logger.info("Invalid username or password, please try again.")
+                        logger.info(
+                            "Invalid username or password, please try again.")
                         break
                     elif err_code == 1000:
                         logger.info(
@@ -129,7 +133,8 @@ class TwitchLogin(object):
         self.session.headers.update({"Authorization": f"Bearer {self.token}"})
 
     def send_login_request(self, json_data):
-        r = self.session.post("https://passport.twitch.tv/login", json=json_data)
+        r = self.session.post(
+            "https://passport.twitch.tv/login", json=json_data)
         j = r.json()
         return j
 
@@ -161,7 +166,8 @@ class TwitchLogin(object):
         if self.token is None:
             return False
 
-        r = self.session.get(f"https://api.twitch.tv/helix/users?login={self.username}")
+        r = self.session.get(
+            f"https://api.twitch.tv/helix/users?login={self.username}")
         response = r.json()
         if "data" in response:
             self.login_check_result = True

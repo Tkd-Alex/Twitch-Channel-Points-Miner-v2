@@ -79,7 +79,8 @@ class Twitch(object):
     def get_spade_url(self, streamer):
         try:
             headers = {"User-Agent": self.user_agent}
-            main_page_request = requests.get(streamer.streamer_url, headers=headers)
+            main_page_request = requests.get(
+                streamer.streamer_url, headers=headers)
             response = main_page_request.text
             settings_url = re.search(
                 "(https://static.twitchcdn.net/config/settings.*?js)", response
@@ -91,7 +92,8 @@ class Twitch(object):
                 '"spade_url":"(.*?)"', response
             ).group(1)
         except requests.exceptions.RequestException as e:
-            logger.error(f"Something went wrong during extraction of 'spade_url': {e}")
+            logger.error(
+                f"Something went wrong during extraction of 'spade_url': {e}")
 
     def post_gql_request(self, json_data):
         try:
@@ -126,7 +128,8 @@ class Twitch(object):
                 raise StreamerIsOfflineException
 
     def get_stream_info(self, streamer):
-        json_data = copy.deepcopy(GQLOperations.VideoPlayerStreamInfoOverlayChannel)
+        json_data = copy.deepcopy(
+            GQLOperations.VideoPlayerStreamInfoOverlayChannel)
         json_data["variables"] = {"channel": streamer.username}
         response = self.post_gql_request(json_data)
         if response != {}:
@@ -176,24 +179,27 @@ class Twitch(object):
             )
 
         json_data = copy.deepcopy(GQLOperations.DropsPage_ClaimDropRewards)
-        json_data["variables"] = {"input": {"dropInstanceID": drop_instance_id}}
+        json_data["variables"] = {
+            "input": {"dropInstanceID": drop_instance_id}}
         self.post_gql_request(json_data)
 
     def search_drop_in_inventory(self, streamer, drop_id):
         inventory = self.__get_inventory()
-        for campaign in inventory["dropCampaignsInProgress"]:
-            for drop in campaign["timeBasedDrops"]:
-                if drop["id"] == drop_id:
-                    return drop["self"]
-        raise TimeBasedDropNotFound
+        if not inventory:
+            for campaign in inventory["dropCampaignsInProgress"]:
+                for drop in campaign["timeBasedDrops"]:
+                    if drop["id"] == drop_id:
+                        return drop["self"]
+            raise TimeBasedDropNotFound
 
     def claim_all_drops_from_inventory(self):
         inventory = self.__get_inventory()
-        for campaign in inventory["dropCampaignsInProgress"]:
-            for drop in campaign["timeBasedDrops"]:
-                if drop["self"]["dropInstanceID"] is not None:
-                    self.claim_drop(drop["self"]["dropInstanceID"])
-                    time.sleep(random.uniform(10, 30))
+        if not inventory:
+            for campaign in inventory["dropCampaignsInProgress"]:
+                for drop in campaign["timeBasedDrops"]:
+                    if drop["self"]["dropInstanceID"] is not None:
+                        self.claim_drop(drop["self"]["dropInstanceID"])
+                        time.sleep(random.uniform(10, 30))
 
     def __get_inventory(self):
         response = self.post_gql_request(GQLOperations.Inventory)
@@ -213,7 +219,8 @@ class Twitch(object):
             streamer.channel_points = community_points["balance"]
 
             if community_points["availableClaim"] is not None:
-                self.claim_bonus(streamer, community_points["availableClaim"]["id"])
+                self.claim_bonus(
+                    streamer, community_points["availableClaim"]["id"])
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
@@ -300,7 +307,7 @@ class Twitch(object):
                         if len(streamers_watching) == 2:
                             break
 
-            if streamers_watching == []:
+            if not streamers_watching:
                 streamers_watching = streamers_index
             else:
                 while len(streamers_watching) < 2 and len(streamers_index) > 1:
@@ -334,7 +341,8 @@ class Twitch(object):
                     if response.status_code == 204:
                         streamers[index].stream.update_minute_watched()
                 except requests.exceptions.RequestException as e:
-                    logger.error(f"Error while trying to send minute watched: {e}")
+                    logger.error(
+                        f"Error while trying to send minute watched: {e}")
 
                     # The success rate It's very hight usually. Why we have failed?
                     # Check internet connection ...
@@ -352,11 +360,12 @@ class Twitch(object):
                     if self.running is False:
                         break
 
-            if streamers_watching == []:
+            if not streamers_watching:
                 time.sleep(60)
 
     def get_channel_id(self, streamer_username):
-        json_response = self.__do_helix_request(f"/users?login={streamer_username}")
+        json_response = self.__do_helix_request(
+            f"/users?login={streamer_username}")
         if "data" not in json_response:
             raise StreamerDoesNotExistException
         else:
@@ -376,7 +385,8 @@ class Twitch(object):
 
             json_response = self.__do_helix_request(query)
             pagination = json_response["pagination"]
-            followers += [fw["to_login"].lower() for fw in json_response["data"]]
+            followers += [fw["to_login"].lower()
+                          for fw in json_response["data"]]
             time.sleep(random.uniform(0.3, 0.7))
 
             if pagination == {}:

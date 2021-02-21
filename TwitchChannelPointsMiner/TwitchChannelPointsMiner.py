@@ -244,7 +244,8 @@ class TwitchChannelPointsMiner:
 
                 if streamer.settings.make_predictions is True:
                     self.ws_pool.submit(
-                        PubsubTopic("predictions-channel-v1", streamer=streamer)
+                        PubsubTopic("predictions-channel-v1",
+                                    streamer=streamer)
                     )
 
             while self.running:
@@ -260,7 +261,8 @@ class TwitchChannelPointsMiner:
                         logger.info(
                             f"#{index} - The last PING was sent more than 10 minutes ago. Reconnecting to the WebSocket..."
                         )
-                        WebSocketsPool.handle_reconnection(self.ws_pool.ws[index])
+                        WebSocketsPool.handle_reconnection(
+                            self.ws_pool.ws[index])
 
     def end(self, signum, frame):
         logger.info("CTRL+C Detected! Please wait just a moment!")

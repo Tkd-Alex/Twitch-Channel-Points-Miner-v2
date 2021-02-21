@@ -16,7 +16,8 @@ class EmojiFormatter(logging.Formatter):
 
     def format(self, record):
         record.emoji_is_present = (
-            record.emoji_is_present if hasattr(record, "emoji_is_present") else False
+            record.emoji_is_present if hasattr(
+                record, "emoji_is_present") else False
         )
         if (
             hasattr(record, "emoji")

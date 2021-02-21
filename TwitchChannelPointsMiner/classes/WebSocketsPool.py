@@ -53,7 +53,8 @@ class WebSocketsPool:
         if self.ws[index].is_opened is False:
             self.ws[index].pending_topics.append(topic)
         else:
-            self.ws[index].listen(topic, self.twitch.twitch_login.get_auth_token())
+            self.ws[index].listen(
+                topic, self.twitch.twitch_login.get_auth_token())
 
     def __new(self, index):
         return TwitchWebSocket(
@@ -68,7 +69,8 @@ class WebSocketsPool:
         )
 
     def __start(self, index):
-        thread_ws = threading.Thread(target=lambda: self.ws[index].run_forever())
+        thread_ws = threading.Thread(
+            target=lambda: self.ws[index].run_forever())
         thread_ws.daemon = True
         thread_ws.name = f"WebSocket #{self.ws[index].index}"
         thread_ws.start()
@@ -142,7 +144,8 @@ class WebSocketsPool:
 
             # Why not create a new ws on the same array index? Let's try.
             self = ws.parent_pool
-            self.ws[ws.index] = self.__new(ws.index)  # Create a new connection.
+            # Create a new connection.
+            self.ws[ws.index] = self.__new(ws.index)
             # self.ws[ws.index].topics = ws.topics
 
             self.__start(ws.index)  # Start a new thread.
@@ -173,7 +176,8 @@ class WebSocketsPool:
             ws.last_message_timestamp = message.timestamp
             ws.last_message_type_channel = message.identifier
 
-            streamer_index = get_streamer_index(ws.streamers, message.channel_id)
+            streamer_index = get_streamer_index(
+                ws.streamers, message.channel_id)
             if streamer_index != -1:
                 try:
                     if message.topic == "community-points-user-v1":
@@ -214,7 +218,8 @@ class WebSocketsPool:
                                 message.message["raid"]["id"],
                                 message.message["raid"]["target_login"],
                             )
-                            ws.twitch.update_raid(ws.streamers[streamer_index], raid)
+                            ws.twitch.update_raid(
+                                ws.streamers[streamer_index], raid)
 
                     elif message.topic == "predictions-channel-v1":
 
@@ -233,7 +238,8 @@ class WebSocketsPool:
                                     event_dict["prediction_window_seconds"]
                                 )
                                 # Reduce prediction window by 3/6s - Collect more accurate data for decision
-                                prediction_window_seconds -= random.uniform(3, 6)
+                                prediction_window_seconds -= random.uniform(
+                                    3, 6)
                                 event = EventPrediction(
                                     ws.streamers[streamer_index],
                                     event_id,
@@ -357,7 +363,8 @@ class WebSocketsPool:
                                     )
                             else:
                                 # Skip 0% and 100% ...
-                                percentage_state = int((current / required) * 100)
+                                percentage_state = int(
+                                    (current / required) * 100)
                                 if percentage_state != 0 and percentage_state % 25 == 0:
                                     logger.info(
                                         f"Drop event {percentage_state}% for {ws.streamers[streamer_index]}!",
@@ -371,7 +378,8 @@ class WebSocketsPool:
                     )
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
-            raise RuntimeError(f"Error while trying to listen for a topic: {response}")
+            raise RuntimeError(
+                f"Error while trying to listen for a topic: {response}")
 
         elif response["type"] == "RECONNECT":
             logger.info(f"#{ws.index} - Reconnection required")
