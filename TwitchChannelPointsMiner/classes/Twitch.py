@@ -455,7 +455,12 @@ class Twitch(object):
 
     def __get_inventory(self):
         response = self.post_gql_request(GQLOperations.Inventory)
-        return response["data"]["currentUser"]["inventory"] if response != {} else {}
+        try:
+            return (
+                response["data"]["currentUser"]["inventory"] if response != {} else {}
+            )
+        except (ValueError, KeyError, TypeError):
+            return {}
 
     def __get_drops_dashboard(self, status=None):
         response = self.post_gql_request(GQLOperations.ViewerDropsDashboard)
@@ -480,10 +485,10 @@ class Twitch(object):
         # We need the inventory only for get the real updated value/progress
         # Get data from inventory and sync current status with streamers.campaigns
         inventory = self.__get_inventory()
-        if (
-            inventory not in [None, {}]
-            and inventory["dropCampaignsInProgress"] is not None
-        ):
+        if inventory not in [None, {}] and inventory["dropCampaignsInProgress"] not in [
+            None,
+            {},
+        ]:
             # Iterate all campaigns from dashboard (only active, with working drops)
             # In this array we have also the campaigns never started from us (not in nventory)
             for i in range(len(campaigns)):
@@ -512,13 +517,15 @@ class Twitch(object):
 
     def claim_all_drops_from_inventory(self):
         inventory = self.__get_inventory()
-        for campaign in inventory["dropCampaignsInProgress"]:
-            for drop_dict in campaign["timeBasedDrops"]:
-                drop = Drop(drop_dict)
-                drop.update(drop_dict["self"])
-                if drop.is_claimable is True:
-                    drop.is_claimed = self.claim_drop(drop)
-                    time.sleep(random.uniform(5, 10))
+        if inventory not in [None, {}]:
+            if inventory["dropCampaignsInProgress"] not in [None, {}]:
+                for campaign in inventory["dropCampaignsInProgress"]:
+                    for drop_dict in campaign["timeBasedDrops"]:
+                        drop = Drop(drop_dict)
+                        drop.update(drop_dict["self"])
+                        if drop.is_claimable is True:
+                            drop.is_claimed = self.claim_drop(drop)
+                            time.sleep(random.uniform(5, 10))
 
     def sync_campaigns(self, streamers, chunk_size=3):
         campaigns_update = 0
