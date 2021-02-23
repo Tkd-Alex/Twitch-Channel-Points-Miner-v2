@@ -67,7 +67,7 @@ class TwitchChannelPointsMiner:
     ):
         self.username = username
 
-        # Set as globally config
+        # Set as global config
         Settings.logger = logger_settings
 
         # Init as default all the missing values
@@ -409,7 +409,7 @@ class TwitchChannelPointsMiner:
                 self.base_points[streamer.username] = streamer.channel_points
 
     def end(self, signum, frame):
-        logger.info("CTRL+C Detected! Please wait just a moments!")
+        logger.info("CTRL+C Detected! Please wait just a moment!")
 
         self.running = self.twitch.running = False
         self.ws_pool.end()
