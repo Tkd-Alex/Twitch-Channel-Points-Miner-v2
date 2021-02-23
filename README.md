@@ -1,7 +1,7 @@
 ![Twitch Channel Points Miner - v2](./assets/banner.png)
 <p align="center">
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
-<a href="https://www.python.org/download/releases/3.0/"><img alt="Python3" src="https://img.shields.io/badge/built%20with-Python3-red.svg?style=flat"></a>
+<a href="https://www.python.org/downloads/release/python-350/"><img alt="Python3" src="https://img.shields.io/badge/built%20for-Python≥3.5-red.svg?style=flat"></a>
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pulls"><img alt="PRsWelcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"></a>
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues?q=is%3Aissue+is%3Aclosed"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
