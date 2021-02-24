@@ -5,6 +5,8 @@ class Priority(Enum):
     ORDER = auto()
     STREAK = auto()
     DROPS = auto()
+    POINTS_ASCENDING = auto()
+    POINTS_DESCEDING = auto()
 
 
 # Empty object shared between class

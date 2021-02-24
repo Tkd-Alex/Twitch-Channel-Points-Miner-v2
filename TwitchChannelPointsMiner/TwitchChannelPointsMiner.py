@@ -82,7 +82,7 @@ class TwitchChannelPointsMiner:
         self.twitch = Twitch(self.username, user_agent, password)
 
         self.claim_drops_startup = claim_drops_startup
-        self.priority = priority
+        self.priority = priority if isinstance(priority, list) else [priority]
 
         self.streamers = []
         self.events_predictions = {}

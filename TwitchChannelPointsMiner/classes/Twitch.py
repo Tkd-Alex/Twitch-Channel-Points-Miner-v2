@@ -238,11 +238,6 @@ class Twitch(object):
 
     def send_minute_watched_events(self, streamers, priority, chunk_size=3):
         while self.running:
-            # OK! We will do the following:
-            #   - Create an array of int - index of streamers currently online
-            #   - Create a dictionary with grouped streamers, based on watch-streak or drops
-            #   - For each array we don't need more than 2 streamer (becuase we can't watch more than 2)
-
             streamers_index = [
                 i
                 for i in range(0, len(streamers))
@@ -265,6 +260,21 @@ class Twitch(object):
                     # Get the first 2 items, they are already in order
                     streamers_watching += streamers_index[:2]
 
+                elif (
+                    prior in [Priority.POINTS_ASCENDING, Priority.POINTS_DESCEDING]
+                    and len(streamers_watching) < 2
+                ):
+                    items = [
+                        {"points": streamers[index].channel_points, "index": index}
+                        for index in streamers_index
+                    ]
+                    items = sorted(
+                        items,
+                        key=lambda x: x["points"],
+                        reverse=(True if prior == Priority.POINTS_DESCEDING else False),
+                    )
+                    streamers_watching += [item["index"] for item in items][:2]
+
                 elif prior == Priority.STREAK and len(streamers_watching) < 2:
                     """
                     Check if we need need to change priority based on watch streak
@@ -283,11 +293,6 @@ class Twitch(object):
                             )
                             and streamers[index].stream.minute_watched < 7
                         ):
-                            """
-                            logger.debug(
-                                f"Switch priority: {streamers[index]}, WatchStreak missing is {streamers[index].stream.watch_streak_missing} and minute_watched: {round(streamers[index].stream.minute_watched, 2)}"
-                            )
-                            """
                             streamers_watching.append(index)
                             if len(streamers_watching) == 2:
                                 break
@@ -295,21 +300,6 @@ class Twitch(object):
                 elif prior == Priority.DROPS and len(streamers_watching) < 2:
                     for index in streamers_index:
                         if streamers[index].drops_condition() is True:
-                            """
-                            stream = streamers[index].stream
-                            drops_available = sum(
-                                [
-                                    len(campaign.drops)
-                                    for campaign in stream.campaigns
-                                ]
-                            )
-                            logger.debug(
-                                f"{streamers[index]} it's currently stream: {stream}"
-                            )
-                            logger.debug(
-                                f"Campaign currently active here: {len(stream.campaigns)}, drops available: {drops_available}"
-                            )
-                            """
                             streamers_watching.append(index)
                             if len(streamers_watching) == 2:
                                 break

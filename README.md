@@ -179,7 +179,7 @@ twitch_miner = TwitchChannelPointsMiner(
     priority=[                                  # Custom priority in this case for example:
         Priority.STREAK,                        # - we want first of all to catch all watch streak from all streamers
         Priority.DROPS,                         # - when we don't have anymore watch streak to catch wait until all drops are collected over the streamers
-        Priority.ORDER                          # - when we have all of drops claimed and no watch-streak avaialable use the order priority
+        Priority.ORDER                          # - when we have all of drops claimed and no watch-streak avaialable use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
     ],
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
@@ -249,6 +249,15 @@ twitch_miner.mine(["streamer1", "streamer2"], followers=True)   # Mixed
 Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow has the highest priority.
 
 ## Settings
+Most of the settings are self-explained and are commented in example.
+You can watch only two streamers per time. With `priority` settings you can select which streamers to priority. You can use an array of priority on single items.
+Available values are the following:
+    - `STREAK` - Catch the watch streak from all streamers
+    - `DROPS` - Claim all drops from streamers with drops tags enabled
+    - `ORDER` - Following the order of the list
+    - `POINTS_ASCENDING` - On top the streamers with the lowest points
+    - `POINTS_DESCEDING` - On top the streamers with the highest points
+You can combine all priority but keep in mind that use `ORDER` and `POINTS_ASCENDING` in the same settings doesn't make sense.
 
 ### LoggerSettings
 | Key             	| Type            	| Default                        	| Description                                                                          	                                      |
