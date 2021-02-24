@@ -129,9 +129,8 @@ class TwitchLogin(object):
         self.session.headers.update({"Authorization": f"Bearer {self.token}"})
 
     def send_login_request(self, json_data):
-        r = self.session.post("https://passport.twitch.tv/login", json=json_data)
-        j = r.json()
-        return j
+        response = self.session.post("https://passport.twitch.tv/login", json=json_data)
+        return response.json()
 
     def login_flow_backup(self):
         """Backup OAuth login flow in case manual captcha solving is required"""
@@ -161,8 +160,10 @@ class TwitchLogin(object):
         if self.token is None:
             return False
 
-        r = self.session.get(f"https://api.twitch.tv/helix/users?login={self.username}")
-        response = r.json()
+        response = self.session.get(
+            f"https://api.twitch.tv/helix/users?login={self.username}"
+        )
+        response = response.json()
         if "data" in response:
             self.login_check_result = True
             self.user_id = response["data"][0]["id"]
