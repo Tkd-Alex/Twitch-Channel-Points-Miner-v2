@@ -176,8 +176,8 @@ twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
     claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
     priority=[                                  # Custom priority in this case for example:
-        Priority.DROPS,                         # - we want first of all to collect all drops
-        Priority.STREAK,                        # - after all drops are collected do priority on watch-streak
+        Priority.STREAK,                        # - we want first of all to catch all watch streak from all streamers
+        Priority.DROPS,                         # - when we don't have anymore watch streak to catch wait until all drops are collected over the streamers
         Priority.ORDER                          # - when we have all of drops claimed and no watch-streak avaialable use the order priority
     ],
     logger_settings=LoggerSettings(
@@ -200,7 +200,7 @@ twitch_miner = TwitchChannelPointsMiner(
             stealth_mode=True,                  # If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points #33
             filter_condition=FilterCondition(
                 by=OutcomeKeys.TOTAL_USERS,    # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
-                where=Condition.LTE,           # The key must be [GT, LT, GTE, LTE] than value
+                where=Condition.LTE,           # 'by' must be [GT, LT, GTE, LTE] than value
                 value=800
             )
         )
