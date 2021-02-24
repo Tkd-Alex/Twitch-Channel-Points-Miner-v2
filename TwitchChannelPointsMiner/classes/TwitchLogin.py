@@ -23,12 +23,13 @@ class TwitchLogin(object):
         "session",
         "session",
         "username",
+        "password",
         "user_id",
         "email",
         "cookies",
     ]
 
-    def __init__(self, client_id, username, user_agent):
+    def __init__(self, client_id, username, user_agent, password=None):
         self.client_id = client_id
         self.token = None
         self.login_check_result = False
@@ -37,6 +38,7 @@ class TwitchLogin(object):
             {"Client-ID": self.client_id, "User-Agent": user_agent}
         )
         self.username = username
+        self.password = password
         self.user_id = None
         self.email = None
 
@@ -55,7 +57,11 @@ class TwitchLogin(object):
 
         while True:
             # self.username = input('Enter Twitch username: ')
-            password = getpass.getpass(f"Enter Twitch password for {self.username}: ")
+            password = (
+                getpass.getpass(f"Enter Twitch password for {self.username}: ")
+                if self.password is None
+                else self.password
+            )
 
             post_data["username"] = self.username
             post_data["password"] = password

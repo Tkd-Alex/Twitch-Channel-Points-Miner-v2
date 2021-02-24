@@ -60,8 +60,9 @@ class TwitchChannelPointsMiner:
     def __init__(
         self,
         username: str,
+        password: str = None,
         claim_drops_startup: bool = False,
-        priority=[Priority.STREAK, Priority.DROPS, Priority.ORDER],
+        priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
         # Default values for all streamers
@@ -78,7 +79,7 @@ class TwitchChannelPointsMiner:
         Settings.streamer_settings = streamer_settings
 
         user_agent = get_user_agent("FIREFOX")
-        self.twitch = Twitch(self.username, user_agent)
+        self.twitch = Twitch(self.username, user_agent, password)
 
         self.claim_drops_startup = claim_drops_startup
         self.priority = priority
