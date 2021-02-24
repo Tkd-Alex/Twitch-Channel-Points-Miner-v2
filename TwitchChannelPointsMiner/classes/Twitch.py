@@ -238,125 +238,136 @@ class Twitch(object):
 
     def send_minute_watched_events(self, streamers, priority, chunk_size=3):
         while self.running:
-            streamers_index = [
-                i
-                for i in range(0, len(streamers))
-                if streamers[i].is_online is True
-                and (
-                    streamers[i].online_at == 0
-                    or (time.time() - streamers[i].online_at) > 30
-                )
-            ]
-
-            for index in streamers_index:
-                if (streamers[index].stream.update_elapsed() / 60) > 10:
-                    # Why this user It's currently online but the last updated was more than 10minutes ago?
-                    # Please perform a manually update and check if the user it's online
-                    self.check_streamer_online(streamers[index])
-
-            streamers_watching = []
-            for prior in priority:
-                if prior == Priority.ORDER and len(streamers_watching) < 2:
-                    # Get the first 2 items, they are already in order
-                    streamers_watching += streamers_index[:2]
-
-                elif (
-                    prior in [Priority.POINTS_ASCENDING, Priority.POINTS_DESCEDING]
-                    and len(streamers_watching) < 2
-                ):
-                    items = [
-                        {"points": streamers[index].channel_points, "index": index}
-                        for index in streamers_index
-                    ]
-                    items = sorted(
-                        items,
-                        key=lambda x: x["points"],
-                        reverse=(True if prior == Priority.POINTS_DESCEDING else False),
+            try:
+                streamers_index = [
+                    i
+                    for i in range(0, len(streamers))
+                    if streamers[i].is_online is True
+                    and (
+                        streamers[i].online_at == 0
+                        or (time.time() - streamers[i].online_at) > 30
                     )
-                    streamers_watching += [item["index"] for item in items][:2]
+                ]
 
-                elif prior == Priority.STREAK and len(streamers_watching) < 2:
-                    """
-                    Check if we need need to change priority based on watch streak
-                    Viewers receive points for returning for x consecutive streams.
-                    Each stream must be at least 10 minutes long and it must have been at least 30 minutes since the last stream ended.
-                    Watch at least 6m for get the +10
-                    """
-                    for index in streamers_index:
-                        if (
-                            streamers[index].settings.watch_streak is True
-                            and streamers[index].stream.watch_streak_missing is True
-                            and (
-                                streamers[index].offline_at == 0
-                                or ((time.time() - streamers[index].offline_at) // 60)
-                                > 30
-                            )
-                            and streamers[index].stream.minute_watched < 7
-                        ):
-                            streamers_watching.append(index)
-                            if len(streamers_watching) == 2:
-                                break
+                for index in streamers_index:
+                    if (streamers[index].stream.update_elapsed() / 60) > 10:
+                        # Why this user It's currently online but the last updated was more than 10minutes ago?
+                        # Please perform a manually update and check if the user it's online
+                        self.check_streamer_online(streamers[index])
 
-                elif prior == Priority.DROPS and len(streamers_watching) < 2:
-                    for index in streamers_index:
-                        if streamers[index].drops_condition() is True:
-                            streamers_watching.append(index)
-                            if len(streamers_watching) == 2:
-                                break
+                streamers_watching = []
+                for prior in priority:
+                    if prior == Priority.ORDER and len(streamers_watching) < 2:
+                        # Get the first 2 items, they are already in order
+                        streamers_watching += streamers_index[:2]
 
-            """
-            Twitch has a limit - you can't watch more than 2 channels at one time.
-            We take the first two streamers from the list as they have the highest priority (based on order or WatchStreak).
-            """
-            streamers_watching = streamers_watching[:2]
+                    elif (
+                        prior in [Priority.POINTS_ASCENDING, Priority.POINTS_DESCEDING]
+                        and len(streamers_watching) < 2
+                    ):
+                        items = [
+                            {"points": streamers[index].channel_points, "index": index}
+                            for index in streamers_index
+                        ]
+                        items = sorted(
+                            items,
+                            key=lambda x: x["points"],
+                            reverse=(
+                                True if prior == Priority.POINTS_DESCEDING else False
+                            ),
+                        )
+                        streamers_watching += [item["index"] for item in items][:2]
 
-            for index in streamers_watching:
-                next_iteration = time.time() + 60 / len(streamers_watching)
-
-                try:
-                    response = requests.post(
-                        streamers[index].stream.spade_url,
-                        data=streamers[index].stream.encode_payload(),
-                        headers={"User-Agent": self.user_agent},
-                    )
-                    logger.debug(
-                        f"Send minute watched request for {streamers[index]} - Status code: {response.status_code}"
-                    )
-                    if response.status_code == 204:
-                        streamers[index].stream.update_minute_watched()
-
+                    elif prior == Priority.STREAK and len(streamers_watching) < 2:
                         """
-                        Remember, you can only earn progress towards a time-based Drop on one participating channel at a time.  [ ! ! ! ]
-                        You can also check your progress towards Drops within a campaign anytime by viewing the Drops Inventory.
-                        For time-based Drops, if you are unable to claim the Drop in time, you will be able to claim it from the inventory page until the Drops campaign ends.
+                        Check if we need need to change priority based on watch streak
+                        Viewers receive points for returning for x consecutive streams.
+                        Each stream must be at least 10 minutes long and it must have been at least 30 minutes since the last stream ended.
+                        Watch at least 6m for get the +10
                         """
-
-                        for campaign in streamers[index].stream.campaigns:
-                            for drop in campaign.drops:
-                                # We could add .has_preconditions_met condition inside is_printable
-                                if (
-                                    drop.has_preconditions_met is not False
-                                    and drop.is_printable is True
-                                ):
-                                    # print("=" * 125)
-                                    logger.info(
-                                        f"{streamers[index]} is streaming {streamers[index].stream}"
+                        for index in streamers_index:
+                            if (
+                                streamers[index].settings.watch_streak is True
+                                and streamers[index].stream.watch_streak_missing is True
+                                and (
+                                    streamers[index].offline_at == 0
+                                    or (
+                                        (time.time() - streamers[index].offline_at)
+                                        // 60
                                     )
-                                    logger.info(f"Campaign: {campaign}")
-                                    logger.info(f"Drop: {drop}")
-                                    logger.info(f"{drop.progress_bar()}")
-                                    # print("=" * 125)
+                                    > 30
+                                )
+                                and streamers[index].stream.minute_watched < 7
+                            ):
+                                streamers_watching.append(index)
+                                if len(streamers_watching) == 2:
+                                    break
 
-                except requests.exceptions.ConnectionError as e:
-                    logger.error(f"Error while trying to send minute watched: {e}")
-                    self.__check_connection_handler(chunk_size)
+                    elif prior == Priority.DROPS and len(streamers_watching) < 2:
+                        for index in streamers_index:
+                            if streamers[index].drops_condition() is True:
+                                streamers_watching.append(index)
+                                if len(streamers_watching) == 2:
+                                    break
 
-                self.__chuncked_sleep(
-                    next_iteration - time.time(), chunk_size=chunk_size
-                )
+                """
+                Twitch has a limit - you can't watch more than 2 channels at one time.
+                We take the first two streamers from the list as they have the highest priority (based on order or WatchStreak).
+                """
+                streamers_watching = streamers_watching[:2]
 
-            if streamers_watching == []:
-                self.__chuncked_sleep(60, chunk_size=chunk_size)
+                for index in streamers_watching:
+                    next_iteration = time.time() + 60 / len(streamers_watching)
+
+                    try:
+                        response = requests.post(
+                            streamers[index].stream.spade_url,
+                            data=streamers[index].stream.encode_payload(),
+                            headers={"User-Agent": self.user_agent},
+                            timeout=60,
+                        )
+                        logger.debug(
+                            f"Send minute watched request for {streamers[index]} - Status code: {response.status_code}"
+                        )
+                        if response.status_code == 204:
+                            streamers[index].stream.update_minute_watched()
+
+                            """
+                            Remember, you can only earn progress towards a time-based Drop on one participating channel at a time.  [ ! ! ! ]
+                            You can also check your progress towards Drops within a campaign anytime by viewing the Drops Inventory.
+                            For time-based Drops, if you are unable to claim the Drop in time, you will be able to claim it from the inventory page until the Drops campaign ends.
+                            """
+
+                            for campaign in streamers[index].stream.campaigns:
+                                for drop in campaign.drops:
+                                    # We could add .has_preconditions_met condition inside is_printable
+                                    if (
+                                        drop.has_preconditions_met is not False
+                                        and drop.is_printable is True
+                                    ):
+                                        # print("=" * 125)
+                                        logger.info(
+                                            f"{streamers[index]} is streaming {streamers[index].stream}"
+                                        )
+                                        logger.info(f"Campaign: {campaign}")
+                                        logger.info(f"Drop: {drop}")
+                                        logger.info(f"{drop.progress_bar()}")
+                                        # print("=" * 125)
+
+                    except requests.exceptions.ConnectionError as e:
+                        logger.error(f"Error while trying to send minute watched: {e}")
+                        self.__check_connection_handler(chunk_size)
+                    except requests.exceptions.Timeout as e:
+                        logger.error(f"Error while trying to send minute watched: {e}")
+
+                    self.__chuncked_sleep(
+                        next_iteration - time.time(), chunk_size=chunk_size
+                    )
+
+                if streamers_watching == []:
+                    self.__chuncked_sleep(60, chunk_size=chunk_size)
+            except Exception:
+                logger.error("Exception raised in send minute watched", exc_info=True)
 
     # === CHANNEL POINTS / PREDICTION === #
     # Load the amount of current points for a channel, check if a bonus is available
