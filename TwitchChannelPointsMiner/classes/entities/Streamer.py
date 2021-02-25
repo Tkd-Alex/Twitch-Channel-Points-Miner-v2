@@ -41,7 +41,7 @@ class StreamerSettings(object):
             self.bet = BetSettings()
 
     def __repr__(self):
-        return f"BetSettings(MakePredictions={self.make_predictions}, FollowRaid={self.follow_raid}, ClaimDrops={self.claim_drops}, WatchStreak={self.watch_streak}, Bet={self.bet})"
+        return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, watch_streak={self.watch_streak}, bet={self.bet})"
 
 
 class Streamer(object):
@@ -60,12 +60,11 @@ class Streamer(object):
         "raid",
         "history",
         "streamer_url",
-        "chat_url",
     ]
 
     def __init__(self, username, settings=None):
-        self.username = username.lower().strip()
-        self.channel_id = 0
+        self.username: str = username.lower().strip()
+        self.channel_id: str = ""
         self.settings = settings
         self.is_online = False
         self.stream_up = 0
@@ -81,7 +80,6 @@ class Streamer(object):
         self.history = {}
 
         self.streamer_url = f"{URL}/{self.username}"
-        self.chat_url = f"{URL}/popout/{self.username}/chat?popout="
 
     def __repr__(self):
         return f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={_millify(self.channel_points)})"
@@ -128,3 +126,11 @@ class Streamer(object):
 
     def stream_up_elapsed(self):
         return self.stream_up == 0 or ((time.time() - self.stream_up) > 120)
+
+    def drops_condition(self):
+        return (
+            self.settings.claim_drops is True
+            and self.is_online is True
+            and self.stream.drops_tags is True
+            and self.stream.campaigns_ids != []
+        )

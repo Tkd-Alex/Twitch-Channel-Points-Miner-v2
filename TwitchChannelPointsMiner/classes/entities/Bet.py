@@ -54,7 +54,7 @@ class FilterCondition(object):
         self.value = value
 
     def __repr__(self):
-        return f"FilterCondition(By={self.by.upper()}, Where={self.where}, Value={self.value})"
+        return f"FilterCondition(by={self.by.upper()}, where={self.where}, value={self.value})"
 
 
 class BetSettings(object):
@@ -91,7 +91,7 @@ class BetSettings(object):
         self.stealth_mode = self.stealth_mode if not None else False
 
     def __repr__(self):
-        return f"BetSettings(Strategy={self.strategy}, Percentage={self.percentage}, PercentageGap={self.percentage_gap}, MaxPoints={self.max_points}, StealthMode={self.stealth_mode})"
+        return f"BetSettings(strategy={self.strategy}, percentage={self.percentage}, percentage_gap={self.percentage_gap}, max_points={self.max_points}, stealth_mode={self.stealth_mode})"
 
 
 class Bet(object):
@@ -153,7 +153,7 @@ class Bet(object):
         self.__clear_outcomes()
 
     def __repr__(self):
-        return f"Bet(TotalUsers={millify(self.total_users)}, TotalPoints={millify(self.total_points)}), Decision={self.decision})\n\t\tOutcome0({self.get_outcome(0)})\n\t\tOutcome1({self.get_outcome(1)})"
+        return f"Bet(total_users={millify(self.total_users)}, total_points={millify(self.total_points)}), decision={self.decision})\n\t\tOutcome0({self.get_outcome(0)})\n\t\tOutcome1({self.get_outcome(1)})"
 
     def get_outcome(self, index):
         outcome = self.outcomes[index]
