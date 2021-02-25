@@ -308,8 +308,17 @@ class WebSocketsPool:
                                     else 0
                                 )
                                 points_prefix = "+" if points_gained >= 0 else ""
+                                action = (
+                                    "Lost"
+                                    if result_type == "LOSE"
+                                    else (
+                                        "Refunded"
+                                        if result_type == "REFUND"
+                                        else "Gained"
+                                    )
+                                )
                                 logger.info(
-                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {points_prefix}{_millify(points_gained)}",
+                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, {action}: {points_prefix}{_millify(points_gained)}",
                                     extra={"emoji": ":bar_chart:"},
                                 )
                                 ws.events_predictions[event_id].final_result = {

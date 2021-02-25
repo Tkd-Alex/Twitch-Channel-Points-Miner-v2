@@ -250,13 +250,14 @@ Make sure to write the streamers array in order of priority from left to right. 
 
 ## Settings
 Most of the settings are self-explained and are commented in example.
-You can watch only two streamers per time. With `priority` settings you can select which streamers to priority. You can use an array of priority on single items.
+You can watch only two streamers per time. With `priority` settings you can select which streamers watch by use priority. You can use an array of priority or single item. I suggest to use at least one priority from `ORDER`, `POINTS_ASCENDING`, `POINTS_DESCEDING` because for example If you set only `STREAK` after catch all watch streak the script will stop to watch streamers.
 Available values are the following:
-    - `STREAK` - Catch the watch streak from all streamers
-    - `DROPS` - Claim all drops from streamers with drops tags enabled
-    - `ORDER` - Following the order of the list
-    - `POINTS_ASCENDING` - On top the streamers with the lowest points
-    - `POINTS_DESCEDING` - On top the streamers with the highest points
+ - `STREAK` - Catch the watch streak from all streamers
+ - `DROPS` - Claim all drops from streamers with drops tags enabled
+ - `ORDER` - Following the order of the list
+ - `POINTS_ASCENDING` - On top the streamers with the lowest points
+ - `POINTS_DESCEDING` - On top the streamers with the highest points
+
 You can combine all priority but keep in mind that use `ORDER` and `POINTS_ASCENDING` in the same settings doesn't make sense.
 
 ### LoggerSettings
