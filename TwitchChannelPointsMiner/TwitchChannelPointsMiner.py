@@ -59,7 +59,7 @@ class TwitchChannelPointsMiner:
         self,
         username: str,
         claim_drops_startup: bool = False,
-        refresh_streamers: int = 60,  # Minutes
+        refresh_streamers: float = float("inf"),  # Minutes
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
         # Default values for all streamers
@@ -90,7 +90,6 @@ class TwitchChannelPointsMiner:
         self.start_datetime = None
         self.base_points = {}
         self.sources_usernames = {
-            # "STREAMERS": [],  # Nothing to remove in the future ...
             "JSON_FILE": [],
             "FOLLOWERS": [],
         }
@@ -101,14 +100,14 @@ class TwitchChannelPointsMiner:
             signal.signal(sign, self.end)
 
     def mine(
-        self, streamers: list = [], streamers_json="settings.json", followers=False
+        self, streamers: list = [], streamers_json: str = None, followers: bool = False
     ):
         self.run(
             streamers=streamers, streamers_json=streamers_json, followers=followers
         )
 
     def run(
-        self, streamers: list = [], streamers_json="settings.json", followers=False
+        self, streamers: list = [], streamers_json: str = None, followers: bool = False
     ):
         if self.running:
             logger.error("You can't start multiple sessions of this instance!")
@@ -213,7 +212,10 @@ class TwitchChannelPointsMiner:
                         )
                         WebSocketsPool.handle_reconnection(self.ws_pool.ws[index])
 
-                if (time.time() - refresh_streamers) / 60 > self.refresh_streamers:
+                if (
+                    self.refresh_streamers is not None
+                    and (time.time() - refresh_streamers) / 60 > self.refresh_streamers
+                ):
                     refresh_streamers = time.time()
                     self.streamers = self.__reload_streamers(
                         streamers=streamers,
@@ -224,8 +226,8 @@ class TwitchChannelPointsMiner:
 
     @staticmethod
     def __remove_missing(streamers_name, streamers_dict, items, reason):
-        for username in streamers_name:
-            if username in items:
+        for username in items:
+            if username in streamers_name:
                 logger.info(
                     f"Remove the streamer: {username}. {reason}",
                     extra={"emoji": ":wastebasket:"},
@@ -237,7 +239,7 @@ class TwitchChannelPointsMiner:
     def __reload_streamers(
         self,
         streamers: list = [],
-        streamers_json="settings.json",
+        streamers_json: str = None,
         followers: bool = False,
     ):
         streamers_array = []
@@ -292,15 +294,7 @@ class TwitchChannelPointsMiner:
                     streamers_dict[username].settings = streamer.settings
 
             usernames = list(map(lambda x: x["username"], json_streamers))
-            """
-            if self.streamers != []:
-                streamers_name, streamers_dict = self.__remove_missing(
-                    streamers_name,
-                    streamers_dict,
-                    usernames,
-                    reason="1. Not present in JSON file",
-                )
-            """
+
             if self.sources_usernames["JSON_FILE"] != []:
                 streamers_name, streamers_dict = self.__remove_missing(
                     streamers_name,
@@ -384,7 +378,8 @@ class TwitchChannelPointsMiner:
                     extra={"emoji": ":cry:"},
                 )
 
-        Settings.write(streamers_json)
+        if streamers_json is not None:
+            Settings.write(streamers_json)
 
         # Populate the streamers with default values.
         # 1. Load channel points and auto-claim bonus

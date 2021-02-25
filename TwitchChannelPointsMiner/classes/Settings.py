@@ -15,8 +15,10 @@ class Settings(object):
         fname = (
             fname
             if fname is not None
-            else os.path.join(Path().absolute(), "settings.json")
+            else os.path.join(Path().absolute(), "streamers.json")
         )
+        if fname.endswith(".json") is False:
+            fname += ".json"
         if cls.streamers_settings != cls.read(fname):
             with open(fname, "w") as fp:
                 json.dump(cls.streamers_settings, fp, sort_keys=True, indent=4)
@@ -40,6 +42,8 @@ class Settings(object):
     @staticmethod
     def read(fname):
         try:
+            if fname.endswith(".json") is False:
+                fname += ".json"
             return json.load(open(fname, "r")) if os.path.isfile(fname) else []
         except json.decoder.JSONDecodeError:
             logger.error(f"Failed to read {fname}", exc_info=True)
