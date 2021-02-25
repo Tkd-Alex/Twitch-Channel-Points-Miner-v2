@@ -8,7 +8,3 @@ class StreamerIsOfflineException(Exception):
 
 class WrongCookiesException(Exception):
     pass
-
-
-class TimeBasedDropNotFound(Exception):
-    pass

@@ -10,7 +10,8 @@ from dateutil import parser
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.entities.Message import Message
 from TwitchChannelPointsMiner.classes.entities.Raid import Raid
-from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
+
+# from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
@@ -308,8 +309,17 @@ class WebSocketsPool:
                                     else 0
                                 )
                                 points_prefix = "+" if points_gained >= 0 else ""
+                                action = (
+                                    "Lost"
+                                    if result_type == "LOSE"
+                                    else (
+                                        "Refunded"
+                                        if result_type == "REFUND"
+                                        else "Gained"
+                                    )
+                                )
                                 logger.info(
-                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, Gained: {points_prefix}{_millify(points_gained)}",
+                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, {action}: {points_prefix}{_millify(points_gained)}",
                                     extra={
                                         "emoji": ":bar_chart:",
                                         "color": Fore.GREEN
@@ -341,35 +351,6 @@ class WebSocketsPool:
                                     )
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
-
-                    elif message.topic == "user-drop-events":
-                        if message.type == "drop-progress":
-                            current = message.data["current_progress_min"]
-                            required = message.data["required_progress_min"]
-                            if current >= required:
-                                try:
-                                    drop = ws.twitch.search_drop_in_inventory(
-                                        ws.streamers[streamer_index],
-                                        message.data["drop_id"],
-                                    )
-                                    if drop["dropInstanceID"] is not None:
-                                        ws.twitch.claim_drop(
-                                            drop["dropInstanceID"],
-                                            ws.streamers[streamer_index],
-                                        )
-                                except TimeBasedDropNotFound:
-                                    logger.error(
-                                        f"Unable to find {message.data['drop_id']} in your inventory"
-                                    )
-                            else:
-                                # Skip 0% and 100% ...
-                                percentage_state = int((current / required) * 100)
-                                if percentage_state != 0 and percentage_state % 25 == 0:
-                                    logger.info(
-                                        f"Drop event {percentage_state}% for {ws.streamers[streamer_index]}!",
-                                        extra={"emoji": ":package:"},
-                                    )
-
                 except Exception:
                     logger.error(
                         f"Exception raised for topic: {message.topic} and message: {message}",

@@ -101,3 +101,31 @@ class GQLOperations:
             }
         },
     }
+    ViewerDropsDashboard = {
+        "operationName": "ViewerDropsDashboard",
+        "variables": {},
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "c4d61d7b71d03b324914d3cf8ca0bc23fe25dacf54120cc954321b9704a3f4e2",
+            }
+        },
+    }
+    DropCampaignDetails = {
+        "operationName": "DropCampaignDetails",
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "7da6078b1bfa2f0a4dd061cb47bdcd1ffddf31cccadd966ec192e4cd06666e2b",
+            }
+        },
+    }
+    DropsHighlightService_AvailableDrops = {
+        "operationName": "DropsHighlightService_AvailableDrops",
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "b19ee96a0e79e3f8281c4108bc4c7b3f232266db6f96fd04a339ab393673a075",
+            }
+        },
+    }

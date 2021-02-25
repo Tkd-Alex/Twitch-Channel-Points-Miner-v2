@@ -1,7 +1,7 @@
 ![Twitch Channel Points Miner - v2](./assets/banner.png)
 <p align="center">
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
-<a href="https://www.python.org/download/releases/3.0/"><img alt="Python3" src="https://img.shields.io/badge/built%20with-Python3-red.svg?style=flat"></a>
+<a href="https://www.python.org/downloads/release/python-360/"><img alt="Python3" src="https://img.shields.io/badge/built%20for-Python≥3.6-red.svg?style=flat"></a>
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pulls"><img alt="PRsWelcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"></a>
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues?q=is%3Aissue+is%3Aclosed"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
@@ -168,12 +168,19 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 import logging
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings
+from TwitchChannelPointsMiner.classes.Settings import Priority
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
-    claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on the startup
+    password="write-your-secure-psw",           # If no password will be provided the script will ask interactively
+    claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
+    priority=[                                  # Custom priority in this case for example:
+        Priority.STREAK,                        # - we want first of all to catch all watch streak from all streamers
+        Priority.DROPS,                         # - when we don't have anymore watch streak to catch wait until all drops are collected over the streamers
+        Priority.ORDER                          # - when we have all of drops claimed and no watch-streak avaialable use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
+    ],
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info)
@@ -243,6 +250,16 @@ twitch_miner.mine(["streamer1", "streamer2"], followers=True)   # Mixed
 Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow has the highest priority.
 
 ## Settings
+Most of the settings are self-explained and are commented in example.
+You can watch only two streamers per time. With `priority` settings you can select which streamers watch by use priority. You can use an array of priority or single item. I suggest to use at least one priority from `ORDER`, `POINTS_ASCENDING`, `POINTS_DESCEDING` because for example If you set only `STREAK` after catch all watch streak the script will stop to watch streamers.
+Available values are the following:
+ - `STREAK` - Catch the watch streak from all streamers
+ - `DROPS` - Claim all drops from streamers with drops tags enabled
+ - `ORDER` - Following the order of the list
+ - `POINTS_ASCENDING` - On top the streamers with the lowest points
+ - `POINTS_DESCEDING` - On top the streamers with the highest points
+
+You can combine all priority but keep in mind that use `ORDER` and `POINTS_ASCENDING` in the same settings doesn't make sense.
 
 ### LoggerSettings
 | Key             	| Type            	| Default                        	| Description                                                                          	                                      |

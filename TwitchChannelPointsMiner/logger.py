@@ -85,7 +85,6 @@ def configure_loggers(username, settings):
             print_colored=settings.colored,
         )
     )
-    root_logger.addHandler(console_handler)
 
     if settings.save is True:
         logs_path = os.path.join(Path().absolute(), "logs")
@@ -96,14 +95,16 @@ def configure_loggers(username, settings):
         )
         file_handler = logging.FileHandler(logs_file, "w", "utf-8")
         file_handler.setFormatter(
-            GlobalFormatter(
+            logging.Formatter(
                 fmt="%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s",
                 datefmt="%d/%m/%y %H:%M:%S",
-                print_emoji=settings.emoji,
-                print_colored=settings.colored,
             )
         )
         file_handler.setLevel(settings.file_level)
+
         root_logger.addHandler(file_handler)
+        root_logger.addHandler(console_handler)
         return logs_file
-    return None
+    else:
+        root_logger.addHandler(console_handler)
+        return None
