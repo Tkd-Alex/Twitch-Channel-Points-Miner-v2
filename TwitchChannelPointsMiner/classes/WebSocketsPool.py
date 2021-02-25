@@ -4,14 +4,12 @@ import random
 import threading
 import time
 
-from colorama import Fore
 from dateutil import parser
 
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.entities.Message import Message
 from TwitchChannelPointsMiner.classes.entities.Raid import Raid
-
-# from TwitchChannelPointsMiner.classes.Exceptions import TimeBasedDropNotFound
+from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
@@ -186,7 +184,12 @@ class WebSocketsPool:
                             ws.streamers[streamer_index].channel_points = balance
                             logger.info(
                                 f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
-                                extra={"emoji": ":rocket:"},
+                                extra={
+                                    "emoji": ":rocket:",
+                                    "color": Settings.logger.color_palette.get(
+                                        f"GAIN_FOR_{reason_code}"
+                                    ),
+                                },
                             )
                             ws.streamers[streamer_index].update_history(
                                 reason_code, earned
@@ -322,9 +325,9 @@ class WebSocketsPool:
                                     f"{ws.events_predictions[event_id]} - Result: {result_type}, {action}: {points_prefix}{_millify(points_gained)}",
                                     extra={
                                         "emoji": ":bar_chart:",
-                                        "color": Fore.GREEN
-                                        if result_type == "WIN"
-                                        else Fore.RED,
+                                        "color": Settings.logger.color_palette.get(
+                                            f"BET_{result_type}"
+                                        ),
                                     },
                                 )
                                 ws.events_predictions[event_id].final_result = {

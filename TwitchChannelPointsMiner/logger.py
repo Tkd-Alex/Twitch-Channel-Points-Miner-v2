@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 import emoji
-from colorama import Style, init
+from colorama import Fore, init
 
 from TwitchChannelPointsMiner.utils import remove_emoji
 
@@ -39,9 +39,58 @@ class GlobalFormatter(logging.Formatter):
             record.msg = remove_emoji(record.msg)
 
         if self.print_colored and hasattr(record, "color"):
-            record.msg = f"{record.color}{record.msg}{Style.RESET_ALL}"
+            record.msg = f"{record.color}{record.msg}"
 
         return super().format(record)
+
+
+# Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+class ColorPalette(object):
+    STREAMER_ONLINE = Fore.RESET
+    STREAMER_OFFLINE = Fore.RESET
+
+    GAIN_FOR_RAID = Fore.RESET
+    GAIN_FOR_CLAIM = Fore.RESET
+    GAIN_FOR_WATCH = Fore.RESET
+
+    BET_WIN = Fore.GREEN
+    BET_LOSE = Fore.RED
+    BET_REFUND = Fore.RESET
+    BET_FILTERS = Fore.RESET
+    BET_GENERAL = Fore.RESET
+    BET_FAILED = Fore.RESET
+
+    def __init__(self, **kwargs):
+        for k in kwargs:
+            if getattr(self, k.upper()) is not None:
+                if kwargs[k] in [
+                    Fore.BLACK,
+                    Fore.RED,
+                    Fore.GREEN,
+                    Fore.YELLOW,
+                    Fore.BLUE,
+                    Fore.MAGENTA,
+                    Fore.CYAN,
+                    Fore.WHITE,
+                    Fore.RESET,
+                ]:
+                    setattr(self, k.upper(), kwargs[k])
+                elif kwargs[k].upper() in [
+                    "BLACK",
+                    "RED",
+                    "GREEN",
+                    "YELLOW",
+                    "BLUE",
+                    "MAGENTA",
+                    "CYAN",
+                    "WHITE",
+                    "RESET",
+                ]:
+                    setattr(self, k.upper(), getattr(Fore, kwargs[k].upper()))
+
+    def get(self, key):
+        color = getattr(self, key.upper())
+        return Fore.RESET if color is None else color
 
 
 class LoggerSettings:
@@ -53,6 +102,7 @@ class LoggerSettings:
         file_level: int = logging.DEBUG,
         emoji: bool = platform.system() != "Windows",
         colored: bool = False,
+        color_palette: ColorPalette = ColorPalette(),
     ):
         self.save = save
         self.less = less
@@ -60,11 +110,12 @@ class LoggerSettings:
         self.file_level = file_level
         self.emoji = emoji
         self.colored = colored
+        self.color_palette = color_palette
 
 
 def configure_loggers(username, settings):
     if settings.colored is True:
-        init()
+        init(autoreset=True)
 
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)

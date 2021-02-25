@@ -52,7 +52,7 @@ If you have any issues or you want to contribute, you are welcome! But please be
 
 ## Main differences from the original repository:
 
-- Improve the logging
+- Improve the logging - Emoji, colors, file and soo on
 - Final report with all the data
 - Rewrite the entire code using classe instead of module with global variables
 - Automatic download the follower's list and use it as input
@@ -166,8 +166,9 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 # -*- coding: utf-8 -*-
 
 import logging
+from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
-from TwitchChannelPointsMiner.logger import LoggerSettings
+from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
 from TwitchChannelPointsMiner.classes.Settings import Priority
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
@@ -187,7 +188,12 @@ twitch_miner = TwitchChannelPointsMiner(
         file_level=logging.DEBUG,               # Level of logs - If you think the log file it's too big, use logging.INFO
         emoji=True,                             # On Windows, we have a problem printing emoji. Set to false if you have a problem
         less=False,                             # If you think that the logs are too verbose, set this to True
-        colored=True                            # If you want to print colored text
+        colored=True,                           # If you want to print colored text
+        color_palette=ColorPalette(             # You can also create a custom palette color (for the common message).
+            STREAMER_online="GREEN",            # Don't worry about lower/upper case the script will be parse all the values.
+            streamer_offline="red",             # Read more in README.md
+            BET_wiN=Fore.MAGENTA                # Color allowed are: [BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET].
+        )
     ),
     streamer_settings=StreamerSettings(
         make_predictions=True,                  # If you want to Bet / Make prediction
@@ -262,22 +268,58 @@ Available values are the following:
 You can combine all priority but keep in mind that use `ORDER` and `POINTS_ASCENDING` in the same settings doesn't make sense.
 
 ### LoggerSettings
-| Key             	| Type            	| Default                        	| Description                                                                          	                                      |
-|-----------------	|-----------------	|--------------------------------	|---------------------------------------------------------------------------------------------------------------------------- |
-| `save`          	| bool            	| True                           	| If you want to save logs in file (suggested)                                         	                                      |
-| `less`          	| bool            	| False                          	| Reduce the logging format and message verbosity [#10](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/10) |
-| `console_level` 	| level 	        | logging.INFO                   	| Level of logs in terminal - Use logging.DEBUG for more helpful messages.             	                                      |
-| `file_level`    	| level 	        | logging.DEBUG                  	| Level of logs in file save - If you think the log file it's too big, use logging.INFO 	                                  |
-| `emoji`         	| bool            	| For Windows is False else True 	| On Windows, we have a problem printing emoji. Set to false if you have a problem      	                                  |
-| `colored`         | bool            	| True 	                            | If you want to print colored text      	                                                                                  |
+| Key             	| Type            	| Default                        	                                  | Description                                                                          	                                                                                                  |
+|-----------------	|-----------------	|-------------------------------------------------------------------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `save`          	| bool            	| True                           	                                  | If you want to save logs in file (suggested)                                         	                                                                                                  |
+| `less`          	| bool            	| False                          	                                  | Reduce the logging format and message verbosity [#10](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/10)                                                               |
+| `console_level` 	| level 	        | logging.INFO                   	                                  | Level of logs in terminal - Use logging.DEBUG for more helpful messages.             	                                                                                                  |
+| `file_level`    	| level 	        | logging.DEBUG                  	                                  | Level of logs in file save - If you think the log file it's too big, use logging.INFO 	                                                                                                  |
+| `emoji`         	| bool            	| For Windows is False else True 	                                  | On Windows, we have a problem printing emoji. Set to false if you have a problem      	                                                                                                  |
+| `colored`         | bool            	| True 	                                                              | If you want to print colored text [#45](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/45) [#82](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/82) |
+| `color_palette`   | ColorPalette      | All messages are Fore.RESET except WIN and LOSE bet (GREEN and RED) | Create your custom color palette. Read more above.      	                                                                                                                              |
+
+#### Color Palette
+Now you can customize the color of the terminal message. We have created a default ColorPalette that provide all the message with `DEFAULT (RESET)` color and the `BET_WIN` and `BET_LOSE` message `GREEN` and `RED` respectively.
+Currently you can only change the following types of messages:
+ - `STREAMER_ONLINE`
+ - `STREAMER_OFFLINE`
+ - `GAIN_FOR_RAID`
+ - `GAIN_FOR_CLAIM`
+ - `GAIN_FOR_WATCH`
+ - `BET_WIN`
+ - `BET_LOSE`
+ - `BET_REFUND`
+ - `BET_FILTERS`
+ - `BET_GENERAL`
+ - `BET_FAILED`
+
+The colors allowed are all the Fore color from Colorama: `BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.`
+The script was developed to handle all the human error, lower-case upper case and more, but I want to suggest using the following code-style
+```python
+from colorama import Fore
+ColorPalette(
+    "STREAMER_ONLINE" = Fore.GREEN,
+    "STREAMER_OFFLINE" = Fore.RED,
+    "GAIN_FOR_RAID" = Fore.YELLOW,
+    "GAIN_FOR_CLAIM" = Fore.YELLOW,
+    "GAIN_FOR_WATCH" = Fore.YELLOW,
+    "BET_WIN" = Fore.GREEN,
+    "BET_LOSE" = Fore.RED,
+    "BET_REFUND" = Fore.RESET,
+    "BET_FILTERS" = Fore.MAGENTA,
+    "BET_GENERAL" = Fore.BLUE,
+    "BET_FAILED" = Fore.RED,
+)
+```
+
 ### StreamerSettings
-| Key                	| Type        	| Default                        	| Description                                                                                                                                          	                                                                           |
-|--------------------	|-------------	|--------------------------------	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `make_predictions` 	| bool        	| True                           	| Choose if you want to make predictions / bet or not                                                                                                  	                                                                           |
-| `follow_raid`      	| bool        	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	                                                                           |
+| Key                	| Type        	| Default                        	| Description                                                                                                                                          	                                                                            |
+|--------------------	|-------------	|--------------------------------	|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `make_predictions` 	| bool        	| True                           	| Choose if you want to make predictions / bet or not                                                                                                  	                                                                            |
+| `follow_raid`      	| bool        	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	                                                                            |
 | `claim_drops`      	| bool        	| True                           	| If this value is True, the script will increase the watch-time for the current game. With this, you are able to claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) |
-| `watch_streak`     	| bool        	| True                           	| Choose if you want to change a priority for these streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                     |
-| `bet`              	| BetSettings 	|  	                                | Rules to follow for the bet                                                                                                                                                                                                      |
+| `watch_streak`     	| bool        	| True                           	| Choose if you want to change a priority for these streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                   |
+| `bet`              	| BetSettings 	|  	                                | Rules to follow for the bet                                                                                                                                                                                                       |
 ### BetSettings
 | Key                	| Type            	| Default 	| Description                                                                                                    	                                                                     |
 |--------------------	|-----------------	|---------	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
