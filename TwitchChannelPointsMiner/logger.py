@@ -62,7 +62,7 @@ class ColorPalette(object):
 
     def __init__(self, **kwargs):
         for k in kwargs:
-            if getattr(self, k.upper()) is not None:
+            if k.upper() in dir(self) and getattr(self, k.upper()) is not None:
                 if kwargs[k] in [
                     Fore.BLACK,
                     Fore.RED,
@@ -89,7 +89,7 @@ class ColorPalette(object):
                     setattr(self, k.upper(), getattr(Fore, kwargs[k].upper()))
 
     def get(self, key):
-        color = getattr(self, key.upper())
+        color = getattr(self, key.upper()) if key.upper() in dir(self) else None
         return Fore.RESET if color is None else color
 
 
