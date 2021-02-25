@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 import emoji
-from colorama import Style
+from colorama import Style, init
 
 from TwitchChannelPointsMiner.utils import remove_emoji
 
@@ -63,6 +63,9 @@ class LoggerSettings:
 
 
 def configure_loggers(username, settings):
+    if settings.colored is True:
+        init()
+
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
 
