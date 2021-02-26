@@ -7,13 +7,21 @@ from threading import Lock
 from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.Stream import Stream
 from TwitchChannelPointsMiner.classes.Settings import Settings
-from TwitchChannelPointsMiner.constants.twitch import URL
+from TwitchChannelPointsMiner.constants import URL
 from TwitchChannelPointsMiner.utils import _millify
 
 logger = logging.getLogger(__name__)
 
 
 class StreamerSettings(object):
+    __slots__ = [
+        "make_predictions",
+        "follow_raid",
+        "claim_drops",
+        "watch_streak",
+        "bet",
+    ]
+
     def __init__(
         self,
         make_predictions: bool = None,
@@ -36,13 +44,30 @@ class StreamerSettings(object):
             self.bet = BetSettings()
 
     def __repr__(self):
-        return f"BetSettings(MakePredictions={self.make_predictions}, FollowRaid={self.follow_raid}, ClaimDrops={self.claim_drops}, WatchStreak={self.watch_streak}, Bet={self.bet})"
+        return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, watch_streak={self.watch_streak}, bet={self.bet})"
 
 
 class Streamer(object):
+    __slots__ = [
+        "username",
+        "channel_id",
+        "settings",
+        "is_online",
+        "stream_up",
+        "online_at",
+        "offline_at",
+        "channel_points",
+        "minute_watched_requests",
+        "viewer_is_mod",
+        "stream",
+        "raid",
+        "history",
+        "streamer_url",
+    ]
+
     def __init__(self, username, settings=None):
-        self.username = username.lower().strip()
-        self.channel_id = 0
+        self.username: str = username.lower().strip()
+        self.channel_id: str = ""
         self.settings = settings
         self.is_online = False
         self.stream_up = 0
@@ -58,7 +83,6 @@ class Streamer(object):
         self.history = {}
 
         self.streamer_url = f"{URL}/{self.username}"
-        self.chat_url = f"{URL}/popout/{self.username}/chat?popout="
 
         self.mutex = Lock()
 
@@ -91,14 +115,15 @@ class Streamer(object):
         return ", ".join(
             [
                 f"{key}({self.history[key]['counter']} times, {_millify(self.history[key]['amount'])} gained)"
-                for key in self.history
+                for key in sorted(self.history)
+                if self.history[key]["counter"] != 0
             ]
         )
 
-    def update_history(self, reason_code, earned):
+    def update_history(self, reason_code, earned, counter=1):
         if reason_code not in self.history:
             self.history[reason_code] = {"counter": 0, "amount": 0}
-        self.history[reason_code]["counter"] += 1
+        self.history[reason_code]["counter"] += counter
         self.history[reason_code]["amount"] += earned
 
         if reason_code == "WATCH_STREAK":
@@ -107,6 +132,15 @@ class Streamer(object):
     def stream_up_elapsed(self):
         return self.stream_up == 0 or ((time.time() - self.stream_up) > 120)
 
+    def drops_condition(self):
+        return (
+            self.settings.claim_drops is True
+            and self.is_online is True
+            and self.stream.drops_tags is True
+            and self.stream.campaigns_ids != []
+        )
+
+    # === ANALYTICS === #
     def persistent_points(self, event_type, event_text):
         event_type = event_type.upper()
         if event_type in ["WATCH_STREAK", "WIN", "LOSE"]:

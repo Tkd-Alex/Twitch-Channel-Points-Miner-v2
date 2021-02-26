@@ -4,7 +4,21 @@ from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.utils import float_round
 
 
-class EventPrediction:
+class EventPrediction(object):
+    __slots__ = [
+        "streamer",
+        "event_id",
+        "title",
+        "created_at",
+        "prediction_window_seconds",
+        "status",
+        "final_result",
+        "box_fillable",
+        "bet_confirmed",
+        "bet_placed",
+        "bet",
+    ]
+
     def __init__(
         self,
         streamer: Streamer,
@@ -30,11 +44,11 @@ class EventPrediction:
         self.bet = Bet(outcomes, streamer.settings.bet)
 
     def __repr__(self):
-        return f"EventPrediction(event_id={self.event_id}, title={self.title})"
+        return f"EventPrediction(event_id={self.event_id}, streamer={self.streamer}, title={self.title})"
 
     def __str__(self):
         return (
-            f"EventPrediction: {self.title}"
+            f"EventPrediction: {self.streamer} - {self.title}"
             if Settings.logger.less
             else self.__repr__()
         )
@@ -46,4 +60,4 @@ class EventPrediction:
         return float_round(self.prediction_window_seconds - self.elapsed(timestamp))
 
     def print_recap(self) -> str:
-        return f"{self}\n\t\t{self.streamer}\n\t\t{self.bet}\n\t\tResult: {self.final_result}"
+        return f"{self}\n\t\t{self.bet}\n\t\tResult: {self.final_result}"

@@ -15,8 +15,21 @@ from TwitchChannelPointsMiner.classes.Exceptions import WrongCookiesException
 logger = logging.getLogger(__name__)
 
 
-class TwitchLogin:
-    def __init__(self, client_id, username, user_agent):
+class TwitchLogin(object):
+    __self__ = [
+        "client_id",
+        "token",
+        "login_check_result",
+        "session",
+        "session",
+        "username",
+        "password",
+        "user_id",
+        "email",
+        "cookies",
+    ]
+
+    def __init__(self, client_id, username, user_agent, password=None):
         self.client_id = client_id
         self.token = None
         self.login_check_result = False
@@ -25,6 +38,7 @@ class TwitchLogin:
             {"Client-ID": self.client_id, "User-Agent": user_agent}
         )
         self.username = username
+        self.password = password
         self.user_id = None
         self.email = None
 
@@ -43,7 +57,11 @@ class TwitchLogin:
 
         while True:
             # self.username = input('Enter Twitch username: ')
-            password = getpass.getpass(f"Enter Twitch password for {self.username}: ")
+            password = (
+                getpass.getpass(f"Enter Twitch password for {self.username}: ")
+                if self.password is None
+                else self.password
+            )
 
             post_data["username"] = self.username
             post_data["password"] = password
@@ -117,9 +135,8 @@ class TwitchLogin:
         self.session.headers.update({"Authorization": f"Bearer {self.token}"})
 
     def send_login_request(self, json_data):
-        r = self.session.post("https://passport.twitch.tv/login", json=json_data)
-        j = r.json()
-        return j
+        response = self.session.post("https://passport.twitch.tv/login", json=json_data)
+        return response.json()
 
     def login_flow_backup(self):
         """Backup OAuth login flow in case manual captcha solving is required"""
@@ -149,8 +166,10 @@ class TwitchLogin:
         if self.token is None:
             return False
 
-        r = self.session.get(f"https://api.twitch.tv/helix/users?login={self.username}")
-        response = r.json()
+        response = self.session.get(
+            f"https://api.twitch.tv/helix/users?login={self.username}"
+        )
+        response = response.json()
         if "data" in response:
             self.login_check_result = True
             self.user_id = response["data"][0]["id"]

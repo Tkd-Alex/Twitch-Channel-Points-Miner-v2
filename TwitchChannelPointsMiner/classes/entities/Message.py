@@ -3,7 +3,18 @@ import json
 from TwitchChannelPointsMiner.utils import server_time
 
 
-class Message:
+class Message(object):
+    __slots__ = [
+        "topic",
+        "topic_user",
+        "message",
+        "type",
+        "data",
+        "timestamp",
+        "channel_id",
+        "identifier",
+    ]
+
     def __init__(self, data):
         self.topic, self.topic_user = data["topic"].split(".")
 

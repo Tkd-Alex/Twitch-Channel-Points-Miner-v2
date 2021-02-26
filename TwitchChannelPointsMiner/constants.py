@@ -5,6 +5,17 @@ WEBSOCKET = "wss://pubsub-edge.twitch.tv/v1"
 CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"
 DROP_ID = "c2542d6d-cd10-4532-919b-3d19f30a768b"
 
+USER_AGENTS = {
+    "Windows": {
+        "CHROME": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36",
+        "FIREFOX": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0",
+    },
+    "Linux": {
+        "CHROME": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36",
+        "FIREFOX": "Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0",
+    },
+}
+
 
 class GQLOperations:
     url = "https://gql.twitch.tv/gql"
@@ -87,6 +98,34 @@ class GQLOperations:
             "persistedQuery": {
                 "version": 1,
                 "sha256Hash": "b44682ecc88358817009f20e69d75081b1e58825bb40aa53d5dbadcc17c881d8",
+            }
+        },
+    }
+    ViewerDropsDashboard = {
+        "operationName": "ViewerDropsDashboard",
+        "variables": {},
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "c4d61d7b71d03b324914d3cf8ca0bc23fe25dacf54120cc954321b9704a3f4e2",
+            }
+        },
+    }
+    DropCampaignDetails = {
+        "operationName": "DropCampaignDetails",
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "7da6078b1bfa2f0a4dd061cb47bdcd1ffddf31cccadd966ec192e4cd06666e2b",
+            }
+        },
+    }
+    DropsHighlightService_AvailableDrops = {
+        "operationName": "DropsHighlightService_AvailableDrops",
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "b19ee96a0e79e3f8281c4108bc4c7b3f232266db6f96fd04a339ab393673a075",
             }
         },
     }
