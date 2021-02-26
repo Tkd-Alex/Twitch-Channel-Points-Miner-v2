@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
-from TwitchChannelPointsMiner.logger import LoggerSettings
+from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
 from TwitchChannelPointsMiner.classes.Settings import Priority
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
@@ -21,7 +22,13 @@ twitch_miner = TwitchChannelPointsMiner(
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info)
         file_level=logging.DEBUG,               # Level of logs - If you think the log file it's too big, use logging.INFO
         emoji=True,                             # On Windows, we have a problem printing emoji. Set to false if you have a problem
-        less=False                              # If you think that the logs are too verbose, set this to True
+        less=False,                             # If you think that the logs are too verbose, set this to True
+        colored=True,                           # If you want to print colored text
+        color_palette=ColorPalette(             # You can also create a custom palette color (for the common message).
+            STREAMER_online="GREEN",            # Don't worry about lower/upper case the script will be parse all the values.
+            streamer_offline="red",             # Read more in README.md
+            BET_wiN=Fore.MAGENTA                # Color allowed are: [BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET].
+        )
     ),
     streamer_settings=StreamerSettings(
         make_predictions=True,                  # If you want to Bet / Make prediction
