@@ -101,7 +101,13 @@ class Streamer(object):
             self.offline_at = time.time()
             self.is_online = False
 
-        logger.info(f"{self} is Offline!", extra={"emoji": ":sleeping:"})
+        logger.info(
+            f"{self} is Offline!",
+            extra={
+                "emoji": ":sleeping:",
+                "color": Settings.logger.color_palette.STREAMER_OFFLINE,
+            },
+        )
 
     def set_online(self):
         if self.is_online is False:
@@ -109,7 +115,13 @@ class Streamer(object):
             self.is_online = True
             self.stream.init_watch_streak()
 
-        logger.info(f"{self} is Online!", extra={"emoji": ":partying_face:"})
+        logger.info(
+            f"{self} is Online!",
+            extra={
+                "emoji": ":partying_face:",
+                "color": Settings.logger.color_palette.STREAMER_ONLINE,
+            },
+        )
 
     def print_history(self):
         return ", ".join(
