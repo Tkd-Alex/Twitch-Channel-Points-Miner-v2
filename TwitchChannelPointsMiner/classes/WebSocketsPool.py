@@ -272,7 +272,10 @@ class WebSocketsPool:
 
                                         logger.info(
                                             f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
-                                            extra={"emoji": ":alarm_clock:"},
+                                            extra={
+                                                "emoji": ":alarm_clock:",
+                                                "color": Settings.logger.color_palette.BET_START,
+                                            },
                                         )
 
                         elif (

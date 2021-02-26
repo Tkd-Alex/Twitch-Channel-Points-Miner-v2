@@ -292,6 +292,7 @@ Currently you can only change the following types of messages:
  - `BET_FILTERS`
  - `BET_GENERAL`
  - `BET_FAILED`
+ - `BET_START`
 
 The colors allowed are all the Fore color from Colorama: `BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.`
 The script was developed to handle all the human error, lower-case upper case and more, but I want to suggest using the following code-style

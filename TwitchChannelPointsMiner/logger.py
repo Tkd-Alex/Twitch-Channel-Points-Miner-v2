@@ -59,6 +59,7 @@ class ColorPalette(object):
     BET_FILTERS = Fore.RESET
     BET_GENERAL = Fore.RESET
     BET_FAILED = Fore.RESET
+    BET_START = Fore.RESET
 
     def __init__(self, **kwargs):
         for k in kwargs:
