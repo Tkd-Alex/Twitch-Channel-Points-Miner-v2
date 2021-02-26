@@ -15,7 +15,7 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import (
     StreamerSettings,
 )
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
-from TwitchChannelPointsMiner.classes.Settings import Settings
+from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
@@ -43,9 +43,11 @@ class TwitchChannelPointsMiner:
         "twitch",
         "claim_drops_startup",
         "refresh_streamers",
+        "priority",
         "streamers",
         "events_predictions",
         "minute_watcher_thread",
+        "sync_campaigns_thread",
         "ws_pool",
         "session_id",
         "running",
@@ -58,8 +60,10 @@ class TwitchChannelPointsMiner:
     def __init__(
         self,
         username: str,
+        password: str = None,
         claim_drops_startup: bool = False,
         refresh_streamers: float = float("inf"),  # Minutes
+        priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
         # Default values for all streamers
@@ -76,13 +80,16 @@ class TwitchChannelPointsMiner:
         Settings.streamer_settings = streamer_settings
 
         user_agent = get_user_agent("FIREFOX")
-        self.twitch = Twitch(self.username, user_agent)
+        self.twitch = Twitch(self.username, user_agent, password)
 
         self.claim_drops_startup = claim_drops_startup
         self.refresh_streamers = refresh_streamers
+        self.priority = priority if isinstance(priority, list) else [priority]
+
         self.streamers = []
         self.events_predictions = {}
         self.minute_watcher_thread = None
+        self.sync_campaigns_thread = None
         self.ws_pool = None
 
         self.session_id = str(uuid.uuid4())
@@ -100,14 +107,25 @@ class TwitchChannelPointsMiner:
             signal.signal(sign, self.end)
 
     def mine(
-        self, streamers: list = [], streamers_json: str = None, followers: bool = False
+        self,
+        streamers: list = [],
+        streamers_json: str = None,
+        blacklist: list = [],
+        followers=False,
     ):
         self.run(
-            streamers=streamers, streamers_json=streamers_json, followers=followers
+            streamers=streamers,
+            streamers_json=streamers_json,
+            blacklist=blacklist,
+            followers=followers,
         )
 
     def run(
-        self, streamers: list = [], streamers_json: str = None, followers: bool = False
+        self,
+        streamers: list = [],
+        streamers_json: str = None,
+        blacklist: list = [],
+        followers=False,
     ):
         if self.running:
             logger.error("You can't start multiple sessions of this instance!")
@@ -126,6 +144,7 @@ class TwitchChannelPointsMiner:
             self.streamers = self.__reload_streamers(
                 streamers=streamers,
                 streamers_json=streamers_json,
+                blacklist=blacklist,
                 followers=followers,
             )
             self.__save_original()
@@ -135,14 +154,23 @@ class TwitchChannelPointsMiner:
                 self.streamers, "make_predictions", True
             )
 
+            # If we have at least one streamer with settings = claim_drops True
+            # Spawn a thread for sync inventory and dashboard
+            if (
+                at_least_one_value_in_settings_is(self.streamers, "claim_drops", True)
+                is True
+            ):
+                self.sync_campaigns_thread = threading.Thread(
+                    target=self.twitch.sync_campaigns,
+                    args=(self.streamers,),
+                )
+                self.sync_campaigns_thread.name = "Sync campaigns/inventory"
+                self.sync_campaigns_thread.start()
+                time.sleep(30)
+
             self.minute_watcher_thread = threading.Thread(
                 target=self.twitch.send_minute_watched_events,
-                args=(
-                    self.streamers,
-                    at_least_one_value_in_settings_is(
-                        self.streamers, "watch_streak", True
-                    ),
-                ),
+                args=(self.streamers, self.priority),
             )
             self.minute_watcher_thread.name = "Minute watcher"
             self.minute_watcher_thread.start()
@@ -160,19 +188,6 @@ class TwitchChannelPointsMiner:
                     user_id=self.twitch.twitch_login.get_user_id(),
                 )
             )
-
-            # If we have at least one streamer with settings = claim_drops True
-            # Going to subscribe to user-drop-events. Get update for drop-progress
-            claim_drops = at_least_one_value_in_settings_is(
-                self.streamers, "claim_drops", True
-            )
-            if claim_drops is True:
-                self.ws_pool.submit(
-                    PubsubTopic(
-                        "user-drop-events",
-                        user_id=self.twitch.twitch_login.get_user_id(),
-                    )
-                )
 
             # Going to subscribe to predictions-user-v1. Get update when we place a new prediction (confirm)
             if make_predictions is True:
@@ -239,6 +254,7 @@ class TwitchChannelPointsMiner:
     def __reload_streamers(
         self,
         streamers: list = [],
+        blacklist: list = [],
         streamers_json: str = None,
         followers: bool = False,
     ):
@@ -250,8 +266,9 @@ class TwitchChannelPointsMiner:
         # Use for prevent duplicate and easy access
         streamers_dict: dict = {}
         for streamer in self.streamers:
-            streamers_name.append(streamer.username)
-            streamers_dict[streamer.username] = streamer
+            if streamer.username not in blacklist:
+                streamers_name.append(streamer.username)
+                streamers_dict[streamer.username] = streamer
 
         # In the run.py a username can insert a "username" string or Streamer istance
         for streamer in streamers:
@@ -260,7 +277,7 @@ class TwitchChannelPointsMiner:
                 if isinstance(streamer, Streamer)
                 else streamer.lower().strip()
             )
-            if username not in streamers_dict:
+            if username not in streamers_dict and username not in blacklist:
                 streamers_name.append(username)
                 streamers_dict[username] = (
                     streamer
@@ -278,22 +295,23 @@ class TwitchChannelPointsMiner:
         #   3. If this user It's not in list append the new Streamer
         if streamers_json is not None:
             json_streamers = Settings.read(streamers_json)
+            usernames = []
             for streamer_dict in json_streamers:
-                username = streamer_dict["username"]
-                streamer = Streamer(
-                    username,
-                    settings=Settings.parse(
-                        streamer_dict["settings"], StreamerSettings
-                    ),
-                )
-                if username not in streamers_dict:
-                    streamers_name.append(username)
-                    streamers_dict[username] = streamer
-                else:
-                    # Get settings form json
-                    streamers_dict[username].settings = streamer.settings
-
-            usernames = list(map(lambda x: x["username"], json_streamers))
+                if username not in blacklist:
+                    username = streamer_dict["username"]
+                    usernames.append(username)
+                    streamer = Streamer(
+                        username,
+                        settings=Settings.parse(
+                            streamer_dict["settings"], StreamerSettings
+                        ),
+                    )
+                    if username not in streamers_dict:
+                        streamers_name.append(username)
+                        streamers_dict[username] = streamer
+                    else:
+                        # Get settings form json
+                        streamers_dict[username].settings = streamer.settings
 
             if self.sources_usernames["JSON_FILE"] != []:
                 streamers_name, streamers_dict = self.__remove_missing(
@@ -316,6 +334,9 @@ class TwitchChannelPointsMiner:
 
         if followers is True:
             followers_array = self.twitch.get_followers()
+            followers_array = list(
+                filter(lambda x: x not in blacklist, followers_array)
+            )
 
             for username in followers_array:
                 if username not in streamers_dict:
@@ -409,9 +430,13 @@ class TwitchChannelPointsMiner:
         self.running = self.twitch.running = False
         self.ws_pool.end()
 
-        self.minute_watcher_thread.join()
-        time.sleep(1)
+        if self.minute_watcher_thread is not None:
+            self.minute_watcher_thread.join()
 
+        if self.sync_campaigns_thread is not None:
+            self.sync_campaigns_thread.join()
+
+        time.sleep(1)
         self.__print_report()
 
         sys.exit(0)
@@ -433,29 +458,22 @@ class TwitchChannelPointsMiner:
         if self.events_predictions != {}:
             print("")
             for event_id in self.events_predictions:
+                event = self.events_predictions[event_id]
                 if (
-                    self.events_predictions[event_id].bet_confirmed is True
-                    and self.events_predictions[
-                        event_id
-                    ].streamer.settings.make_predictions
-                    is True
+                    event.bet_confirmed is True
+                    and event.streamer.settings.make_predictions is True
                 ):
                     logger.info(
-                        f"{self.events_predictions[event_id].streamer.settings.bet}",
+                        f"{event.streamer.settings.bet}",
                         extra={"emoji": ":wrench:"},
                     )
-                    if (
-                        self.events_predictions[
-                            event_id
-                        ].streamer.settings.bet.filter_condition
-                        is not None
-                    ):
+                    if event.streamer.settings.bet.filter_condition is not None:
                         logger.info(
-                            f"{self.events_predictions[event_id].streamer.settings.bet.filter_condition}",
+                            f"{event.streamer.settings.bet.filter_condition}",
                             extra={"emoji": ":pushpin:"},
                         )
                     logger.info(
-                        f"{self.events_predictions[event_id].print_recap()}",
+                        f"{event.print_recap()}",
                         extra={"emoji": ":bar_chart:"},
                     )
 

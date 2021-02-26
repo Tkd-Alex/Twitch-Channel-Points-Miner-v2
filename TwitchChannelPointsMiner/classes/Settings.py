@@ -1,11 +1,21 @@
 import json
 import logging
 import os
+from enum import Enum, auto
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 
+class Priority(Enum):
+    ORDER = auto()
+    STREAK = auto()
+    DROPS = auto()
+    POINTS_ASCENDING = auto()
+    POINTS_DESCEDING = auto()
+
+
+# Empty object shared between class
 class Settings(object):
     __slots__ = ["logger", "streamer_settings"]
     streamers_settings = []
