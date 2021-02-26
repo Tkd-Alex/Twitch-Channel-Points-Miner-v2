@@ -63,6 +63,7 @@ class Streamer(object):
         "raid",
         "history",
         "streamer_url",
+        "mutex",
     ]
 
     def __init__(self, username, settings=None):
