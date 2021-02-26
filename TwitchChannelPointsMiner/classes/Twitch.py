@@ -392,23 +392,36 @@ class Twitch(object):
 
         logger.info(
             f"Going to complete bet for {event}",
-            extra={"emoji": ":four_leaf_clover:"},
+            extra={
+                "emoji": ":four_leaf_clover:",
+                "color": Settings.logger.color_palette.BET_GENERAL,
+            },
         )
         if event.status == "ACTIVE":
             skip, compared_value = event.bet.skip()
             if skip is True:
                 logger.info(
-                    f"Skip betting for the event {event}", extra={"emoji": ":pushpin:"}
+                    f"Skip betting for the event {event}",
+                    extra={
+                        "emoji": ":pushpin:",
+                        "color": Settings.logger.color_palette.BET_FILTERS,
+                    },
                 )
                 logger.info(
                     f"Skip settings {event.bet.settings.filter_condition}, current value is: {compared_value}",
-                    extra={"emoji": ":pushpin:"},
+                    extra={
+                        "emoji": ":pushpin:",
+                        "color": Settings.logger.color_palette.BET_FILTERS,
+                    },
                 )
             else:
                 if decision["amount"] >= 10:
                     logger.info(
                         f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
-                        extra={"emoji": ":four_leaf_clover:"},
+                        extra={
+                            "emoji": ":four_leaf_clover:",
+                            "color": Settings.logger.color_palette.BET_GENERAL,
+                        },
                     )
 
                     json_data = copy.deepcopy(GQLOperations.MakePrediction)
@@ -424,7 +437,10 @@ class Twitch(object):
         else:
             logger.info(
                 f"Oh no! The event is not active anymore! Current status: {event.status}",
-                extra={"emoji": ":disappointed_relieved:"},
+                extra={
+                    "emoji": ":disappointed_relieved:",
+                    "color": Settings.logger.color_palette.BET_FAILED,
+                },
             )
 
     def claim_bonus(self, streamer, claim_id):
