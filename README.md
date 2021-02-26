@@ -44,7 +44,7 @@ If you have any type of issue, you need help, or you just want to suggest a new 
 
 If you want to help on this project, please leave a star 🌟 and share it with your friends! 😎
 
-A coffee is always a sign of LOVE ❤️
+A coffee is always a gesture of LOVE ❤️
 
 <a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
@@ -160,7 +160,13 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 
 ## How to use:
 1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
-2. Install all the requirements `pip install -r requirements.txt`
+2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements make sure to have at least Python3.6. You could also try to create a virtualenv and then install all the requirements
+```sh
+pip install virtualenv
+virtualenv -p python3 venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 3. Create your `run.py` file start from [example.py](/example.py)
 ```python
 # -*- coding: utf-8 -*-
@@ -240,6 +246,12 @@ twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
 twitch_miner.mine(["streamer1", "streamer2"])                   # Array of streamers OR
 twitch_miner.mine(followers=True)                               # Automatic use the followers list OR
 twitch_miner.mine(["streamer1", "streamer2"], followers=True)   # Mixed
+```
+If you follow so many streamers on Twitch, but you don't want to mine points for all of them, you can blacklist the users with `blacklist` keyword. [#94](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/94)
+```python
+from TwitchChannelPointsMiner import TwitchChannelPointsMiner
+twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
+twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Automatic use the followers list OR
 ```
 4. Start mining! `python run.py`
 

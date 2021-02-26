@@ -100,10 +100,10 @@ class TwitchChannelPointsMiner:
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
 
-    def mine(self, streamers: list = [], followers=False):
-        self.run(streamers, followers)
+    def mine(self, streamers: list = [], blacklist: list = [], followers=False):
+        self.run(streamers=streamers, blacklist=blacklist, followers=followers)
 
-    def run(self, streamers: list = [], followers=False):
+    def run(self, streamers: list = [], blacklist: list = [], followers=False):
         if self.running:
             logger.error("You can't start multiple sessions of this instance!")
         else:
@@ -127,8 +127,9 @@ class TwitchChannelPointsMiner:
                     if isinstance(streamer, Streamer)
                     else streamer.lower().strip()
                 )
-                streamers_name.append(username)
-                streamers_dict[username] = streamer
+                if username not in blacklist:
+                    streamers_name.append(username)
+                    streamers_dict[username] = streamer
 
             if followers is True:
                 followers_array = self.twitch.get_followers()
@@ -137,7 +138,7 @@ class TwitchChannelPointsMiner:
                     extra={"emoji": ":clipboard:"},
                 )
                 for username in followers_array:
-                    if username not in streamers_dict:
+                    if username not in streamers_dict and username not in blacklist:
                         streamers_dict[username] = username.lower().strip()
             else:
                 followers_array = []
