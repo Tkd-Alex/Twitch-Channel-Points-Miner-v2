@@ -66,7 +66,6 @@ class TwitchChannelPointsMiner:
         username: str,
         password: str = None,
         claim_drops_startup: bool = False,
-        analytics: bool = True,
         # Settings for logging and selenium as you can see.
         priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
@@ -106,12 +105,12 @@ class TwitchChannelPointsMiner:
 
         self.logs_file = configure_loggers(self.username, logger_settings)
 
-        if analytics is True:
-            http_server = AnalyticsServer()
-            http_server.start()
-
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
+
+    def analytics(self, host="127.0.0.1", port=5000):
+        http_server = AnalyticsServer(host=host, port=port)
+        http_server.start()
 
     def mine(self, streamers: list = [], blacklist: list = [], followers=False):
         self.run(streamers=streamers, blacklist=blacklist, followers=followers)

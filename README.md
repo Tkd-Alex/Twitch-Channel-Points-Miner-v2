@@ -258,7 +258,14 @@ If you follow so many streamers on Twitch, but you don't want to mine points for
 ```python
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
-twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Automatic use the followers list OR
+twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Blacklist example
+```
+If you want to use the analytics function [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96) call the analytics method before start mining.
+```python
+from TwitchChannelPointsMiner import TwitchChannelPointsMiner
+twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
+twitch_miner.analytics(host="127.0.0.1", port=5000)              # Analytics web-server
+twitch_miner.mine(followers=True, blacklist=["user1", "user2"])
 ```
 4. Start mining! `python run.py`
 
