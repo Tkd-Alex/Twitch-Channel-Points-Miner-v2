@@ -311,17 +311,17 @@ The script was developed to handle all the human error, lower-case upper case an
 ```python
 from colorama import Fore
 ColorPalette(
-    "STREAMER_ONLINE" = Fore.GREEN,
-    "STREAMER_OFFLINE" = Fore.RED,
-    "GAIN_FOR_RAID" = Fore.YELLOW,
-    "GAIN_FOR_CLAIM" = Fore.YELLOW,
-    "GAIN_FOR_WATCH" = Fore.YELLOW,
-    "BET_WIN" = Fore.GREEN,
-    "BET_LOSE" = Fore.RED,
-    "BET_REFUND" = Fore.RESET,
-    "BET_FILTERS" = Fore.MAGENTA,
-    "BET_GENERAL" = Fore.BLUE,
-    "BET_FAILED" = Fore.RED,
+    STREAMER_ONLINE = Fore.GREEN,
+    STREAMER_OFFLINE = Fore.RED,
+    GAIN_FOR_RAID = Fore.YELLOW,
+    GAIN_FOR_CLAIM = Fore.YELLOW,
+    GAIN_FOR_WATCH = Fore.YELLOW,
+    BET_WIN = Fore.GREEN,
+    BET_LOSE = Fore.RED,
+    BET_REFUND = Fore.RESET,
+    BET_FILTERS = Fore.MAGENTA,
+    BET_GENERAL = Fore.BLUE,
+    BET_FAILED = Fore.RED,
 )
 ```
 
