@@ -40,7 +40,7 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
 
 
 ## Community
-If you have any type of issue, you need help, or you just want to suggest a new feature, please open a GitHub Issue. Don't write me on [Instagram](https://www.instagram.com/tkd_alex/), [Telegram](https://t.me/TkdAlex), [Discord](https://discordapp.com/users/641397388132483121), [Twitter](https://twitter.com/TkdAxel) (but you can follow me 😆) or somewhere else. If you don't have an account on this platform, you can create it. It's free. I do not want to be rude, but if you have a problem, maybe another user can also have the same problem, and your issue can help the community. Same for the new feature, your idea can help other users, and It's beautiful to discuss between us.
+If you have any type of issue, need help, or want to suggest a new feature, please open a GitHub Issue. Don't write me on [Instagram](https://www.instagram.com/tkd_alex/), [Telegram](https://t.me/TkdAlex), [Discord](https://discordapp.com/users/641397388132483121), [Twitter](https://twitter.com/TkdAxel) (but you can follow me 😆) or somewhere else. If you don't have an account on this platform, you can create it. It's free. I do not want to be rude, but if you have a problem, maybe another user can also have the same problem, and your issue can help the community. Same for the new feature, your idea can help other users, and It's beautiful to discuss between us.
 
 If you want to help on this project, please leave a star 🌟 and share it with your friends! 😎
 
@@ -160,7 +160,7 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 
 ## How to use:
 1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
-2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements make sure to have at least Python3.6. You could also try to create a virtualenv and then install all the requirements
+2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements, make sure to have at least Python3.6. You could also try to create a virtualenv and then install all the requirements
 ```sh
 pip install virtualenv
 virtualenv -p python3 venv
@@ -181,12 +181,12 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, Streame
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
-    password="write-your-secure-psw",           # If no password will be provided the script will ask interactively
-    claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
+    password="write-your-secure-psw",           # If no password will be provided, the script will ask interactively
+    claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on the startup
     priority=[                                  # Custom priority in this case for example:
-        Priority.STREAK,                        # - we want first of all to catch all watch streak from all streamers
-        Priority.DROPS,                         # - when we don't have anymore watch streak to catch wait until all drops are collected over the streamers
-        Priority.ORDER                          # - when we have all of drops claimed and no watch-streak avaialable use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
+        Priority.STREAK,                        # - We want first of all to catch all watch streak from all streamers
+        Priority.DROPS,                         # - When we don't have anymore watch streak to catch, wait until all drops are collected over the streamers
+        Priority.ORDER                          # - When we have all of the  drops claimed and no watch-streak available, use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
     ],
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
@@ -196,7 +196,7 @@ twitch_miner = TwitchChannelPointsMiner(
         less=False,                             # If you think that the logs are too verbose, set this to True
         colored=True,                           # If you want to print colored text
         color_palette=ColorPalette(             # You can also create a custom palette color (for the common message).
-            STREAMER_online="GREEN",            # Don't worry about lower/upper case the script will be parse all the values.
+            STREAMER_online="GREEN",            # Don't worry about lower/upper case. The script will parse all the values.
             streamer_offline="red",             # Read more in README.md
             BET_wiN=Fore.MAGENTA                # Color allowed are: [BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET].
         )
@@ -254,7 +254,7 @@ twitch_miner.mine(["streamer1", "streamer2"])                   # Array of strea
 twitch_miner.mine(followers=True)                               # Automatic use the followers list OR
 twitch_miner.mine(["streamer1", "streamer2"], followers=True)   # Mixed
 ```
-If you follow so many streamers on Twitch, but you don't want to mine points for all of them, you can blacklist the users with `blacklist` keyword. [#94](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/94)
+If you follow so many streamers on Twitch, but you don't want to mine points for all of them, you can blacklist the users with the `blacklist` keyword. [#94](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/94)
 ```python
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
@@ -263,13 +263,13 @@ twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Automatic use
 4. Start mining! `python run.py`
 
 ### Limits
-> Twitch has a limit - you can't watch more than 2 channels at one time. We take the first two streamers from the list as they have the highest priority.
+> Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
 
 Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow has the highest priority.
 
 ## Settings
-Most of the settings are self-explained and are commented in example.
-You can watch only two streamers per time. With `priority` settings you can select which streamers watch by use priority. You can use an array of priority or single item. I suggest to use at least one priority from `ORDER`, `POINTS_ASCENDING`, `POINTS_DESCEDING` because for example If you set only `STREAK` after catch all watch streak the script will stop to watch streamers.
+Most of the settings are self-explained and are commented on in the example.
+You can watch only two streamers per time. With `priority` settings, you can select which streamers watch by use priority. You can use an array of priority or single item. I suggest using at least one priority from `ORDER`, `POINTS_ASCENDING`, `POINTS_DESCEDING` because, for example, If you set only `STREAK` after catch all watch streak, the script will stop to watch streamers.
 Available values are the following:
  - `STREAK` - Catch the watch streak from all streamers
  - `DROPS` - Claim all drops from streamers with drops tags enabled
@@ -330,7 +330,7 @@ ColorPalette(
 |--------------------	|-------------	|--------------------------------	|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `make_predictions` 	| bool        	| True                           	| Choose if you want to make predictions / bet or not                                                                                                  	                                                                            |
 | `follow_raid`      	| bool        	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	                                                                            |
-| `claim_drops`      	| bool        	| True                           	| If this value is True, the script will increase the watch-time for the current game. With this, you are able to claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) |
+| `claim_drops`      	| bool        	| True                           	| If this value is True, the script will increase the watch-time for the current game. With this, you can claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) |
 | `watch_streak`     	| bool        	| True                           	| Choose if you want to change a priority for these streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                   |
 | `bet`              	| BetSettings 	|  	                                | Rules to follow for the bet                                                                                                                                                                                                       |
 ### BetSettings
@@ -348,7 +348,7 @@ ColorPalette(
 - **MOST_VOTED**: Select the option most voted based on users count
 - **HIGH_ODDS**: Select the option with the highest odds
 - **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same as select LOWEST_ODDS
-- **SMART**: If the majority in percent chose an option, then follow the other users, otherwise choose the option with the highest odds
+- **SMART**: If the majority in percent chose an option, then follow the other users, otherwise select the option with the highest odds
 
 ![Screenshot](./assets/prediction.png)
 
@@ -357,7 +357,7 @@ Here a concrete example:
 - **MOST_VOTED**: 21 Users have select **'over 7.5'**, instead of 9 'under 7.5'
 - **HIGH_ODDS**: The highest odd is 2.27 on **'over 7.5'** vs 1.79 on 'under 7.5'
 - **PERCENTAGE**: The highest percentage is 56% for **'under 7.5'**
-- **SMART**: Calculate the percentage based on the users. The percentages are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percentages are higher than `percentage_gap` select the highest percentage, else the highest odds.
+- **SMART**: Calculate the percentage based on the users. The percentages are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percentages is higher than `percentage_gap` select the highest percentage, else the highest odds.
 
 In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 ### FilterCondition
@@ -388,7 +388,7 @@ Allowed values for `where` are: `GT, LT, GTE, LTE`
 `FilterCondition(by=OutcomeKeys.TOP_POINTS, where=Condition.LT, value=2000)`
 
 ## Migrating from an old repository (the original one):
-If you already have a `twitch-cookies.pkl` and you don't want to login again, please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
+If you already have a `twitch-cookies.pkl` and you don't want to log in again, please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
 ```
 .
 +-- run.py
