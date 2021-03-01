@@ -110,8 +110,9 @@
     };
 
     var chart = new ApexCharts(document.querySelector("#chart"), options);
+    var currentStreamer = null;
 
-    $( document ).ready(function() {
+    $(document).ready(function() {
         chart.render();
         $("li").eq(0).click();
     });
@@ -119,17 +120,24 @@
     function changeStreamer(streamer, index) {
         $("li").removeClass( "is-active" )
         $("li").eq(index - 1).addClass('is-active');
+        currentStreamer = streamer;
+        getData(streamer);
+    }
 
-        $.getJSON(`./json/${streamer}`, function (response) {
-            chart.clearAnnotations()
-            chart.updateSeries([{
-                name: streamer.replace(".json", ""),
-                data: response["series"]
-            }], true)
-            response["points"].forEach(annotation => {
-                chart.addPointAnnotation(annotation, true)
-            })
-        });
+    function getStreamerData(streamer) {
+        if(currentStreamer == streamer){
+            $.getJSON(`./json/${streamer}`, function (response) {
+                chart.clearAnnotations()
+                chart.updateSeries([{
+                    name: streamer.replace(".json", ""),
+                    data: response["series"]
+                }], true)
+                response["points"].forEach(annotation => {
+                    chart.addPointAnnotation(annotation, true)
+                })
+                setTimeout(function(){getStreamerData(streamer);}, 300000);  // 5 minutes
+            });
+        }
     }
 
 </script>
