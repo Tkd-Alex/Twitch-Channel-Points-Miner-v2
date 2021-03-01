@@ -52,6 +52,7 @@ class ColorPalette(object):
     GAIN_FOR_RAID = Fore.RESET
     GAIN_FOR_CLAIM = Fore.RESET
     GAIN_FOR_WATCH = Fore.RESET
+    GAIN_FOR_WATCH_STREAK = Fore.RESET
 
     BET_WIN = Fore.GREEN
     BET_LOSE = Fore.RED

@@ -323,6 +323,7 @@ ColorPalette(
     GAIN_FOR_RAID = Fore.YELLOW,
     GAIN_FOR_CLAIM = Fore.YELLOW,
     GAIN_FOR_WATCH = Fore.YELLOW,
+    GAIN_FOR_WATCH_STREAK = Fore.YELLOW,
     BET_WIN = Fore.GREEN,
     BET_LOSE = Fore.RED,
     BET_REFUND = Fore.RESET,
