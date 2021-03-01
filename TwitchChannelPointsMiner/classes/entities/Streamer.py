@@ -156,11 +156,11 @@ class Streamer(object):
     # === ANALYTICS === #
     def persistent_points(self, event_type, event_text):
         event_type = event_type.upper()
-        if event_type in ["WATCH_STREAK", "WIN", "LOSE"]:
+        if event_type in ["WATCH_STREAK", "WIN", "PREDICTION_MADE"]:
             primary_color = (
                 "#45c1ff"
                 if event_type == "WATCH_STREAK"
-                else ("#ff4560" if event_type == "LOSE" else "#54ff45")
+                else ("#ffe045" if event_type == "LOSE" else "#54ff45")
             )
             data = {
                 "marker": {

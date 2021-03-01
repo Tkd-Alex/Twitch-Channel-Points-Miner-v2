@@ -362,12 +362,17 @@ class WebSocketsPool:
                                         counter=-1,
                                     )
 
-                                ws.streamers[streamer_index].persistent_points(
-                                    event_result["type"],
-                                    f"{points_prefix}{points_won} - {result_type}: {ws.events_predictions[event_id].title}",
-                                )
+                                if result_type != "LOSE":
+                                    ws.streamers[streamer_index].persistent_points(
+                                        event_result["type"],
+                                        f"{result_type}: {ws.events_predictions[event_id].title}",
+                                    )
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
+                                ws.streamers[streamer_index].persistent_points(
+                                    "PREDICTION_MADE",
+                                    f"PREDICTION MADE: {event_prediction.bet.decision['choice']} {event_prediction.title}",
+                                )
                 except Exception:
                     logger.error(
                         f"Exception raised for topic: {message.topic} and message: {message}",
