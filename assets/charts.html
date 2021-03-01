@@ -76,6 +76,9 @@
         dataLabels: {
             enabled: false
         },
+        stroke: {
+            curve: 'smooth',
+        },
         markers: {
             size: 0,
         },
@@ -102,7 +105,11 @@
             type: 'datetime'
         },
         tooltip: {
-            shared: false
+            shared: false,
+            x: {
+                show: true,
+                format: 'HH:mm:ss dd MMM',
+            },
         },
         noData: {
             text: 'Loading...'
@@ -121,7 +128,7 @@
         $("li").removeClass( "is-active" )
         $("li").eq(index - 1).addClass('is-active');
         currentStreamer = streamer;
-        getData(streamer);
+        getStreamerData(streamer);
     }
 
     function getStreamerData(streamer) {
