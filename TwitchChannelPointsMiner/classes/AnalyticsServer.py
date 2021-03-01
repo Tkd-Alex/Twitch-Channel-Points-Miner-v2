@@ -1,7 +1,7 @@
 import logging
 import os
-from multiprocessing import Process
 from pathlib import Path
+from threading import Thread
 
 from flask import Flask, Response, cli, render_template
 
@@ -34,7 +34,7 @@ def index():
     return render_template("charts.html", streamers=",".join(streamers_available()))
 
 
-class AnalyticsServer(Process):
+class AnalyticsServer(Thread):
     def __init__(self, host="127.0.0.1", port=5000):
         super(AnalyticsServer, self).__init__()
 

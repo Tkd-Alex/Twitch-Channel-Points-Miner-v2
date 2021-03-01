@@ -110,6 +110,8 @@ class TwitchChannelPointsMiner:
 
     def analytics(self, host="127.0.0.1", port=5000):
         http_server = AnalyticsServer(host=host, port=port)
+        http_server.daemon = True
+        http_server.name = "Analytics Thread"
         http_server.start()
 
     def mine(self, streamers: list = [], blacklist: list = [], followers=False):
