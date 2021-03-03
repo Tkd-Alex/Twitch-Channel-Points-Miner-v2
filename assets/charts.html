@@ -68,9 +68,6 @@
                 type: 'x',
                 enabled: true,
                 autoScaleYaxis: true
-            },
-            toolbar: {
-                autoSelected: 'zoom'
             }
         },
         dataLabels: {
@@ -110,6 +107,21 @@
                 show: true,
                 format: 'HH:mm:ss dd MMM',
             },
+            custom: ({series, seriesIndex, dataPointIndex, w}) => {
+                console.log(w.globals)
+                return (`<div class="apexcharts-active">
+                    <div class="apexcharts-tooltip-title">${w.globals.seriesNames[seriesIndex]}</div>
+                    <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex; padding-bottom: 0px !important;">
+                        <div class="apexcharts-tooltip-text">
+                            <div class="apexcharts-tooltip-y-group">
+                                <span class="apexcharts-tooltip-text-label"><b>Points</b>: ${series[seriesIndex][dataPointIndex]}</span><br>
+                                <span class="apexcharts-tooltip-text-label"><b>Reason</b>: ${w.globals.seriesZ[seriesIndex][dataPointIndex] ? w.globals.seriesZ[seriesIndex][dataPointIndex] : ''}</span>
+                            </div>
+                        </div>
+                    </div>
+                    </div>`
+                )
+            }
         },
         noData: {
             text: 'Loading...'
@@ -139,8 +151,8 @@
                     name: streamer.replace(".json", ""),
                     data: response["series"]
                 }], true)
-                response["points"].forEach(annotation => {
-                    chart.addPointAnnotation(annotation, true)
+                response["annotations"].forEach(annotation => {
+                    chart.addXaxisAnnotation(annotation, true)
                 })
                 setTimeout(function(){getStreamerData(streamer);}, 300000);  // 5 minutes
             });

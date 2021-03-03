@@ -180,7 +180,11 @@ class WebSocketsPool:
                         if message.type in ["points-earned", "points-spent"]:
                             balance = message.data["balance"]["balance"]
                             ws.streamers[streamer_index].channel_points = balance
-                            ws.streamers[streamer_index].persistent_series()
+                            ws.streamers[streamer_index].persistent_series(
+                                event_type=message.data["point_gain"]["reason_code"]
+                                if message.type == "points-earned"
+                                else "Spent"
+                            )
 
                         if message.type == "points-earned":
                             earned = message.data["point_gain"]["total_points"]
@@ -197,7 +201,7 @@ class WebSocketsPool:
                             ws.streamers[streamer_index].update_history(
                                 reason_code, earned
                             )
-                            ws.streamers[streamer_index].persistent_points(
+                            ws.streamers[streamer_index].persistent_annotations(
                                 reason_code, f"+{earned} - {reason_code}"
                             )
                         elif message.type == "claim-available":
@@ -363,15 +367,15 @@ class WebSocketsPool:
                                     )
 
                                 if result_type != "LOSE":
-                                    ws.streamers[streamer_index].persistent_points(
+                                    ws.streamers[streamer_index].persistent_annotations(
                                         event_result["type"],
-                                        f"{result_type}: {ws.events_predictions[event_id].title}",
+                                        f"{ws.events_predictions[event_id].title}",
                                     )
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
-                                ws.streamers[streamer_index].persistent_points(
+                                ws.streamers[streamer_index].persistent_annotations(
                                     "PREDICTION_MADE",
-                                    f"PREDICTION MADE: {event_prediction.bet.decision['choice']} {event_prediction.title}",
+                                    f"Decision: {event_prediction.bet.decision['choice']} - {event_prediction.title}",
                                 )
                 except Exception:
                     logger.error(
