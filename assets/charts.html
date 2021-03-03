@@ -39,13 +39,24 @@
         </div>
         <br>
 
-        <div class="tabs">
-            <ul>
-                {% for streamer in streamers.split(',')|sort %}
-                    <li onClick="changeStreamer('{{streamer}}', {{loop.index}})"><a>{{ streamer.replace(".json", "")  }}</a></li>
-                {% endfor %}
-            </ul>
+        <div class="columns">
+            <div class="column is-10">
+                <div class="tabs">
+                    <ul>
+                        {% for streamer in streamers.split(',')|sort %}
+                            <li onClick="changeStreamer('{{streamer}}', {{loop.index}})"><a>{{ streamer.replace(".json", "")  }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="column" style="text-align: center">
+                <label class="checkbox">
+                    <input type="checkbox" checked="true" id="annotations">
+                    Annotations
+                </label>
+            </div>
         </div>
+
         <div id="chart"></div>
 
         <hr>
@@ -108,7 +119,6 @@
                 format: 'HH:mm:ss dd MMM',
             },
             custom: ({series, seriesIndex, dataPointIndex, w}) => {
-                console.log(w.globals)
                 return (`<div class="apexcharts-active">
                     <div class="apexcharts-tooltip-title">${w.globals.seriesNames[seriesIndex]}</div>
                     <div class="apexcharts-tooltip-series-group apexcharts-active" style="order: 1; display: flex; padding-bottom: 0px !important;">
@@ -130,6 +140,7 @@
 
     var chart = new ApexCharts(document.querySelector("#chart"), options);
     var currentStreamer = null;
+    var annotations = [];
 
     $(document).ready(function() {
         chart.render();
@@ -146,18 +157,28 @@
     function getStreamerData(streamer) {
         if(currentStreamer == streamer){
             $.getJSON(`./json/${streamer}`, function (response) {
-                chart.clearAnnotations()
                 chart.updateSeries([{
                     name: streamer.replace(".json", ""),
                     data: response["series"]
                 }], true)
-                response["annotations"].forEach(annotation => {
-                    chart.addXaxisAnnotation(annotation, true)
-                })
+                annotations = response["annotations"];
+                updateAnnotations()
                 setTimeout(function(){getStreamerData(streamer);}, 300000);  // 5 minutes
             });
         }
     }
+
+    function updateAnnotations() {
+        if($('#annotations').prop("checked") === true){
+            chart.clearAnnotations()
+            if(annotations && annotations.length > 0)
+                annotations.forEach(annotation => {
+                    chart.addXaxisAnnotation(annotation, true)
+                })
+        } else chart.clearAnnotations()
+    }
+
+    $('#annotations').click(() => { updateAnnotations(); });
 
 </script>
 
