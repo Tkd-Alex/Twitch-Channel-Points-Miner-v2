@@ -41,7 +41,7 @@
 
         <div class="tabs">
             <ul>
-                {% for streamer in streamers.split(',') %}
+                {% for streamer in streamers.split(',')|sort %}
                     <li onClick="changeStreamer('{{streamer}}', {{loop.index}})"><a>{{ streamer.replace(".json", "")  }}</a></li>
                 {% endfor %}
             </ul>
