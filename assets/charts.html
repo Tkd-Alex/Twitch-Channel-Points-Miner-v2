@@ -44,7 +44,7 @@
                 <div class="tabs">
                     <ul>
                         {% for streamer in streamers.split(',')|sort %}
-                            <li onClick="changeStreamer('{{streamer}}', {{loop.index}})"><a>{{ streamer.replace(".json", "")  }}</a></li>
+                            <li onClick="changeStreamer('{{ streamer }}', {{ loop.index }})"><a>{{ streamer.replace(".json", "")  }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -141,6 +141,8 @@
     var chart = new ApexCharts(document.querySelector("#chart"), options);
     var currentStreamer = null;
     var annotations = [];
+
+    var refresh = parseInt("{{ refresh }}");
 
     $(document).ready(function() {
         chart.render();
