@@ -30,15 +30,16 @@ logger = logging.getLogger(__name__)
 
 
 class Twitch(object):
-    __slots__ = ["cookies_file", "user_agent", "twitch_login", "running"]
+    __slots__ = ["cookies_file", "session", "twitch_login", "running"]
 
     def __init__(self, username, user_agent, password=None):
         cookies_path = os.path.join(Path().absolute(), "cookies")
         Path(cookies_path).mkdir(parents=True, exist_ok=True)
         self.cookies_file = os.path.join(cookies_path, f"{username}.pkl")
-        self.user_agent = user_agent
+        self.session = requests.Session()
+        self.session.headers.update({"User-Agent": user_agent})
         self.twitch_login = TwitchLogin(
-            CLIENT_ID, username, self.user_agent, password=password
+            CLIENT_ID, username, user_agent, password=password
         )
         self.running = True
 
@@ -86,13 +87,12 @@ class Twitch(object):
 
     def get_spade_url(self, streamer):
         try:
-            headers = {"User-Agent": self.user_agent}
-            main_page_request = requests.get(streamer.streamer_url, headers=headers)
+            main_page_request = self.session.get(streamer.streamer_url)
             response = main_page_request.text
             regex_settings = "(https://static.twitchcdn.net/config/settings.*?js)"
             settings_url = re.search(regex_settings, response).group(1)
 
-            settings_request = requests.get(settings_url, headers=headers)
+            settings_request = self.session.get(settings_url)
             response = settings_request.text
             regex_spade = '"spade_url":"(.*?)"'
             streamer.stream.spade_url = re.search(regex_spade, response).group(1)
@@ -217,13 +217,12 @@ class Twitch(object):
 
     def post_gql_request(self, json_data):
         try:
-            response = requests.post(
+            response = self.session.post(
                 GQLOperations.url,
                 json=json_data,
                 headers={
                     "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
                     "Client-Id": CLIENT_ID,
-                    "User-Agent": self.user_agent,
                 },
             )
             logger.debug(
@@ -320,10 +319,9 @@ class Twitch(object):
                     next_iteration = time.time() + 60 / len(streamers_watching)
 
                     try:
-                        response = requests.post(
+                        response = self.session.post(
                             streamers[index].stream.spade_url,
                             data=streamers[index].stream.encode_payload(),
-                            headers={"User-Agent": self.user_agent},
                             timeout=60,
                         )
                         logger.debug(
