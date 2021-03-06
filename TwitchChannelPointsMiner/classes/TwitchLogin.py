@@ -10,7 +10,10 @@ import pickle
 import browser_cookie3
 import requests
 
-from TwitchChannelPointsMiner.classes.Exceptions import WrongCookiesException, BadCredentialsException
+from TwitchChannelPointsMiner.classes.Exceptions import (
+    BadCredentialsException,
+    WrongCookiesException,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +110,9 @@ class TwitchLogin(object):
 
                         # If the password is loaded from run.py, require the user to fix it there.
                         if self.password is not None:
-                            raise BadCredentialsException("Username or password is incorrect.")
+                            raise BadCredentialsException(
+                                "Username or password is incorrect."
+                            )
 
                         # If the user didn't load the password from run.py we can just ask for it again.
                         break
