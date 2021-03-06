@@ -8,3 +8,7 @@ class StreamerIsOfflineException(Exception):
 
 class WrongCookiesException(Exception):
     pass
+
+
+class BadCredentialsException(Exception):
+    pass
