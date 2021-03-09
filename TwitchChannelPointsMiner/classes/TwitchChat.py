@@ -1,22 +1,12 @@
 import logging
-from multiprocessing import Process
+from threading import Thread
 
 from TwitchChannelPointsMiner.classes.entities.Chat import Chat
 
 logger = logging.getLogger(__name__)
 
 
-class ChatSettings(object):
-    def __init__(
-        self,
-        username: str = None,
-        token: str = None,
-    ):
-        self.username = username
-        self.token = token
-
-
-class TwitchChat(Process):
+class TwitchChat(Thread):
     def __deepcopy__(self, memo):
         return None
 

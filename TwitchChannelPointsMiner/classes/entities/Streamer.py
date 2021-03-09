@@ -4,7 +4,6 @@ import time
 from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.Stream import Stream
 from TwitchChannelPointsMiner.classes.Settings import Settings
-from TwitchChannelPointsMiner.classes.TwitchChat import TwitchChat
 from TwitchChannelPointsMiner.constants import URL
 from TwitchChannelPointsMiner.utils import _millify
 
@@ -121,7 +120,6 @@ class Streamer(object):
             self.online_at = time.time()
             self.is_online = True
             self.stream.init_watch_streak()
-
             self.join_chat()
 
         logger.info(
@@ -153,20 +151,6 @@ class Streamer(object):
     def stream_up_elapsed(self):
         return self.stream_up == 0 or ((time.time() - self.stream_up) > 120)
 
-    def leave_chat(self):
-        if self.irc_chat is not None:
-            self.irc_chat.terminate()
-
-    def join_chat(self):
-        if self.settings.chat_client is not None:
-            self.irc_chat = TwitchChat(
-                self.settings.chat_client.username,
-                self.settings.chat_client.token,
-                self.username,
-            )
-            logger.info(f"Connecting to {self.username}'s chat!")
-            self.irc_chat.start()
-
     def drops_condition(self):
         return (
             self.settings.claim_drops is True
@@ -174,3 +158,12 @@ class Streamer(object):
             and self.stream.drops_tags is True
             and self.stream.campaigns_ids != []
         )
+
+    def leave_chat(self):
+        if self.settings.join_chat is True and self.irc_chat is not None:
+            self.irc_chat.terminate()
+
+    def join_chat(self):
+        if self.settings.join_chat is True and self.irc_chat is not None:
+            logger.info(f"Connecting to {self.username}'s chat!")
+            self.irc_chat.start()

@@ -1,5 +1,7 @@
 import irc.bot
 
+from TwitchChannelPointsMiner.constants import IRC, IRC_PORT
+
 
 class Chat(irc.bot.SingleServerIRCBot):
     def __init__(self, username, token, channel):
@@ -7,10 +9,8 @@ class Chat(irc.bot.SingleServerIRCBot):
         self.channel = "#" + channel
 
         # Create IRC bot connection
-        server = "irc.chat.twitch.tv"
-        port = 6667
         irc.bot.SingleServerIRCBot.__init__(
-            self, [(server, port, "oauth:" + token)], username, username
+            self, [(IRC, IRC_PORT, "oauth:" + token)], username, username
         )
 
     def on_welcome(self, c, e):

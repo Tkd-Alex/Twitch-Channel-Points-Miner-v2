@@ -19,6 +19,7 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import (
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
+from TwitchChannelPointsMiner.classes.TwitchChat import TwitchChat
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.utils import (
@@ -184,6 +185,12 @@ class TwitchChannelPointsMiner:
                 self.twitch.viewer_is_mod(streamer)
                 if streamer.viewer_is_mod is True:
                     streamer.settings.make_predictions = False
+                if streamer.settings.join_chat is True:
+                    streamer.irc_chat = TwitchChat(
+                        self.username,
+                        self.twitch.twitch_login.get_auth_token(),
+                        streamer.username,
+                    )
 
             self.original_streamers = copy.deepcopy(self.streamers)
 
@@ -268,7 +275,7 @@ class TwitchChannelPointsMiner:
         logger.info("CTRL+C Detected! Please wait just a moment!")
 
         for streamer in self.streamers:
-            if streamer is not None:
+            if streamer.irc_chat is not None:
                 streamer.leave_chat()
 
         self.running = self.twitch.running = False
