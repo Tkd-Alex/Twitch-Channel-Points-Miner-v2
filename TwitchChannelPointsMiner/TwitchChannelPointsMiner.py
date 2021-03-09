@@ -73,7 +73,7 @@ class TwitchChannelPointsMiner:
         # Default values for all streamers
         streamer_settings: StreamerSettings = StreamerSettings(),
     ):
-        Settings.analytics_path = os.path.join(Path().absolute(), "analytics")
+        Settings.analytics_path = os.path.join(Path().absolute(), "analytics", username)
         Path(Settings.analytics_path).mkdir(parents=True, exist_ok=True)
 
         self.username = username
