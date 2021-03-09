@@ -344,9 +344,9 @@ class WebSocketsPool:
                                         counter=-1,
                                     )
 
-                                if result_type != "LOSE":
+                                if event_prediction.result["type"] != "LOSE":
                                     ws.streamers[streamer_index].persistent_annotations(
-                                        event_result["type"],
+                                        event_prediction.result["type"],
                                         f"{ws.events_predictions[event_id].title}",
                                     )
                             elif message.type == "prediction-made":
