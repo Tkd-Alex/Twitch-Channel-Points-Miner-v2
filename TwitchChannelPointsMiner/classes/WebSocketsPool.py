@@ -324,8 +324,19 @@ class WebSocketsPool:
                                         else "Gained"
                                     )
                                 )
+                                ws.events_predictions[
+                                    event_id
+                                ].result = f"{result_type}, {action}: {points_prefix}{_millify(points_gained)}"
+
+                                decision = ws.events_predictions[
+                                    event_id
+                                ].bet.get_decision()
+                                choice = ws.events_predictions[event_id].bet.decision[
+                                    "choice"
+                                ]
+
                                 logger.info(
-                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, {action}: {points_prefix}{_millify(points_gained)}",
+                                    f"{ws.events_predictions[event_id]} - Decision: {choice}: {decision['title']} ({decision['color']}) - Result: {ws.events_predictions[event_id].result}",
                                     extra={
                                         "emoji": ":bar_chart:",
                                         "color": Settings.logger.color_palette.get(
@@ -333,11 +344,7 @@ class WebSocketsPool:
                                         ),
                                     },
                                 )
-                                ws.events_predictions[event_id].final_result = {
-                                    "type": event_result["type"],
-                                    "points_won": points_won,
-                                    "gained": points_gained,
-                                }
+
                                 ws.streamers[streamer_index].update_history(
                                     "PREDICTION", points_gained
                                 )

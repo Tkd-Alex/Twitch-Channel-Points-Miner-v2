@@ -12,7 +12,7 @@ class EventPrediction(object):
         "created_at",
         "prediction_window_seconds",
         "status",
-        "final_result",
+        "result",
         "box_fillable",
         "bet_confirmed",
         "bet_placed",
@@ -36,7 +36,7 @@ class EventPrediction(object):
         self.created_at = created_at
         self.prediction_window_seconds = prediction_window_seconds
         self.status = status
-        self.final_result: dict = {}
+        self.result = ""
 
         self.box_fillable = False
         self.bet_confirmed = False
@@ -60,4 +60,4 @@ class EventPrediction(object):
         return float_round(self.prediction_window_seconds - self.elapsed(timestamp))
 
     def print_recap(self) -> str:
-        return f"{self}\n\t\t{self.bet}\n\t\tResult: {self.final_result}"
+        return f"{self}\n\t\t{self.bet}\n\t\tResult: {self.result}"
