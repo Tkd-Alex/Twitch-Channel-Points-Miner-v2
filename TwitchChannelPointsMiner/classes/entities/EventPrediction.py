@@ -1,7 +1,7 @@
 from TwitchChannelPointsMiner.classes.entities.Bet import Bet
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer
 from TwitchChannelPointsMiner.classes.Settings import Settings
-from TwitchChannelPointsMiner.utils import float_round
+from TwitchChannelPointsMiner.utils import _millify, float_round
 
 
 class EventPrediction(object):
@@ -36,7 +36,7 @@ class EventPrediction(object):
         self.created_at = created_at
         self.prediction_window_seconds = prediction_window_seconds
         self.status = status
-        self.result = ""
+        self.result: dict = {}
 
         self.box_fillable = False
         self.bet_confirmed = False
@@ -60,4 +60,33 @@ class EventPrediction(object):
         return float_round(self.prediction_window_seconds - self.elapsed(timestamp))
 
     def print_recap(self) -> str:
-        return f"{self}\n\t\t{self.bet}\n\t\tResult: {self.result}"
+        return f"{self}\n\t\t{self.bet}\n\t\tResult: {self.result['string']}"
+
+    def parse_result(self, result) -> dict:
+        result_type = result["type"]
+
+        points = {}
+        points["placed"] = self.bet.decision["amount"]
+        points["won"] = (
+            result["points_won"]
+            if result["points_won"] or result_type == "REFUND"
+            else 0
+        )
+        points["gained"] = (
+            points["won"] - points["placed"] if result_type != "REFUND" else 0
+        )
+        points["prefix"] = "+" if points["gained"] >= 0 else ""
+
+        action = (
+            "Lost"
+            if result_type == "LOSE"
+            else ("Refunded" if result_type == "REFUND" else "Gained")
+        )
+
+        self.result = {
+            "string": f"{result_type}, {action}: {points['prefix']}{_millify(points['gained'])}",
+            "type": result_type,
+            "gained": points["gained"],
+        }
+
+        return points

@@ -13,7 +13,6 @@ from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
-    _millify,
     get_streamer_index,
     internet_connection_available,
 )
@@ -300,66 +299,38 @@ class WebSocketsPool:
                                 message.type == "prediction-result"
                                 and event_prediction.bet_confirmed
                             ):
-                                event_result = message.data["prediction"]["result"]
-                                result_type = event_result["type"]
-                                points_placed = event_prediction.bet.decision["amount"]
-                                points_won = (
-                                    event_result["points_won"]
-                                    if event_result["points_won"]
-                                    or result_type == "REFUND"
-                                    else 0
+                                points = event_prediction.parse_result(
+                                    message.data["prediction"]["result"]
                                 )
-                                points_gained = (
-                                    points_won - points_placed
-                                    if result_type != "REFUND"
-                                    else 0
-                                )
-                                points_prefix = "+" if points_gained >= 0 else ""
-                                action = (
-                                    "Lost"
-                                    if result_type == "LOSE"
-                                    else (
-                                        "Refunded"
-                                        if result_type == "REFUND"
-                                        else "Gained"
-                                    )
-                                )
-                                ws.events_predictions[
-                                    event_id
-                                ].result = f"{result_type}, {action}: {points_prefix}{_millify(points_gained)}"
 
-                                decision = ws.events_predictions[
-                                    event_id
-                                ].bet.get_decision()
-                                choice = ws.events_predictions[event_id].bet.decision[
-                                    "choice"
-                                ]
+                                decision = event_prediction.bet.get_decision()
+                                choice = event_prediction.bet.decision["choice"]
 
                                 logger.info(
-                                    f"{ws.events_predictions[event_id]} - Decision: {choice}: {decision['title']} ({decision['color']}) - Result: {ws.events_predictions[event_id].result}",
+                                    f"{event_prediction} - Decision: {choice}: {decision['title']} ({decision['color']}) - Result: {event_prediction.result['string']}",
                                     extra={
                                         "emoji": ":bar_chart:",
                                         "color": Settings.logger.color_palette.get(
-                                            f"BET_{result_type}"
+                                            f"BET_{event_prediction.result['type']}"
                                         ),
                                     },
                                 )
 
                                 ws.streamers[streamer_index].update_history(
-                                    "PREDICTION", points_gained
+                                    "PREDICTION", points["gained"]
                                 )
 
                                 # Remove duplicate history records from previous message sent in community-points-user-v1
-                                if result_type == "REFUND":
+                                if event_prediction.result["type"] == "REFUND":
                                     ws.streamers[streamer_index].update_history(
                                         "REFUND",
-                                        -points_placed,
+                                        -points["placed"],
                                         counter=-1,
                                     )
-                                elif result_type == "WIN":
+                                elif event_prediction.result["type"] == "WIN":
                                     ws.streamers[streamer_index].update_history(
                                         "PREDICTION",
-                                        -points_won,
+                                        -points["won"],
                                         counter=-1,
                                     )
                             elif message.type == "prediction-made":
