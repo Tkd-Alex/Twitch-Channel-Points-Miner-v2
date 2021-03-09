@@ -10,5 +10,5 @@ class WrongCookiesException(Exception):
     pass
 
 
-class TimeBasedDropNotFound(Exception):
+class BadCredentialsException(Exception):
     pass

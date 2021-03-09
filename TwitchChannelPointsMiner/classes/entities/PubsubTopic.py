@@ -1,4 +1,6 @@
-class PubsubTopic:
+class PubsubTopic(object):
+    __slots__ = ["topic", "user_id", "streamer"]
+
     def __init__(self, topic, user_id=None, streamer=None):
         self.topic = topic
         self.user_id = user_id

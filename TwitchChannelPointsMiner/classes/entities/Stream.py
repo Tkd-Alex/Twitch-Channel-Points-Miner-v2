@@ -4,19 +4,40 @@ import time
 from base64 import b64encode
 
 from TwitchChannelPointsMiner.classes.Settings import Settings
-from TwitchChannelPointsMiner.constants.twitch import DROP_ID
+from TwitchChannelPointsMiner.constants import DROP_ID
 
 logger = logging.getLogger(__name__)
 
 
-class Stream:
+class Stream(object):
+    __slots__ = [
+        "broadcast_id",
+        "title",
+        "game",
+        "tags",
+        "drops_tags",
+        "campaigns",
+        "campaigns_ids",
+        "viewers_count",
+        "spade_url",
+        "payload",
+        "watch_streak_missing",
+        "minute_watched",
+        "__last_update",
+        "__minute_watched_timestamp",
+    ]
+
     def __init__(self):
         self.broadcast_id = None
 
         self.title = None
         self.game = {}
         self.tags = []
-        self.drops_enabled = False
+
+        self.drops_tags = False
+        self.campaigns = []
+        self.campaigns_ids = []
+
         self.viewers_count = 0
         self.__last_update = 0
 
@@ -36,7 +57,7 @@ class Stream:
         self.tags = tags
         self.viewers_count = viewers_count
 
-        self.drops_enabled = (
+        self.drops_tags = (
             DROP_ID in [tag["id"] for tag in self.tags] and self.game != {}
         )
         self.__last_update = time.time()
@@ -63,7 +84,10 @@ class Stream:
         return None if self.game in [{}, None] else self.game["name"]
 
     def update_required(self):
-        return self.__last_update == 0 or (time.time() - self.__last_update) >= 120
+        return self.__last_update == 0 or self.update_elapsed() >= 120
+
+    def update_elapsed(self):
+        return 0 if self.__last_update == 0 else (time.time() - self.__last_update)
 
     def init_watch_streak(self):
         self.watch_streak_missing = True

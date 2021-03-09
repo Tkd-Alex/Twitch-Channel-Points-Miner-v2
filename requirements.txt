@@ -2,9 +2,9 @@ requests
 websocket-client
 browser_cookie3
 pillow
-selenium
 python-dateutil
 emoji
 millify
 pre-commit
 irc
+colorama
