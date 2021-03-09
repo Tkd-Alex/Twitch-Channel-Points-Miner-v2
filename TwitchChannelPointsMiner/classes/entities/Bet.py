@@ -153,11 +153,18 @@ class Bet(object):
         self.__clear_outcomes()
 
     def __repr__(self):
-        return f"Bet(total_users={millify(self.total_users)}, total_points={millify(self.total_points)}), decision={self.decision})\n\t\tOutcome0({self.get_outcome(0)})\n\t\tOutcome1({self.get_outcome(1)})"
+        return f"Bet(total_users={millify(self.total_users)}, total_points={millify(self.total_points)}), decision={self.decision})\n\t\tOutcome A({self.get_outcome(0)})\n\t\tOutcome B({self.get_outcome(1)})"
+
+    def get_decision(self, parsed=False):
+        decision = self.outcomes[0 if self.decision["choice"] == "A" else 1]
+        return decision if parsed is False else Bet.__parse_outcome(decision)
+
+    @staticmethod
+    def __parse_outcome(outcome):
+        return f"{outcome['title']} ({outcome['color']}), Points: {millify(outcome[OutcomeKeys.TOTAL_POINTS])}, Users: {millify(outcome[OutcomeKeys.TOTAL_USERS])} ({outcome[OutcomeKeys.PERCENTAGE_USERS]}%), Odds: {outcome[OutcomeKeys.ODDS]} ({outcome[OutcomeKeys.ODDS_PERCENTAGE]}%)"
 
     def get_outcome(self, index):
-        outcome = self.outcomes[index]
-        return f"{outcome['title']} ({outcome['color']}), Points: {millify(outcome[OutcomeKeys.TOTAL_POINTS])}, Users: {millify(outcome[OutcomeKeys.TOTAL_USERS])} ({outcome[OutcomeKeys.PERCENTAGE_USERS]}%), Odds: {outcome[OutcomeKeys.ODDS]} ({outcome[OutcomeKeys.ODDS_PERCENTAGE]}%)"
+        return Bet.__parse_outcome(self.outcomes[index])
 
     def __clear_outcomes(self):
         for index in range(0, len(self.outcomes)):
