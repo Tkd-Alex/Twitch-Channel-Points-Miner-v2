@@ -58,7 +58,8 @@ class TwitchLogin(object):
 
         use_backup_flow = False
 
-        while True:
+        # while True:
+        for attempt in range(0, 25):
             # self.username = input('Enter Twitch username: ')
             password = (
                 getpass.getpass(f"Enter Twitch password for {self.username}: ")
