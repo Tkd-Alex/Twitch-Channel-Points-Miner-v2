@@ -167,6 +167,12 @@ class TwitchChannelPointsMiner:
                     streamer.settings.bet = set_default_settings(
                         streamer.settings.bet, Settings.streamer_settings.bet
                     )
+                    if streamer.settings.join_chat is True:
+                        streamer.irc_chat = TwitchChat(
+                            self.username,
+                            self.twitch.twitch_login.get_auth_token(),
+                            streamer.username,
+                        )
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:
                     logger.info(
@@ -185,12 +191,6 @@ class TwitchChannelPointsMiner:
                 self.twitch.viewer_is_mod(streamer)
                 if streamer.viewer_is_mod is True:
                     streamer.settings.make_predictions = False
-                if streamer.settings.join_chat is True:
-                    streamer.irc_chat = TwitchChat(
-                        self.username,
-                        self.twitch.twitch_login.get_auth_token(),
-                        streamer.username,
-                    )
 
             self.original_streamers = copy.deepcopy(self.streamers)
 
@@ -277,6 +277,8 @@ class TwitchChannelPointsMiner:
         for streamer in self.streamers:
             if streamer.irc_chat is not None:
                 streamer.leave_chat()
+                if streamer.irc_chat.is_alive() is True:
+                    streamer.irc_chat.join()
 
         self.running = self.twitch.running = False
         self.ws_pool.end()

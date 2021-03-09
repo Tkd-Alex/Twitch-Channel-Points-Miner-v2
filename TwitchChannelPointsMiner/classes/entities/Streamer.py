@@ -65,7 +65,8 @@ class Streamer(object):
         "channel_points",
         "minute_watched_requests",
         "viewer_is_mod",
-        "irc_chat" "stream",
+        "irc_chat",
+        "stream",
         "raid",
         "history",
         "streamer_url",
@@ -160,10 +161,9 @@ class Streamer(object):
         )
 
     def leave_chat(self):
-        if self.settings.join_chat is True and self.irc_chat is not None:
-            self.irc_chat.terminate()
+        if self.irc_chat is not None:
+            self.irc_chat.stop()
 
     def join_chat(self):
-        if self.settings.join_chat is True and self.irc_chat is not None:
-            logger.info(f"Connecting to {self.username}'s chat!")
+        if self.irc_chat is not None:
             self.irc_chat.start()
