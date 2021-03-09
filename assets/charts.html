@@ -65,6 +65,8 @@
                 <img style="margin-bottom: -8px; margin-left: 10px;"  src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="5" width="138">
             </a>
         </div>
+
+        <br>
     </div>
 </body>
 <script type="text/javascript">
@@ -172,12 +174,20 @@
 
     function updateAnnotations() {
         if($('#annotations').prop("checked") === true){
-            chart.clearAnnotations()
+            clearAnnotations()
             if(annotations && annotations.length > 0)
-                annotations.forEach(annotation => {
+                annotations.forEach((annotation, index) => {
+                    annotations[index]['id'] = `id-${index}`
                     chart.addXaxisAnnotation(annotation, true)
                 })
-        } else chart.clearAnnotations()
+        } else clearAnnotations()
+    }
+
+    function clearAnnotations(){
+        if(annotations && annotations.length > 0)
+            annotations.forEach((annotation, index) => {
+                chart.removeAnnotation(annotation['id'])
+            })
     }
 
     $('#annotations').click(() => { updateAnnotations(); });
