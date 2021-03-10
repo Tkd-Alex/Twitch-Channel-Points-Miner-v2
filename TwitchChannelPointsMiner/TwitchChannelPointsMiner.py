@@ -34,8 +34,12 @@ from TwitchChannelPointsMiner.utils import (
 #   - chardet.charsetprober - [feed]
 #   - chardet.charsetprober - [get_confidence]
 #   - requests - [Starting new HTTPS connection (1)]
+#   - irc.client - [process_data]
+#   - irc.client - [_dispatcher]
+#   - irc.client - [_handle_message]
 logging.getLogger("chardet.charsetprober").setLevel(logging.ERROR)
 logging.getLogger("requests").setLevel(logging.ERROR)
+logging.getLogger("irc.client").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
