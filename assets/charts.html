@@ -9,12 +9,14 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.css" rel="stylesheet"/>
+
+    <link href="{{url_for('static', filename='dark-theme.css')}}" rel="stylesheet"/>
 </head>
 
-<body>
+<body style="height: 100vh;">
     <div class="container">
         <div style="text-align: center">
-            <img width="600px" src="{{url_for('static', filename='banner.png')}}" alt="banner">
+            <img style="margin-top: -20px;" width="600px" src="{{url_for('static', filename='banner.png')}}" alt="banner">
             <br>
             <div style="margin-top: -15px;">
                 <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE">
@@ -49,17 +51,21 @@
                     </ul>
                 </div>
             </div>
-            <div class="column" style="text-align: center">
+            <div class="column" style="text-align: right">
                 <label class="checkbox">
-                    <input type="checkbox" checked="true" id="annotations">
                     Annotations
+                    <input type="checkbox" checked="true" id="annotations">
+                </label>
+                <label class="checkbox">
+                    Dark mode
+                    <input type="checkbox" checked="true" id="dark-mode">
                 </label>
             </div>
         </div>
 
-        <div id="chart"></div>
+        <div class="box" id="chart" style="padding: 0.30rem;"></div>
 
-        <hr>
+        <!-- <hr style="margin: 1.2rem 0;"> -->
         <div style="text-align: center">If you want to help on this project, please leave a star 🌟 and share it with your friends! 😎 - A coffee is always a gesture of LOVE ❤️
             <a href="https://www.buymeacoffee.com/tkdalex" target="_blank">
                 <img style="margin-bottom: -8px; margin-left: 10px;"  src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="5" width="138">
@@ -81,7 +87,9 @@
                 type: 'x',
                 enabled: true,
                 autoScaleYaxis: true
-            }
+            },
+            // background: '#2B2D3E',
+            foreColor: '#fff'
         },
         dataLabels: {
             enabled: false
@@ -96,6 +104,7 @@
             text: 'Channel points',
             align: 'left'
         },
+        colors: ["#f9826c"],
         fill: {
             type: 'gradient',
             gradient: {
@@ -115,6 +124,7 @@
             type: 'datetime'
         },
         tooltip: {
+            theme: 'dark',
             shared: false,
             x: {
                 show: true,
@@ -190,7 +200,24 @@
             })
     }
 
+    function toggleDarkMode(){
+        var darkMode = $('#dark-mode').prop("checked")
+        $("link[href='{{url_for('static', filename='dark-theme.css')}}']").prop("disabled", !darkMode);
+        chart.updateOptions({
+            colors: darkMode === true ? ["#f9826c"] : ['#008ffb'],
+            chart: {
+                foreColor: darkMode === true ? "#fff" : '#373d3f'
+            },
+            tooltip: {
+                theme: darkMode === true ? "dark" : "light"
+            }
+        })
+        // if (darkMode === true) $("#chart").addClass("box")
+        // else $("#chart").removeClass("box")
+    }
+
     $('#annotations').click(() => { updateAnnotations(); });
+    $('#dark-mode').click(() => { toggleDarkMode(); });
 
 </script>
 
