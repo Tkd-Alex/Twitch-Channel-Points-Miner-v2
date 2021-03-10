@@ -166,7 +166,7 @@ class Streamer(object):
             data = {
                 "borderColor": primary_color,
                 "label": {
-                    "style": {"color": "#fff", "background": primary_color},
+                    "style": {"color": "#000", "background": primary_color},
                     "text": event_text,
                 },
             }
