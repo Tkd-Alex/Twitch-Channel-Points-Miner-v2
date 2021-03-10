@@ -11,6 +11,7 @@ import uuid
 from collections import OrderedDict
 from datetime import datetime
 
+from TwitchChannelPointsMiner.classes.Chat import ThreadChat
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.entities.Streamer import (
     Streamer,
@@ -19,7 +20,6 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import (
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
 from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
-from TwitchChannelPointsMiner.classes.TwitchChat import TwitchChat
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.utils import (
@@ -168,7 +168,7 @@ class TwitchChannelPointsMiner:
                         streamer.settings.bet, Settings.streamer_settings.bet
                     )
                     if streamer.settings.join_chat is True:
-                        streamer.irc_chat = TwitchChat(
+                        streamer.irc_chat = ThreadChat(
                             self.username,
                             self.twitch.twitch_login.get_auth_token(),
                             streamer.username,

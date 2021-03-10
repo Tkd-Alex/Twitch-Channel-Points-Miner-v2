@@ -1,6 +1,7 @@
 import logging
 import time
 
+from TwitchChannelPointsMiner.classes.Chat import ThreadChat
 from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.Stream import Stream
 from TwitchChannelPointsMiner.classes.Settings import Settings
@@ -163,6 +164,14 @@ class Streamer(object):
     def leave_chat(self):
         if self.irc_chat is not None:
             self.irc_chat.stop()
+
+            # Recreate a new thread to start again
+            # raise RuntimeError("threads can only be started once")
+            self.irc_chat = ThreadChat(
+                self.irc_chat.username,
+                self.irc_chat.token,
+                self.username,
+            )
 
     def join_chat(self):
         if self.irc_chat is not None:
