@@ -253,29 +253,48 @@ class WebSocketsPool:
                                 ):
                                     if event.streamer.viewer_is_mod is True:
                                         logger.info(
-                                            f"Sorry, you are moderator of {event.streamer}, so you can't bet!"
-                                        )
-                                    else:
-                                        ws.events_predictions[event_id] = event
-                                        start_after = event.closing_bet_after(
-                                            current_tmsp
-                                        )
-
-                                        place_bet_thread = threading.Timer(
-                                            start_after,
-                                            ws.twitch.make_predictions,
-                                            (ws.events_predictions[event_id],),
-                                        )
-                                        place_bet_thread.daemon = True
-                                        place_bet_thread.start()
-
-                                        logger.info(
-                                            f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
+                                            f"Sorry, you are moderator of {event.streamer}, so you can't bet!",
                                             extra={
-                                                "emoji": ":alarm_clock:",
-                                                "color": Settings.logger.color_palette.BET_START,
+                                                "emoji": ":pushpin:",
+                                                "color": Settings.logger.color_palette.BET_FILTERS,
                                             },
                                         )
+                                    else:
+                                        streamer = ws.streamers[streamer_index]
+                                        bet_settings = streamer.settings.bet
+                                        if (
+                                            bet_settings.minimum_points is None
+                                            or streamer.channel_points
+                                            > bet_settings.minimum_points
+                                        ):
+                                            ws.events_predictions[event_id] = event
+                                            start_after = event.closing_bet_after(
+                                                current_tmsp
+                                            )
+
+                                            place_bet_thread = threading.Timer(
+                                                start_after,
+                                                ws.twitch.make_predictions,
+                                                (ws.events_predictions[event_id],),
+                                            )
+                                            place_bet_thread.daemon = True
+                                            place_bet_thread.start()
+
+                                            logger.info(
+                                                f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
+                                                extra={
+                                                    "emoji": ":alarm_clock:",
+                                                    "color": Settings.logger.color_palette.BET_START,
+                                                },
+                                            )
+                                        else:
+                                            logger.info(
+                                                f"{streamer} have only {streamer.channel_points} channel points and the minimum for bet is: {bet_settings.minimum_points}",
+                                                extra={
+                                                    "emoji": ":pushpin:",
+                                                    "color": Settings.logger.color_palette.BET_FILTERS,
+                                                },
+                                            )
 
                         elif (
                             message.type == "event-updated"

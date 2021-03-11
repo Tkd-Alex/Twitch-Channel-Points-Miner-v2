@@ -63,6 +63,7 @@ class BetSettings(object):
         "percentage",
         "percentage_gap",
         "max_points",
+        "minimum_points",
         "stealth_mode",
         "filter_condition",
     ]
@@ -73,6 +74,7 @@ class BetSettings(object):
         percentage: int = None,
         percentage_gap: int = None,
         max_points: int = None,
+        minimum_points: int = None,
         stealth_mode: bool = None,
         filter_condition: FilterCondition = None,
     ):
@@ -80,6 +82,7 @@ class BetSettings(object):
         self.percentage = percentage
         self.percentage_gap = percentage_gap
         self.max_points = max_points
+        self.minimum_points = minimum_points
         self.stealth_mode = stealth_mode
         self.filter_condition = filter_condition
 
@@ -88,10 +91,11 @@ class BetSettings(object):
         self.percentage = self.percentage if not None else 5
         self.percentage_gap = self.percentage_gap if not None else 20
         self.max_points = self.max_points if not None else 50000
+        self.minimum_points = self.minimum_points if not None else 0
         self.stealth_mode = self.stealth_mode if not None else False
 
     def __repr__(self):
-        return f"BetSettings(strategy={self.strategy}, percentage={self.percentage}, percentage_gap={self.percentage_gap}, max_points={self.max_points}, stealth_mode={self.stealth_mode})"
+        return f"BetSettings(strategy={self.strategy}, percentage={self.percentage}, percentage_gap={self.percentage_gap}, max_points={self.max_points}, minimum_points={self.minimum_points}, stealth_mode={self.stealth_mode})"
 
 
 class Bet(object):
