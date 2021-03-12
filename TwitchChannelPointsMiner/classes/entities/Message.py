@@ -58,7 +58,11 @@ class Message(object):
                     else (
                         self.data["channel_id"]
                         if "channel_id" in self.data
-                        else self.topic_user
+                        else (
+                            self.data["balance"]["channel_id"]
+                            if "balance" in self.data
+                            else self.topic_user
+                        )
                     )
                 )
             )

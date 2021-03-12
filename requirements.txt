@@ -6,5 +6,6 @@ python-dateutil
 emoji
 millify
 pre-commit
-irc
 colorama
+flask
+irc

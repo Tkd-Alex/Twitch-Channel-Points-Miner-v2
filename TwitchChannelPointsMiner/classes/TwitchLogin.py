@@ -58,12 +58,10 @@ class TwitchLogin(object):
 
         use_backup_flow = False
 
-        # while True:
         for attempt in range(0, 25):
-            # self.username = input('Enter Twitch username: ')
             password = (
                 getpass.getpass(f"Enter Twitch password for {self.username}: ")
-                if self.password is None
+                if self.password in [None, ""]
                 else self.password
             )
 
@@ -79,7 +77,7 @@ class TwitchLogin(object):
 
                 if "error_code" in login_response:
                     err_code = login_response["error_code"]
-                    if err_code == 3011 or err_code == 3012:  # missing 2fa token
+                    if err_code in [3011, 3012]:  # missing 2fa token
                         if err_code == 3011:
                             logger.info(
                                 "Two factor authentication enabled, please enter token below."
@@ -91,7 +89,7 @@ class TwitchLogin(object):
                         post_data["authy_token"] = twofa.strip()
                         continue
 
-                    elif err_code == 3022 or err_code == 3023:  # missing 2fa token
+                    elif err_code in [3022, 3023]:  # missing 2fa token
                         if err_code == 3022:
                             logger.info("Login Verification code required.")
                             self.email = login_response["obscured_email"]
@@ -106,11 +104,12 @@ class TwitchLogin(object):
                         post_data["twitchguard_code"] = twofa.strip()
                         continue
 
-                    elif err_code == 3001:  # invalid password
+                    # invalid password, or password not provided
+                    elif err_code in [3001, 3003]:
                         logger.info("Invalid username or password, please try again.")
 
                         # If the password is loaded from run.py, require the user to fix it there.
-                        if self.password is not None:
+                        if self.password not in [None, ""]:
                             raise BadCredentialsException(
                                 "Username or password is incorrect."
                             )

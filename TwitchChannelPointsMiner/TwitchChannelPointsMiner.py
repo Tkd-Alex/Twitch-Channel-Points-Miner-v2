@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import copy
 import logging
+import os
 import random
 import signal
 import sys
@@ -10,8 +10,10 @@ import time
 import uuid
 from collections import OrderedDict
 from datetime import datetime
+from pathlib import Path
 
 from TwitchChannelPointsMiner.classes.Chat import ThreadChat
+from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.entities.Streamer import (
     Streamer,
@@ -34,11 +36,13 @@ from TwitchChannelPointsMiner.utils import (
 #   - chardet.charsetprober - [feed]
 #   - chardet.charsetprober - [get_confidence]
 #   - requests - [Starting new HTTPS connection (1)]
+#   - Flask (werkzeug) logs
 #   - irc.client - [process_data]
 #   - irc.client - [_dispatcher]
 #   - irc.client - [_handle_message]
 logging.getLogger("chardet.charsetprober").setLevel(logging.ERROR)
 logging.getLogger("requests").setLevel(logging.ERROR)
+logging.getLogger("werkzeug").setLevel(logging.ERROR)
 logging.getLogger("irc.client").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
@@ -67,12 +71,16 @@ class TwitchChannelPointsMiner:
         username: str,
         password: str = None,
         claim_drops_startup: bool = False,
+        # Settings for logging and selenium as you can see.
         priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
         # Default values for all streamers
         streamer_settings: StreamerSettings = StreamerSettings(),
     ):
+        Settings.analytics_path = os.path.join(Path().absolute(), "analytics", username)
+        Path(Settings.analytics_path).mkdir(parents=True, exist_ok=True)
+
         self.username = username
 
         # Set as global config
@@ -104,6 +112,12 @@ class TwitchChannelPointsMiner:
 
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
+
+    def analytics(self, host: str = "127.0.0.1", port: int = 5000, refresh: int = 5):
+        http_server = AnalyticsServer(host=host, port=port, refresh=refresh)
+        http_server.daemon = True
+        http_server.name = "Analytics Thread"
+        http_server.start()
 
     def mine(self, streamers: list = [], blacklist: list = [], followers=False):
         self.run(streamers=streamers, blacklist=blacklist, followers=followers)
@@ -196,7 +210,9 @@ class TwitchChannelPointsMiner:
                 if streamer.viewer_is_mod is True:
                     streamer.settings.make_predictions = False
 
-            self.original_streamers = copy.deepcopy(self.streamers)
+            self.original_streamers = [
+                streamer.channel_points for streamer in self.streamers
+            ]
 
             # If we have at least one streamer with settings = make_predictions True
             make_predictions = at_least_one_value_in_settings_is(
@@ -293,7 +309,13 @@ class TwitchChannelPointsMiner:
         if self.sync_campaigns_thread is not None:
             self.sync_campaigns_thread.join()
 
-        time.sleep(1)
+        # Check if all the mutex are unlocked.
+        # Prevent breaks of .json file
+        for streamer in self.streamers:
+            if streamer.mutex.locked():
+                streamer.mutex.acquire()
+                streamer.mutex.release()
+
         self.__print_report()
 
         sys.exit(0)
@@ -339,7 +361,7 @@ class TwitchChannelPointsMiner:
             if self.streamers[streamer_index].history != {}:
                 gained = (
                     self.streamers[streamer_index].channel_points
-                    - self.original_streamers[streamer_index].channel_points
+                    - self.original_streamers[streamer_index]
                 )
                 logger.info(
                     f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(gained)}",

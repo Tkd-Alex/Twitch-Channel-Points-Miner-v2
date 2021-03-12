@@ -1,5 +1,9 @@
+import json
 import logging
+import os
 import time
+from datetime import datetime
+from threading import Lock
 
 from TwitchChannelPointsMiner.classes.Chat import ThreadChat
 from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
@@ -71,6 +75,7 @@ class Streamer(object):
         "raid",
         "history",
         "streamer_url",
+        "mutex",
     ]
 
     def __init__(self, username, settings=None):
@@ -92,6 +97,8 @@ class Streamer(object):
         self.history = {}
 
         self.streamer_url = f"{URL}/{self.username}"
+
+        self.mutex = Lock()
 
     def __repr__(self):
         return f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={_millify(self.channel_points)})"
@@ -160,6 +167,47 @@ class Streamer(object):
             and self.stream.drops_tags is True
             and self.stream.campaigns_ids != []
         )
+
+    # === ANALYTICS === #
+    def persistent_annotations(self, event_type, event_text):
+        event_type = event_type.upper()
+        if event_type in ["WATCH_STREAK", "WIN", "PREDICTION_MADE"]:
+            primary_color = (
+                "#45c1ff"
+                if event_type == "WATCH_STREAK"
+                else ("#ffe045" if event_type == "PREDICTION_MADE" else "#54ff45")
+            )
+            data = {
+                "borderColor": primary_color,
+                "label": {
+                    "style": {"color": "#000", "background": primary_color},
+                    "text": event_text,
+                },
+            }
+            self.__save_json("annotations", data)
+
+    def persistent_series(self, event_type="Watch"):
+        self.__save_json("series", event_type=event_type)
+
+    def __save_json(self, key, data={}, event_type="Watch"):
+        # https://stackoverflow.com/questions/4676195/why-do-i-need-to-multiply-unix-timestamps-by-1000-in-javascript
+        # data.update({"x": round(time.time() * 1000)})
+        now = datetime.now().replace(microsecond=0)
+        data.update({"x": round(datetime.timestamp(now) * 1000)})
+
+        if key == "series":
+            data.update({"y": self.channel_points})
+            if event_type is not None:
+                data.update({"z": event_type.replace("_", " ").title()})
+
+        fname = os.path.join(Settings.analytics_path, f"{self.username}.json")
+        with self.mutex:
+            json_data = json.load(open(fname, "r")) if os.path.isfile(fname) else {}
+            if key not in json_data:
+                json_data[key] = []
+
+            json_data[key].append(data)
+            json.dump(json_data, open(fname, "w"), indent=4)
 
     def leave_chat(self):
         if self.irc_chat is not None:
