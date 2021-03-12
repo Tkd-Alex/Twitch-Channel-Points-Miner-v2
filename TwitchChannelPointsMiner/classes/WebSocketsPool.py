@@ -176,11 +176,18 @@ class WebSocketsPool:
             if streamer_index != -1:
                 try:
                     if message.topic == "community-points-user-v1":
+                        if message.type in ["points-earned", "points-spent"]:
+                            balance = message.data["balance"]["balance"]
+                            ws.streamers[streamer_index].channel_points = balance
+                            ws.streamers[streamer_index].persistent_series(
+                                event_type=message.data["point_gain"]["reason_code"]
+                                if message.type == "points-earned"
+                                else "Spent"
+                            )
+
                         if message.type == "points-earned":
                             earned = message.data["point_gain"]["total_points"]
                             reason_code = message.data["point_gain"]["reason_code"]
-                            balance = message.data["balance"]["balance"]
-                            ws.streamers[streamer_index].channel_points = balance
                             logger.info(
                                 f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
                                 extra={
@@ -192,6 +199,9 @@ class WebSocketsPool:
                             )
                             ws.streamers[streamer_index].update_history(
                                 reason_code, earned
+                            )
+                            ws.streamers[streamer_index].persistent_annotations(
+                                reason_code, f"+{earned} - {reason_code}"
                             )
                         elif message.type == "claim-available":
                             ws.twitch.claim_bonus(
@@ -333,8 +343,18 @@ class WebSocketsPool:
                                         -points["won"],
                                         counter=-1,
                                     )
+
+                                if event_prediction.result["type"] != "LOSE":
+                                    ws.streamers[streamer_index].persistent_annotations(
+                                        event_prediction.result["type"],
+                                        f"{ws.events_predictions[event_id].title}",
+                                    )
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
+                                ws.streamers[streamer_index].persistent_annotations(
+                                    "PREDICTION_MADE",
+                                    f"Decision: {event_prediction.bet.decision['choice']} - {event_prediction.title}",
+                                )
                 except Exception:
                     logger.error(
                         f"Exception raised for topic: {message.topic} and message: {message}",

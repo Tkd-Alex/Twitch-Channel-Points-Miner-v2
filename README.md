@@ -34,10 +34,11 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
         - [Bet strategy](#bet-strategy)
     - [FilterCondition](#filtercondition)
         - [Example](#example)
-6. 🍪 [Migrating from old repository (the original one)](#migrating-from-old-repository-the-original-one)
-7. 🪟 [Windows](#windows)
-8. 📱 [Termux](#termux)
-9. ⚠️ [Disclaimer](#disclaimer)
+6. 📈 [Analytics](#analytics)
+7. 🍪 [Migrating from old repository (the original one)](#migrating-from-old-repository-the-original-one)
+8. 🪟 [Windows](#windows)
+9. 📱 [Termux](#termux)
+10. ⚠️ [Disclaimer](#disclaimer)
 
 
 ## Community
@@ -61,6 +62,7 @@ If you have any issues or you want to contribute, you are welcome! But please be
 - Auto claim game drops from Twitch inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) Read more about game drops [here](https://help.twitch.tv/s/article/mission-based-drops)
 - Place the bet / make a prediction and win or lose (🍀) your channel points!
 No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/41) ([@lay295](https://github.com/lay295))
+- Analytics chart
 
 ## Logs feature
 ### Full logs
@@ -259,7 +261,7 @@ If you follow so many streamers on Twitch, but you don't want to mine points for
 ```python
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
-twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Automatic use the followers list OR
+twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Blacklist example
 ```
 4. Start mining! `python run.py`
 
@@ -388,6 +390,25 @@ Allowed values for `where` are: `GT, LT, GTE, LTE`
 `FilterCondition(by=OutcomeKeys.ODDS, where=Condition.GTE, value=1.3)`
 - If you want to place the bet ONLY if the highest bet is lower than 2000
 `FilterCondition(by=OutcomeKeys.TOP_POINTS, where=Condition.LT, value=2000)`
+
+## Analytics
+We have recently introduced a little frontend where you can show with a chart you points trend. The script will spawn a Flask web-server on your machine where you can select binding address and port.
+The chart provides some annotation to handle the prediction and watch strike events. Usually annotation are used to notice big increase / decrease of points. If you want to can disable annotations.
+On each (x, y) points Its present a tooltip that show points, date time and reason of points gained / lost. This web page was just a funny idea, and it is not intended to use for a professional usage.
+If you want you can toggle the dark theme with the dedicated checkbox.
+
+| Light theme | Dark theme |
+| ----------- | ---------- |
+| ![Light theme](./assets/chart-analytics-light.png) | ![Dark theme](./assets/chart-analytics-dark.png) |
+
+For use this feature just call the `analytics` method before start mining. Read more at: [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
+The chart will be autofreshed each `refresh` minutes. If you want to connect from one to second machine that have that webpanel you have to use `0.0.0.0` instead of `127.0.0.1`.
+```python
+from TwitchChannelPointsMiner import TwitchChannelPointsMiner
+twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
+twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5)   # Analytics web-server
+twitch_miner.mine(followers=True, blacklist=["user1", "user2"])
+```
 
 ## Migrating from an old repository (the original one):
 If you already have a `twitch-cookies.pkl` and you don't want to log in again, please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
