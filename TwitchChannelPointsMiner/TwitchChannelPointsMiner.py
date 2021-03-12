@@ -12,8 +12,8 @@ from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 
-from TwitchChannelPointsMiner.classes.Chat import ThreadChat
 from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
+from TwitchChannelPointsMiner.classes.Chat import ThreadChat
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.entities.Streamer import (
     Streamer,
