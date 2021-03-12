@@ -13,6 +13,7 @@ from datetime import datetime
 from pathlib import Path
 
 from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
+from TwitchChannelPointsMiner.classes.Chat import ThreadChat
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.entities.Streamer import (
     Streamer,
@@ -36,9 +37,13 @@ from TwitchChannelPointsMiner.utils import (
 #   - chardet.charsetprober - [get_confidence]
 #   - requests - [Starting new HTTPS connection (1)]
 #   - Flask (werkzeug) logs
+#   - irc.client - [process_data]
+#   - irc.client - [_dispatcher]
+#   - irc.client - [_handle_message]
 logging.getLogger("chardet.charsetprober").setLevel(logging.ERROR)
 logging.getLogger("requests").setLevel(logging.ERROR)
 logging.getLogger("werkzeug").setLevel(logging.ERROR)
+logging.getLogger("irc.client").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
@@ -180,6 +185,12 @@ class TwitchChannelPointsMiner:
                     streamer.settings.bet = set_default_settings(
                         streamer.settings.bet, Settings.streamer_settings.bet
                     )
+                    if streamer.settings.join_chat is True:
+                        streamer.irc_chat = ThreadChat(
+                            self.username,
+                            self.twitch.twitch_login.get_auth_token(),
+                            streamer.username,
+                        )
                     self.streamers.append(streamer)
                 except StreamerDoesNotExistException:
                     logger.info(
@@ -282,6 +293,12 @@ class TwitchChannelPointsMiner:
 
     def end(self, signum, frame):
         logger.info("CTRL+C Detected! Please wait just a moment!")
+
+        for streamer in self.streamers:
+            if streamer.irc_chat is not None:
+                streamer.leave_chat()
+                if streamer.irc_chat.is_alive() is True:
+                    streamer.irc_chat.join()
 
         self.running = self.twitch.running = False
         self.ws_pool.end()

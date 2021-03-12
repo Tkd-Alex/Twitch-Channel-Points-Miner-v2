@@ -1,8 +1,8 @@
 import json
 import logging
 import random
-import threading
 import time
+from threading import Thread, Timer
 
 from dateutil import parser
 
@@ -67,7 +67,7 @@ class WebSocketsPool:
         )
 
     def __start(self, index):
-        thread_ws = threading.Thread(target=lambda: self.ws[index].run_forever())
+        thread_ws = Thread(target=lambda: self.ws[index].run_forever())
         thread_ws.daemon = True
         thread_ws.name = f"WebSocket #{self.ws[index].index}"
         thread_ws.start()
@@ -99,7 +99,7 @@ class WebSocketsPool:
                         )
                         WebSocketsPool.handle_reconnection(ws)
 
-        thread_ws = threading.Thread(target=run)
+        thread_ws = Thread(target=run)
         thread_ws.daemon = True
         thread_ws.start()
 
@@ -271,7 +271,7 @@ class WebSocketsPool:
                                             current_tmsp
                                         )
 
-                                        place_bet_thread = threading.Timer(
+                                        place_bet_thread = Timer(
                                             start_after,
                                             ws.twitch.make_predictions,
                                             (ws.events_predictions[event_id],),

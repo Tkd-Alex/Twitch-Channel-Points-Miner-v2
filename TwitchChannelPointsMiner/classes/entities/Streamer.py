@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 from threading import Lock
 
+from TwitchChannelPointsMiner.classes.Chat import ThreadChat
 from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
 from TwitchChannelPointsMiner.classes.entities.Stream import Stream
 from TwitchChannelPointsMiner.classes.Settings import Settings
@@ -21,6 +22,7 @@ class StreamerSettings(object):
         "claim_drops",
         "watch_streak",
         "bet",
+        "join_chat",
     ]
 
     def __init__(
@@ -30,22 +32,30 @@ class StreamerSettings(object):
         claim_drops: bool = None,
         watch_streak: bool = None,
         bet: BetSettings = None,
+        join_chat: bool = True,
     ):
         self.make_predictions = make_predictions
         self.follow_raid = follow_raid
         self.claim_drops = claim_drops
         self.watch_streak = watch_streak
         self.bet = bet
+        self.join_chat = join_chat
 
     def default(self):
-        for name in ["make_predictions", "follow_raid", "claim_drops", "watch_streak"]:
+        for name in [
+            "make_predictions",
+            "follow_raid",
+            "claim_drops",
+            "watch_streak",
+            "join_chat",
+        ]:
             if getattr(self, name) is None:
                 setattr(self, name, True)
         if self.bet is None:
             self.bet = BetSettings()
 
     def __repr__(self):
-        return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, watch_streak={self.watch_streak}, bet={self.bet})"
+        return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, watch_streak={self.watch_streak}, bet={self.bet}, join_chat={self.join_chat})"
 
 
 class Streamer(object):
@@ -60,6 +70,7 @@ class Streamer(object):
         "channel_points",
         "minute_watched_requests",
         "viewer_is_mod",
+        "irc_chat",
         "stream",
         "raid",
         "history",
@@ -78,6 +89,7 @@ class Streamer(object):
         self.channel_points = 0
         self.minute_watched_requests = None
         self.viewer_is_mod = False
+        self.irc_chat = None
 
         self.stream = Stream()
 
@@ -102,6 +114,7 @@ class Streamer(object):
         if self.is_online is True:
             self.offline_at = time.time()
             self.is_online = False
+            self.leave_chat()
 
         logger.info(
             f"{self} is Offline!",
@@ -116,6 +129,7 @@ class Streamer(object):
             self.online_at = time.time()
             self.is_online = True
             self.stream.init_watch_streak()
+            self.join_chat()
 
         logger.info(
             f"{self} is Online!",
@@ -194,3 +208,19 @@ class Streamer(object):
 
             json_data[key].append(data)
             json.dump(json_data, open(fname, "w"), indent=4)
+
+    def leave_chat(self):
+        if self.irc_chat is not None:
+            self.irc_chat.stop()
+
+            # Recreate a new thread to start again
+            # raise RuntimeError("threads can only be started once")
+            self.irc_chat = ThreadChat(
+                self.irc_chat.username,
+                self.irc_chat.token,
+                self.username,
+            )
+
+    def join_chat(self):
+        if self.irc_chat is not None:
+            self.irc_chat.start()
