@@ -59,7 +59,7 @@ class AnalyticsServer(Thread):
         self.app.add_url_rule(f"{baseurl}/json/<string:streamer>", "json", read_json, defaults={"baseurl": baseurl})
     def run(self):
         logger.info(
-            f"Analytics running on http://{self.host}:{self.port}{self.baseurl}",
+            f"Analytics running on http://{self.host}:{self.port}{self.baseurl}/",
             extra={"emoji": ":globe_with_meridians:"},
         )
         self.app.run(host=self.host, port=self.port, threaded=True)
