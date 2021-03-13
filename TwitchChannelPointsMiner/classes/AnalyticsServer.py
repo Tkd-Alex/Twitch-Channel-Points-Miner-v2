@@ -23,9 +23,11 @@ def streamers_available():
 def read_json(streamer, baseurl):
     path = Settings.analytics_path
     streamer = streamer if streamer.endswith(".json") else f"{streamer}.json"
-    streamer_without_baseurl = streamer.replace(baseurl, '')
+    streamer_without_baseurl = streamer.replace(baseurl, "")
     return Response(
-        open(os.path.join(path, streamer_without_baseurl)) if streamer in streamers_available() else [],
+        open(os.path.join(path, streamer_without_baseurl))
+        if streamer in streamers_available()
+        else [],
         status=200,
         mimetype="application/json",
     )
@@ -40,9 +42,14 @@ def index(refresh=5, baseurl=""):
     )
 
 
-
 class AnalyticsServer(Thread):
-    def __init__(self, host: str = "127.0.0.1", port: int = 5000, refresh: int = 5, baseurl: str = ""):
+    def __init__(
+        self,
+        host: str = "127.0.0.1",
+        port: int = 5000,
+        refresh: int = 5,
+        baseurl: str = "",
+    ):
         super(AnalyticsServer, self).__init__()
 
         self.host = host
@@ -53,10 +60,22 @@ class AnalyticsServer(Thread):
         self.app = Flask(
             __name__,
             template_folder=os.path.join(Path().absolute(), "assets"),
-            static_folder=os.path.join(Path().absolute(), "assets"), static_url_path=f"{baseurl}/static",
+            static_folder=os.path.join(Path().absolute(), "assets"),
+            static_url_path=f"{baseurl}/static",
         )
-        self.app.add_url_rule(f"{baseurl}/", "index", index, defaults={"refresh": refresh, "baseurl": baseurl})
-        self.app.add_url_rule(f"{baseurl}/json/<string:streamer>", "json", read_json, defaults={"baseurl": baseurl})
+        self.app.add_url_rule(
+            f"{baseurl}/",
+            "index",
+            index,
+            defaults={"refresh": refresh, "baseurl": baseurl},
+        )
+        self.app.add_url_rule(
+            f"{baseurl}/json/<string:streamer>",
+            "json",
+            read_json,
+            defaults={"baseurl": baseurl},
+        )
+
     def run(self):
         logger.info(
             f"Analytics running on http://{self.host}:{self.port}{self.baseurl}/",
