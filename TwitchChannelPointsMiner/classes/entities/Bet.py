@@ -40,6 +40,12 @@ class OutcomeKeys(object):
     DECISION_USERS = "decision_users"
     DECISION_POINTS = "decision_points"
 
+    @classmethod
+    def search(cls, value):
+        for attr in dir(cls):
+            if attr.isupper() and getattr(cls, attr) == value:
+                return attr
+
 
 class FilterCondition(object):
     __slots__ = [
@@ -55,6 +61,21 @@ class FilterCondition(object):
 
     def __repr__(self):
         return f"FilterCondition(by={self.by.upper()}, where={self.where}, value={self.value})"
+
+    def to_dict(self):
+        return {
+            "by": OutcomeKeys.search(self.by),
+            "where": self.where.name,
+            "value": self.value,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            by=getattr(OutcomeKeys, data["by"]),
+            where=Condition[data["where"]],
+            value=data["value"],
+        )
 
 
 class BetSettings(object):
@@ -92,6 +113,31 @@ class BetSettings(object):
 
     def __repr__(self):
         return f"BetSettings(strategy={self.strategy}, percentage={self.percentage}, percentage_gap={self.percentage_gap}, max_points={self.max_points}, stealth_mode={self.stealth_mode})"
+
+    def to_dict(self):
+        return {
+            "strategy": self.strategy.name,
+            "percentage": self.percentage,
+            "percentage_gap": self.percentage_gap,
+            "max_points": self.max_points,
+            "stealth_mode": self.stealth_mode,
+            "filter_condition": None
+            if self.filter_condition is None
+            else self.filter_condition.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            strategy=None if data["strategy"] is None else Strategy[data["strategy"]],
+            percentage=data["percentage"],
+            percentage_gap=data["percentage_gap"],
+            max_points=data["max_points"],
+            stealth_mode=data["stealth_mode"],
+            filter_condition=None
+            if data["filter_condition"] is None
+            else FilterCondition.from_dict(data["filter_condition"]),
+        )
 
 
 class Bet(object):

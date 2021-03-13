@@ -57,6 +57,27 @@ class StreamerSettings(object):
     def __repr__(self):
         return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, watch_streak={self.watch_streak}, bet={self.bet}, join_chat={self.join_chat})"
 
+    def to_dict(self):
+        return {
+            "make_predictions": self.make_predictions,
+            "follow_raid": self.follow_raid,
+            "claim_drops": self.claim_drops,
+            "watch_streak": self.watch_streak,
+            "join_chat": self.join_chat,
+            "bet": None if self.bet is None else self.bet.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            make_predictions=data["make_predictions"],
+            follow_raid=data["follow_raid"],
+            claim_drops=data["claim_drops"],
+            watch_streak=data["watch_streak"],
+            join_chat=data["join_chat"],
+            bet=None if data["bet"] is None else BetSettings.from_dict(data["bet"]),
+        )
+
 
 class Streamer(object):
     __slots__ = [
@@ -75,6 +96,7 @@ class Streamer(object):
         "raid",
         "history",
         "streamer_url",
+        "init_processed",
         "mutex",
     ]
 
@@ -97,6 +119,7 @@ class Streamer(object):
         self.history = {}
 
         self.streamer_url = f"{URL}/{self.username}"
+        self.init_processed = False
 
         self.mutex = Lock()
 
@@ -160,6 +183,13 @@ class Streamer(object):
     def stream_up_elapsed(self):
         return self.stream_up == 0 or ((time.time() - self.stream_up) > 120)
 
+    # Should be done by channel_id ?
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.username == other.username
+        else:
+            return False
+
     def drops_condition(self):
         return (
             self.settings.claim_drops is True
@@ -209,6 +239,7 @@ class Streamer(object):
             json_data[key].append(data)
             json.dump(json_data, open(fname, "w"), indent=4)
 
+    # === CHAT === #
     def leave_chat(self):
         if self.irc_chat is not None:
             self.irc_chat.stop()

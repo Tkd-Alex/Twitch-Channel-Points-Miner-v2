@@ -8,7 +8,6 @@ import sys
 import threading
 import time
 import uuid
-from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 
@@ -53,6 +52,7 @@ class TwitchChannelPointsMiner:
         "username",
         "twitch",
         "claim_drops_startup",
+        "refresh_streamers",
         "priority",
         "streamers",
         "events_predictions",
@@ -62,7 +62,8 @@ class TwitchChannelPointsMiner:
         "session_id",
         "running",
         "start_datetime",
-        "original_streamers",
+        "base_points",
+        "sources_usernames",
         "logs_file",
     ]
 
@@ -71,6 +72,7 @@ class TwitchChannelPointsMiner:
         username: str,
         password: str = None,
         claim_drops_startup: bool = False,
+        refresh_streamers: float = float("inf"),  # Minutes
         # Settings for logging and selenium as you can see.
         priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
@@ -95,6 +97,7 @@ class TwitchChannelPointsMiner:
         self.twitch = Twitch(self.username, user_agent, password)
 
         self.claim_drops_startup = claim_drops_startup
+        self.refresh_streamers = refresh_streamers
         self.priority = priority if isinstance(priority, list) else [priority]
 
         self.streamers = []
@@ -106,7 +109,11 @@ class TwitchChannelPointsMiner:
         self.session_id = str(uuid.uuid4())
         self.running = False
         self.start_datetime = None
-        self.original_streamers = []
+        self.base_points = {}
+        self.sources_usernames = {
+            "JSON_FILE": [],
+            "FOLLOWERS": [],
+        }
 
         self.logs_file = configure_loggers(self.username, logger_settings)
 
@@ -119,10 +126,27 @@ class TwitchChannelPointsMiner:
         http_server.name = "Analytics Thread"
         http_server.start()
 
-    def mine(self, streamers: list = [], blacklist: list = [], followers=False):
-        self.run(streamers=streamers, blacklist=blacklist, followers=followers)
+    def mine(
+        self,
+        streamers: list = [],
+        streamers_json: str = None,
+        blacklist: list = [],
+        followers=False,
+    ):
+        self.run(
+            streamers=streamers,
+            streamers_json=streamers_json,
+            blacklist=blacklist,
+            followers=followers,
+        )
 
-    def run(self, streamers: list = [], blacklist: list = [], followers=False):
+    def run(
+        self,
+        streamers: list = [],
+        streamers_json: str = None,
+        blacklist: list = [],
+        followers=False,
+    ):
         if self.running:
             logger.error("You can't start multiple sessions of this instance!")
         else:
@@ -137,82 +161,13 @@ class TwitchChannelPointsMiner:
             if self.claim_drops_startup is True:
                 self.twitch.claim_all_drops_from_inventory()
 
-            streamers_name: list = []
-            streamers_dict: dict = {}
-
-            for streamer in streamers:
-                username = (
-                    streamer.username
-                    if isinstance(streamer, Streamer)
-                    else streamer.lower().strip()
-                )
-                if username not in blacklist:
-                    streamers_name.append(username)
-                    streamers_dict[username] = streamer
-
-            if followers is True:
-                followers_array = self.twitch.get_followers()
-                logger.info(
-                    f"Load {len(followers_array)} followers from your profile!",
-                    extra={"emoji": ":clipboard:"},
-                )
-                for username in followers_array:
-                    if username not in streamers_dict and username not in blacklist:
-                        streamers_dict[username] = username.lower().strip()
-            else:
-                followers_array = []
-
-            streamers_name = list(
-                OrderedDict.fromkeys(streamers_name + followers_array)
+            self.streamers = self.__reload_streamers(
+                streamers=streamers,
+                streamers_json=streamers_json,
+                blacklist=blacklist,
+                followers=followers,
             )
-
-            logger.info(
-                f"Loading data for {len(streamers_name)} streamers. Please wait...",
-                extra={"emoji": ":nerd_face:"},
-            )
-            for username in streamers_name:
-                time.sleep(random.uniform(0.3, 0.7))
-                try:
-                    streamer = (
-                        streamers_dict[username]
-                        if isinstance(streamers_dict[username], Streamer) is True
-                        else Streamer(username)
-                    )
-                    streamer.channel_id = self.twitch.get_channel_id(username)
-                    streamer.settings = set_default_settings(
-                        streamer.settings, Settings.streamer_settings
-                    )
-                    streamer.settings.bet = set_default_settings(
-                        streamer.settings.bet, Settings.streamer_settings.bet
-                    )
-                    if streamer.settings.join_chat is True:
-                        streamer.irc_chat = ThreadChat(
-                            self.username,
-                            self.twitch.twitch_login.get_auth_token(),
-                            streamer.username,
-                        )
-                    self.streamers.append(streamer)
-                except StreamerDoesNotExistException:
-                    logger.info(
-                        f"Streamer {username} does not exist",
-                        extra={"emoji": ":cry:"},
-                    )
-
-            # Populate the streamers with default values.
-            # 1. Load channel points and auto-claim bonus
-            # 2. Check if streamers are online
-            # 3. Check if the user is a Streamer. In thi case you can't do prediction
-            for streamer in self.streamers:
-                time.sleep(random.uniform(0.3, 0.7))
-                self.twitch.load_channel_points_context(streamer)
-                self.twitch.check_streamer_online(streamer)
-                self.twitch.viewer_is_mod(streamer)
-                if streamer.viewer_is_mod is True:
-                    streamer.settings.make_predictions = False
-
-            self.original_streamers = [
-                streamer.channel_points for streamer in self.streamers
-            ]
+            self.__save_original()
 
             # If we have at least one streamer with settings = make_predictions True
             make_predictions = at_least_one_value_in_settings_is(
@@ -276,6 +231,7 @@ class TwitchChannelPointsMiner:
                         PubsubTopic("predictions-channel-v1", streamer=streamer)
                     )
 
+            refresh_streamers = time.time()
             while self.running:
                 time.sleep(random.uniform(20, 60))
                 # Do an external control for WebSocket. Check if the thread is running
@@ -290,6 +246,209 @@ class TwitchChannelPointsMiner:
                             f"#{index} - The last PING was sent more than 10 minutes ago. Reconnecting to the WebSocket..."
                         )
                         WebSocketsPool.handle_reconnection(self.ws_pool.ws[index])
+
+                if (
+                    self.refresh_streamers is not None
+                    and (time.time() - refresh_streamers) / 60 > self.refresh_streamers
+                ):
+                    refresh_streamers = time.time()
+                    self.streamers = self.__reload_streamers(
+                        streamers=streamers,
+                        streamers_json=streamers_json,
+                        followers=followers,
+                    )
+                    self.__save_original()
+
+    @staticmethod
+    def __remove_missing(streamers_name, streamers_dict, items, reason):
+        for username in items:
+            if username in streamers_name:
+                logger.info(
+                    f"Remove the streamer: {username}. {reason}",
+                    extra={"emoji": ":wastebasket:"},
+                )
+                streamers_name.remove(username)
+                del streamers_dict[username]
+        return streamers_name, streamers_dict
+
+    def __reload_streamers(
+        self,
+        streamers: list = [],
+        blacklist: list = [],
+        streamers_json: str = None,
+        followers: bool = False,
+    ):
+        streamers_array = []
+        Settings.streamers_settings = []
+
+        # Use for remove duplicate with followers + keep order from array
+        streamers_name: list = []
+        # Use for prevent duplicate and easy access
+        streamers_dict: dict = {}
+        for streamer in self.streamers:
+            if streamer.username not in blacklist:
+                streamers_name.append(streamer.username)
+                streamers_dict[streamer.username] = streamer
+
+        # In the run.py a username can insert a "username" string or Streamer istance
+        for streamer in streamers:
+            username = (
+                streamer.username
+                if isinstance(streamer, Streamer)
+                else streamer.lower().strip()
+            )
+            if username not in streamers_dict and username not in blacklist:
+                streamers_name.append(username)
+                streamers_dict[username] = (
+                    streamer
+                    if isinstance(streamer, Streamer) is True
+                    else Streamer(streamer)
+                )
+        logger.info(
+            f"Load {len(streamers)} streamers from: [STREAMERS]",
+            extra={"emoji": ":clipboard:"},
+        )
+
+        # Steps.
+        #   1. Read json file and iterate.
+        #   2. If this user It's already in list just parse the json file and update the settings
+        #   3. If this user It's not in list append the new Streamer
+        if streamers_json is not None:
+            json_streamers = Settings.read(streamers_json)
+            usernames = []
+            for streamer_dict in json_streamers:
+                if username not in blacklist:
+                    username = streamer_dict["username"]
+                    usernames.append(username)
+                    streamer = Streamer(
+                        username,
+                        settings=Settings.parse(
+                            streamer_dict["settings"], StreamerSettings
+                        ),
+                    )
+                    if username not in streamers_dict:
+                        streamers_name.append(username)
+                        streamers_dict[username] = streamer
+                    else:
+                        # Get settings form json
+                        streamers_dict[username].settings = streamer.settings
+
+            if self.sources_usernames["JSON_FILE"] != []:
+                streamers_name, streamers_dict = self.__remove_missing(
+                    streamers_name,
+                    streamers_dict,
+                    list(
+                        filter(
+                            lambda x: x not in usernames,
+                            self.sources_usernames["JSON_FILE"],
+                        )
+                    ),
+                    reason="Not present in JSON file",
+                )
+            self.sources_usernames["JSON_FILE"] = usernames
+
+            logger.info(
+                f"Load {len(json_streamers)} streamers from: [JSON FILE]",
+                extra={"emoji": ":clipboard:"},
+            )
+
+        if followers is True:
+            followers_array = self.twitch.get_followers()
+            followers_array = list(
+                filter(lambda x: x not in blacklist, followers_array)
+            )
+
+            for username in followers_array:
+                if username not in streamers_dict:
+                    streamers_dict[username] = Streamer(username.lower().strip())
+                    streamers_name.append(username)
+
+            if self.sources_usernames["FOLLOWERS"] != []:
+                unfollowed = list(
+                    filter(
+                        lambda x: x not in followers_array,
+                        self.sources_usernames["FOLLOWERS"],
+                    )
+                )
+                streamers_name, streamers_dict = self.__remove_missing(
+                    streamers_name,
+                    streamers_dict,
+                    unfollowed,
+                    reason="User was unfollowed",
+                )
+            self.sources_usernames["FOLLOWERS"] = followers_array
+
+            logger.info(
+                f"Load {len(followers_array)} streamers from: [FOLLOWERS]",
+                extra={"emoji": ":clipboard:"},
+            )
+
+        count = len(
+            [
+                username
+                for username in streamers_dict
+                if streamers_dict[username].init_processed is False
+            ]
+        )
+        logger.info(
+            f"Loading data for new {count} streamers. Please wait...",
+            extra={"emoji": ":nerd_face:"},
+        )
+        for username in streamers_name:
+            try:
+                streamer = streamers_dict[username]
+                Settings.append(streamer)  # Store in .json the original settings
+                if (
+                    streamer.init_processed is False
+                ):  # We have already the channel_id and other values.
+                    time.sleep(random.uniform(0.3, 0.7))
+                    streamer.channel_id = self.twitch.get_channel_id(username)
+
+                # Init all the missing settings with a default value
+                streamer.settings = set_default_settings(
+                    streamer.settings, Settings.streamer_settings
+                )
+                streamer.settings.bet = set_default_settings(
+                    streamer.settings.bet, Settings.streamer_settings.bet
+                )
+                if streamer.settings.join_chat is True and streamer.irc_chat is None:
+                    streamer.irc_chat = ThreadChat(
+                        self.username,
+                        self.twitch.twitch_login.get_auth_token(),
+                        streamer.username,
+                    )
+
+                streamers_array.append(streamer)
+            except StreamerDoesNotExistException:
+                logger.info(
+                    f"Streamer {username} does not exist",
+                    extra={"emoji": ":cry:"},
+                )
+
+        if streamers_json is not None:
+            Settings.write(streamers_json)
+
+        # Populate the streamers with default values.
+        # 1. Load channel points and auto-claim bonus
+        # 2. Check if streamers is online
+        # 3. Check if the user is a Streamer. In this case you can't do prediction
+        for streamer in streamers_array:
+            if streamer.init_processed is False:
+                time.sleep(random.uniform(0.3, 0.7))
+                self.twitch.load_channel_points_context(streamer)
+                self.twitch.check_streamer_online(streamer)
+                self.twitch.viewer_is_mod(streamer)
+                if streamer.viewer_is_mod is True:
+                    streamer.settings.make_predictions = False
+
+                streamer.init_processed = True
+
+        return streamers_array
+
+    def __save_original(self):
+        for streamer in self.streamers:
+            if streamer.username not in self.base_points:
+                self.base_points[streamer.username] = streamer.channel_points
 
     def end(self, signum, frame):
         logger.info("CTRL+C Detected! Please wait just a moment!")
@@ -357,18 +516,14 @@ class TwitchChannelPointsMiner:
                     )
 
         print("")
-        for streamer_index in range(0, len(self.streamers)):
-            if self.streamers[streamer_index].history != {}:
-                gained = (
-                    self.streamers[streamer_index].channel_points
-                    - self.original_streamers[streamer_index]
-                )
+        for streamer in self.streamers:
+            if streamer.history != {}:
+                gained = streamer.channel_points - self.base_points[streamer.username]
                 logger.info(
-                    f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(gained)}",
+                    f"{repr(streamer)}, Total Points Gained (after farming - before farming): {_millify(gained)}",
                     extra={"emoji": ":robot:"},
                 )
-                if self.streamers[streamer_index].history != {}:
-                    logger.info(
-                        f"{self.streamers[streamer_index].print_history()}",
-                        extra={"emoji": ":moneybag:"},
-                    )
+                logger.info(
+                    f"{streamer.print_history()}",
+                    extra={"emoji": ":moneybag:"},
+                )

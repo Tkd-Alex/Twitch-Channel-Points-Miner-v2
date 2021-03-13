@@ -185,8 +185,9 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, Streame
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
-    password="write-your-secure-psw",           # If no password will be provided, the script will ask interactively
-    claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on the startup
+    password="write-your-secure-psw",           # If no password will be provided the script will ask interactively
+    claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
+    refresh_streamers=60,                       # Refresh the streamers list (followers and .json file) each x minutes
     priority=[                                  # Custom priority in this case for example:
         Priority.STREAK,                        # - We want first of all to catch all watch streak from all streamers
         Priority.DROPS,                         # - When we don't have anymore watch streak to catch, wait until all drops are collected over the streamers
@@ -235,7 +236,7 @@ twitch_miner = TwitchChannelPointsMiner(
 # If you haven't set any value even in the instance the default one will be used
 
 twitch_miner.mine(
-    [
+    streamers=[
         Streamer("streamer-username01", settings=StreamerSettings(make_predictions=True  , follow_raid=False , claim_drops=True  , watch_streak=True , bet=BetSettings(strategy=Strategy.SMART      , percentage=5 , stealth_mode=True,  percentage_gap=20 , max_points=234   , filter_condition=FilterCondition(by=OutcomeKeys.TOTAL_USERS,      where=Condition.LTE, value=800 ) ) )),
         Streamer("streamer-username02", settings=StreamerSettings(make_predictions=False , follow_raid=True  , claim_drops=False ,                     bet=BetSettings(strategy=Strategy.PERCENTAGE , percentage=5 , stealth_mode=False, percentage_gap=20 , max_points=1234  , filter_condition=FilterCondition(by=OutcomeKeys.TOTAL_POINTS,     where=Condition.GTE, value=250 ) ) )),
         Streamer("streamer-username03", settings=StreamerSettings(make_predictions=True  , follow_raid=False ,                     watch_streak=True , bet=BetSettings(strategy=Strategy.SMART      , percentage=5 , stealth_mode=False, percentage_gap=30 , max_points=50000 , filter_condition=FilterCondition(by=OutcomeKeys.ODDS,             where=Condition.LT,  value=300 ) ) )),
@@ -248,16 +249,17 @@ twitch_miner.mine(
         "streamer-username10",
         "streamer-username11"
     ],                                 # Array of streamers (order = priority)
-    followers=False                    # Automatic download the list of your followers (unable to set custom settings for you followers list)
+    followers=False,                   # Automatic download the list of your followers (unable to set custom settings for you followers list)
+    streamers_json="settings.json"     # .json file path. Where store and/or load/update streamers settings
 )
 ```
 You can also use all the default values except for your username obv. Short version:
 ```python
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
-twitch_miner.mine(["streamer1", "streamer2"])                   # Array of streamers OR
-twitch_miner.mine(followers=True)                               # Automatic use the followers list OR
-twitch_miner.mine(["streamer1", "streamer2"], followers=True)   # Mixed
+twitch_miner.mine(["streamer1", "streamer2"])                                                   # Array of streamers OR
+twitch_miner.mine(followers=True, streamers_json="settings.json")                               # Automatic use the followers list and load from JSON OR
+twitch_miner.mine(["streamer1", "streamer2"], followers=True, streamers_json="settings.json")   # Mixed
 ```
 If you follow so many streamers on Twitch, but you don't want to mine points for all of them, you can blacklist the users with the `blacklist` keyword. [#94](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/94)
 ```python
@@ -266,6 +268,67 @@ twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
 twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Blacklist example
 ```
 4. Start mining! `python run.py`
+
+You streamers's settings will be stored `streamers_json="settings.json"`. You can also edit the file on runtime. Each `refresh_streamers` the script will check for Followers update (if set to True) and new settings from .json file. Read more about: [StreamerSettings](#streamersettings)
+
+⚠️ **Keep attention**: the json settings will ovveride settings from run.py. Here an example:
+- You start the script and the settings in run.py are `Streamer("streamer-username01", settings=StreamerSettings(make_predictions=True))`
+- While script is running, you change the .json file with new settings `{"settings": { "make_predictions": false }, "username": "streamer-username01"}`
+- Your script will continue execution with `make_predictions=False` (new settings)
+- If you restart the script and now the settings are:
+    - From run.py `Streamer("streamer-username01", settings=StreamerSettings(make_predictions=True))`
+    - From .json `{"settings": { "make_predictions": false }, "username": "streamer-username01"}`
+
+    **The .json settings will ovveride the run.py.**
+
+If you prefer you can also use only the .json file and pass an empty array on streamers: `twitch_miner.mine(streamers=[], streamers_json="settings.json")`
+Example of `settings.json`
+```json
+[
+    {
+        "settings": {
+            "bet": {
+                "filter_condition": {"by": "ODDS", "value": 1.4, "where": "GTE"},
+                "max_points": 50000, "percentage": 5, "percentage_gap": 20, "stealth_mode": null, "strategy": "SMART"
+            },
+            "claim_drops": true, "follow_raid": true, "make_predictions": true, "watch_streak": true
+        },
+        "username": "username-1"
+    },
+    {
+        "settings": {
+            "bet": {
+                "filter_condition": {"by": "ODDS", "value": 3, "where": "GTE"},
+                "max_points": 234, "percentage": 5, "percentage_gap": 20, "stealth_mode": false, "strategy": "HIGH_ODDS"
+            },
+            "claim_drops": false, "follow_raid": false, "make_predictions": true, "watch_streak": true
+        },
+        "username": "username-2"
+    },
+    {
+        "settings": null,
+        "username": "username-3"
+    },
+    {
+        "settings": {
+            "bet": {
+                "max_points": 234,
+                "percentage": 10,
+                "percentage_gap": 10,
+                "stealth_mode": true,
+                "strategy": "HIGH_ODDS"
+            },
+            "claim_drops": false,
+            "watch_streak": true
+        },
+        "username": "username-4"
+    },
+    {
+        "settings": null,
+        "username": "username-5"
+    }
+]
+```
 
 ### Limits
 > Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
