@@ -140,6 +140,9 @@ cython_debug/
 # PyCharm
 .idea/
 
+#VSCode
+.vscode/*
+
 # Custom files
 run.py
 chromedriver*
