@@ -14,9 +14,9 @@ twitch_miner = TwitchChannelPointsMiner(
     claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
     refresh_streamers=60,                       # Refresh the streamers list (followers and .json file) each x minutes
     priority=[                                  # Custom priority in this case for example:
-        Priority.STREAK,                        # - we want first of all to catch all watch streak from all streamers
-        Priority.DROPS,                         # - when we don't have anymore watch streak to catch wait until all drops are collected over the streamers
-        Priority.ORDER                          # - when we have all of drops claimed and no watch-streak avaialable use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
+        Priority.STREAK,                        # - We want first of all to catch all watch streak from all streamers
+        Priority.DROPS,                         # - When we don't have anymore watch streak to catch, wait until all drops are collected over the streamers
+        Priority.ORDER                          # - When we have all of the  drops claimed and no watch-streak available, use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
     ],
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
@@ -26,7 +26,7 @@ twitch_miner = TwitchChannelPointsMiner(
         less=False,                             # If you think that the logs are too verbose, set this to True
         colored=True,                           # If you want to print colored text
         color_palette=ColorPalette(             # You can also create a custom palette color (for the common message).
-            STREAMER_online="GREEN",            # Don't worry about lower/upper case the script will be parse all the values.
+            STREAMER_online="GREEN",            # Don't worry about lower/upper case. The script will parse all the values.
             streamer_offline="red",             # Read more in README.md
             BET_wiN=Fore.MAGENTA                # Color allowed are: [BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET].
         )
@@ -36,6 +36,7 @@ twitch_miner = TwitchChannelPointsMiner(
         follow_raid=True,                       # Follow raid to obtain more points
         claim_drops=True,                       # We can't filter rewards base on stream. Set to False for skip viewing counter increase and you will never obtain a drop reward from this script. Issue #21
         watch_streak=True,                      # If a streamer go online change the priotiry of streamers array and catch the watch screak. Issue #11
+        join_chat=True,                         # Join irc chat to increase watch-time
         bet=BetSettings(
             strategy=Strategy.SMART,            # Choose you strategy!
             percentage=5,                       # Place the x% of your channel points

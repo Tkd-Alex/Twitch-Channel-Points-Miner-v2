@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import os
 import random
 import signal
 import sys
@@ -8,7 +9,10 @@ import threading
 import time
 import uuid
 from datetime import datetime
+from pathlib import Path
 
+from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
+from TwitchChannelPointsMiner.classes.Chat import ThreadChat
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.entities.Streamer import (
     Streamer,
@@ -31,8 +35,14 @@ from TwitchChannelPointsMiner.utils import (
 #   - chardet.charsetprober - [feed]
 #   - chardet.charsetprober - [get_confidence]
 #   - requests - [Starting new HTTPS connection (1)]
+#   - Flask (werkzeug) logs
+#   - irc.client - [process_data]
+#   - irc.client - [_dispatcher]
+#   - irc.client - [_handle_message]
 logging.getLogger("chardet.charsetprober").setLevel(logging.ERROR)
 logging.getLogger("requests").setLevel(logging.ERROR)
+logging.getLogger("werkzeug").setLevel(logging.ERROR)
+logging.getLogger("irc.client").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
@@ -63,12 +73,16 @@ class TwitchChannelPointsMiner:
         password: str = None,
         claim_drops_startup: bool = False,
         refresh_streamers: float = float("inf"),  # Minutes
+        # Settings for logging and selenium as you can see.
         priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
         logger_settings: LoggerSettings = LoggerSettings(),
         # Default values for all streamers
         streamer_settings: StreamerSettings = StreamerSettings(),
     ):
+        Settings.analytics_path = os.path.join(Path().absolute(), "analytics", username)
+        Path(Settings.analytics_path).mkdir(parents=True, exist_ok=True)
+
         self.username = username
 
         # Set as global config
@@ -105,6 +119,12 @@ class TwitchChannelPointsMiner:
 
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
+
+    def analytics(self, host: str = "127.0.0.1", port: int = 5000, refresh: int = 5):
+        http_server = AnalyticsServer(host=host, port=port, refresh=refresh)
+        http_server.daemon = True
+        http_server.name = "Analytics Thread"
+        http_server.start()
 
     def mine(
         self,
@@ -391,6 +411,12 @@ class TwitchChannelPointsMiner:
                 streamer.settings.bet = set_default_settings(
                     streamer.settings.bet, Settings.streamer_settings.bet
                 )
+                if streamer.settings.join_chat is True and streamer.irc_chat is None:
+                    streamer.irc_chat = ThreadChat(
+                        self.username,
+                        self.twitch.twitch_login.get_auth_token(),
+                        streamer.username,
+                    )
 
                 streamers_array.append(streamer)
             except StreamerDoesNotExistException:
@@ -427,6 +453,12 @@ class TwitchChannelPointsMiner:
     def end(self, signum, frame):
         logger.info("CTRL+C Detected! Please wait just a moment!")
 
+        for streamer in self.streamers:
+            if streamer.irc_chat is not None:
+                streamer.leave_chat()
+                if streamer.irc_chat.is_alive() is True:
+                    streamer.irc_chat.join()
+
         self.running = self.twitch.running = False
         self.ws_pool.end()
 
@@ -436,7 +468,13 @@ class TwitchChannelPointsMiner:
         if self.sync_campaigns_thread is not None:
             self.sync_campaigns_thread.join()
 
-        time.sleep(1)
+        # Check if all the mutex are unlocked.
+        # Prevent breaks of .json file
+        for streamer in self.streamers:
+            if streamer.mutex.locked():
+                streamer.mutex.acquire()
+                streamer.mutex.release()
+
         self.__print_report()
 
         sys.exit(0)
@@ -480,8 +518,9 @@ class TwitchChannelPointsMiner:
         print("")
         for streamer in self.streamers:
             if streamer.history != {}:
+                gained = streamer.channel_points - self.base_points[streamer.username]
                 logger.info(
-                    f"{repr(streamer)}, Total Points Gained (after farming - before farming): {_millify(streamer.channel_points - self.base_points[streamer.username])}",
+                    f"{repr(streamer)}, Total Points Gained (after farming - before farming): {_millify(gained)}",
                     extra={"emoji": ":robot:"},
                 )
                 logger.info(

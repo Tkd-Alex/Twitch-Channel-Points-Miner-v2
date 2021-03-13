@@ -1,8 +1,8 @@
 import json
 import logging
 import random
-import threading
 import time
+from threading import Thread, Timer
 
 from dateutil import parser
 
@@ -13,7 +13,6 @@ from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
-    _millify,
     get_streamer_index,
     internet_connection_available,
 )
@@ -68,7 +67,7 @@ class WebSocketsPool:
         )
 
     def __start(self, index):
-        thread_ws = threading.Thread(target=lambda: self.ws[index].run_forever())
+        thread_ws = Thread(target=lambda: self.ws[index].run_forever())
         thread_ws.daemon = True
         thread_ws.name = f"WebSocket #{self.ws[index].index}"
         thread_ws.start()
@@ -100,7 +99,7 @@ class WebSocketsPool:
                         )
                         WebSocketsPool.handle_reconnection(ws)
 
-        thread_ws = threading.Thread(target=run)
+        thread_ws = Thread(target=run)
         thread_ws.daemon = True
         thread_ws.start()
 
@@ -177,11 +176,18 @@ class WebSocketsPool:
             if streamer_index != -1:
                 try:
                     if message.topic == "community-points-user-v1":
+                        if message.type in ["points-earned", "points-spent"]:
+                            balance = message.data["balance"]["balance"]
+                            ws.streamers[streamer_index].channel_points = balance
+                            ws.streamers[streamer_index].persistent_series(
+                                event_type=message.data["point_gain"]["reason_code"]
+                                if message.type == "points-earned"
+                                else "Spent"
+                            )
+
                         if message.type == "points-earned":
                             earned = message.data["point_gain"]["total_points"]
                             reason_code = message.data["point_gain"]["reason_code"]
-                            balance = message.data["balance"]["balance"]
-                            ws.streamers[streamer_index].channel_points = balance
                             logger.info(
                                 f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
                                 extra={
@@ -193,6 +199,9 @@ class WebSocketsPool:
                             )
                             ws.streamers[streamer_index].update_history(
                                 reason_code, earned
+                            )
+                            ws.streamers[streamer_index].persistent_annotations(
+                                reason_code, f"+{earned} - {reason_code}"
                             )
                         elif message.type == "claim-available":
                             ws.twitch.claim_bonus(
@@ -262,7 +271,7 @@ class WebSocketsPool:
                                             current_tmsp
                                         )
 
-                                        place_bet_thread = threading.Timer(
+                                        place_bet_thread = Timer(
                                             start_after,
                                             ws.twitch.make_predictions,
                                             (ws.events_predictions[event_id],),
@@ -300,63 +309,52 @@ class WebSocketsPool:
                                 message.type == "prediction-result"
                                 and event_prediction.bet_confirmed
                             ):
-                                event_result = message.data["prediction"]["result"]
-                                result_type = event_result["type"]
-                                points_placed = event_prediction.bet.decision["amount"]
-                                points_won = (
-                                    event_result["points_won"]
-                                    if event_result["points_won"]
-                                    or result_type == "REFUND"
-                                    else 0
+                                points = event_prediction.parse_result(
+                                    message.data["prediction"]["result"]
                                 )
-                                points_gained = (
-                                    points_won - points_placed
-                                    if result_type != "REFUND"
-                                    else 0
-                                )
-                                points_prefix = "+" if points_gained >= 0 else ""
-                                action = (
-                                    "Lost"
-                                    if result_type == "LOSE"
-                                    else (
-                                        "Refunded"
-                                        if result_type == "REFUND"
-                                        else "Gained"
-                                    )
-                                )
+
+                                decision = event_prediction.bet.get_decision()
+                                choice = event_prediction.bet.decision["choice"]
+
                                 logger.info(
-                                    f"{ws.events_predictions[event_id]} - Result: {result_type}, {action}: {points_prefix}{_millify(points_gained)}",
+                                    f"{event_prediction} - Decision: {choice}: {decision['title']} ({decision['color']}) - Result: {event_prediction.result['string']}",
                                     extra={
                                         "emoji": ":bar_chart:",
                                         "color": Settings.logger.color_palette.get(
-                                            f"BET_{result_type}"
+                                            f"BET_{event_prediction.result['type']}"
                                         ),
                                     },
                                 )
-                                ws.events_predictions[event_id].final_result = {
-                                    "type": event_result["type"],
-                                    "points_won": points_won,
-                                    "gained": points_gained,
-                                }
+
                                 ws.streamers[streamer_index].update_history(
-                                    "PREDICTION", points_gained
+                                    "PREDICTION", points["gained"]
                                 )
 
                                 # Remove duplicate history records from previous message sent in community-points-user-v1
-                                if result_type == "REFUND":
+                                if event_prediction.result["type"] == "REFUND":
                                     ws.streamers[streamer_index].update_history(
                                         "REFUND",
-                                        -points_placed,
+                                        -points["placed"],
                                         counter=-1,
                                     )
-                                elif result_type == "WIN":
+                                elif event_prediction.result["type"] == "WIN":
                                     ws.streamers[streamer_index].update_history(
                                         "PREDICTION",
-                                        -points_won,
+                                        -points["won"],
                                         counter=-1,
+                                    )
+
+                                if event_prediction.result["type"] != "LOSE":
+                                    ws.streamers[streamer_index].persistent_annotations(
+                                        event_prediction.result["type"],
+                                        f"{ws.events_predictions[event_id].title}",
                                     )
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
+                                ws.streamers[streamer_index].persistent_annotations(
+                                    "PREDICTION_MADE",
+                                    f"Decision: {event_prediction.bet.decision['choice']} - {event_prediction.title}",
+                                )
                 except Exception:
                     logger.error(
                         f"Exception raised for topic: {message.topic} and message: {message}",
