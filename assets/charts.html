@@ -178,8 +178,9 @@
                     name: streamer.replace(".json", ""),
                     data: response["series"]
                 }], true)
+                clearAnnotations();
                 annotations = response["annotations"];
-                updateAnnotations()
+                updateAnnotations();
                 setTimeout(function(){getStreamerData(streamer);}, 300000);  // 5 minutes
             });
         }
