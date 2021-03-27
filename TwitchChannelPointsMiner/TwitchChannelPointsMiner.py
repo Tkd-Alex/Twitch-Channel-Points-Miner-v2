@@ -276,6 +276,7 @@ class TwitchChannelPointsMiner:
                         PubsubTopic("predictions-channel-v1", streamer=streamer)
                     )
 
+            refresh_context = time.time()
             while self.running:
                 time.sleep(random.uniform(20, 60))
                 # Do an external control for WebSocket. Check if the thread is running
@@ -290,6 +291,14 @@ class TwitchChannelPointsMiner:
                             f"#{index} - The last PING was sent more than 10 minutes ago. Reconnecting to the WebSocket..."
                         )
                         WebSocketsPool.handle_reconnection(self.ws_pool.ws[index])
+
+                if ((time.time() - refresh_context) // 60) >= 30:
+                    refresh_context = time.time()
+                    for index in range(0, len(self.streamers)):
+                        if self.streamers[index].is_online:
+                            self.twitch.load_channel_points_context(
+                                self.streamers[index]
+                            )
 
     def end(self, signum, frame):
         logger.info("CTRL+C Detected! Please wait just a moment!")
