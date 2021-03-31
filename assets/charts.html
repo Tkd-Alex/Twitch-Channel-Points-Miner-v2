@@ -176,6 +176,9 @@
         chart.render();
         $("li").eq(0).click();
 
+        if (!localStorage.getItem("annotations")) localStorage.setItem("annotations", true);
+        if (!localStorage.getItem("dark-mode")) localStorage.setItem("dark-mode", true);
+
         $('#annotations').prop("checked", localStorage.getItem("annotations") === "true");
         $('#dark-mode').prop("checked", localStorage.getItem("dark-mode") === "true");
 
