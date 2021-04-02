@@ -24,7 +24,11 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
 from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.constants import API, CLIENT_ID, GQLOperations
-from TwitchChannelPointsMiner.utils import _millify, internet_connection_available
+from TwitchChannelPointsMiner.utils import (
+    _millify,
+    create_chunks,
+    internet_connection_available,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -489,16 +493,20 @@ class Twitch(object):
         return campaigns
 
     def __get_campaigns_details(self, campaigns):
-        json_data = []
-        for campaign in campaigns:
-            json_data.append(copy.deepcopy(GQLOperations.DropCampaignDetails))
-            json_data[-1]["variables"] = {
-                "dropID": campaign["id"],
-                "channelLogin": f"{self.twitch_login.get_user_id()}",
-            }
+        result = []
+        chunks = create_chunks(campaigns)
+        for chunk in chunks:
+            json_data = []
+            for campaign in chunk:
+                json_data.append(copy.deepcopy(GQLOperations.DropCampaignDetails))
+                json_data[-1]["variables"] = {
+                    "dropID": campaign["id"],
+                    "channelLogin": f"{self.twitch_login.get_user_id()}",
+                }
 
-        response = self.post_gql_request(json_data)
-        return list(map(lambda x: x["data"]["user"]["dropCampaign"], response))
+            response = self.post_gql_request(json_data)
+            result += list(map(lambda x: x["data"]["user"]["dropCampaign"], response))
+        return result
 
     def __sync_campaigns(self, campaigns):
         # We need the inventory only for get the real updated value/progress
