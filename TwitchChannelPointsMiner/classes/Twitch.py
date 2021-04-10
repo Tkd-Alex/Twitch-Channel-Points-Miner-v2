@@ -494,7 +494,7 @@ class Twitch(object):
 
     def __get_campaigns_details(self, campaigns):
         result = []
-        chunks = create_chunks(campaigns)
+        chunks = create_chunks(campaigns, 20)
         for chunk in chunks:
             json_data = []
             for campaign in chunk:
