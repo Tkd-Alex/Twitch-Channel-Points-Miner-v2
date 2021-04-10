@@ -207,8 +207,6 @@ class TwitchChannelPointsMiner:
                 self.twitch.load_channel_points_context(streamer)
                 self.twitch.check_streamer_online(streamer)
                 self.twitch.viewer_is_mod(streamer)
-                if streamer.viewer_is_mod is True:
-                    streamer.settings.make_predictions = False
 
             self.original_streamers = [
                 streamer.channel_points for streamer in self.streamers
