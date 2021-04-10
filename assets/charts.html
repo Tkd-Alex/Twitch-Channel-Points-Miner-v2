@@ -19,8 +19,6 @@
             flex-grow: 0px;
         }
         .tabs {
-            margin-top: 20px;
-
             max-height: 425px;
             overflow-y: auto;
             direction: rtl;
@@ -57,36 +55,34 @@
         <br>
 
         <div class="columns">
+            <div class="column"></div>
+            <div class="column is-3" style="text-align: right;">
+                <label class="checkbox" style="padding-left: 15px;">
+                    Annotations
+                    <input type="checkbox" checked="true" id="annotations">
+                </label>
+                <label class="checkbox" style="padding-left: 15px;">
+                    Dark mode
+                    <input type="checkbox" checked="true" id="dark-mode">
+                </label>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-2">
+                <div class="tabs">
+                    <ul>
+                        <li onCLick="getAllStreamersData()"><a>&#x02605; [All Streamers]</a></li>
+                        {% for streamer in streamers.split(',')|sort %}
+                            <li onClick="changeStreamer('{{ streamer }}', {{ loop.index }})"><a>{{ streamer.replace(".json", "")  }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
             <div class="column">
-                <div style="text-align: right;">
-                    <label class="checkbox" style="padding-left: 15px;">
-                        Annotations
-                        <input type="checkbox" checked="true" id="annotations">
-                    </label>
-                    <label class="checkbox" style="padding-left: 15px;">
-                        Dark mode
-                        <input type="checkbox" checked="true" id="dark-mode">
-                    </label>
-                </div>
-                <div class="columns">
-                    <div class="column is-2">
-                        <div class="tabs">
-                            <ul>
-                                {% for streamer in streamers.split(',')|sort %}
-                                    <li onClick="changeStreamer('{{ streamer }}', {{ loop.index }})"><a>{{ streamer.replace(".json", "")  }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div class="box" id="chart" style="padding: 0.30rem; margin-top: 15px;"></div>
-                    </div>
-                </div>
+                <div class="box" id="chart" style="padding: 0.30rem;></div>
             </div>
         </div>
 
-
-        <!-- <hr style="margin: 1.2rem 0;"> -->
         <div style="text-align: center">If you want to help on this project, please leave a star 🌟 and share it with your friends! 😎 - A coffee is always a gesture of LOVE ❤️
             <a href="https://www.buymeacoffee.com/tkdalex" target="_blank">
                 <img style="margin-bottom: -8px; margin-left: 10px;"  src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="5" width="138">
@@ -205,6 +201,17 @@
                 setTimeout(function(){getStreamerData(streamer);}, 300000);  // 5 minutes
             });
         }
+    }
+
+    function getAllStreamersData(){
+        $.getJSON(`./json_all`, function (response) {apexcharts:6 It is a possibility that you may have not included 'data' property in series.
+            for(var i in response){
+                chart.appendSeries({
+                    name: response[i]["name"].replace(".json", ""),
+                    data: response[i]["data"]["series"]
+                }, true)
+            }
+        });
     }
 
     function updateAnnotations() {

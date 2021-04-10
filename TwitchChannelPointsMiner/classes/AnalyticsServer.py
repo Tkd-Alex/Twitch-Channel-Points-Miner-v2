@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from pathlib import Path
@@ -30,6 +31,23 @@ def read_json(streamer):
     )
 
 
+def json_all():
+    path = Settings.analytics_path
+    return Response(
+        json.dumps(
+            [
+                {
+                    "name": streamer.strip(".json"),
+                    "data": json.load(open(os.path.join(path, streamer))),
+                }
+                for streamer in streamers_available()
+            ]
+        ),
+        status=200,
+        mimetype="application/json",
+    )
+
+
 def index(refresh=5):
     return render_template(
         "charts.html",
@@ -53,6 +71,7 @@ class AnalyticsServer(Thread):
         )
         self.app.add_url_rule("/", "index", index, defaults={"refresh": refresh})
         self.app.add_url_rule("/json/<string:streamer>", "json", read_json)
+        self.app.add_url_rule("/json_all", "json_all", json_all)
 
     def run(self):
         logger.info(
