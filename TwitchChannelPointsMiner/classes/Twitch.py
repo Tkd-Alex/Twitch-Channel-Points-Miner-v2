@@ -538,7 +538,21 @@ class Twitch(object):
         json_data["variables"] = {"input": {"dropInstanceID": drop.drop_instance_id}}
         response = self.post_gql_request(json_data)
         try:
-            return response["data"]["claimDropRewards"]["status"] == "ELIGIBLE_FOR_ALL"
+            # response["data"]["claimDropRewards"] can be null and respose["data"]["errors"] != []
+            # or response["data"]["claimDropRewards"]["status"] === DROP_INSTANCE_ALREADY_CLAIMED
+            if ("claimDropRewards" in response["data"]) and (
+                response["data"]["claimDropRewards"] is None
+            ):
+                return False
+            elif ("errors" in response["data"]) and (response["data"]["errors"] != []):
+                return False
+            elif ("claimDropRewards" in response["data"]) and (
+                response["data"]["claimDropRewards"]["status"]
+                in ["ELIGIBLE_FOR_ALL", "DROP_INSTANCE_ALREADY_CLAIMED"]
+            ):
+                return True
+            else:
+                return False
         except (ValueError, KeyError):
             return False
 
