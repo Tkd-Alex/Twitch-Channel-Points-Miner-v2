@@ -201,12 +201,12 @@ class TwitchChannelPointsMiner:
             # Populate the streamers with default values.
             # 1. Load channel points and auto-claim bonus
             # 2. Check if streamers are online
-            # 3. Check if the user is a Streamer. In thi case you can't do prediction
+            # 3. DEACTIVATED: Check if the user is a moderator. (was used before the 5th of April 2021 to deactivate predictions)
             for streamer in self.streamers:
                 time.sleep(random.uniform(0.3, 0.7))
                 self.twitch.load_channel_points_context(streamer)
                 self.twitch.check_streamer_online(streamer)
-                self.twitch.viewer_is_mod(streamer)
+                # self.twitch.viewer_is_mod(streamer)
 
             self.original_streamers = [
                 streamer.channel_points for streamer in self.streamers
