@@ -262,9 +262,7 @@ class WebSocketsPool:
                                     and event.closing_bet_after(current_tmsp) > 0
                                 ):
                                     ws.events_predictions[event_id] = event
-                                    start_after = event.closing_bet_after(
-                                        current_tmsp
-                                    )
+                                    start_after = event.closing_bet_after(current_tmsp)
 
                                     place_bet_thread = Timer(
                                         start_after,
