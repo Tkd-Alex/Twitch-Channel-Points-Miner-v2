@@ -261,31 +261,24 @@ class WebSocketsPool:
                                     ws.streamers[streamer_index].is_online
                                     and event.closing_bet_after(current_tmsp) > 0
                                 ):
-                                    if event.streamer.viewer_is_mod is True:
-                                        logger.info(
-                                            f"Sorry, you are moderator of {event.streamer}, so you can't bet!"
-                                        )
-                                    else:
-                                        ws.events_predictions[event_id] = event
-                                        start_after = event.closing_bet_after(
-                                            current_tmsp
-                                        )
+                                    ws.events_predictions[event_id] = event
+                                    start_after = event.closing_bet_after(current_tmsp)
 
-                                        place_bet_thread = Timer(
-                                            start_after,
-                                            ws.twitch.make_predictions,
-                                            (ws.events_predictions[event_id],),
-                                        )
-                                        place_bet_thread.daemon = True
-                                        place_bet_thread.start()
+                                    place_bet_thread = Timer(
+                                        start_after,
+                                        ws.twitch.make_predictions,
+                                        (ws.events_predictions[event_id],),
+                                    )
+                                    place_bet_thread.daemon = True
+                                    place_bet_thread.start()
 
-                                        logger.info(
-                                            f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
-                                            extra={
-                                                "emoji": ":alarm_clock:",
-                                                "color": Settings.logger.color_palette.BET_START,
-                                            },
-                                        )
+                                    logger.info(
+                                        f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
+                                        extra={
+                                            "emoji": ":alarm_clock:",
+                                            "color": Settings.logger.color_palette.BET_START,
+                                        },
+                                    )
 
                         elif (
                             message.type == "event-updated"
