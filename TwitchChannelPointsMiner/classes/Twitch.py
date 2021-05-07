@@ -314,6 +314,13 @@ class Twitch(object):
                                 if len(streamers_watching) == 2:
                                     break
 
+                    elif prior == Priority.SUBSCRIBED and len(streamers_watching) < 2:
+                        for index in streamers_index:
+                            if streamers[index].viewer_has_points_multiplier is True:
+                                streamers_watching.append(index)
+                                if len(streamers_watching) == 2:
+                                    break
+
                 """
                 Twitch has a limit - you can't watch more than 2 channels at one time.
                 We take the first two streamers from the list as they have the highest priority (based on order or WatchStreak).
@@ -386,6 +393,7 @@ class Twitch(object):
             channel = response["data"]["community"]["channel"]
             community_points = channel["self"]["communityPoints"]
             streamer.channel_points = community_points["balance"]
+            streamer.viewer_has_points_multiplier = len(community_points["activeMultipliers"]) > 0
 
             if community_points["availableClaim"] is not None:
                 self.claim_bonus(streamer, community_points["availableClaim"]["id"])

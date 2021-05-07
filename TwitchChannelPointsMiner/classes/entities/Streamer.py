@@ -70,6 +70,7 @@ class Streamer(object):
         "channel_points",
         "minute_watched_requests",
         "viewer_is_mod",
+        "viewer_has_points_multiplier",
         "irc_chat",
         "stream",
         "raid",
@@ -89,6 +90,7 @@ class Streamer(object):
         self.channel_points = 0
         self.minute_watched_requests = None
         self.viewer_is_mod = False
+        self.viewer_has_points_multiplier = False
         self.irc_chat = None
 
         self.stream = Stream()
