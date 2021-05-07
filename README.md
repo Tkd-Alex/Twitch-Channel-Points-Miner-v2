@@ -278,7 +278,7 @@ You can watch only two streamers per time. With `priority` settings, you can sel
 Available values are the following:
  - `STREAK` - Catch the watch streak from all streamers
  - `DROPS` - Claim all drops from streamers with drops tags enabled
- - `SUBSCRIBED` - Prioritize streamers you're subscribed to
+ - `SUBSCRIBED` - Prioritize streamers you're subscribed to (higher subscription tiers are mined first)
  - `ORDER` - Following the order of the list
  - `POINTS_ASCENDING` - On top the streamers with the lowest points
  - `POINTS_DESCEDING` - On top the streamers with the highest points
