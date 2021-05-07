@@ -70,6 +70,7 @@ class Streamer(object):
         "channel_points",
         "minute_watched_requests",
         "viewer_is_mod",
+        "activeMultipliers",
         "irc_chat",
         "stream",
         "raid",
@@ -89,6 +90,7 @@ class Streamer(object):
         self.channel_points = 0
         self.minute_watched_requests = None
         self.viewer_is_mod = False
+        self.activeMultipliers = None
         self.irc_chat = None
 
         self.stream = Stream()
@@ -166,6 +168,21 @@ class Streamer(object):
             and self.is_online is True
             and self.stream.drops_tags is True
             and self.stream.campaigns_ids != []
+        )
+
+    def viewer_has_points_multiplier(self):
+        return self.activeMultipliers is not None and len(self.activeMultipliers) > 0
+
+    def total_points_multiplier(self):
+        return (
+            sum(
+                map(
+                    lambda x: x["factor"],
+                    self.activeMultipliers,
+                ),
+            )
+            if self.activeMultipliers is not None
+            else 0
         )
 
     # === ANALYTICS === #
