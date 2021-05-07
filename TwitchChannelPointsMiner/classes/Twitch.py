@@ -323,6 +323,7 @@ class Twitch(object):
                         streamers_with_multiplier = sorted(
                             streamers_with_multiplier,
                             key=lambda x: streamers[x].total_points_multiplier(),
+                            reverse=True,
                         )
                         streamers_watching += streamers_with_multiplier[:2]
 
