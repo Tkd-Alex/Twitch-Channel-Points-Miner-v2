@@ -172,7 +172,7 @@ class TwitchChannelPointsMiner:
                 extra={"emoji": ":nerd_face:"},
             )
             for username in streamers_name:
-                if username in streamers_dict:
+                if username in streamers_name:
                     time.sleep(random.uniform(0.3, 0.7))
                     try:
                         streamer = (
