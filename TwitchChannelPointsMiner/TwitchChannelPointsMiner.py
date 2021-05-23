@@ -165,38 +165,40 @@ class TwitchChannelPointsMiner:
             streamers_name = list(
                 OrderedDict.fromkeys(streamers_name + followers_array)
             )
+            streamers_name = [name for name in streamers_name if name not in blacklist]
 
             logger.info(
                 f"Loading data for {len(streamers_name)} streamers. Please wait...",
                 extra={"emoji": ":nerd_face:"},
             )
             for username in streamers_name:
-                time.sleep(random.uniform(0.3, 0.7))
-                try:
-                    streamer = (
-                        streamers_dict[username]
-                        if isinstance(streamers_dict[username], Streamer) is True
-                        else Streamer(username)
-                    )
-                    streamer.channel_id = self.twitch.get_channel_id(username)
-                    streamer.settings = set_default_settings(
-                        streamer.settings, Settings.streamer_settings
-                    )
-                    streamer.settings.bet = set_default_settings(
-                        streamer.settings.bet, Settings.streamer_settings.bet
-                    )
-                    if streamer.settings.join_chat is True:
-                        streamer.irc_chat = ThreadChat(
-                            self.username,
-                            self.twitch.twitch_login.get_auth_token(),
-                            streamer.username,
+                if username in streamers_dict:
+                    time.sleep(random.uniform(0.3, 0.7))
+                    try:
+                        streamer = (
+                            streamers_dict[username]
+                            if isinstance(streamers_dict[username], Streamer) is True
+                            else Streamer(username)
                         )
-                    self.streamers.append(streamer)
-                except StreamerDoesNotExistException:
-                    logger.info(
-                        f"Streamer {username} does not exist",
-                        extra={"emoji": ":cry:"},
-                    )
+                        streamer.channel_id = self.twitch.get_channel_id(username)
+                        streamer.settings = set_default_settings(
+                            streamer.settings, Settings.streamer_settings
+                        )
+                        streamer.settings.bet = set_default_settings(
+                            streamer.settings.bet, Settings.streamer_settings.bet
+                        )
+                        if streamer.settings.join_chat is True:
+                            streamer.irc_chat = ThreadChat(
+                                self.username,
+                                self.twitch.twitch_login.get_auth_token(),
+                                streamer.username,
+                            )
+                        self.streamers.append(streamer)
+                    except StreamerDoesNotExistException:
+                        logger.info(
+                            f"Streamer {username} does not exist",
+                            extra={"emoji": ":cry:"},
+                        )
 
             # Populate the streamers with default values.
             # 1. Load channel points and auto-claim bonus
