@@ -110,7 +110,7 @@ class WebSocketsPool:
         logger.error(f"#{ws.index} - WebSocket error: {error}")
 
     @staticmethod
-    def on_close(ws):
+    def on_close(ws, close_status_code, close_reason):
         logger.info(f"#{ws.index} - WebSocket closed")
         # On close please reconnect automatically
         WebSocketsPool.handle_reconnection(ws)
