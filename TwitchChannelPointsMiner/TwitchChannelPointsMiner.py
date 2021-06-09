@@ -158,14 +158,8 @@ class TwitchChannelPointsMiner:
                 )
                 for username in followers_array:
                     if username not in streamers_dict and username not in blacklist:
+                        streamers_name.append(username)
                         streamers_dict[username] = username.lower().strip()
-            else:
-                followers_array = []
-
-            streamers_name = list(
-                OrderedDict.fromkeys(streamers_name + followers_array)
-            )
-            streamers_name = [name for name in streamers_name if name not in blacklist]
 
             logger.info(
                 f"Loading data for {len(streamers_name)} streamers. Please wait...",
