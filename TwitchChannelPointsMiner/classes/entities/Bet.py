@@ -75,7 +75,7 @@ class BetSettings(object):
         "stealth_mode",
         "filter_condition",
         "delay",
-        "delay_mode"
+        "delay_mode",
     ]
 
     def __init__(
@@ -87,7 +87,7 @@ class BetSettings(object):
         stealth_mode: bool = None,
         filter_condition: FilterCondition = None,
         delay: float = None,
-        delay_mode: DelayMode = None
+        delay_mode: DelayMode = None,
     ):
         self.strategy = strategy
         self.percentage = percentage

@@ -247,7 +247,9 @@ class WebSocketsPool:
                                     event_dict["prediction_window_seconds"]
                                 )
                                 # Reduce prediction window by 3/6s - Collect more accurate data for decision
-                                prediction_window_seconds = ws.streamers[streamer_index].get_prediction_window(prediction_window_seconds)
+                                prediction_window_seconds = ws.streamers[
+                                    streamer_index
+                                ].get_prediction_window(prediction_window_seconds)
                                 event = EventPrediction(
                                     ws.streamers[streamer_index],
                                     event_id,
