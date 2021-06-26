@@ -180,7 +180,7 @@ from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
 from TwitchChannelPointsMiner.classes.Settings import Priority
-from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition
+from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
 twitch_miner = TwitchChannelPointsMiner(
@@ -217,7 +217,9 @@ twitch_miner = TwitchChannelPointsMiner(
             percentage_gap=20,                  # Gap difference between outcomesA and outcomesB (for SMART stragegy)
             max_points=50000,                   # If the x percentage of your channel points is gt bet_max_points set this value
             stealth_mode=True,                  # If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points #33
-            filter_condition=FilterCondition(
+           delay_mode=DelayMode.FROM_END,       # When placing a bet, we will wait until `delay` seconds before the end of the timer
+           delay=6,
+           filter_condition=FilterCondition(
                 by=OutcomeKeys.TOTAL_USERS,    # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
                 where=Condition.LTE,           # 'by' must be [GT, LT, GTE, LTE] than value
                 value=800
@@ -349,6 +351,8 @@ ColorPalette(
 | `max_points`       	| int             	| 50000   	| If the x percentage of your channel points is GT bet_max_points set this value                                 	                                                                          |
 | `stealth_mode`     	| bool            	| False   	| If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points [#33](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/33)      |
 | `join_chat` 	        | bool 	            | True    	| Join IRC-Chat to appear online in chat and attempt to get StreamElements channel points and increase view-time  [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47) |
+| `delay_mode` 	        | DelayMode         | FROM_END	| Define how is calculating the waiting time before placing a bet |
+| `delay` 	            | float             | 6     	| Value to be used to calculate bet delay depending on `delay_mode` value |
 
 #### Bet strategy
 
@@ -393,6 +397,18 @@ Allowed values for `where` are: `GT, LT, GTE, LTE`
 `FilterCondition(by=OutcomeKeys.ODDS, where=Condition.GTE, value=1.3)`
 - If you want to place the bet ONLY if the highest bet is lower than 2000
 `FilterCondition(by=OutcomeKeys.TOP_POINTS, where=Condition.LT, value=2000)`
+
+### DelayMode
+
+- **FROM_START**: Will wait `delay` seconds from when the bet was opened
+- **FROM_END**: Will until there is `delay` seconds left to place the bet
+- **PERCENTAGE**: Will place the bet when `delay` percent of the set timer is elapsed
+
+Here a concrete example. Let's suppose we have a bet that is opened with a timer of 10 minutes:
+
+- **FROM_START** with `delay=20`: The bet will be placed 20s after the bet is opened
+- **FROM_END** with `delay=20`: The bet will be placed 20s before the end of the bet (so 9mins 40s after the bet is opened)
+- **PERCENTAGE** with `delay=0.2`: The bet will be placed when the timer went down by 20% (so 2mins after the bet is opened)
 
 ## Analytics
 We have recently introduced a little frontend where you can show with a chart you points trend. The script will spawn a Flask web-server on your machine where you can select binding address and port.
