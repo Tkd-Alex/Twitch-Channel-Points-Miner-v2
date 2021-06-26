@@ -404,7 +404,7 @@ Allowed values for `where` are: `GT, LT, GTE, LTE`
 - **FROM_END**: Will until there is `delay` seconds left to place the bet
 - **PERCENTAGE**: Will place the bet when `delay` percent of the set timer is elapsed
 
-Here a concrete example. Let's suppose we have a bet that is opened with a timer of 10 minutes:
+Here's a concrete example. Let's suppose we have a bet that is opened with a timer of 10 minutes:
 
 - **FROM_START** with `delay=20`: The bet will be placed 20s after the bet is opened
 - **FROM_END** with `delay=20`: The bet will be placed 20s before the end of the bet (so 9mins 40s after the bet is opened)
