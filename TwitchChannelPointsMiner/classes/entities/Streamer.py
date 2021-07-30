@@ -6,7 +6,7 @@ from datetime import datetime
 from threading import Lock
 
 from TwitchChannelPointsMiner.classes.Chat import ThreadChat
-from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings
+from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings, DelayMode
 from TwitchChannelPointsMiner.classes.entities.Stream import Stream
 from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.constants import URL
@@ -184,6 +184,18 @@ class Streamer(object):
             if self.activeMultipliers is not None
             else 0
         )
+
+    def get_prediction_window(self, prediction_window_seconds):
+        delay_mode = self.settings.bet.delay_mode
+        delay = self.settings.bet.delay
+        if delay_mode == DelayMode.FROM_START:
+            return min(delay, prediction_window_seconds)
+        elif delay_mode == DelayMode.FROM_END:
+            return max(prediction_window_seconds - delay, 0)
+        elif delay_mode == DelayMode.PERCENTAGE:
+            return prediction_window_seconds * delay
+        else:
+            return prediction_window_seconds
 
     # === ANALYTICS === #
     def persistent_annotations(self, event_type, event_text):
