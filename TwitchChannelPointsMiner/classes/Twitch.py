@@ -453,9 +453,9 @@ class Twitch(object):
                     }
                     response = self.post_gql_request(json_data)
                     if (
-                            "data" in response and
-                            "makePrediction" in response["data"] and
-                            "error" in response["data"]["makePrediction"]
+                        "data" in response and
+                        "makePrediction" in response["data"] and
+                        "error" in response["data"]["makePrediction"]
                     ):
                         error_code = response["data"]["makePrediction"]["code"]
                         logger.error(
