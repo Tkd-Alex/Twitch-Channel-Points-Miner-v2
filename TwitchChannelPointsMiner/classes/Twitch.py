@@ -466,6 +466,14 @@ class Twitch(object):
                                 "color": Settings.logger.color_palette.BET_FAILED,
                             },
                         )
+                else:
+                    logger.info(
+                        f"Bet won't be placed as the amount {_millify(decision['amount'])} is less than the minimum required 10",
+                        extra={
+                            "emoji": ":four_leaf_clover:",
+                            "color": Settings.logger.color_palette.BET_GENERAL,
+                        },
+                    )
         else:
             logger.info(
                 f"Oh no! The event is not active anymore! Current status: {event.status}",
