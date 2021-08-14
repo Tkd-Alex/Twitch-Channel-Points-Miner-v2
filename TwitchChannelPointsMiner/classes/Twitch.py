@@ -456,6 +456,7 @@ class Twitch(object):
                         "data" in response
                         and "makePrediction" in response["data"]
                         and "error" in response["data"]["makePrediction"]
+                        and response["data"]["makePrediction"]["error"] is not None
                     ):
                         error_code = response["data"]["makePrediction"]["error"]["code"]
                         logger.error(
