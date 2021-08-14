@@ -457,7 +457,7 @@ class Twitch(object):
                         and "makePrediction" in response["data"]
                         and "error" in response["data"]["makePrediction"]
                     ):
-                        error_code = response["data"]["makePrediction"]["code"]
+                        error_code = response["data"]["makePrediction"]["error"]["code"]
                         logger.error(
                             f"Failed to place bet, error: {error_code}",
                             extra={
