@@ -12,7 +12,7 @@ twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
     password="write-your-secure-psw",           # If no password will be provided the script will ask interactively
     claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
-    refresh_streamers=60,                       # Refresh the streamers list (followers and .json file) each x minutes
+    refresh_context=60,                       # Refresh the streamers list (followers and .json file) each x minutes
     priority=[                                  # Custom priority in this case for example:
         Priority.STREAK,                        # - We want first of all to catch all watch streak from all streamers
         Priority.DROPS,                         # - When we don't have anymore watch streak to catch, wait until all drops are collected over the streamers

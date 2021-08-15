@@ -118,7 +118,7 @@ class GQLOperations:
         "extensions": {
             "persistedQuery": {
                 "version": 1,
-                "sha256Hash": "7da6078b1bfa2f0a4dd061cb47bdcd1ffddf31cccadd966ec192e4cd06666e2b",
+                "sha256Hash": "14b5e8a50777165cfc3971e1d93b4758613fe1c817d5542c398dce70b7a45c05",  # "7da6078b1bfa2f0a4dd061cb47bdcd1ffddf31cccadd966ec192e4cd06666e2b",
             }
         },
     }

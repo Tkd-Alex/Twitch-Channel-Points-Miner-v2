@@ -36,7 +36,7 @@ class EventPrediction(object):
         self.created_at = created_at
         self.prediction_window_seconds = prediction_window_seconds
         self.status = status
-        self.result: dict = {}
+        self.result: dict = {"string": "", "type": None, "gained": 0}
 
         self.box_fillable = False
         self.bet_confirmed = False

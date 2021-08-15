@@ -52,7 +52,7 @@ class TwitchChannelPointsMiner:
         "username",
         "twitch",
         "claim_drops_startup",
-        "refresh_streamers",
+        "refresh_context",
         "priority",
         "streamers",
         "events_predictions",
@@ -72,7 +72,7 @@ class TwitchChannelPointsMiner:
         username: str,
         password: str = None,
         claim_drops_startup: bool = False,
-        refresh_streamers: float = float("inf"),  # Minutes
+        refresh_context: float = float("inf"),  # Minutes
         # Settings for logging and selenium as you can see.
         priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
@@ -97,7 +97,7 @@ class TwitchChannelPointsMiner:
         self.twitch = Twitch(self.username, user_agent, password)
 
         self.claim_drops_startup = claim_drops_startup
-        self.refresh_streamers = refresh_streamers
+        self.refresh_context = refresh_context
         self.priority = priority if isinstance(priority, list) else [priority]
 
         self.streamers = []
@@ -231,7 +231,7 @@ class TwitchChannelPointsMiner:
                         PubsubTopic("predictions-channel-v1", streamer=streamer)
                     )
 
-            refresh_streamers = time.time()
+            refresh_context = time.time()
             while self.running:
                 time.sleep(random.uniform(20, 60))
                 # Do an external control for WebSocket. Check if the thread is running
@@ -248,10 +248,10 @@ class TwitchChannelPointsMiner:
                         WebSocketsPool.handle_reconnection(self.ws_pool.ws[index])
 
                 if (
-                    self.refresh_streamers is not None
-                    and (time.time() - refresh_streamers) / 60 > self.refresh_streamers
+                    self.refresh_context is not None
+                    and (time.time() - refresh_context) / 60 > self.refresh_context
                 ):
-                    refresh_streamers = time.time()
+                    refresh_context = time.time()
                     self.streamers = self.__reload_streamers(
                         streamers=streamers,
                         streamers_json=streamers_json,
@@ -430,16 +430,16 @@ class TwitchChannelPointsMiner:
 
         # Populate the streamers with default values.
         # 1. Load channel points and auto-claim bonus
-        # 2. Check if streamers is online
-        # 3. Check if the user is a Streamer. In this case you can't do prediction
+        # 2. Check if streamers are online
+        # 3. DEACTIVATED: Check if the user is a moderator. (was used before the 5th of April 2021 to deactivate predictions)
         for streamer in streamers_array:
             if streamer.init_processed is False:
                 time.sleep(random.uniform(0.3, 0.7))
                 self.twitch.load_channel_points_context(streamer)
                 self.twitch.check_streamer_online(streamer)
-                self.twitch.viewer_is_mod(streamer)
-                if streamer.viewer_is_mod is True:
-                    streamer.settings.make_predictions = False
+                # self.twitch.viewer_is_mod(streamer)
+                # if streamer.viewer_is_mod is True:
+                #     streamer.settings.make_predictions = False
 
                 streamer.init_processed = True
 
@@ -516,14 +516,18 @@ class TwitchChannelPointsMiner:
                     )
 
         print("")
-        for streamer in self.streamers:
-            if streamer.history != {}:
-                gained = streamer.channel_points - self.base_points[streamer.username]
+        for streamer_index in range(0, len(self.streamers)):
+            if self.streamers[streamer_index].history != {}:
+                gained = (
+                    self.streamers[streamer_index].channel_points
+                    - self.original_streamers[streamer_index]
+                )
                 logger.info(
-                    f"{repr(streamer)}, Total Points Gained (after farming - before farming): {_millify(gained)}",
+                    f"{repr(self.streamers[streamer_index])}, Total Points Gained (after farming - before farming): {_millify(gained)}",
                     extra={"emoji": ":robot:"},
                 )
-                logger.info(
-                    f"{streamer.print_history()}",
-                    extra={"emoji": ":moneybag:"},
-                )
+                if self.streamers[streamer_index].history != {}:
+                    logger.info(
+                        f"{self.streamers[streamer_index].print_history()}",
+                        extra={"emoji": ":moneybag:"},
+                    )
