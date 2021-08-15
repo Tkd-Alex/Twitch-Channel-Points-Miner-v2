@@ -314,6 +314,19 @@ class Twitch(object):
                                 if len(streamers_watching) == 2:
                                     break
 
+                    elif prior == Priority.SUBSCRIBED and len(streamers_watching) < 2:
+                        streamers_with_multiplier = [
+                            index
+                            for index in streamers_index
+                            if streamers[index].viewer_has_points_multiplier()
+                        ]
+                        streamers_with_multiplier = sorted(
+                            streamers_with_multiplier,
+                            key=lambda x: streamers[x].total_points_multiplier(),
+                            reverse=True,
+                        )
+                        streamers_watching += streamers_with_multiplier[:2]
+
                 """
                 Twitch has a limit - you can't watch more than 2 channels at one time.
                 We take the first two streamers from the list as they have the highest priority (based on order or WatchStreak).
@@ -386,6 +399,7 @@ class Twitch(object):
             channel = response["data"]["community"]["channel"]
             community_points = channel["self"]["communityPoints"]
             streamer.channel_points = community_points["balance"]
+            streamer.activeMultipliers = community_points["activeMultipliers"]
 
             if community_points["availableClaim"] is not None:
                 self.claim_bonus(streamer, community_points["availableClaim"]["id"])
@@ -494,7 +508,7 @@ class Twitch(object):
 
     def __get_campaigns_details(self, campaigns):
         result = []
-        chunks = create_chunks(campaigns)
+        chunks = create_chunks(campaigns, 20)
         for chunk in chunks:
             json_data = []
             for campaign in chunk:
@@ -538,7 +552,21 @@ class Twitch(object):
         json_data["variables"] = {"input": {"dropInstanceID": drop.drop_instance_id}}
         response = self.post_gql_request(json_data)
         try:
-            return response["data"]["claimDropRewards"]["status"] == "ELIGIBLE_FOR_ALL"
+            # response["data"]["claimDropRewards"] can be null and respose["data"]["errors"] != []
+            # or response["data"]["claimDropRewards"]["status"] === DROP_INSTANCE_ALREADY_CLAIMED
+            if ("claimDropRewards" in response["data"]) and (
+                response["data"]["claimDropRewards"] is None
+            ):
+                return False
+            elif ("errors" in response["data"]) and (response["data"]["errors"] != []):
+                return False
+            elif ("claimDropRewards" in response["data"]) and (
+                response["data"]["claimDropRewards"]["status"]
+                in ["ELIGIBLE_FOR_ALL", "DROP_INSTANCE_ALREADY_CLAIMED"]
+            ):
+                return True
+            else:
+                return False
         except (ValueError, KeyError):
             return False
 
