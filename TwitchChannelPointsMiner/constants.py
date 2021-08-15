@@ -1,6 +1,8 @@
 # Twitch endpoints
 URL = "https://www.twitch.tv"
 API = "https://api.twitch.tv"
+IRC = "irc.chat.twitch.tv"
+IRC_PORT = 6667
 WEBSOCKET = "wss://pubsub-edge.twitch.tv/v1"
 CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"
 DROP_ID = "c2542d6d-cd10-4532-919b-3d19f30a768b"
@@ -116,7 +118,7 @@ class GQLOperations:
         "extensions": {
             "persistedQuery": {
                 "version": 1,
-                "sha256Hash": "7da6078b1bfa2f0a4dd061cb47bdcd1ffddf31cccadd966ec192e4cd06666e2b",
+                "sha256Hash": "14b5e8a50777165cfc3971e1d93b4758613fe1c817d5542c398dce70b7a45c05",  # "7da6078b1bfa2f0a4dd061cb47bdcd1ffddf31cccadd966ec192e4cd06666e2b",
             }
         },
     }

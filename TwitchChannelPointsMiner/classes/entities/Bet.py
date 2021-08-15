@@ -41,6 +41,15 @@ class OutcomeKeys(object):
     DECISION_POINTS = "decision_points"
 
 
+class DelayMode(Enum):
+    FROM_START = auto()
+    FROM_END = auto()
+    PERCENTAGE = auto()
+
+    def __str__(self):
+        return self.name
+
+
 class FilterCondition(object):
     __slots__ = [
         "by",
@@ -66,6 +75,8 @@ class BetSettings(object):
         "minimum_points",
         "stealth_mode",
         "filter_condition",
+        "delay",
+        "delay_mode",
     ]
 
     def __init__(
@@ -77,6 +88,8 @@ class BetSettings(object):
         minimum_points: int = None,
         stealth_mode: bool = None,
         filter_condition: FilterCondition = None,
+        delay: float = None,
+        delay_mode: DelayMode = None,
     ):
         self.strategy = strategy
         self.percentage = percentage
@@ -85,6 +98,8 @@ class BetSettings(object):
         self.minimum_points = minimum_points
         self.stealth_mode = stealth_mode
         self.filter_condition = filter_condition
+        self.delay = delay
+        self.delay_mode = delay_mode
 
     def default(self):
         self.strategy = self.strategy if not None else Strategy.SMART
@@ -93,6 +108,8 @@ class BetSettings(object):
         self.max_points = self.max_points if not None else 50000
         self.minimum_points = self.minimum_points if not None else 0
         self.stealth_mode = self.stealth_mode if not None else False
+        self.delay = self.delay if not None else 6
+        self.delay_mode = self.delay_mode if not None else DelayMode.FROM_END
 
     def __repr__(self):
         return f"BetSettings(strategy={self.strategy}, percentage={self.percentage}, percentage_gap={self.percentage_gap}, max_points={self.max_points}, minimum_points={self.minimum_points}, stealth_mode={self.stealth_mode})"

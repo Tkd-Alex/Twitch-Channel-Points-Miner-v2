@@ -1,0 +1,29 @@
+body {
+    background: #343E59;
+    color: #fff;
+}
+.box {
+    background-color: #2B2D3E;
+}
+.tabs a {
+    border-bottom-color: #dbdbdb;
+    color: #fff;
+    border-bottom-style: none;
+}
+.tabs li.is-active a {
+    border-bottom-color: #f9826c;
+    color: #fff;
+    border-bottom-style: solid;
+}
+.tabs a:hover {
+    border-bottom-color: #dbdbdb;
+    color: #dbdbdb;
+    border-bottom-style: solid;
+}
+.tabs ul{
+    margin-bottom: 5px;
+    border-bottom-style: none;
+}
+.checkbox:hover{
+    color: #f9826c;
+}
