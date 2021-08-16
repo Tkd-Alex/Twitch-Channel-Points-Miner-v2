@@ -4,7 +4,7 @@ var options = {
     chart: {
         type: 'area',
         stacked: false,
-        height: 400,
+        height: 490,
         zoom: {
             type: 'x',
             enabled: true,
@@ -86,7 +86,9 @@ var annotations = [];
 var streamersList = [];
 var sortBy = "Name ascending";
 
-var refresh = parseInt("{{ refresh }}");
+var startDate = new Date();
+startDate.setDate(startDate.getDate() - daysAgo);
+var endDate = new Date();
 
 $(document).ready(function () {
     chart.render();
@@ -98,13 +100,28 @@ $(document).ready(function () {
     $('#annotations').prop("checked", localStorage.getItem("annotations") === "true");
     $('#dark-mode').prop("checked", localStorage.getItem("dark-mode") === "true");
 
+    $('#startDate').val(formatDate(startDate));
+    $('#endDate').val(formatDate(endDate));
+
     sortBy = localStorage.getItem("sort-by");
-    $('#sorting-by').text(`Sort by: ${sortBy}`);
+    $('#sorting-by').text(sortBy);
     getStreamers();
 
     updateAnnotations();
     toggleDarkMode();
 });
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+}
 
 function changeStreamer(streamer, index) {
     $("li").removeClass("is-active")
@@ -115,7 +132,10 @@ function changeStreamer(streamer, index) {
 
 function getStreamerData(streamer) {
     if (currentStreamer == streamer) {
-        $.getJSON(`./json/${streamer}`, function (response) {
+        $.getJSON(`./json/${streamer}`, {
+            startDate: formatDate(startDate),
+            endDate: formatDate(endDate)
+        }, function (response) {
             chart.updateSeries([{
                 name: streamer.replace(".json", ""),
                 data: response["series"]
@@ -154,7 +174,7 @@ function renderStreamers() {
     var promised = new Promise((resolve, reject) => {
         streamersList.forEach((streamer, index, array) => {
             $("#streamers-list").append(`<li><a onClick="changeStreamer('${streamer.name}', ${index + 1}); return false;">${streamer.name.replace(".json", "")}</a></li>`);
-            if (index === array.length -1) resolve();
+            if (index === array.length - 1) resolve();
         });
     });
     promised.then(() => {
@@ -172,7 +192,7 @@ function changeSortBy(option) {
     sortBy = option.innerText.trim();
     sortStreamers();
     renderStreamers();
-    $('#sorting-by').text(`Sort by: ${sortBy}`);
+    $('#sorting-by').text(sortBy);
     localStorage.setItem("sort-by", sortBy);
 }
 
@@ -195,14 +215,24 @@ function clearAnnotations() {
     chart.clearAnnotations();
 }
 
+// Toggle
 $('#annotations').click(() => {
     updateAnnotations();
 });
-
 $('#dark-mode').click(() => {
     toggleDarkMode();
 });
 
 $('.dropdown').click(() => {
-    $('.dropdown').toggleClass('is-active')
-})
+    $('.dropdown').toggleClass('is-active');
+});
+
+// Input date
+$('#startDate').change(() => {
+    startDate = new Date($('#startDate').val());
+    getStreamerData(currentStreamer);
+});
+$('#endDate').change(() => {
+    endDate = new Date($('#endDate').val());
+    getStreamerData(currentStreamer);
+});

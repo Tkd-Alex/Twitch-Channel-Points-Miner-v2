@@ -5,72 +5,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Twitch-Channel-Points-Miner-v2</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png"><link rel="icon" type="image/png" sizes="16x16" href="https://static.twitchcdn.net/assets/favicon-16-52e571ffea063af7a7f4.png">
+
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"
+        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link href="{{url_for('static', filename='dark-theme.css')}}" rel="stylesheet" />
+    <link href="{{url_for('static', filename='style.css')}}" rel="stylesheet" />
 
-    <style>
-        .tabs ul {
-            -webkit-flex-direction: column;
-            flex-direction: column;
-            flex-grow: 0px;
-        }
-
-        .tabs {
-            max-height: 425px;
-            overflow-y: auto;
-            direction: rtl;
-        }
-    </style>
 </head>
 
 <body style="height: 100vh;">
-    <div class="container">
-        <div style="text-align: center">
-            <img style="margin-top: -20px;" width="600px" src="{{url_for('static', filename='banner.png')}}"
-                alt="banner">
-            <br>
-            <div style="margin-top: -15px;">
-                <a style="text-decoration: none;"
-                    href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE">
+    <div class="container has-text-centered" style="height: 100vh;">
+        <div class="columns">
+            <div class="column has-text-right">
+                <img style="margin-top: -20px;" width="600px" src="{{url_for('static', filename='banner.png')}}"
+                    alt="banner"></div>
+            <div class="column is-4 has-text-left" style="margin-top: 35px;">
+                <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE">
                     <img alt="License"
                         src="https://img.shields.io/github/license/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
                 </a>
-                <a style="text-decoration: none;" href="https://www.python.org/downloads/release/python-360/">
+                <br>
+                <a href="https://www.python.org/downloads/release/python-360/">
                     <img alt="Python3" src="https://img.shields.io/badge/built%20for-Python≥3.6-red.svg?style=flat">
                 </a>
-                <a style="text-decoration: none;"
-                    href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pulls">
+                <br>
+                <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pulls">
                     <img alt="PRsWelcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" />
                 </a>
-                <a style="text-decoration: none;"
-                    href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/stargazers">
+                <br>
+                <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/stargazers">
                     <img alt="GitHub Repo stars"
                         src="https://img.shields.io/github/stars/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
                 </a>
-                <a style="text-decoration: none;"
-                    href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues?q=is%3Aissue+is%3Aclosed">
+                <br>
+                <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues?q=is%3Aissue+is%3Aclosed">
                     <img alt="GitHub closed issues"
                         src="https://img.shields.io/github/issues-closed/Tkd-Alex/Twitch-Channel-Points-Miner-v2">
                 </a>
-                <a style="text-decoration: none;" href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2">
+                <br>
+                <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2">
                     <img alt="GitHub last commit"
                         src="https://img.shields.io/github/last-commit/Tkd-Alex/Twitch-Channel-Points-Miner-v2" />
                 </a>
+                <br>
+
+                <br>
+                <a href="https://www.buymeacoffee.com/tkdalex" target="_blank">
+                    <img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="5"
+                        width="138">
+                </a>
             </div>
         </div>
-        <br>
 
-        <div class="columns">
-            <div class="column">
+        <div class="columns" style="margin-top: -30px">
+            <div class="column is-2 has-text-left">
                 <div class="dropdown">
                     <div class="dropdown-trigger">
                         <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                            <span id="sorting-by">Sort by</span>
+                            <span id="sorting-by"></span>
                             <span class="icon is-small">
                                 <i class="fas fa-angle-down" aria-hidden="true"></i>
                             </span>
@@ -94,12 +93,18 @@
                     </div>
                 </div>
             </div>
-            <div class="column is-3" style="text-align: right;">
-                <label class="checkbox" style="padding-left: 15px; font-weight: bold">
+            <div class="column is-2 has-text-left">
+                <input class="input" type="date" id="startDate">
+            </div>
+            <div class="column is-2 has-text-left">
+                <input class="input" type="date" id="endDate">
+            </div>
+            <div class="column has-text-right" style="margin: auto">
+                <label class="checkbox checkbox-label">
                     Annotations
                     <input type="checkbox" checked="true" id="annotations">
                 </label>
-                <label class="checkbox" style="padding-left: 15px; font-weight: bold">
+                <label class="checkbox checkbox-label">
                     Dark mode
                     <input type="checkbox" checked="true" id="dark-mode">
                 </label>
@@ -115,21 +120,13 @@
                 <div class="box" id="chart" style="padding: 0.30rem;"></div>
             </div>
         </div>
-
-        <div style="text-align: center">If you want to help on this project, please leave a star 🌟 and share it with
-            your friends! 😎 - A coffee is always a gesture of LOVE ❤️
-            <a href="https://www.buymeacoffee.com/tkdalex" target="_blank">
-                <img style="margin-bottom: -8px; margin-left: 10px;"
-                    src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="5"
-                    width="138">
-            </a>
-        </div>
-
-        <br>
     </div>
 </body>
 
 <script type="text/javascript">
+    // n.b. Seems that we are unable to call Flask variable in JS code imported from JS file.
+    // That's why "link[href='{{url_for('static', filename='dark-theme.css')}}']", {{ refresh }}, {{ daysAgo }} are here.
+
     function toggleDarkMode() {
         var darkMode = $('#dark-mode').prop("checked")
         $("link[href='{{url_for('static', filename='dark-theme.css')}}']").prop("disabled", !darkMode);
@@ -142,7 +139,9 @@
                 theme: darkMode === true ? "dark" : "light"
             }
         })
-}
+    }
+    var refresh = parseInt("{{ refresh }}");
+    var daysAgo = parseInt("{{ daysAgo }}");
 </script>
 <script type="text/javascript" src="{{url_for('static', filename='script.js')}}"></script>
 
