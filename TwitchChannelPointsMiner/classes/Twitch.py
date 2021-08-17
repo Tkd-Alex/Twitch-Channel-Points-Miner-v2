@@ -10,6 +10,7 @@ import os
 import random
 import re
 import time
+from textwrap import dedent
 from pathlib import Path
 from secrets import token_hex
 
@@ -28,6 +29,7 @@ from TwitchChannelPointsMiner.utils import (
     _millify,
     create_chunks,
     internet_connection_available,
+    post_telegram,
 )
 
 logger = logging.getLogger(__name__)
@@ -362,14 +364,17 @@ class Twitch(object):
                                         drop.has_preconditions_met is not False
                                         and drop.is_printable is True
                                     ):
-                                        # print("=" * 125)
-                                        logger.info(
-                                            f"{streamers[index]} is streaming {streamers[index].stream}"
+                                        log_message = dedent(
+                                            f"""
+                                                {streamers[index]} is streaming {streamers[index].stream}
+                                                Campaign: {campaign}
+                                                Drop: {drop}
+                                                {drop.progress_bar()}
+                                            """
                                         )
-                                        logger.info(f"Campaign: {campaign}")
-                                        logger.info(f"Drop: {drop}")
-                                        logger.info(f"{drop.progress_bar()}")
-                                        # print("=" * 125)
+                                        post_telegram(log_message)
+                                        for line in log_message.split("\n"):
+                                            logger.info(line)
 
                     except requests.exceptions.ConnectionError as e:
                         logger.error(f"Error while trying to send minute watched: {e}")
@@ -546,7 +551,9 @@ class Twitch(object):
         return campaigns
 
     def claim_drop(self, drop):
-        logger.info(f"Claim {drop}", extra={"emoji": ":package:"})
+        log_message = f"Claim {drop}"
+        post_telegram(log_message)
+        logger.info(log_message, extra={"emoji": ":package:"})
 
         json_data = copy.deepcopy(GQLOperations.DropsPage_ClaimDropRewards)
         json_data["variables"] = {"input": {"dropInstanceID": drop.drop_instance_id}}

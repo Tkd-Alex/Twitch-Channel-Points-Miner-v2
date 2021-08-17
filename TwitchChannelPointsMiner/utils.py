@@ -7,8 +7,12 @@ from datetime import datetime, timezone
 from random import randrange
 
 from millify import millify
+import requests
 
 from TwitchChannelPointsMiner.constants import USER_AGENTS
+
+__TOKEN = "PLACE BOT TOKEN HERE"
+TG_API = f"https://api.telegram.org/bot{__TOKEN}/sendMessage"
 
 
 def _millify(input, precision=2):
@@ -154,3 +158,15 @@ def percentage(a, b):
 
 def create_chunks(lst, n):
     return [lst[i : (i + n)] for i in range(0, len(lst), n)]  # noqa: E203
+
+
+def post_telegram(message: str) -> None:
+    r = requests.post(
+        url=TG_API,
+        data={
+            "chat_id": 289579584,
+            "text": message,
+            "disable_web_page_preview": True,  # include link to twitch streamer?
+            "disable_notification": True,  # no sound, notif just in tray
+        }
+    )
