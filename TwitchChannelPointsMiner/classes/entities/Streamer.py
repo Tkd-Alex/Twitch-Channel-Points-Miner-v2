@@ -241,7 +241,7 @@ class Streamer(object):
             json_data[key].append(data)
             json.dump(json_data, open(fname, "w"), indent=4)
 
-    def __leave_chat(self):
+    def leave_chat(self):
         if self.irc_chat is not None:
             self.irc_chat.stop()
 
@@ -266,9 +266,9 @@ class Streamer(object):
                 if self.settings.chat == ChatPresence.ONLINE:
                     self.__join_chat()
                 elif self.settings.chat == ChatPresence.OFFLINE:
-                    self.__leave_chat()
+                    self.leave_chat()
             else:
                 if self.settings.chat == ChatPresence.ONLINE:
-                    self.__leave_chat()
+                    self.leave_chat()
                 elif self.settings.chat == ChatPresence.OFFLINE:
                     self.__join_chat()

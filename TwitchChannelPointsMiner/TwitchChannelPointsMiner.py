@@ -297,7 +297,10 @@ class TwitchChannelPointsMiner:
         logger.info("CTRL+C Detected! Please wait just a moment!")
 
         for streamer in self.streamers:
-            if streamer.irc_chat is not None:
+            if (
+                streamer.irc_chat is not None
+                and streamer.settings.chat != ChatPresence.NEVER
+            ):
                 streamer.leave_chat()
                 if streamer.irc_chat.is_alive() is True:
                     streamer.irc_chat.join()
