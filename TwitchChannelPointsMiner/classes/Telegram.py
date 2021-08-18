@@ -2,7 +2,7 @@ from textwrap import dedent
 
 import requests
 
-from TwitchChannelPointsMiner.classes.settings import Events
+from TwitchChannelPointsMiner.classes.Settings import Events
 
 
 class Telegram(object):
