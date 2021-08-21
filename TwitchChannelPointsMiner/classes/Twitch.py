@@ -459,7 +459,29 @@ class Twitch(object):
                             "transactionID": token_hex(16),
                         }
                     }
-                    return self.post_gql_request(json_data)
+                    response = self.post_gql_request(json_data)
+                    if (
+                        "data" in response
+                        and "makePrediction" in response["data"]
+                        and "error" in response["data"]["makePrediction"]
+                        and response["data"]["makePrediction"]["error"] is not None
+                    ):
+                        error_code = response["data"]["makePrediction"]["error"]["code"]
+                        logger.error(
+                            f"Failed to place bet, error: {error_code}",
+                            extra={
+                                "emoji": ":four_leaf_clover:",
+                                "color": Settings.logger.color_palette.BET_FAILED,
+                            },
+                        )
+                else:
+                    logger.info(
+                        f"Bet won't be placed as the amount {_millify(decision['amount'])} is less than the minimum required 10",
+                        extra={
+                            "emoji": ":four_leaf_clover:",
+                            "color": Settings.logger.color_palette.BET_GENERAL,
+                        },
+                    )
         else:
             logger.info(
                 f"Oh no! The event is not active anymore! Current status: {event.status}",
