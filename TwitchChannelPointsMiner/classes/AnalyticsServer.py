@@ -35,10 +35,16 @@ def filter_datas(start_date, end_date, datas):
         else datetime.now().timestamp() * 1000
     )
 
-    datas["series"] = [d for d in datas["series"] if start_date <= d["x"] <= end_date]
-    datas["annotations"] = [
-        d for d in datas["annotations"] if start_date <= d["x"] <= end_date
-    ]
+    datas["series"] = (
+        [d for d in datas["series"] if start_date <= d["x"] <= end_date]
+        if "series" in datas
+        else []
+    )
+    datas["annotations"] = (
+        [d for d in datas["annotations"] if start_date <= d["x"] <= end_date]
+        if "annotations" in datas
+        else []
+    )
 
     return datas
 
