@@ -36,3 +36,7 @@ class Events(Enum):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def get(cls, key):
+        return getattr(cls, str(key)) if str(key) in dir(cls) else None
