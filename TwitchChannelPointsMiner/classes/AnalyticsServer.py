@@ -156,4 +156,4 @@ class AnalyticsServer(Thread):
             f"Analytics running on http://{self.host}:{self.port}/",
             extra={"emoji": ":globe_with_meridians:"},
         )
-        self.app.run(host=self.host, port=self.port, threaded=True)
+        self.app.run(host=self.host, port=self.port, threaded=True, debug=False)
