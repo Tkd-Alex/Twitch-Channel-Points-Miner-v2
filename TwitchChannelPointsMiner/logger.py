@@ -115,7 +115,13 @@ class GlobalFormatter(logging.Formatter):
             record.msg = remove_emoji(record.msg)
 
         if hasattr(record, "event"):
-            if self.settings.telegram is not None:
+            skip_telegram = (
+                False
+                if hasattr(record, "skip_telegram") is False
+                or hasattr(record, "skip_telegram") is False
+                else True
+            )
+            if self.settings.telegram is not None and skip_telegram is False:
                 self.settings.telegram.send(record.msg, record.event)
 
             if self.settings.colored is True:

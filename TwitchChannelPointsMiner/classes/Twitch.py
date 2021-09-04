@@ -362,22 +362,26 @@ class Twitch(object):
                                         drop.has_preconditions_met is not False
                                         and drop.is_printable is True
                                     ):
-                                        logger.info(
+                                        drop_messages = [
                                             f"{streamers[index]} is streaming {streamers[index].stream}",
-                                            extra={"event": Events.DROP_STATUS},
-                                        )
-                                        logger.info(
                                             f"Campaign: {campaign}",
-                                            extra={"event": Events.DROP_STATUS},
-                                        )
-                                        logger.info(
                                             f"Drop: {drop}",
-                                            extra={"event": Events.DROP_STATUS},
-                                        )
-                                        logger.info(
                                             f"{drop.progress_bar()}",
-                                            extra={"event": Events.DROP_STATUS},
-                                        )
+                                        ]
+                                        for msg in drop_messages:
+                                            logger.info(
+                                                msg,
+                                                extra={
+                                                    "event": Events.DROP_STATUS,
+                                                    "skip_telegram": True,
+                                                },
+                                            )
+
+                                        if Settings.logger.telegram is not None:
+                                            Settings.logger.telegram.send(
+                                                "\n".join(drop_messages),
+                                                Events.DROP_STATUS,
+                                            )
 
                     except requests.exceptions.ConnectionError as e:
                         logger.error(f"Error while trying to send minute watched: {e}")
@@ -471,7 +475,7 @@ class Twitch(object):
                             f"Failed to place bet, error: {error_code}",
                             extra={
                                 "emoji": ":four_leaf_clover:",
-                                "color": Settings.logger.color_palette.BET_FAILED,
+                                "event": Events.BET_FAILED,
                             },
                         )
                 else:
@@ -479,7 +483,7 @@ class Twitch(object):
                         f"Bet won't be placed as the amount {_millify(decision['amount'])} is less than the minimum required 10",
                         extra={
                             "emoji": ":four_leaf_clover:",
-                            "color": Settings.logger.color_palette.BET_GENERAL,
+                            "event": Events.BET_GENERAL,
                         },
                     )
         else:
