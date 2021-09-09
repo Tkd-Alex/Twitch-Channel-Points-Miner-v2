@@ -104,12 +104,20 @@ class BetSettings(object):
     def default(self):
         self.strategy = self.strategy if self.strategy is not None else Strategy.SMART
         self.percentage = self.percentage if self.percentage is not None else 5
-        self.percentage_gap = self.percentage_gap if self.percentage_gap is not None else 20
+        self.percentage_gap = (
+            self.percentage_gap if self.percentage_gap is not None else 20
+        )
         self.max_points = self.max_points if self.max_points is not None else 50000
-        self.minimum_points = self.minimum_points if self.minimum_points is not None else 0
-        self.stealth_mode = self.stealth_mode if self.stealth_mode is not None else False
+        self.minimum_points = (
+            self.minimum_points if self.minimum_points is not None else 0
+        )
+        self.stealth_mode = (
+            self.stealth_mode if self.stealth_mode is not None else False
+        )
         self.delay = self.delay if self.delay is not None else 6
-        self.delay_mode = self.delay_mode if self.delay_mode is not None else DelayMode.FROM_END
+        self.delay_mode = (
+            self.delay_mode if self.delay_mode is not None else DelayMode.FROM_END
+        )
 
     def __repr__(self):
         return f"BetSettings(strategy={self.strategy}, percentage={self.percentage}, percentage_gap={self.percentage_gap}, max_points={self.max_points}, minimum_points={self.minimum_points}, stealth_mode={self.stealth_mode})"
