@@ -180,7 +180,7 @@ class TwitchLogin(object):
             return False
 
         json_data = copy.deepcopy(GQLOperations.ReportMenuItem)
-        json_data["variables"] = {"channelLogin": self.usrername}
+        json_data["variables"] = {"channelLogin": self.username}
         response = self.session.post(GQLOperations.url, json=json_data)
 
         if response.status_code == 200:
