@@ -1,6 +1,5 @@
 # Twitch endpoints
 URL = "https://www.twitch.tv"
-API = "https://api.twitch.tv"
 IRC = "irc.chat.twitch.tv"
 IRC_PORT = 6667
 WEBSOCKET = "wss://pubsub-edge.twitch.tv/v1"
@@ -118,7 +117,7 @@ class GQLOperations:
         "extensions": {
             "persistedQuery": {
                 "version": 1,
-                "sha256Hash": "14b5e8a50777165cfc3971e1d93b4758613fe1c817d5542c398dce70b7a45c05",  # "7da6078b1bfa2f0a4dd061cb47bdcd1ffddf31cccadd966ec192e4cd06666e2b",
+                "sha256Hash": "14b5e8a50777165cfc3971e1d93b4758613fe1c817d5542c398dce70b7a45c05",
             }
         },
     }
@@ -128,6 +127,33 @@ class GQLOperations:
             "persistedQuery": {
                 "version": 1,
                 "sha256Hash": "b19ee96a0e79e3f8281c4108bc4c7b3f232266db6f96fd04a339ab393673a075",
+            }
+        },
+    }
+    ReportMenuItem = {  # Use for replace https://api.twitch.tv/helix/users?login={self.username}
+        "operationName": "ReportMenuItem",
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "8f3628981255345ca5e5453dfd844efffb01d6413a9931498836e6268692a30c",
+            }
+        },
+    }
+    PersonalSections = {
+        "operationName": "PersonalSections",
+        "variables": {
+            "input": {
+                "sectionInputs": ["FOLLOWED_SECTION"],
+                "recommendationContext": {"platform": "web"},
+            },
+            "channelLogin": None,
+            "withChannelUser": False,
+            "creatorAnniversariesExperimentEnabled": False,
+        },
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "9fbdfb00156f754c26bde81eb47436dee146655c92682328457037da1a48ed39",
             }
         },
     }

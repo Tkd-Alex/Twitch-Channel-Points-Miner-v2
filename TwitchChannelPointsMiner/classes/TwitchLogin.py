@@ -2,6 +2,7 @@
 # Original Copyright (c) 2020 Rodney
 # The MIT License (MIT)
 
+import copy
 import getpass
 import logging
 import os
@@ -14,6 +15,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     BadCredentialsException,
     WrongCookiesException,
 )
+from TwitchChannelPointsMiner.constants import GQLOperations
 
 logger = logging.getLogger(__name__)
 
@@ -177,13 +179,19 @@ class TwitchLogin(object):
         if self.token is None:
             return False
 
-        response = self.session.get(
-            f"https://api.twitch.tv/helix/users?login={self.username}"
-        )
-        response = response.json()
-        if "data" in response:
-            self.login_check_result = True
-            self.user_id = response["data"][0]["id"]
+        json_data = copy.deepcopy(GQLOperations.ReportMenuItem)
+        json_data["variables"] = {"channelLogin": self.usrername}
+        response = self.session.post(GQLOperations.url, json=json_data)
+
+        if response.status_code == 200:
+            json_response = response.json()
+            if (
+                "data" in json_response
+                and "user" in json_response["data"]
+                and json_response["data"]["user"]["id"] is not None
+            ):
+                self.user_id = json_response["data"]["user"]["id"]
+                self.login_check_result = True
 
         return self.login_check_result
 
