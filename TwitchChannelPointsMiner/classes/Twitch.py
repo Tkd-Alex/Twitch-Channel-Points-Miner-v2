@@ -143,7 +143,6 @@ class Twitch(object):
                 streamer.set_offline()
 
     def get_channel_id(self, streamer_username):
-        # json_response = self.__do_helix_request(f"/users?login={streamer_username}")
         json_data = copy.deepcopy(GQLOperations.ReportMenuItem)
         json_data["variables"] = {"channelLogin": streamer_username}
         json_response = self.post_gql_request(json_data)
@@ -155,26 +154,6 @@ class Twitch(object):
             raise StreamerDoesNotExistException
         else:
             return json_response["data"]["user"]["id"]
-
-    """
-    def get_followers(self, first=100):
-        followers = []
-        pagination = {}
-        while 1:
-            query = f"/users/follows?from_id={self.twitch_login.get_user_id()}&first={first}"
-            if pagination != {}:
-                query += f"&after={pagination['cursor']}"
-
-            json_response = self.__do_helix_request(query)
-            pagination = json_response["pagination"]
-            followers += [fw["to_login"].lower() for fw in json_response["data"]]
-            time.sleep(random.uniform(0.3, 0.7))
-
-            if pagination == {}:
-                break
-
-        return followers
-    """
 
     def get_followers(self):
         json_data = copy.deepcopy(GQLOperations.PersonalSections)
@@ -188,6 +167,7 @@ class Twitch(object):
                 return [
                     fw["user"]["login"]
                     for fw in json_response["data"]["personalSections"][0]["items"]
+                    if fw["user"] is not None
                 ]
         except KeyError:
             return []
