@@ -240,10 +240,11 @@ class TwitchChannelPointsMiner:
             )
 
             # Subscribe to community-points-user. Get update for points spent or gains
+            user_id = self.twitch.twitch_login.get_user_id()
             self.ws_pool.submit(
                 PubsubTopic(
                     "community-points-user-v1",
-                    user_id=self.twitch.twitch_login.get_user_id(),
+                    user_id=user_id,
                 )
             )
 
@@ -252,7 +253,7 @@ class TwitchChannelPointsMiner:
                 self.ws_pool.submit(
                     PubsubTopic(
                         "predictions-user-v1",
-                        user_id=self.twitch.twitch_login.get_user_id(),
+                        user_id=user_id,
                     )
                 )
 

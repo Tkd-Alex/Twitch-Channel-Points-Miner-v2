@@ -2,6 +2,7 @@
 # Original Copyright (c) 2020 Rodney
 # The MIT License (MIT)
 
+import copy
 import getpass
 import logging
 import os
@@ -14,6 +15,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     BadCredentialsException,
     WrongCookiesException,
 )
+from TwitchChannelPointsMiner.constants import GQLOperations
 
 logger = logging.getLogger(__name__)
 
@@ -177,14 +179,7 @@ class TwitchLogin(object):
         if self.token is None:
             return False
 
-        response = self.session.get(
-            f"https://api.twitch.tv/helix/users?login={self.username}"
-        )
-        response = response.json()
-        if "data" in response:
-            self.login_check_result = True
-            self.user_id = response["data"][0]["id"]
-
+        self.login_check_result = self.__set_user_id()
         return self.login_check_result
 
     def save_cookies(self, cookies_file):
@@ -203,6 +198,7 @@ class TwitchLogin(object):
             if cookie["name"] == key:
                 if cookie["value"] is not None:
                     return cookie["value"]
+        return None
 
     def load_cookies(self, cookies_file):
         if os.path.isfile(cookies_file):
@@ -211,7 +207,30 @@ class TwitchLogin(object):
             raise WrongCookiesException("There must be a cookies file!")
 
     def get_user_id(self):
-        return int(self.get_cookie_value("persistent").split("%")[0])
+        persistent = self.get_cookie_value("persistent")
+        user_id = (
+            int(persistent.split("%")[0]) if persistent is not None else self.user_id
+        )
+        if user_id is None:
+            if self.__set_user_id() is True:
+                return self.user_id
+        return user_id
+
+    def __set_user_id(self):
+        json_data = copy.deepcopy(GQLOperations.ReportMenuItem)
+        json_data["variables"] = {"channelLogin": self.username}
+        response = self.session.post(GQLOperations.url, json=json_data)
+
+        if response.status_code == 200:
+            json_response = response.json()
+            if (
+                "data" in json_response
+                and "user" in json_response["data"]
+                and json_response["data"]["user"]["id"] is not None
+            ):
+                self.user_id = json_response["data"]["user"]["id"]
+                return True
+        return False
 
     def get_auth_token(self):
         return self.get_cookie_value("auth-token")
