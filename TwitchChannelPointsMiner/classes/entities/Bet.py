@@ -1,11 +1,14 @@
 import copy
 from enum import Enum, auto
 from random import uniform
+import logging
 
 from millify import millify
 
 from TwitchChannelPointsMiner.utils import char_decision_as_index, float_round
+from TwitchChannelPointsMiner.classes.Settings import Settings
 
+logger = logging.getLogger(__name__)
 
 class Strategy(Enum):
     MOST_VOTED = auto()
@@ -66,6 +69,7 @@ class BetSettings(object):
         "max_points",
         "target_odd",
         "only_doubt",
+        "always_bet",
         "stealth_mode",
         "filter_condition",
     ]
@@ -78,6 +82,7 @@ class BetSettings(object):
         max_points: int = None,
         target_odd: float = None,
         only_doubt: bool = None,
+        always_bet: bool = None,
         stealth_mode: bool = None,
         filter_condition: FilterCondition = None,
     ):
@@ -87,6 +92,7 @@ class BetSettings(object):
         self.max_points = max_points
         self.target_odd = target_odd
         self.only_doubt = only_doubt
+        self.always_bet = always_bet
         self.stealth_mode = stealth_mode
         self.filter_condition = filter_condition
 
@@ -97,6 +103,7 @@ class BetSettings(object):
         self.max_points = self.max_points if not None else 50000
         self.target_odd = self.target_odd if not None else 3
         self.only_doubt = self.only_doubt if not None else False
+        self.always_bet = self.always_bet if not None else True
         self.stealth_mode = self.stealth_mode if not None else False
 
     def __repr__(self):
@@ -203,6 +210,27 @@ class Bet(object):
     def __return_choice(self, key) -> str:
         return "A" if self.outcomes[0][key] > self.outcomes[1][key] else "B"
 
+    def __both_odds_too_low(self) -> bool:
+        return (
+            self.outcomes[0][OutcomeKeys.ODDS] <= self.settings.target_odd
+            and self.outcomes[1][OutcomeKeys.ODDS] <= self.settings.target_odd
+        )
+
+    def __is_only_doubt(self) -> bool:
+        return (
+            self.outcomes[1][OutcomeKeys.ODDS] <= self.settings.target_odd
+            and self.settings.only_doubt
+        )
+
+    def __log_skip(self, string) -> str:
+        logger.info(
+            string,
+            extra={
+                "emoji": ":pushpin:",
+                "color": Settings.logger.color_palette.BET_GENERAL,
+            },
+        )
+
     def skip(self) -> bool:
         if self.settings.filter_condition is not None:
             # key == by , condition == where
@@ -228,29 +256,29 @@ class Bet(object):
                     self.outcomes[0][OutcomeKeys.TOTAL_POINTS] > 0
                     and self.outcomes[1][OutcomeKeys.TOTAL_POINTS] == 0
                 ):
-                    return False, "No bet on B."
+                    self.__log_skip("No bet on B")
+                    return False, 0
                 if (
                     self.outcomes[0][OutcomeKeys.TOTAL_POINTS] == 0
                     and self.outcomes[1][OutcomeKeys.TOTAL_POINTS] > 0
                 ):
                     if not self.settings.only_doubt:
-                        return False, "No bet on A."
-                both_odds_too_low = (
-                    self.outcomes[0][OutcomeKeys.ODDS] <= self.settings.target_odd
-                    and self.outcomes[1][OutcomeKeys.ODDS] <= self.settings.target_odd
-                )
-                is_only_doubt = (
-                    self.outcomes[1][OutcomeKeys.ODDS] <= self.settings.target_odd
-                    and self.settings.only_doubt
-                )
-                if both_odds_too_low:
-                    output = "Odd is too low.\n"
-                elif is_only_doubt:
-                    output = "Odd is too low and only_doubt activated.\n"
-                if both_odds_too_low or is_only_doubt:
-                    output += f"{self.get_outcome(0)}\n{self.get_outcome(1)}\n"
-                    output += f"Target odd: {self.settings.target_odd}"
-                    return True, output # Skip
+                        self.__log_skip("No bet on A")
+                        return False, 0
+
+                if self.__both_odds_too_low() or self.__is_only_doubt():
+                    if self.__both_odds_too_low():
+                        self.__log_skip("Odd is too low")
+                    elif self.__is_only_doubt():
+                        self.__log_skip("Odd is too low and only_doubt activated")
+                    self.__log_skip(f"{self.get_outcome(0)}; {self.get_outcome(1)}")
+                    self.__log_skip(f"Target odd: {self.settings.target_odd}")
+                    if self.settings.always_bet:
+                        self.__log_skip("Odd is too low, but always_bet activated")
+                    if self.settings.always_bet:
+                        return False, 0
+                    else:
+                        return True, 0 # Skip
 
             # Check if condition is satisfied
             if condition == Condition.GT:
@@ -272,7 +300,9 @@ class Bet(object):
     def calculate_sho_bet(self, index):
         low_odd_points = self.outcomes[1 - index][OutcomeKeys.TOTAL_POINTS]
         high_odd_points = self.outcomes[index][OutcomeKeys.TOTAL_POINTS]
-        if high_odd_points <= 50: # in case no one bet
+        if self.__both_odds_too_low() or self.__is_only_doubt():
+            return 10
+        elif high_odd_points <= 50: # in case no one bet
             return 50
         else:
             target_odd = self.settings.target_odd
