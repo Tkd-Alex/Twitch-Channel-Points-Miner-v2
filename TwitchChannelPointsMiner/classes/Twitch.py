@@ -355,14 +355,12 @@ class Twitch(object):
                                         drop.has_preconditions_met is not False
                                         and drop.is_printable is True
                                     ):
-                                        # print("=" * 125)
                                         logger.info(
                                             f"{streamers[index]} is streaming {streamers[index].stream}"
                                         )
                                         logger.info(f"Campaign: {campaign}")
                                         logger.info(f"Drop: {drop}")
                                         logger.info(f"{drop.progress_bar()}")
-                                        # print("=" * 125)
 
                     except requests.exceptions.ConnectionError as e:
                         logger.error(f"Error while trying to send minute watched: {e}")
@@ -534,7 +532,9 @@ class Twitch(object):
                 }
 
             response = self.post_gql_request(json_data)
-            result += list(map(lambda x: x["data"]["user"]["dropCampaign"], response))
+            for r in response:
+                if r["data"]["user"] is not None:
+                    result.append(r["data"]["user"]["dropCampaign"])
         return result
 
     def __sync_campaigns(self, campaigns):

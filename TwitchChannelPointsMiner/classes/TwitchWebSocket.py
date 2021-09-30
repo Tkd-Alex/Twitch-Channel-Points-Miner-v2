@@ -43,7 +43,6 @@ class TwitchWebSocket(WebSocketApp):
         data = {"topics": [str(topic)]}
         if topic.is_user_topic() and auth_token is not None:
             data["auth_token"] = auth_token
-
         nonce = create_nonce()
         self.send({"type": "LISTEN", "nonce": nonce, "data": data})
 
