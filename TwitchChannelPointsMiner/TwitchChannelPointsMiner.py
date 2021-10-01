@@ -304,7 +304,8 @@ class TwitchChannelPointsMiner:
                     streamer.irc_chat.join()
 
         self.running = self.twitch.running = False
-        self.ws_pool.end()
+        if self.ws_pool is not None:
+            self.ws_pool.end()
 
         if self.minute_watcher_thread is not None:
             self.minute_watcher_thread.join()
