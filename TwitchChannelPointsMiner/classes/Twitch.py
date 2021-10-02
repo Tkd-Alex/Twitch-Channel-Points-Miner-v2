@@ -23,7 +23,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
 )
 from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
-from TwitchChannelPointsMiner.constants import CLIENT_ID, GQLOperations
+from TwitchChannelPointsMiner.constants import CLIENT_ID, GQLOperations, API
 from TwitchChannelPointsMiner.utils import (
     _millify,
     create_chunks,
@@ -155,22 +155,22 @@ class Twitch(object):
         else:
             return json_response["data"]["user"]["id"]
 
-    def get_followers(self):
-        json_data = copy.deepcopy(GQLOperations.PersonalSections)
-        json_response = self.post_gql_request(json_data)
-        try:
-            if (
-                "data" in json_response
-                and "personalSections" in json_response["data"]
-                and json_response["data"]["personalSections"] != []
-            ):
-                return [
-                    fw["user"]["login"]
-                    for fw in json_response["data"]["personalSections"][0]["items"]
-                    if fw["user"] is not None
-                ]
-        except KeyError:
-            return []
+    def __do_kraken_request(self, query, response_as_json=True):
+        url = f"{API}/{query.strip('/')}"
+        response = self.twitch_login.session.get(url)
+        logger.debug(
+            f"Query: {query}, Status code: {response.status_code}, Content: {response.json()}"
+        )
+        return response.json() if response_as_json is True else response
+
+    def get_followers(self, limit=100, offset=0):
+        followers = []
+        query = f"/kraken/users/{self.twitch_login.get_user_id()}/follows/channels?limit={limit}&direction=asc&sortby=login&offset={offset}"
+        json_response = self.__do_kraken_request(query)
+        followers += [i["channel"]["name"] for i in json_response["follows"]]
+        if len(followers) == limit:
+            followers += self.get_followers(limit, offset + limit)
+        return followers
 
     def update_raid(self, streamer, raid):
         if streamer.raid != raid:

@@ -40,7 +40,7 @@ class TwitchLogin(object):
         self.login_check_result = False
         self.session = requests.session()
         self.session.headers.update(
-            {"Client-ID": self.client_id, "User-Agent": user_agent}
+            {"Client-ID": self.client_id, "User-Agent": user_agent, "Accept": "application/vnd.twitchtv.v5+json"}
         )
         self.username = username
         self.password = password
