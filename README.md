@@ -35,6 +35,7 @@ Currently, we have a lot of PRs requests opened, but the time to test and improv
     - [Final report](#final-report)
 4. 🧐 [How to use](#how-to-use)
     - [Limits](#limits)
+    - [With Docker (advanced)](#docker)
 5. 🔧 [Settings](#settings)
     - [LoggerSettings](#loggersettings)
     - [StreamerSettings](#streamersettings)
@@ -283,6 +284,32 @@ twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Blacklist exa
 
 Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow has the highest priority.
 
+### With Docker (advanced)
+***You have to have docker installed and configured.***  
+You can start miner in docker container with these commands from the root project folder:
+```
+docker build -t=twitch_farmer .
+docker run -ti --name twitch_farmer twitch_farmer
+```
+
+>⚠️ Warning
+> 
+> If you are using analytics server you have to configure it on `5000` port and `"0.0.0.0"` ip address.
+> ```python 
+> twitch_miner.analytics(host="0.0.0.0", port=5000, refresh=5)
+> ```
+> If you want to use another port on your computer, you should bind it in `docker run` command via `p` argument.
+> ```
+> docker run -ti -p1234:5000 --name twitch_farmer twitch_farmer
+> ```
+> Analytics server will be available on computer at `1234` port in this example.
+
+If you want container to start automaticaly when docker starts, then change second command with the following:
+```
+docker run -ti --name twitch_farmer --restart always twitch_farmer
+```
+
+After you that you enter your 2FA token and could close the console; container will be going in background.
 ## Settings
 Most of the settings are self-explained and are commented on in the example.
 You can watch only two streamers per time. With `priority` settings, you can select which streamers watch by use priority. You can use an array of priority or single item. I suggest using at least one priority from `ORDER`, `POINTS_ASCENDING`, `POINTS_DESCEDING` because, for example, If you set only `STREAK` after catch all watch streak, the script will stop to watch streamers.

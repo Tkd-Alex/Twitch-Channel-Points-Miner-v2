@@ -156,9 +156,14 @@ class TwitchLogin(object):
         browser = input(
             "What browser do you use? Chrome (1), Firefox (2), Other (3): "
         ).strip()
-        if browser not in ("1", "2"):
+        if browser not in ("1", "2", "3"):
             logger.info("Your browser is unsupported, sorry.")
             return None
+
+        if browser == "3":
+            logger.info("Login through your browser and enter cookie values manually")
+            self.username = input("login: ").strip()
+            return input("auth-token: ").strip()
 
         input(
             "Please login inside your browser of choice (NOT incognito mode) and press Enter..."
