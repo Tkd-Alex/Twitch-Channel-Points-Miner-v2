@@ -23,7 +23,7 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
 )
 from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
-from TwitchChannelPointsMiner.constants import API, CLIENT_ID, GQLOperations
+from TwitchChannelPointsMiner.constants import CLIENT_ID, GQLOperations
 from TwitchChannelPointsMiner.utils import (
     _millify,
     create_chunks,
@@ -143,33 +143,34 @@ class Twitch(object):
                 streamer.set_offline()
 
     def get_channel_id(self, streamer_username):
-        json_response = self.__do_helix_request(f"/users?login={streamer_username}")
-        if "data" not in json_response:
+        json_data = copy.deepcopy(GQLOperations.ReportMenuItem)
+        json_data["variables"] = {"channelLogin": streamer_username}
+        json_response = self.post_gql_request(json_data)
+        if (
+            "data" not in json_response
+            or "user" not in json_response["data"]
+            or json_response["data"]["user"] is None
+        ):
             raise StreamerDoesNotExistException
         else:
-            data = json_response["data"]
-            if len(data) >= 1:
-                return data[0]["id"]
-            else:
-                raise StreamerDoesNotExistException
+            return json_response["data"]["user"]["id"]
 
-    def get_followers(self, first=100):
-        followers = []
-        pagination = {}
-        while 1:
-            query = f"/users/follows?from_id={self.twitch_login.get_user_id()}&first={first}"
-            if pagination != {}:
-                query += f"&after={pagination['cursor']}"
-
-            json_response = self.__do_helix_request(query)
-            pagination = json_response["pagination"]
-            followers += [fw["to_login"].lower() for fw in json_response["data"]]
-            time.sleep(random.uniform(0.3, 0.7))
-
-            if pagination == {}:
-                break
-
-        return followers
+    def get_followers(self):
+        json_data = copy.deepcopy(GQLOperations.PersonalSections)
+        json_response = self.post_gql_request(json_data)
+        try:
+            if (
+                "data" in json_response
+                and "personalSections" in json_response["data"]
+                and json_response["data"]["personalSections"] != []
+            ):
+                return [
+                    fw["user"]["login"]
+                    for fw in json_response["data"]["personalSections"][0]["items"]
+                    if fw["user"] is not None
+                ]
+        except KeyError:
+            return []
 
     def update_raid(self, streamer, raid):
         if streamer.raid != raid:
@@ -210,14 +211,6 @@ class Twitch(object):
                 f"No internet connection available! Retry after {random_sleep}m"
             )
             self.__chuncked_sleep(random_sleep * 60, chunk_size=chunk_size)
-
-    def __do_helix_request(self, query, response_as_json=True):
-        url = f"{API}/helix/{query.strip('/')}"
-        response = self.twitch_login.session.get(url)
-        logger.debug(
-            f"Query: {query}, Status code: {response.status_code}, Content: {response.json()}"
-        )
-        return response.json() if response_as_json is True else response
 
     def post_gql_request(self, json_data):
         try:
@@ -362,14 +355,12 @@ class Twitch(object):
                                         drop.has_preconditions_met is not False
                                         and drop.is_printable is True
                                     ):
-                                        # print("=" * 125)
                                         logger.info(
                                             f"{streamers[index]} is streaming {streamers[index].stream}"
                                         )
                                         logger.info(f"Campaign: {campaign}")
                                         logger.info(f"Drop: {drop}")
                                         logger.info(f"{drop.progress_bar()}")
-                                        # print("=" * 125)
 
                     except requests.exceptions.ConnectionError as e:
                         logger.error(f"Error while trying to send minute watched: {e}")
@@ -541,7 +532,9 @@ class Twitch(object):
                 }
 
             response = self.post_gql_request(json_data)
-            result += list(map(lambda x: x["data"]["user"]["dropCampaign"], response))
+            for r in response:
+                if r["data"]["user"] is not None:
+                    result.append(r["data"]["user"]["dropCampaign"])
         return result
 
     def __sync_campaigns(self, campaigns):
