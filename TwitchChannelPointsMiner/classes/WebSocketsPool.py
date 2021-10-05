@@ -142,7 +142,6 @@ class WebSocketsPool:
             # Why not create a new ws on the same array index? Let's try.
             self = ws.parent_pool
             self.ws[ws.index] = self.__new(ws.index)  # Create a new connection.
-            # self.ws[ws.index].topics = ws.topics
 
             self.__start(ws.index)  # Start a new thread.
             time.sleep(30)
