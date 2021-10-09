@@ -1,26 +1,32 @@
 from TwitchChannelPointsMiner.classes.entities.Bet import (
     Bet,
-    Strategy,
     BetSettings,
-    Condition,
-    OutcomeKeys,
     FilterCondition,
     DelayMode
 )
+from TwitchChannelPointsMiner.classes.entities.Strategy import (
+    Strategy,
+    StrategySettings,
+    Condition,
+    OutcomeKeys
+)
 import pytest
-
+from TwitchChannelPointsMiner.logger import LoggerSettings
+from TwitchChannelPointsMiner.classes.Settings import Settings
 
 @pytest.fixture
 def bet_settings():
     settings = BetSettings(
         strategy=Strategy.SMART_HIGH_ODDS,
         percentage=50,
-        target_odd=2.1,
-        only_doubt=True,
+        only_doubt=False,
         max_points=50000,
         stealth_mode=False,
         delay_mode=DelayMode.FROM_END,
-        delay=6
+        delay=6,
+        strategy_settings={
+            "target_odd": 2.1
+        }
     )
     return settings
 
@@ -55,9 +61,11 @@ def outcomes():
 
 
 def test_settings(bet_settings, outcomes):
-    bet = Bet(outcomes, bet_settings).calculate(1000)
-    assert bet["choice"] == "B"
-    assert bet["amount"] == 145
+    bet = Bet(outcomes, bet_settings)
+    calc = bet.calculate(1000)
+    assert calc["choice"] == "B"
+    assert calc["amount"] == 145
+    assert bet.decision == {"amount": 145, "choice": "B", "id": 2}  # important
 
 
 def test_settings2(bet_settings, outcomes):
@@ -89,14 +97,23 @@ def test_settings4(bet_settings, outcomes):
 
 def test_settings5(bet_settings, outcomes):
     outcomes = [outcomes[1], outcomes[0]]
-    bet_settings.only_doubt = False
     bet = Bet(outcomes, bet_settings).calculate(1000)
     assert bet["choice"] == "A"
     assert bet["amount"] == 145
 
 
+def test_always_bet(bet_settings, outcomes):
+    Settings.logger = LoggerSettings()
+    outcomes[1]["odds"] = 2
+    outcomes[0]["odds"] = 2
+    skip = Bet(outcomes, bet_settings).skip()
+    assert skip == (True, 0)
+    bet_settings.strategy_settings.always_bet = True
+    skip = Bet(outcomes, bet_settings).skip()
+    assert skip == (False, 0)
+
+
 def test_most_voted(bet_settings, outcomes):
-    bet_settings.only_doubt = False
     bet_settings.strategy = Strategy.MOST_VOTED
     bet_settings.percentage = 20
     outcomes[0]["total_users"] = 1
@@ -111,7 +128,6 @@ def test_most_voted(bet_settings, outcomes):
 
 
 def test_high_odds(bet_settings, outcomes):
-    bet_settings.only_doubt = False
     bet_settings.strategy = Strategy.HIGH_ODDS
     bet_settings.percentage = 20
     outcomes[0]["odds"] = 2
@@ -126,7 +142,6 @@ def test_high_odds(bet_settings, outcomes):
 
 
 def test_percentage(bet_settings, outcomes):
-    bet_settings.only_doubt = False
     bet_settings.strategy = Strategy.PERCENTAGE
     bet_settings.percentage = 20
     outcomes[0]["odds_percentage"] = 2
@@ -141,16 +156,20 @@ def test_percentage(bet_settings, outcomes):
 
 
 def test_smart(bet_settings, outcomes):
-    bet_settings.only_doubt = False
-    bet_settings.strategy = Strategy.SMART
-    bet_settings.percentage_gap = 1
+    bet_settings = BetSettings(
+        strategy=Strategy.SMART,
+        strategy_settings={
+            "percentage_gap": 1
+        }
+    )
+    bet_settings.default()
     outcomes[0]["percentage_users"] = 30
     outcomes[1]["percentage_users"] = 70
     outcomes[0]["total_users"] = 30
     outcomes[1]["total_users"] = 70
     bet = Bet(outcomes, bet_settings).calculate(1000)
     assert bet["choice"] == "B"
-    assert bet["amount"] == 500
+    assert bet["amount"] == 50
     outcomes[0]["percentage_users"] = 60
     outcomes[1]["percentage_users"] = 40
     outcomes[0]["total_users"] = 60
@@ -160,14 +179,18 @@ def test_smart(bet_settings, outcomes):
 
 
 def test_smart2(bet_settings, outcomes):
-    bet_settings.only_doubt = False
-    bet_settings.strategy = Strategy.SMART
-    bet_settings.percentage_gap = 99
+    bet_settings = BetSettings(
+        strategy=Strategy.SMART,
+        strategy_settings={
+            "percentage_gap": 99
+        }
+    )
+    bet_settings.default()
     outcomes[0]["percentage_users"] = 30
     outcomes[1]["percentage_users"] = 70
     bet = Bet(outcomes, bet_settings).calculate(1000)
     assert bet["choice"] == "B"
-    assert bet["amount"] == 500
+    assert bet["amount"] == 50
     outcomes[0]["percentage_users"] = 60
     outcomes[1]["percentage_users"] = 40
     outcomes[0]["odds"] = 2
@@ -180,7 +203,11 @@ def test_only_doubt(bet_settings, outcomes):
     bet = Bet(outcomes, bet_settings).calculate(1000)
     assert bet["choice"] == "B"
     assert bet["amount"] == 145
-    outcomes[1]["odds"] = 2
+    outcomes[1]["odds"] = 1.5
+    bet = Bet(outcomes, bet_settings).calculate(1000)
+    assert bet["choice"] == "A"
+    assert bet["amount"] == 10
+    bet_settings.only_doubt = True
     bet = Bet(outcomes, bet_settings).calculate(1000)
     assert bet["choice"] == "B"
     assert bet["amount"] == 10
@@ -204,3 +231,10 @@ def test_skip2(bet_settings, outcomes):
     )
     skip = Bet(outcomes, bet_settings).skip()
     assert skip == (True, 2.5)
+
+
+def test_skip3(bet_settings, outcomes):
+    Settings.logger = LoggerSettings()
+    bet_settings.strategy_settings.target_odd = 2.5
+    skip = Bet(outcomes, bet_settings).skip()
+    assert skip == (True, 0)

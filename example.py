@@ -39,8 +39,6 @@ twitch_miner = TwitchChannelPointsMiner(
         bet=BetSettings(
             strategy=Strategy.SMART,            # Choose you strategy!
             percentage=5,                       # Place the x% of your channel points
-            percentage_gap=20,                  # Gap difference between outcomesA and outcomesB (for SMART stragegy)
-            target_odd=3,                       # Target odd for SMART_HIGH_ODDS strategy
             only_doubt=False,                   # Will only doubt (bet on B). If set to True will overwrite strategy bet decision
             max_points=50000,                   # If the x percentage of your channel points is gt bet_max_points set this value
             stealth_mode=True,                  # If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points Issue #33
@@ -51,7 +49,10 @@ twitch_miner = TwitchChannelPointsMiner(
                 by=OutcomeKeys.TOTAL_USERS,     # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
                 where=Condition.LTE,            # 'by' must be [GT, LT, GTE, LTE] than value
                 value=800
-            )
+            ),
+            strategy_settings={
+                "percentage_gap": 20            # Gap difference between outcomesA and outcomesB (for SMART stragegy)
+            }
         )
     )
 )
