@@ -27,6 +27,7 @@ jobs:
           pip3 install pyflakes
           pip3 install black
           pip3 install isort
+          pip3 install pytest
 
       - name: Detect errors with pyflakes
         run: pyflakes TwitchChannelPointsMiner
@@ -36,3 +37,6 @@ jobs:
 
       - name: Lint with isort
         run: isort TwitchChannelPointsMiner --profile black --check --diff
+
+      - name: Run tests
+        run: pytest
