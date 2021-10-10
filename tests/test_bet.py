@@ -102,6 +102,35 @@ def test_settings5(bet_settings, outcomes):
     assert bet["amount"] == 145
 
 
+def test_update_outcomes(bet_settings, outcomes):
+    bet = Bet(outcomes, bet_settings)
+    outcomes[0]["top_points"] = 0
+    outcomes[0]["top_predictors"] = [{"points": 100}, {"points": 200}]
+    outcomes[1]["top_predictors"] = [{"points": 100}, {"points": 300}]
+    outcomes[0]["total_users"] = 1
+    outcomes[1]["total_users"] = 3
+    outcomes[0]["total_points"] = 800
+    outcomes[1]["total_points"] = 200
+    bet.update_outcomes(outcomes)
+    assert bet.outcomes[0]["top_points"] == 200
+    assert bet.outcomes[1]["top_points"] == 300
+    assert bet.outcomes[0]["percentage_users"] == 25
+    assert bet.outcomes[1]["percentage_users"] == 75
+    assert bet.outcomes[0]["odds"] == 1.25
+    assert bet.outcomes[1]["odds"] == 5
+    assert bet.outcomes[0]["odds_percentage"] == 80
+    assert bet.outcomes[1]["odds_percentage"] == 20
+
+
+def test_stealth_mode(bet_settings, outcomes):
+    bet_settings.stealth_mode = True
+    outcomes[1]["top_points"] = 80
+    for x in range(10):
+        bet = Bet(outcomes, bet_settings).calculate(1000)
+        assert bet["amount"] >= 75
+        assert bet["amount"] <= 79
+
+
 def test_always_bet(bet_settings, outcomes):
     Settings.logger = LoggerSettings()
     outcomes[1]["odds"] = 2
