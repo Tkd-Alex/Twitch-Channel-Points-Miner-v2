@@ -134,23 +134,23 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 
 %d/%m/%y %H:%M:%S - 📊  BetSettings(Strategy=Strategy.SMART, Percentage=7, PercentageGap=20, MaxPoints=7500
 %d/%m/%y %H:%M:%S - 📊  EventPrediction(event_id=xxxx-xxxx-xxxx-xxxx, title="Event Title1")
-		Streamer(username=streamer-username, channel_id=0000000, channel_points=67247)
-		Bet(TotalUsers=1k, TotalPoints=11M), Decision={'choice': 'B', 'amount': 5289, 'id': 'xxxx-yyyy-zzzz'})
-		Outcome0(YES (BLUE) Points: 7M, Users: 641 (58.49%), Odds: 1.6, (5}%)
-		Outcome1(NO (PINK),Points: 4M, Users: 455 (41.51%), Odds: 2.65 (37.74%))
-		Result: {'type': 'LOSE', 'won': 0}
+                Streamer(username=streamer-username, channel_id=0000000, channel_points=67247)
+                Bet(TotalUsers=1k, TotalPoints=11M), Decision={'choice': 'B', 'amount': 5289, 'id': 'xxxx-yyyy-zzzz'})
+                Outcome0(YES (BLUE) Points: 7M, Users: 641 (58.49%), Odds: 1.6, (5}%)
+                Outcome1(NO (PINK),Points: 4M, Users: 455 (41.51%), Odds: 2.65 (37.74%))
+                Result: {'type': 'LOSE', 'won': 0}
 %d/%m/%y %H:%M:%S - 📊  EventPrediction(event_id=yyyy-yyyy-yyyy-yyyy, title="Event Title2")
-		Streamer(username=streamer-username, channel_id=0000000, channel_points=3453464)
-		Bet(TotalUsers=921, TotalPoints=11M), Decision={'choice': 'A', 'amount': 4926, 'id': 'xxxx-yyyy-zzzz'})
-		Outcome0(YES (BLUE) Points: 9M, Users: 562 (61.02%), Odds: 1.31 (76.34%))
-		Outcome1(YES (PINK) Points: 3M, Users: 359 (38.98%), Odds: 4.21 (23.75%))
-		Result: {'type': 'WIN', 'won': 6531}
+                Streamer(username=streamer-username, channel_id=0000000, channel_points=3453464)
+                Bet(TotalUsers=921, TotalPoints=11M), Decision={'choice': 'A', 'amount': 4926, 'id': 'xxxx-yyyy-zzzz'})
+                Outcome0(YES (BLUE) Points: 9M, Users: 562 (61.02%), Odds: 1.31 (76.34%))
+                Outcome1(YES (PINK) Points: 3M, Users: 359 (38.98%), Odds: 4.21 (23.75%))
+                Result: {'type': 'WIN', 'won': 6531}
 %d/%m/%y %H:%M:%S - 📊  EventPrediction(event_id=ad152117-251b-4666-b683-18e5390e56c3, title="Event Title3")
-		Streamer(username=streamer-username, channel_id=0000000, channel_points=45645645)
-		Bet(TotalUsers=260, TotalPoints=3M), Decision={'choice': 'A', 'amount': 5054, 'id': 'xxxx-yyyy-zzzz'})
-		Outcome0(YES (BLUE) Points: 689k, Users: 114 (43.85%), Odds: 4.24 (23.58%))
-		Outcome1(NO (PINK) Points: 2M, Users: 146 (56.15%), Odds: 1.31 (76.34%))
-		Result: {'type': 'LOSE', 'won': 0}
+                Streamer(username=streamer-username, channel_id=0000000, channel_points=45645645)
+                Bet(TotalUsers=260, TotalPoints=3M), Decision={'choice': 'A', 'amount': 5054, 'id': 'xxxx-yyyy-zzzz'})
+                Outcome0(YES (BLUE) Points: 689k, Users: 114 (43.85%), Odds: 4.24 (23.58%))
+                Outcome1(NO (PINK) Points: 2M, Users: 146 (56.15%), Odds: 1.31 (76.34%))
+                Result: {'type': 'LOSE', 'won': 0}
 
 %d/%m/%y %H:%M:%S - 🤖  Streamer(username=streamer-username, channel_id=0000000, channel_points=67247), Total points gained (after farming - before farming): -7838
 %d/%m/%y %H:%M:%S - 💰  CLAIM(11 times, 550 gained), PREDICTION(1 times, 6531 gained), WATCH(35 times, 350 gained)
@@ -180,7 +180,8 @@ from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
 from TwitchChannelPointsMiner.classes.Settings import Priority
-from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
+from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings, FilterCondition, DelayMode
+from TwitchChannelPointsMiner.classes.entities.Strategy import Strategy, Condition, OutcomeKeys
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
 twitch_miner = TwitchChannelPointsMiner(
@@ -214,8 +215,6 @@ twitch_miner = TwitchChannelPointsMiner(
         bet=BetSettings(
             strategy=Strategy.SMART,            # Choose you strategy!
             percentage=5,                       # Place the x% of your channel points
-            percentage_gap=20,                  # Gap difference between outcomesA and outcomesB (for SMART stragegy)
-            target_odd=3,                       # Target odd for SMART_HIGH_ODDS strategy
             max_points=50000,                   # If the x percentage of your channel points is gt bet_max_points set this value
             stealth_mode=True,                  # If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points Issue #33
             delay_mode=DelayMode.FROM_END,      # When placing a bet, we will wait until `delay` seconds before the end of the timer
@@ -225,7 +224,10 @@ twitch_miner = TwitchChannelPointsMiner(
                 by=OutcomeKeys.TOTAL_USERS,     # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
                 where=Condition.LTE,            # 'by' must be [GT, LT, GTE, LTE] than value
                 value=800
-            )
+            ),
+            strategy_settings={
+                "percentage_gap": 20            # Gap difference between outcomesA and outcomesB (for SMART stragegy)
+            }
         )
     )
 )
@@ -290,15 +292,15 @@ Available values are the following:
 You can combine all priority but keep in mind that use `ORDER` and `POINTS_ASCENDING` in the same settings doesn't make sense.
 
 ### LoggerSettings
-| Key             	| Type            	| Default                        	                                  | Description                                                                          	                                                                                                  |
-|-----------------	|-----------------	|-------------------------------------------------------------------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `save`          	| bool            	| True                           	                                  | If you want to save logs in file (suggested)                                         	                                                                                                  |
-| `less`          	| bool            	| False                          	                                  | Reduce the logging format and message verbosity [#10](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/10)                                                               |
-| `console_level` 	| level 	        | logging.INFO                   	                                  | Level of logs in terminal - Use logging.DEBUG for more helpful messages.             	                                                                                                  |
-| `file_level`    	| level 	        | logging.DEBUG                  	                                  | Level of logs in file save - If you think the log file it's too big, use logging.INFO 	                                                                                                  |
-| `emoji`         	| bool            	| For Windows is False else True 	                                  | On Windows, we have a problem printing emoji. Set to false if you have a problem      	                                                                                                  |
-| `colored`         | bool            	| True 	                                                              | If you want to print colored text [#45](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/45) [#82](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/82) |
-| `color_palette`   | ColorPalette      | All messages are Fore.RESET except WIN and LOSE bet (GREEN and RED) | Create your custom color palette. Read more above.      	                                                                                                                              |
+| Key               | Type              | Default                                                             | Description                                                                                                                                                                               |
+|-----------------  |-----------------  |-------------------------------------------------------------------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `save`            | bool              | True                                                                | If you want to save logs in file (suggested)                                                                                                                                              |
+| `less`            | bool              | False                                                               | Reduce the logging format and message verbosity [#10](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/10)                                                               |
+| `console_level`   | level             | logging.INFO                                                        | Level of logs in terminal - Use logging.DEBUG for more helpful messages.                                                                                                                  |
+| `file_level`      | level             | logging.DEBUG                                                       | Level of logs in file save - If you think the log file it's too big, use logging.INFO                                                                                                     |
+| `emoji`           | bool              | For Windows is False else True                                      | On Windows, we have a problem printing emoji. Set to false if you have a problem                                                                                                          |
+| `colored`         | bool              | True                                                                | If you want to print colored text [#45](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/45) [#82](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/82) |
+| `color_palette`   | ColorPalette      | All messages are Fore.RESET except WIN and LOSE bet (GREEN and RED) | Create your custom color palette. Read more above.                                                                                                                                        |
 
 #### Color Palette
 Now you can customize the color of the terminal message. We have created a default ColorPalette that provide all the message with `DEFAULT (RESET)` color and the `BET_WIN` and `BET_LOSE` message `GREEN` and `RED` respectively.
@@ -337,25 +339,32 @@ ColorPalette(
 ```
 
 ### StreamerSettings
-| Key                	| Type        	| Default                        	| Description                                                                                                                                          	                                                                            |
-|--------------------	|-------------	|--------------------------------	|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `make_predictions` 	| bool        	| True                           	| Choose if you want to make predictions / bet or not                                                                                                  	                                                                            |
-| `follow_raid`      	| bool        	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	                                                                            |
-| `claim_drops`      	| bool        	| True                           	| If this value is True, the script will increase the watch-time for the current game. With this, you can claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21)         |
-| `watch_streak`     	| bool        	| True                           	| Choose if you want to change a priority for these streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                   |
-| `bet`              	| BetSettings 	|  	                                | Rules to follow for the bet                                                                                                                                                                                                       |
+| Key                   | Type          | Default                           | Description                                                                                                                                                                                                                       |
+|--------------------   |-------------  |--------------------------------   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `make_predictions`    | bool          | True                              | Choose if you want to make predictions / bet or not                                                                                                                                                                               |
+| `follow_raid`         | bool          | True                              | Choose if you want to follow raid +250 points                                                                                                                                                                                     |
+| `claim_drops`         | bool          | True                              | If this value is True, the script will increase the watch-time for the current game. With this, you can claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21)         |
+| `watch_streak`        | bool          | True                              | Choose if you want to change a priority for these streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                   |
+| `bet`                 | BetSettings   |                                   | Rules to follow for the bet                                                                                                                                                                                                       |
 ### BetSettings
-| Key                	| Type            	| Default 	| Description                                                                                                    	                                                                          |
-|--------------------	|-----------------	|---------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `strategy`         	| Strategy        	| SMART   	| Choose your strategy! See above for more info                                                                  	                                                                          |
-| `percentage`       	| int             	| 5       	| Place the x% of your channel points                                                                            	                                                                          |
-| `percentage_gap`   	| int             	| 20      	| Gap difference between outcomesA and outcomesB (for SMART stragegy)                                            	                                                                          |
-| `target_odd`          | float             | 3         | Target odd for SMART_HIGH_ODDS strategy                                                                                                                       |
-| `max_points`       	| int             	| 50000   	| If the x percentage of your channel points is GT bet_max_points set this value                                 	                                                                          |
-| `stealth_mode`     	| bool            	| False   	| If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points [#33](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/33)      |
-| `join_chat` 	        | bool 	            	| True    	| Join IRC-Chat to appear online in chat and attempt to get StreamElements channel points and increase view-time  [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47) |
-| `delay_mode` 	        | DelayMode         	| FROM_END	| Define how is calculating the waiting time before placing a bet |
-| `delay` 	        | float             	| 6     	| Value to be used to calculate bet delay depending on `delay_mode` value |
+| Key                   | Type              | Default   | Description   |
+|--------------------   |-----------------  |---------  |-------------  |
+| `strategy`            | Strategy          | SMART     | Choose your strategy! See above for more info |
+| `percentage`          | int               | 5         | Place the x% of your channel points |
+| `max_points`          | int               | 50000     | If the x percentage of your channel points is GT bet_max_points set this value |
+| `stealth_mode`        | bool              | False     | If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points [#33](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/33) |
+| `join_chat`           | bool              | True      | Join IRC-Chat to appear online in chat and attempt to get StreamElements channel points and increase view-time  [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47) |
+| `delay_mode`          | DelayMode         | FROM_END  | Define how is calculating the waiting time before placing a bet |
+| `delay`               | float             | 6         | Value to be used to calculate bet delay depending on `delay_mode` value |
+| `strategy_settings`   | dict              | {}        | Settings specific to strategy |
+| `only_doubt`          | bool              | False     | Always bet on B (will overwrite strategy bet decision) |
+
+### StrategySettings
+| Strategy              | Key                   | Type              | Default       | Description   |
+|--------------------   |---------------------  |-----------------  |-----------    |------------   |
+| SMART                 | `percentage_gap`      | int               | 20            | Gap difference between outcomesA and outcomesB |
+| SMART_HIGH_ODDS       | `target_odd`          | float             | 3             | Bet that much points so the odd will be not less then `target_odd` (default 3) |
+| SMART_HIGH_ODDS       | `always_bet`          | bool              | False         | Always bet minimum 10 points for stats collecting |
 
 #### Bet strategy
 
@@ -372,16 +381,17 @@ Here a concrete example:
 - **MOST_VOTED**: 21 Users have select **'over 7.5'**, instead of 9 'under 7.5'
 - **HIGH_ODDS**: The highest odd is 2.27 on **'over 7.5'** vs 1.79 on 'under 7.5'
 - **SMART_HIGH_ODDS**: No bet because highest odd 2.27 is lower than default target odd (3)
+- - If `target_odd` set to 2.1 then bet will be (6888 / (2.1 - 1)) - 5437 = 824. Making final odds 2.1/1.9
 - **PERCENTAGE**: The highest percentage is 56% for **'under 7.5'**
 - **SMART**: Calculate the percentage based on the users. The percentages are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percentages is higher than `percentage_gap` select the highest percentage, else the highest odds.
+- - In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 
-In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 ### FilterCondition
-| Key         	| Type        	| Default 	| Description                                                                      	|
-|-------------	|-------------	|---------	|----------------------------------------------------------------------------------	|
-| `by`       	| OutcomeKeys 	| None    	| Key to apply the filter                                                          	|
-| `where`      	| Condition   	| None    	| Condition that should match for place bet                                        	|
-| `value`     	| number      	| None    	| Value to compare                                                                 	|
+| Key           | Type          | Default   | Description                                                                       |
+|-------------  |-------------  |---------  |---------------------------------------------------------------------------------- |
+| `by`          | OutcomeKeys   | None      | Key to apply the filter                                                           |
+| `where`       | Condition     | None      | Condition that should match for place bet                                         |
+| `value`       | number        | None      | Value to compare                                                                  |
 
 Allowed values for `by` are:
 - `PERCENTAGE_USERS` (no sum) [Would never want a sum as it'd always be 100%]
