@@ -1,0 +1,4 @@
+humanize==3.5.0
+prettytable==2.1.0
+culour==0.1
+humanfriendly==9.1
