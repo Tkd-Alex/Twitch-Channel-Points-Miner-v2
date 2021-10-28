@@ -6,12 +6,12 @@ settings = {
     "html_filename": "stats.html",
     # stats saved as json data
     "json_filename": "stats.json",
-    # columns in table that show points earned, in hours
+    # columns in table that show points earned (in hours)
     "columns": [3, 8, 24, 48, 24 * 7, 24 * 7 * 2],
     # blacklisted streamers if you don't wan't them to be present in table
     "blacklist": ["forsen"],
     # how often to update data in table (in seconds)
     "refresh_rate": 60,
     "debug": False,
-    "bugged_terminal": True,
+    "bugged_terminal": False,
 }
