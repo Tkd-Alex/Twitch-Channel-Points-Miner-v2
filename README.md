@@ -18,6 +18,14 @@
 
 Read more about channels point [here](https://help.twitch.tv/s/article/channel-points-guide)
 
+## 📢 Help wanted
+Currently, we have a lot of PRs requests opened, but the time to test and improve It's less and less. If you want to help the community and the project, please test the following PRs and give us feedback:
+- [Features/improvements to analytics #131](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/131)
+- [Add SMART_HIGH_ODDS strategy #172](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/172)
+- [Replace join_chat boolean with chat: ChatPresence #253](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/253)
+- [Receive updates to Telegram #254](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/254)
+- [Add stats #318](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/318)
+
 # README Contents
 1. 🤝 [Community](#community)
 2. 🚀 [Main differences from the original repository](#main-differences-from-the-original-repository)
@@ -46,7 +54,7 @@ If you have any type of issue, need help, or want to suggest a new feature, plea
 
 If you want to help on this project, please leave a star 🌟 and share it with your friends! 😎
 
-A coffee is always a gesture of LOVE ❤️
+If you want to offer me a coffee, I would be grateful ❤️
 
 <a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
