@@ -35,7 +35,7 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
     - [FilterCondition](#filtercondition)
         - [Example](#example)
 6. 📈 [Analytics](#analytics)
-7. 🍪 [Migrating from old repository (the original one)](#migrating-from-old-repository-the-original-one)
+7. 🍪 [Migrating from an old repository (the original one)](#migrating-from-an-old-repository-the-original-one)
 8. 🪟 [Windows](#windows)
 9. 📱 [Termux](#termux)
 10. ⚠️ [Disclaimer](#disclaimer)
