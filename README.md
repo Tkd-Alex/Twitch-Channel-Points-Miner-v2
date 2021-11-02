@@ -18,6 +18,14 @@
 
 Read more about channels point [here](https://help.twitch.tv/s/article/channel-points-guide)
 
+## 📢 Help wanted
+Currently, we have a lot of PRs requests opened, but the time to test and improve It's less and less. If you want to help the community and the project, please test the following PRs and give us feedback:
+- [Features/improvements to analytics #131](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/131)
+- [Add SMART_HIGH_ODDS strategy #172](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/172)
+- [Replace join_chat boolean with chat: ChatPresence #253](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/253)
+- [Receive updates to Telegram #254](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/254)
+- [Add stats #318](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/318)
+
 # README Contents
 1. 🤝 [Community](#community)
 2. 🚀 [Main differences from the original repository](#main-differences-from-the-original-repository)
@@ -35,7 +43,7 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
     - [FilterCondition](#filtercondition)
         - [Example](#example)
 6. 📈 [Analytics](#analytics)
-7. 🍪 [Migrating from old repository (the original one)](#migrating-from-old-repository-the-original-one)
+7. 🍪 [Migrating from an old repository (the original one)](#migrating-from-an-old-repository-the-original-one)
 8. 🪟 [Windows](#windows)
 9. 📱 [Termux](#termux)
 10. ⚠️ [Disclaimer](#disclaimer)
@@ -46,7 +54,7 @@ If you have any type of issue, need help, or want to suggest a new feature, plea
 
 If you want to help on this project, please leave a star 🌟 and share it with your friends! 😎
 
-A coffee is always a gesture of LOVE ❤️
+If you want to offer me a coffee, I would be grateful ❤️
 
 <a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
@@ -339,26 +347,25 @@ ColorPalette(
 ```
 
 ### StreamerSettings
-| Key                   | Type          | Default                           | Description                                                                                                                                                                                                                       |
-|--------------------   |-------------  |--------------------------------   |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `make_predictions`    | bool          | True                              | Choose if you want to make predictions / bet or not                                                                                                                                                                               |
-| `follow_raid`         | bool          | True                              | Choose if you want to follow raid +250 points                                                                                                                                                                                     |
-| `claim_drops`         | bool          | True                              | If this value is True, the script will increase the watch-time for the current game. With this, you can claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21)         |
-| `watch_streak`        | bool          | True                              | Choose if you want to change a priority for these streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                   |
-| `bet`                 | BetSettings   |                                   | Rules to follow for the bet                                                                                                                                                                                                       |
+| Key                	| Type        	| Default                        	| Description                                                                                                                                          	                                                                            |
+|--------------------	|-------------	|--------------------------------	|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `make_predictions` 	| bool        	| True                           	| Choose if you want to make predictions / bet or not                                                                                                  	                                                                            |
+| `follow_raid`      	| bool        	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	                                                                            |
+| `claim_drops`      	| bool        	| True                           	| If this value is True, the script will increase the watch-time for the current game. With this, you can claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21)         |
+| `watch_streak`     	| bool        	| True                           	| Choose if you want to change a priority for these streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                   |
+| `join_chat`        	| bool       	| True                           	| Join IRC-Chat to appear online in chat and attempt to get StreamElements channel points and increase view-time  [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47)                                     |
+| `bet`              	| BetSettings 	|  	                                | Rules to follow for the bet                                                                                                                                                                                                       |
 ### BetSettings
-| Key                   | Type              | Default   | Description   |
-|--------------------   |-----------------  |---------  |-------------  |
-| `strategy`            | Strategy          | SMART     | Choose your strategy! See above for more info |
-| `percentage`          | int               | 5         | Place the x% of your channel points |
-| `max_points`          | int               | 50000     | If the x percentage of your channel points is GT bet_max_points set this value |
-| `stealth_mode`        | bool              | False     | If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points [#33](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/33) |
-| `join_chat`           | bool              | True      | Join IRC-Chat to appear online in chat and attempt to get StreamElements channel points and increase view-time  [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47) |
-| `delay_mode`          | DelayMode         | FROM_END  | Define how is calculating the waiting time before placing a bet |
-| `delay`               | float             | 6         | Value to be used to calculate bet delay depending on `delay_mode` value |
-| `strategy_settings`   | dict              | {}        | Settings specific to strategy |
-| `only_doubt`          | bool              | False     | Always bet on B (will overwrite strategy bet decision) |
-
+| Key                	| Type            	| Default 	| Description                                                                                                    	                                                                          |
+|--------------------	|-----------------	|---------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `strategy`         	| Strategy        	| SMART   	| Choose your strategy! See above for more info                                                                  	                                                                          |
+| `percentage`       	| int             	| 5       	| Place the x% of your channel points                                                                            	                                                                          |
+| `max_points`       	| int             	| 50000   	| If the x percentage of your channel points is GT bet_max_points set this value                                 	                                                                          |
+| `stealth_mode`     	| bool            	| False   	| If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points [#33](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/33)      |
+| `delay_mode`       	| DelayMode       	| FROM_END	| Define how is calculating the waiting time before placing a bet |
+| `delay`            	| float           	| 6     	| Value to be used to calculate bet delay depending on `delay_mode` value |
+| `strategy_settings`	| dict            	| {}      	| Settings specific to strategy |
+| `only_doubt`       	| bool            	| False   	| Always bet on B (will overwrite strategy bet decision) |
 ### StrategySettings
 | Strategy              | Key                   | Type              | Default       | Description   |
 |--------------------   |---------------------  |-----------------  |-----------    |------------   |
