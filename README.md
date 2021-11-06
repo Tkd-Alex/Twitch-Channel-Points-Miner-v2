@@ -292,6 +292,11 @@ docker build -t=twitch_farmer .
 docker run -ti --name twitch_farmer twitch_farmer
 ```
 
+If you want container to start automaticaly when docker starts, then add `--restart always` to the command:
+```
+docker run -ti --name twitch_farmer --restart always twitch_farmer
+```
+
 >⚠️ Warning
 > 
 > If you are using analytics server you have to configure it on `5000` port and `"0.0.0.0"` ip address.
@@ -303,13 +308,15 @@ docker run -ti --name twitch_farmer twitch_farmer
 > docker run -ti -p1234:5000 --name twitch_farmer twitch_farmer
 > ```
 > Analytics server will be available on computer at `1234` port in this example.
+>
+> If you want to persist your analytics data you should mount analytics directory. For example: `-v /opt/twitch_farmer/analytics:/app/analytics`. 
+> Your full command will look something like that:
+> ```
+> docker run -p5004:5000 -ti --name twitch_farmer -v /opt/twitch_farmer/analytics:/app/analytics --restart always twitch_farmer
+> ```
 
-If you want container to start automaticaly when docker starts, then change second command with the following:
-```
-docker run -ti --name twitch_farmer --restart always twitch_farmer
-```
 
-After you that you enter your 2FA token and could close the console; container will be going in background.
+After that you enter your 2FA token and could close the console; container will be going in background.
 ## Settings
 Most of the settings are self-explained and are commented on in the example.
 You can watch only two streamers per time. With `priority` settings, you can select which streamers watch by use priority. You can use an array of priority or single item. I suggest using at least one priority from `ORDER`, `POINTS_ASCENDING`, `POINTS_DESCEDING` because, for example, If you set only `STREAK` after catch all watch streak, the script will stop to watch streamers.
