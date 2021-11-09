@@ -396,7 +396,7 @@ class Twitch(object):
                 self.claim_bonus(streamer, community_points["availableClaim"]["id"])
 
     def make_predictions(self, event):
-        decision = event.bet.calculate(event.streamer.channel_points)
+        decision = event.bet.calculate(event.streamer.channel_points, event.title)
         selector_index = 0 if decision["choice"] == "A" else 1
 
         logger.info(
@@ -407,7 +407,7 @@ class Twitch(object):
             },
         )
         if event.status == "ACTIVE":
-            skip, compared_value = event.bet.skip()
+            skip, compared_value = event.bet.skip(event.title)
             if skip is True:
                 logger.info(
                     f"Skip betting for the event {event}",
