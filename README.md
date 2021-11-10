@@ -1,4 +1,4 @@
-![Twitch Channel Points Miner - v2](./assets/banner.png)
+![Twitch Channel Points Miner - v2](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/banner.png)
 <p align="center">
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
 <a href="https://www.python.org/downloads/release/python-360/"><img alt="Python3" src="https://img.shields.io/badge/built%20for-Python≥3.6-red.svg?style=flat"></a>
@@ -58,7 +58,7 @@ If you want to offer me a coffee, I would be grateful ❤️
 
 <a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
-If you have any issues or you want to contribute, you are welcome! But please before read the [CONTRIBUTING.md](/CONTRIBUTING.md)
+If you have any issues or you want to contribute, you are welcome! But please before read the [CONTRIBUTING.md](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/CONTRIBUTING.md) file.
 
 ## Main differences from the original repository:
 
@@ -171,15 +171,23 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 ```
 
 ## How to use:
+### Download via pip
+Via pip you can download the stable version of the project.
+
+`pip install Twitch-Channel-Points-Miner-v2`
+
+### Download via Github
+Via GitHub you can download the latest version of the project.
 1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
-2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements, make sure to have at least Python3.6. You could also try to create a virtualenv and then install all the requirements
+2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements, make sure to have at least Python3.6. You could also try to create a _virtualenv_ and then install all the requirements
 ```sh
 pip install virtualenv
 virtualenv -p python3 venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
-3. Create your `run.py` file start from [example.py](/example.py)
+
+Then create your `run.py` file start from [example.py](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/example.py).
 ```python
 # -*- coding: utf-8 -*-
 
@@ -276,7 +284,7 @@ from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
 twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Blacklist example
 ```
-4. Start mining! `python run.py`
+Start mining! `python run.py` 🥳
 
 ### Limits
 > Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
@@ -371,7 +379,7 @@ ColorPalette(
 - **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same as select LOWEST_ODDS
 - **SMART**: If the majority in percent chose an option, then follow the other users, otherwise select the option with the highest odds
 
-![Screenshot](./assets/prediction.png)
+![Screenshot](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/prediction.png)
 
 Here a concrete example:
 
@@ -428,7 +436,7 @@ If you want you can toggle the dark theme with the dedicated checkbox.
 
 | Light theme | Dark theme |
 | ----------- | ---------- |
-| ![Light theme](./assets/chart-analytics-light.png) | ![Dark theme](./assets/chart-analytics-dark.png) |
+| ![Light theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-light.png) | ![Dark theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-dark.png) |
 
 For use this feature just call the `analytics` method before start mining. Read more at: [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
 The chart will be autofreshed each `refresh` minutes. If you want to connect from one to second machine that have that webpanel you have to use `0.0.0.0` instead of `127.0.0.1`.
