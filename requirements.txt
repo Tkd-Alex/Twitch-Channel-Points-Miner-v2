@@ -9,3 +9,4 @@ pre-commit==2.13.0
 colorama==0.4.4
 flask==2.0.1
 irc==19.0.1
+pandas==1.3.4

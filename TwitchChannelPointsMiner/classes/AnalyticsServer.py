@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from threading import Thread
 
+import pandas as pd
 from flask import Flask, Response, cli, render_template, request
 
 from TwitchChannelPointsMiner.classes.Settings import Settings
@@ -22,29 +23,59 @@ def streamers_available():
     ]
 
 
+def aggregate(df, freq="30Min"):
+    df_base_events = df[(df.z == "Watch") | (df.z == "Claim")]
+    df_other_events = df[(df.z != "Watch") & (df.z != "Claim")]
+
+    be = df_base_events.groupby([pd.Grouper(freq=freq, key="datetime"), "z"]).max()
+    be = be.reset_index()
+
+    oe = df_other_events.groupby([pd.Grouper(freq=freq, key="datetime"), "z"]).max()
+    oe = oe.reset_index()
+
+    result = pd.concat([be, oe])
+    return result
+
+
 def filter_datas(start_date, end_date, datas):
     # Note: https://stackoverflow.com/questions/4676195/why-do-i-need-to-multiply-unix-timestamps-by-1000-in-javascript
     start_date = (
-        datetime.strptime(start_date, "%Y-%m-%d").timestamp() * 1000
-        if start_date is not None
-        else 0
+        datetime.strptime(start_date, "%Y-%m-%d") if start_date is not None else 0
     )
     end_date = (
-        datetime.strptime(end_date, "%Y-%m-%d").timestamp() * 1000
+        datetime.strptime(end_date, "%Y-%m-%d")
         if end_date is not None
-        else datetime.now().timestamp() * 1000
+        else datetime.now()
     )
 
-    datas["series"] = (
-        [d for d in datas["series"] if start_date <= d["x"] <= end_date]
-        if "series" in datas
-        else []
-    )
-    datas["annotations"] = (
-        [d for d in datas["annotations"] if start_date <= d["x"] <= end_date]
-        if "annotations" in datas
-        else []
-    )
+    if "series" in datas:
+        df = pd.DataFrame(datas["series"])
+        df["datetime"] = pd.to_datetime(df.x // 1000, unit="s")
+
+        df = df[(df["datetime"] > start_date) & (df["datetime"] <= end_date)]
+        df = aggregate(df)
+
+        datas["series"] = (
+            df.drop(columns="datetime")
+            .sort_values(by="x", ascending=True)
+            .to_dict("records")
+        )
+    else:
+        datas["series"] = []
+
+    if "annotations" in datas:
+        df = pd.DataFrame(datas["annotations"])
+        df["datetime"] = pd.to_datetime(df.x // 1000, unit="s")
+
+        df = df[(df["datetime"] > start_date) & (df["datetime"] <= end_date)]
+
+        datas["annotations"] = (
+            df.drop(columns="datetime")
+            .sort_values(by="x", ascending=True)
+            .to_dict("records")
+        )
+    else:
+        datas["annotations"] = []
 
     return datas
 
