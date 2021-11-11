@@ -164,7 +164,13 @@ def download_assets(assets_folder, required_files):
 
 
 def check_assets():
-    required_files = ["banner.png", "charts.html", "dark-theme.css"]
+    required_files = [
+        "banner.png",
+        "charts.html",
+        "script.js",
+        "style.css",
+        "dark-theme.css",
+    ]
     assets_folder = os.path.join(Path().absolute(), "assets")
     if os.path.isdir(assets_folder) is False:
         logger.info(f"Assets folder not found at {assets_folder}")
