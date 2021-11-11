@@ -4,11 +4,13 @@ import socket
 import time
 from copy import deepcopy
 from datetime import datetime, timezone
+from os import path
 from random import randrange
 
+import requests
 from millify import millify
 
-from TwitchChannelPointsMiner.constants import USER_AGENTS
+from TwitchChannelPointsMiner.constants import USER_AGENTS, GITHUB_url
 
 
 def _millify(input, precision=2):
@@ -154,3 +156,27 @@ def percentage(a, b):
 
 def create_chunks(lst, n):
     return [lst[i : (i + n)] for i in range(0, len(lst), n)]  # noqa: E203
+
+
+def download_file(name, fpath):
+    r = requests.get(path.join(GITHUB_url, name), stream=True)
+    with open(fpath, "wb") as f:
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+    return True
+
+
+def read(fname):
+    return open(path.join(path.dirname(__file__), fname), encoding="utf-8").read()
+
+
+def init2dict(content):
+    return dict(re.findall(r"""__([a-z]+)__ = "([^"]+)""", content))
+
+
+def check_versions():
+    current_version = init2dict(read("__init__.py"))["version"]
+    r = requests.get(path.join(GITHUB_url, "TwitchChannelPointsMiner", "__init__.py"))
+    github_version = init2dict(r.text)["version"]
+    return current_version, github_version

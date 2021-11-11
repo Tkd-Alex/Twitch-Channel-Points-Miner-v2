@@ -26,6 +26,7 @@ from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
 from TwitchChannelPointsMiner.utils import (
     _millify,
     at_least_one_value_in_settings_is,
+    check_versions,
     get_user_agent,
     internet_connection_available,
     set_default_settings,
@@ -108,6 +109,12 @@ class TwitchChannelPointsMiner:
         self.original_streamers = []
 
         self.logs_file = configure_loggers(self.username, logger_settings)
+
+        # Check for the latest version of the script
+        current_version, github_version = check_versions()
+        if current_version != github_version:
+            logger.info(f"You are running the version {current_version} of this script")
+            logger.info(f"The latest version on GitHub is: {github_version}")
 
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
