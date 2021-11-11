@@ -41,19 +41,21 @@ def aggregate(df, freq="30Min"):
 def filter_datas(start_date, end_date, datas):
     # Note: https://stackoverflow.com/questions/4676195/why-do-i-need-to-multiply-unix-timestamps-by-1000-in-javascript
     start_date = (
-        datetime.strptime(start_date, "%Y-%m-%d") if start_date is not None else 0
+        datetime.strptime(start_date, "%Y-%m-%d").timestamp() * 1000
+        if start_date is not None
+        else 0
     )
     end_date = (
         datetime.strptime(end_date, "%Y-%m-%d")
         if end_date is not None
         else datetime.now()
-    )
+    ).timestamp() * 1000
 
     if "series" in datas:
         df = pd.DataFrame(datas["series"])
         df["datetime"] = pd.to_datetime(df.x // 1000, unit="s")
 
-        df = df[(df["datetime"] > start_date) & (df["datetime"] <= end_date)]
+        df = df[(df.x >= start_date) & (df.x <= end_date)]
         df = aggregate(df)
 
         datas["series"] = (
@@ -68,7 +70,7 @@ def filter_datas(start_date, end_date, datas):
         df = pd.DataFrame(datas["annotations"])
         df["datetime"] = pd.to_datetime(df.x // 1000, unit="s")
 
-        df = df[(df["datetime"] > start_date) & (df["datetime"] <= end_date)]
+        df = df[(df.x >= start_date) & (df.x <= end_date)]
 
         datas["annotations"] = (
             df.drop(columns="datetime")
