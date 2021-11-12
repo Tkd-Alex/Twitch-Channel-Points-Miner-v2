@@ -112,7 +112,11 @@ class TwitchChannelPointsMiner:
 
         # Check for the latest version of the script
         current_version, github_version = check_versions()
-        if current_version != github_version:
+        if github_version == "0.0.0":
+            logger.error(
+                "Unable to detect if you have the latest version of this script"
+            )
+        elif current_version != github_version:
             logger.info(f"You are running the version {current_version} of this script")
             logger.info(f"The latest version on GitHub is: {github_version}")
 
