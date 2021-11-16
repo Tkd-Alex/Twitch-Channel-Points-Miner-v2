@@ -10,6 +10,14 @@ class Priority(Enum):
     POINTS_DESCEDING = auto()
 
 
+class FollowersOrder(Enum):
+    ASC = auto()
+    DESC = auto()
+
+    def __str__(self):
+        return self.name
+
+
 # Empty object shared between class
 class Settings(object):
     __slots__ = ["logger", "streamer_settings"]
