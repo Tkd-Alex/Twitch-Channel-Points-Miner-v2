@@ -76,6 +76,6 @@ twitch_miner.mine(
         "streamer-username10",
         "streamer-username11"
     ],                                 # Array of streamers (order = priority)
-    followers=False,                   # Automatic download the list of your followers (unable to set custom settings for you followers list)
-    order=FollowersOrder.ASC           # Order of the followers list. ASC or DESC
+    followers=False,                   # Automatic download the list of your followers
+    order=FollowersOrder.ASC           # Sort the followers list by follow date. ASC or DESC
 )

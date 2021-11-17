@@ -267,8 +267,8 @@ twitch_miner.mine(
         "streamer-username10",
         "streamer-username11"
     ],                                 # Array of streamers (order = priority)
-    followers=False,                   # Automatic download the list of your followers (unable to set custom settings for you followers list)
-    order=FollowersOrder.ASC           # Order of the followers list. ASC or DESC
+    followers=False,                   # Automatic download the list of your followers
+    order=FollowersOrder.ASC           # Sort the followers list by follow date. ASC or DESC
 )
 ```
 You can also use all the default values except for your username obv. Short version:
@@ -291,7 +291,7 @@ Start mining! `python run.py` 🥳
 ### Limits
 > Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
 
-Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow has the highest priority.
+Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` you can choose to download the followers sorted by follow date (ASC or DESC).
 
 ## Settings
 Most of the settings are self-explained and are commented on in the example.
