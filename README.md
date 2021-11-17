@@ -377,6 +377,7 @@ ColorPalette(
 - **MOST_VOTED**: Select the option most voted based on users count
 - **HIGH_ODDS**: Select the option with the highest odds
 - **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same as select LOWEST_ODDS
+- **SMART_MONEY**: Select the option with the highest points placed. [#331](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/331)
 - **SMART**: If the majority in percent chose an option, then follow the other users, otherwise select the option with the highest odds
 
 ![Screenshot](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/prediction.png)
