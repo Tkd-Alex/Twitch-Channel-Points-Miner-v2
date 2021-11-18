@@ -293,7 +293,7 @@ Install the package via pip, you will find a stable version - maybe a different 
 
 The following file is mounted :
 
-- main.py : this is your starter script with your configuration
+- run.py : this is your starter script with your configuration
 
 These folders are mounted :
 
@@ -301,14 +301,14 @@ These folders are mounted :
 - cookies : to provide login information
 - logs : to keep logs outside of container
 
-Example using docker-compose:
+**Example using docker-compose:**
 
 ```yml
 version: "3.9"
 
 services:
   miner:
-    image: mrcraftcod/twitch-miner
+    image: tkdalex/twitch-channel-points-miner-v2
     tty: true
     environment:
       - TERM=xterm-256color
@@ -316,9 +316,20 @@ services:
       - ./analytics:/usr/src/app/analytics
       - ./cookies:/usr/src/app/cookies
       - ./logs:/usr/src/app/logs
-      - ./main.py:/usr/src/app/main.py:ro
+      - ./run.py:/usr/src/app/run.py:ro
     ports:
       - "5000:5000"
+```
+
+Example with docker run:
+```sh
+docker run \
+    -v $(pwd)/analytics:/usr/src/app/analytics \
+    -v $(pwd)/cookies:/usr/src/app/cookies \
+    -v $(pwd)/logs:/usr/src/app/logs \
+    -v $(pwd)/run.py:/usr/src/app/run.py:ro \
+    -p 5000:5000 \
+    tkdalex/twitch-channel-points-miner-v2
 ```
 
 ### Limits

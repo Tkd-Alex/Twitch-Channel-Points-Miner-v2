@@ -4,7 +4,8 @@ ARG BUILDX_QEMU_ENV
 
 WORKDIR /usr/src/app
 
-COPY ./miner/requirements.txt ./
+COPY ./requirements.txt ./
+
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-install-recommends \
     gcc \
@@ -25,5 +26,5 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /usr/share/doc/*
 
-COPY ./miner .
-CMD [ "python", "./main.py" ]
+ADD ./TwitchChannelPointsMiner ./TwitchChannelPointsMiner
+ENTRYPOINT [ "python", "run.py" ]
