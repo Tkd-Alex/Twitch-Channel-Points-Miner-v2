@@ -26,6 +26,8 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
     - [Less logs](#less-logs)
     - [Final report](#final-report)
 4. 🧐 [How to use](#how-to-use)
+    - [Cloning](#by-cloning-the-repository)
+    - [Docker](#docker)
     - [Limits](#limits)
 5. 🔧 [Settings](#settings)
     - [LoggerSettings](#loggersettings)
@@ -159,6 +161,9 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 ```
 
 ## How to use:
+
+### By cloning the repository
+
 1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
 2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements make sure to have at least Python3.6. You could also try to create a virtualenv and then install all the requirements
 ```sh
@@ -261,6 +266,38 @@ twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
 twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Automatic use the followers list OR
 ```
 4. Start mining! `python run.py`
+
+### Docker
+
+The following file is mounted :
+
+- main.py : this is your starter script with your configuration
+
+These folders are mounted :
+
+- analytics : to save the analytics data
+- cookies : to provide login information
+- logs : to keep logs outside of container
+
+Example using docker-compose:
+
+```yml
+version: "3.9"
+
+services:
+  miner:
+    image: mrcraftcod/twitch-miner
+    tty: true
+    environment:
+      - TERM=xterm-256color
+    volumes:
+      - ./analytics:/usr/src/app/analytics
+      - ./cookies:/usr/src/app/cookies
+      - ./logs:/usr/src/app/logs
+      - ./main.py:/usr/src/app/main.py:ro
+    ports:
+      - "5000:5000"
+```
 
 ### Limits
 > Twitch has a limit - you can't watch more than 2 channels at one time. We take the first two streamers from the list as they have the highest priority.
