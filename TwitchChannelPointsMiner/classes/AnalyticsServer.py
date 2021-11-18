@@ -49,7 +49,7 @@ def filter_datas(start_date, end_date, datas):
         datetime.strptime(end_date, "%Y-%m-%d")
         if end_date is not None
         else datetime.now()
-    ).timestamp() * 1000
+    ).replace(hour=23, minute=59, second=59).timestamp() * 1000
 
     if "series" in datas:
         df = pd.DataFrame(datas["series"])
