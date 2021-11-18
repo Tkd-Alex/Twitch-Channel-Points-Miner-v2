@@ -1,4 +1,4 @@
-name: Doploy on Docker hub
+name: Deploy on Docker hub
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy-docker:
-    name: Deploy docker hub
+    name: Deploy Docker Hub
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -28,7 +28,7 @@ jobs:
           context: .
           push: true
           tags: |
-            mrcraftcod/twitch-miner:latest
+             tkdalex/twitch-channel-points-miner-v2:latest
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: BUILDX_QEMU_ENV=true
       - name: Image digest
