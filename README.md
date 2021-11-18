@@ -1,4 +1,4 @@
-![Twitch Channel Points Miner - v2](./assets/banner.png)
+![Twitch Channel Points Miner - v2](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/banner.png)
 <p align="center">
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
 <a href="https://www.python.org/downloads/release/python-360/"><img alt="Python3" src="https://img.shields.io/badge/built%20for-Python≥3.6-red.svg?style=flat"></a>
@@ -18,6 +18,14 @@
 
 Read more about channels point [here](https://help.twitch.tv/s/article/channel-points-guide)
 
+## 📢 Help wanted
+Currently, we have a lot of PRs requests opened, but the time to test and improve It's less and less. If you want to help the community and the project, please test the following PRs and give us feedback:
+- [Features/improvements to analytics #131](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/131)
+- [Add SMART_HIGH_ODDS strategy #172](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/172)
+- [Replace join_chat boolean with chat: ChatPresence #253](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/253)
+- [Receive updates to Telegram #254](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/254)
+- [Add stats #318](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/318)
+
 # README Contents
 1. 🤝 [Community](#community)
 2. 🚀 [Main differences from the original repository](#main-differences-from-the-original-repository)
@@ -27,6 +35,7 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
     - [Final report](#final-report)
 4. 🧐 [How to use](#how-to-use)
     - [Cloning](#by-cloning-the-repository)
+    - [pip](#pip)
     - [Docker](#docker)
     - [Limits](#limits)
 5. 🔧 [Settings](#settings)
@@ -36,21 +45,23 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
         - [Bet strategy](#bet-strategy)
     - [FilterCondition](#filtercondition)
         - [Example](#example)
-6. 🍪 [Migrating from old repository (the original one)](#migrating-from-old-repository-the-original-one)
-7. 🪟 [Windows](#windows)
-8. ⚠️ [Disclaimer](#disclaimer)
+6. 📈 [Analytics](#analytics)
+7. 🍪 [Migrating from an old repository (the original one)](#migrating-from-an-old-repository-the-original-one)
+8. 🪟 [Windows](#windows)
+9. 📱 [Termux](#termux)
+10. ⚠️ [Disclaimer](#disclaimer)
 
 
 ## Community
-If you have any type of issue, you need help, or you just want to suggest a new feature, please open a GitHub Issue. Don't write me on [Instagram](https://www.instagram.com/tkd_alex/), [Telegram](https://t.me/TkdAlex), [Discord](https://discordapp.com/users/641397388132483121), [Twitter](https://twitter.com/TkdAxel) (but you can follow me 😆) or somewhere else. If you don't have an account on this platform, you can create it. It's free. I do not want to be rude, but if you have a problem, maybe another user can also have the same problem, and your issue can help the community. Same for the new feature, your idea can help other users, and It's beautiful to discuss between us.
+If you have any type of issue, need help, or want to suggest a new feature, please open a GitHub Issue. Don't write me on [Instagram](https://www.instagram.com/tkd_alex/), [Telegram](https://t.me/TkdAlex), [Discord](https://discordapp.com/users/641397388132483121), [Twitter](https://twitter.com/TkdAxel) (but you can follow me 😆) or somewhere else. If you don't have an account on this platform, you can create it. It's free. I do not want to be rude, but if you have a problem, maybe another user can also have the same problem, and your issue can help the community. Same for the new feature, your idea can help other users, and It's beautiful to discuss between us.
 
 If you want to help on this project, please leave a star 🌟 and share it with your friends! 😎
 
-A coffee is always a gesture of LOVE ❤️
+If you want to offer me a coffee, I would be grateful ❤️
 
 <a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
-If you have any issues or you want to contribute, you are welcome! But please before read the [CONTRIBUTING.md](/CONTRIBUTING.md)
+If you have any issues or you want to contribute, you are welcome! But please before read the [CONTRIBUTING.md](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/CONTRIBUTING.md) file.
 
 ## Main differences from the original repository:
 
@@ -62,6 +73,8 @@ If you have any issues or you want to contribute, you are welcome! But please be
 - Auto claim game drops from Twitch inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) Read more about game drops [here](https://help.twitch.tv/s/article/mission-based-drops)
 - Place the bet / make a prediction and win or lose (🍀) your channel points!
 No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/41) ([@lay295](https://github.com/lay295))
+- Analytics chart that show the progress of your points with various annotations [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
+- Join IRC Chat for increase watch-time and get StreamElements points [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47)
 
 ## Logs feature
 ### Full logs
@@ -161,18 +174,7 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 ```
 
 ## How to use:
-
-### By cloning the repository
-
-1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
-2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements make sure to have at least Python3.6. You could also try to create a virtualenv and then install all the requirements
-```sh
-pip install virtualenv
-virtualenv -p python3 venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-3. Create your `run.py` file start from [example.py](/example.py)
+First of all please create a run.py file. You can just copy [example.py](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/example.py) and modify it according to your needs.
 ```python
 # -*- coding: utf-8 -*-
 
@@ -181,17 +183,17 @@ from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
 from TwitchChannelPointsMiner.classes.Settings import Priority
-from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition
+from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
-    password="write-your-secure-psw",           # If no password will be provided the script will ask interactively
-    claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on startup
+    password="write-your-secure-psw",           # If no password will be provided, the script will ask interactively
+    claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on the startup
     priority=[                                  # Custom priority in this case for example:
-        Priority.STREAK,                        # - we want first of all to catch all watch streak from all streamers
-        Priority.DROPS,                         # - when we don't have anymore watch streak to catch wait until all drops are collected over the streamers
-        Priority.ORDER                          # - when we have all of drops claimed and no watch-streak avaialable use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
+        Priority.STREAK,                        # - We want first of all to catch all watch streak from all streamers
+        Priority.DROPS,                         # - When we don't have anymore watch streak to catch, wait until all drops are collected over the streamers
+        Priority.ORDER                          # - When we have all of the  drops claimed and no watch-streak available, use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
     ],
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
@@ -201,7 +203,7 @@ twitch_miner = TwitchChannelPointsMiner(
         less=False,                             # If you think that the logs are too verbose, set this to True
         colored=True,                           # If you want to print colored text
         color_palette=ColorPalette(             # You can also create a custom palette color (for the common message).
-            STREAMER_online="GREEN",            # Don't worry about lower/upper case the script will be parse all the values.
+            STREAMER_online="GREEN",            # Don't worry about lower/upper case. The script will parse all the values.
             streamer_offline="red",             # Read more in README.md
             BET_wiN=Fore.MAGENTA                # Color allowed are: [BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET].
         )
@@ -211,15 +213,19 @@ twitch_miner = TwitchChannelPointsMiner(
         follow_raid=True,                       # Follow raid to obtain more points
         claim_drops=True,                       # We can't filter rewards base on stream. Set to False for skip viewing counter increase and you will never obtain a drop reward from this script. Issue #21
         watch_streak=True,                      # If a streamer go online change the priotiry of streamers array and catch the watch screak. Issue #11
+        join_chat=True,                         # Join irc chat to increase watch-time
         bet=BetSettings(
             strategy=Strategy.SMART,            # Choose you strategy!
             percentage=5,                       # Place the x% of your channel points
             percentage_gap=20,                  # Gap difference between outcomesA and outcomesB (for SMART stragegy)
             max_points=50000,                   # If the x percentage of your channel points is gt bet_max_points set this value
-            stealth_mode=True,                  # If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points #33
+            stealth_mode=True,                  # If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points Issue #33
+            delay_mode=DelayMode.FROM_END,      # When placing a bet, we will wait until `delay` seconds before the end of the timer
+            delay=6,
+            minimum_points=2000,                # Place the bet only if we have at least 20k points. Issue #113
             filter_condition=FilterCondition(
-                by=OutcomeKeys.TOTAL_USERS,    # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
-                where=Condition.LTE,           # 'by' must be [GT, LT, GTE, LTE] than value
+                by=OutcomeKeys.TOTAL_USERS,     # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
+                where=Condition.LTE,            # 'by' must be [GT, LT, GTE, LTE] than value
                 value=800
             )
         )
@@ -259,13 +265,29 @@ twitch_miner.mine(["streamer1", "streamer2"])                   # Array of strea
 twitch_miner.mine(followers=True)                               # Automatic use the followers list OR
 twitch_miner.mine(["streamer1", "streamer2"], followers=True)   # Mixed
 ```
-If you follow so many streamers on Twitch, but you don't want to mine points for all of them, you can blacklist the users with `blacklist` keyword. [#94](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/94)
+If you follow so many streamers on Twitch, but you don't want to mine points for all of them, you can blacklist the users with the `blacklist` keyword. [#94](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/94)
 ```python
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
-twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Automatic use the followers list OR
+twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Blacklist example
 ```
-4. Start mining! `python run.py`
+
+### By cloning the repository
+1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
+2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements, make sure to have at least Python3.6. You could also try to create a _virtualenv_ and then install all the requirements
+```sh
+pip install virtualenv
+virtualenv -p python3 venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+Start mining! `python run.py` 🥳
+
+### pip
+Install the package via pip, you will find a stable version - maybe a different version from the master branch.
+- `pip install Twitch-Channel-Points-Miner-v2`
+- Exceute the run.py file `python run.py` 🥳
 
 ### Docker
 
@@ -300,16 +322,17 @@ services:
 ```
 
 ### Limits
-> Twitch has a limit - you can't watch more than 2 channels at one time. We take the first two streamers from the list as they have the highest priority.
+> Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
 
 Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` Twitch return the streamers order by followed_at. So your last follow has the highest priority.
 
 ## Settings
-Most of the settings are self-explained and are commented in example.
-You can watch only two streamers per time. With `priority` settings you can select which streamers watch by use priority. You can use an array of priority or single item. I suggest to use at least one priority from `ORDER`, `POINTS_ASCENDING`, `POINTS_DESCEDING` because for example If you set only `STREAK` after catch all watch streak the script will stop to watch streamers.
+Most of the settings are self-explained and are commented on in the example.
+You can watch only two streamers per time. With `priority` settings, you can select which streamers watch by use priority. You can use an array of priority or single item. I suggest using at least one priority from `ORDER`, `POINTS_ASCENDING`, `POINTS_DESCEDING` because, for example, If you set only `STREAK` after catch all watch streak, the script will stop to watch streamers.
 Available values are the following:
  - `STREAK` - Catch the watch streak from all streamers
  - `DROPS` - Claim all drops from streamers with drops tags enabled
+ - `SUBSCRIBED` - Prioritize streamers you're subscribed to (higher subscription tiers are mined first)
  - `ORDER` - Following the order of the list
  - `POINTS_ASCENDING` - On top the streamers with the lowest points
  - `POINTS_DESCEDING` - On top the streamers with the highest points
@@ -325,6 +348,7 @@ You can combine all priority but keep in mind that use `ORDER` and `POINTS_ASCEN
 | `file_level`    	| level 	        | logging.DEBUG                  	                                  | Level of logs in file save - If you think the log file it's too big, use logging.INFO 	                                                                                                  |
 | `emoji`         	| bool            	| For Windows is False else True 	                                  | On Windows, we have a problem printing emoji. Set to false if you have a problem      	                                                                                                  |
 | `colored`         | bool            	| True 	                                                              | If you want to print colored text [#45](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/45) [#82](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/82) |
+| `auto_clear`      | bool            	| True 	                                                              | Create a file rotation handler with interval = 1D and backupCount = 7 [#215](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/215)                                       |
 | `color_palette`   | ColorPalette      | All messages are Fore.RESET except WIN and LOSE bet (GREEN and RED) | Create your custom color palette. Read more above.      	                                                                                                                              |
 
 #### Color Palette
@@ -348,17 +372,18 @@ The script was developed to handle all the human error, lower-case upper case an
 ```python
 from colorama import Fore
 ColorPalette(
-    "STREAMER_ONLINE" = Fore.GREEN,
-    "STREAMER_OFFLINE" = Fore.RED,
-    "GAIN_FOR_RAID" = Fore.YELLOW,
-    "GAIN_FOR_CLAIM" = Fore.YELLOW,
-    "GAIN_FOR_WATCH" = Fore.YELLOW,
-    "BET_WIN" = Fore.GREEN,
-    "BET_LOSE" = Fore.RED,
-    "BET_REFUND" = Fore.RESET,
-    "BET_FILTERS" = Fore.MAGENTA,
-    "BET_GENERAL" = Fore.BLUE,
-    "BET_FAILED" = Fore.RED,
+    STREAMER_ONLINE = Fore.GREEN,
+    STREAMER_OFFLINE = Fore.RED,
+    GAIN_FOR_RAID = Fore.YELLOW,
+    GAIN_FOR_CLAIM = Fore.YELLOW,
+    GAIN_FOR_WATCH = Fore.YELLOW,
+    GAIN_FOR_WATCH_STREAK = Fore.YELLOW,
+    BET_WIN = Fore.GREEN,
+    BET_LOSE = Fore.RED,
+    BET_REFUND = Fore.RESET,
+    BET_FILTERS = Fore.MAGENTA,
+    BET_GENERAL = Fore.BLUE,
+    BET_FAILED = Fore.RED,
 )
 ```
 
@@ -367,34 +392,36 @@ ColorPalette(
 |--------------------	|-------------	|--------------------------------	|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `make_predictions` 	| bool        	| True                           	| Choose if you want to make predictions / bet or not                                                                                                  	                                                                            |
 | `follow_raid`      	| bool        	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	                                                                            |
-| `claim_drops`      	| bool        	| True                           	| If this value is True, the script will increase the watch-time for the current game. With this, you are able to claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) |
+| `claim_drops`      	| bool        	| True                           	| If this value is True, the script will increase the watch-time for the current game. With this, you can claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21)         |
 | `watch_streak`     	| bool        	| True                           	| Choose if you want to change a priority for these streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                   |
+| `join_chat` 	        | bool 	        | True                           	| Join IRC-Chat to appear online in chat and attempt to get StreamElements channel points and increase view-time  [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47)                                     |
 | `bet`              	| BetSettings 	|  	                                | Rules to follow for the bet                                                                                                                                                                                                       |
 ### BetSettings
-| Key                	| Type            	| Default 	| Description                                                                                                    	                                                                     |
-|--------------------	|-----------------	|---------	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `strategy`         	| Strategy        	| SMART   	| Choose your strategy! See above for more info                                                                  	                                                                     |
-| `percentage`       	| int             	| 5       	| Place the x% of your channel points                                                                            	                                                                     |
-| `percentage_gap`   	| int             	| 20      	| Gap difference between outcomesA and outcomesB (for SMART stragegy)                                            	                                                                     |
-| `max_points`       	| int             	| 50000   	| If the x percentage of your channel points is GT bet_max_points set this value                                 	                                                                     |
-| `stealth_mode`     	| bool            	| False   	| If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points [#33](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/33) |
-| `filter_condition` 	| FilterCondition 	| None    	| Based on this filter the script will skip some bet [#29](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/29)                                                         |
+| Key                	| Type            	| Default 	| Description                                                                                                    	                                                                          |
+|--------------------	|-----------------	|---------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `strategy`         	| Strategy        	| SMART   	| Choose your strategy! See above for more info                                                                  	                                                                          |
+| `percentage`       	| int             	| 5       	| Place the x% of your channel points                                                                            	                                                                          |
+| `percentage_gap`   	| int             	| 20      	| Gap difference between outcomesA and outcomesB (for SMART stragegy)                                            	                                                                          |
+| `max_points`       	| int             	| 50000   	| If the x percentage of your channel points is GT bet_max_points set this value                                 	                                                                          |
+| `stealth_mode`     	| bool            	| False   	| If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points [#33](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/33)      |
+| `delay_mode` 	        | DelayMode         	| FROM_END	| Define how is calculating the waiting time before placing a bet |
+| `delay` 	        | float             	| 6     	| Value to be used to calculate bet delay depending on `delay_mode` value |
 
 #### Bet strategy
 
 - **MOST_VOTED**: Select the option most voted based on users count
 - **HIGH_ODDS**: Select the option with the highest odds
 - **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same as select LOWEST_ODDS
-- **SMART**: If the majority in percent chose an option, then follow the other users, otherwise choose the option with the highest odds
+- **SMART**: If the majority in percent chose an option, then follow the other users, otherwise select the option with the highest odds
 
-![Screenshot](./assets/prediction.png)
+![Screenshot](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/prediction.png)
 
 Here a concrete example:
 
 - **MOST_VOTED**: 21 Users have select **'over 7.5'**, instead of 9 'under 7.5'
 - **HIGH_ODDS**: The highest odd is 2.27 on **'over 7.5'** vs 1.79 on 'under 7.5'
 - **PERCENTAGE**: The highest percentage is 56% for **'under 7.5'**
-- **SMART**: Calculate the percentage based on the users. The percentages are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percentages are higher than `percentage_gap` select the highest percentage, else the highest odds.
+- **SMART**: Calculate the percentage based on the users. The percentages are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percentages is higher than `percentage_gap` select the highest percentage, else the highest odds.
 
 In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 ### FilterCondition
@@ -424,8 +451,39 @@ Allowed values for `where` are: `GT, LT, GTE, LTE`
 - If you want to place the bet ONLY if the highest bet is lower than 2000
 `FilterCondition(by=OutcomeKeys.TOP_POINTS, where=Condition.LT, value=2000)`
 
+### DelayMode
+
+- **FROM_START**: Will wait `delay` seconds from when the bet was opened
+- **FROM_END**: Will until there is `delay` seconds left to place the bet
+- **PERCENTAGE**: Will place the bet when `delay` percent of the set timer is elapsed
+
+Here's a concrete example. Let's suppose we have a bet that is opened with a timer of 10 minutes:
+
+- **FROM_START** with `delay=20`: The bet will be placed 20s after the bet is opened
+- **FROM_END** with `delay=20`: The bet will be placed 20s before the end of the bet (so 9mins 40s after the bet is opened)
+- **PERCENTAGE** with `delay=0.2`: The bet will be placed when the timer went down by 20% (so 2mins after the bet is opened)
+
+## Analytics
+We have recently introduced a little frontend where you can show with a chart you points trend. The script will spawn a Flask web-server on your machine where you can select binding address and port.
+The chart provides some annotation to handle the prediction and watch strike events. Usually annotation are used to notice big increase / decrease of points. If you want to can disable annotations.
+On each (x, y) points Its present a tooltip that show points, date time and reason of points gained / lost. This web page was just a funny idea, and it is not intended to use for a professional usage.
+If you want you can toggle the dark theme with the dedicated checkbox.
+
+| Light theme | Dark theme |
+| ----------- | ---------- |
+| ![Light theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-light.png) | ![Dark theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-dark.png) |
+
+For use this feature just call the `analytics` method before start mining. Read more at: [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
+The chart will be autofreshed each `refresh` minutes. If you want to connect from one to second machine that have that webpanel you have to use `0.0.0.0` instead of `127.0.0.1`.
+```python
+from TwitchChannelPointsMiner import TwitchChannelPointsMiner
+twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
+twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5)   # Analytics web-server
+twitch_miner.mine(followers=True, blacklist=["user1", "user2"])
+```
+
 ## Migrating from an old repository (the original one):
-If you already have a `twitch-cookies.pkl` and you don't want to login again, please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
+If you already have a `twitch-cookies.pkl` and you don't want to log in again, please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
 ```
 .
 +-- run.py
@@ -443,6 +501,36 @@ Other useful info can be founded here:
 - https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/55
 
 You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
+
+## Termux
+Install the requirements
+```
+pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib`
+LDFLAGS="-L${PREFIX}/lib/" CFLAGS="-I${PREFIX}/include/" pip install --upgrade wheel pillow
+```
+
+Clone this repository
+`git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
+
+(2 way):
+Download sources from GitHub and put it into your Termux storage
+
+Now you can enter the directory with our miner, type this command:
+`cd Twitch-Channel-Points-Miner-v2`
+
+Configure your miner on your preferences by typing
+`nano example.py`
+
+When you have configured it now we can rename it (optional):
+`mv example.py run.py`
+
+We have to also install dependences required to run miner:
+`pip install -r requirements.txt`
+
+Now when we did everything we can run miner:
+`python run.py`
+
+Read more at [#92](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/92) [#76](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/76)
 
 ## Disclaimer
 This project comes with no guarantee or warranty. You are responsible for whatever happens from using this project. It is possible to get soft or hard banned by using this project if you are not careful. This is a personal project and is in no way affiliated with Twitch.

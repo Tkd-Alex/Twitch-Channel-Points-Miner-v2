@@ -4,7 +4,7 @@
 
 Before you begin:
 - Have you read the [code of conduct](CODE_OF_CONDUCT.md)?
-- Check out the [existing issues](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues) & see if there is already an opened issued
+- Check out the [existing issues](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues) & see if there is already an opened issue.
 
 ### Ready to make a change? Fork the repo
 
@@ -72,14 +72,14 @@ Labels can help you find an issue you'd like to help with.
 - The `documentation` label is used when you suggest improvements or additions to documentation (README.md update)
 - The `duplicate` label is used when this issue or pull request already exists
 - The `enhancement` label is used when you ask for / or propose a new feature or request
-- The `help wanted` is used when labeling when you need help with something
+- The `help wanted` is used when you need help with something
 - The `improvements` label is used when you would suggest improvements on already existing features
 - The `invalid` label is used for a non-valid issue
-- The `question` label, is used for further information is requested
+- The `question` label is used for further information is requested
 - The `wontfix` label is used if we will not work on it
 
 ## Opening a pull request
-You can use the GitHub user interface :pencil2: for some small changes, like fixing a typo or updating a readme. You can also fork the repo and then clone it locally to view changes and run your tests on your machine.
+You can use the GitHub user interface :pencil2: for minor changes, like fixing a typo or updating a readme. You can also fork the repo and then clone it locally to view changes and run your tests on your machine.
 
 ### Self review
 You should always review your own PR first.

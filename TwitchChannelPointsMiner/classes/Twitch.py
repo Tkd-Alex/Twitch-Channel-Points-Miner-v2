@@ -23,8 +23,12 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
 )
 from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
-from TwitchChannelPointsMiner.constants import API, CLIENT_ID, GQLOperations
-from TwitchChannelPointsMiner.utils import _millify, internet_connection_available
+from TwitchChannelPointsMiner.constants import CLIENT_ID, GQLOperations
+from TwitchChannelPointsMiner.utils import (
+    _millify,
+    create_chunks,
+    internet_connection_available,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -139,33 +143,34 @@ class Twitch(object):
                 streamer.set_offline()
 
     def get_channel_id(self, streamer_username):
-        json_response = self.__do_helix_request(f"/users?login={streamer_username}")
-        if "data" not in json_response:
+        json_data = copy.deepcopy(GQLOperations.ReportMenuItem)
+        json_data["variables"] = {"channelLogin": streamer_username}
+        json_response = self.post_gql_request(json_data)
+        if (
+            "data" not in json_response
+            or "user" not in json_response["data"]
+            or json_response["data"]["user"] is None
+        ):
             raise StreamerDoesNotExistException
         else:
-            data = json_response["data"]
-            if len(data) >= 1:
-                return data[0]["id"]
-            else:
-                raise StreamerDoesNotExistException
+            return json_response["data"]["user"]["id"]
 
-    def get_followers(self, first=100):
-        followers = []
-        pagination = {}
-        while 1:
-            query = f"/users/follows?from_id={self.twitch_login.get_user_id()}&first={first}"
-            if pagination != {}:
-                query += f"&after={pagination['cursor']}"
-
-            json_response = self.__do_helix_request(query)
-            pagination = json_response["pagination"]
-            followers += [fw["to_login"].lower() for fw in json_response["data"]]
-            time.sleep(random.uniform(0.3, 0.7))
-
-            if pagination == {}:
-                break
-
-        return followers
+    def get_followers(self):
+        json_data = copy.deepcopy(GQLOperations.PersonalSections)
+        json_response = self.post_gql_request(json_data)
+        try:
+            if (
+                "data" in json_response
+                and "personalSections" in json_response["data"]
+                and json_response["data"]["personalSections"] != []
+            ):
+                return [
+                    fw["user"]["login"]
+                    for fw in json_response["data"]["personalSections"][0]["items"]
+                    if fw["user"] is not None
+                ]
+        except KeyError:
+            return []
 
     def update_raid(self, streamer, raid):
         if streamer.raid != raid:
@@ -206,14 +211,6 @@ class Twitch(object):
                 f"No internet connection available! Retry after {random_sleep}m"
             )
             self.__chuncked_sleep(random_sleep * 60, chunk_size=chunk_size)
-
-    def __do_helix_request(self, query, response_as_json=True):
-        url = f"{API}/helix/{query.strip('/')}"
-        response = self.twitch_login.session.get(url)
-        logger.debug(
-            f"Query: {query}, Status code: {response.status_code}, Content: {response.json()}"
-        )
-        return response.json() if response_as_json is True else response
 
     def post_gql_request(self, json_data):
         try:
@@ -310,6 +307,19 @@ class Twitch(object):
                                 if len(streamers_watching) == 2:
                                     break
 
+                    elif prior == Priority.SUBSCRIBED and len(streamers_watching) < 2:
+                        streamers_with_multiplier = [
+                            index
+                            for index in streamers_index
+                            if streamers[index].viewer_has_points_multiplier()
+                        ]
+                        streamers_with_multiplier = sorted(
+                            streamers_with_multiplier,
+                            key=lambda x: streamers[x].total_points_multiplier(),
+                            reverse=True,
+                        )
+                        streamers_watching += streamers_with_multiplier[:2]
+
                 """
                 Twitch has a limit - you can't watch more than 2 channels at one time.
                 We take the first two streamers from the list as they have the highest priority (based on order or WatchStreak).
@@ -345,14 +355,12 @@ class Twitch(object):
                                         drop.has_preconditions_met is not False
                                         and drop.is_printable is True
                                     ):
-                                        # print("=" * 125)
                                         logger.info(
                                             f"{streamers[index]} is streaming {streamers[index].stream}"
                                         )
                                         logger.info(f"Campaign: {campaign}")
                                         logger.info(f"Drop: {drop}")
                                         logger.info(f"{drop.progress_bar()}")
-                                        # print("=" * 125)
 
                     except requests.exceptions.ConnectionError as e:
                         logger.error(f"Error while trying to send minute watched: {e}")
@@ -382,6 +390,7 @@ class Twitch(object):
             channel = response["data"]["community"]["channel"]
             community_points = channel["self"]["communityPoints"]
             streamer.channel_points = community_points["balance"]
+            streamer.activeMultipliers = community_points["activeMultipliers"]
 
             if community_points["availableClaim"] is not None:
                 self.claim_bonus(streamer, community_points["availableClaim"]["id"])
@@ -433,7 +442,29 @@ class Twitch(object):
                             "transactionID": token_hex(16),
                         }
                     }
-                    return self.post_gql_request(json_data)
+                    response = self.post_gql_request(json_data)
+                    if (
+                        "data" in response
+                        and "makePrediction" in response["data"]
+                        and "error" in response["data"]["makePrediction"]
+                        and response["data"]["makePrediction"]["error"] is not None
+                    ):
+                        error_code = response["data"]["makePrediction"]["error"]["code"]
+                        logger.error(
+                            f"Failed to place bet, error: {error_code}",
+                            extra={
+                                "emoji": ":four_leaf_clover:",
+                                "color": Settings.logger.color_palette.BET_FAILED,
+                            },
+                        )
+                else:
+                    logger.info(
+                        f"Bet won't be placed as the amount {_millify(decision['amount'])} is less than the minimum required 10",
+                        extra={
+                            "emoji": ":four_leaf_clover:",
+                            "color": Settings.logger.color_palette.BET_GENERAL,
+                        },
+                    )
         else:
             logger.info(
                 f"Oh no! The event is not active anymore! Current status: {event.status}",
@@ -489,16 +520,22 @@ class Twitch(object):
         return campaigns
 
     def __get_campaigns_details(self, campaigns):
-        json_data = []
-        for campaign in campaigns:
-            json_data.append(copy.deepcopy(GQLOperations.DropCampaignDetails))
-            json_data[-1]["variables"] = {
-                "dropID": campaign["id"],
-                "channelLogin": f"{self.twitch_login.get_user_id()}",
-            }
+        result = []
+        chunks = create_chunks(campaigns, 20)
+        for chunk in chunks:
+            json_data = []
+            for campaign in chunk:
+                json_data.append(copy.deepcopy(GQLOperations.DropCampaignDetails))
+                json_data[-1]["variables"] = {
+                    "dropID": campaign["id"],
+                    "channelLogin": f"{self.twitch_login.get_user_id()}",
+                }
 
-        response = self.post_gql_request(json_data)
-        return list(map(lambda x: x["data"]["user"]["dropCampaign"], response))
+            response = self.post_gql_request(json_data)
+            for r in response:
+                if r["data"]["user"] is not None:
+                    result.append(r["data"]["user"]["dropCampaign"])
+        return result
 
     def __sync_campaigns(self, campaigns):
         # We need the inventory only for get the real updated value/progress
@@ -530,7 +567,21 @@ class Twitch(object):
         json_data["variables"] = {"input": {"dropInstanceID": drop.drop_instance_id}}
         response = self.post_gql_request(json_data)
         try:
-            return response["data"]["claimDropRewards"]["status"] == "ELIGIBLE_FOR_ALL"
+            # response["data"]["claimDropRewards"] can be null and respose["data"]["errors"] != []
+            # or response["data"]["claimDropRewards"]["status"] === DROP_INSTANCE_ALREADY_CLAIMED
+            if ("claimDropRewards" in response["data"]) and (
+                response["data"]["claimDropRewards"] is None
+            ):
+                return False
+            elif ("errors" in response["data"]) and (response["data"]["errors"] != []):
+                return False
+            elif ("claimDropRewards" in response["data"]) and (
+                response["data"]["claimDropRewards"]["status"]
+                in ["ELIGIBLE_FOR_ALL", "DROP_INSTANCE_ALREADY_CLAIMED"]
+            ):
+                return True
+            else:
+                return False
         except (ValueError, KeyError):
             return False
 

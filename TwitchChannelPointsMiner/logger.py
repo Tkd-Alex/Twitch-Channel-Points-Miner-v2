@@ -2,6 +2,7 @@ import logging
 import os
 import platform
 from datetime import datetime
+from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
 import emoji
@@ -34,7 +35,7 @@ class GlobalFormatter(logging.Formatter):
             if "\u2192" in record.msg:
                 record.msg = record.msg.replace("\u2192", "-->")
 
-            # With the update of Stream class It's possible that the Stream Title contains emoji
+            # With the update of Stream class, the Stream Title may contain emoji
             # Full remove using a method from utils.
             record.msg = remove_emoji(record.msg)
 
@@ -52,6 +53,7 @@ class ColorPalette(object):
     GAIN_FOR_RAID = Fore.RESET
     GAIN_FOR_CLAIM = Fore.RESET
     GAIN_FOR_WATCH = Fore.RESET
+    GAIN_FOR_WATCH_STREAK = Fore.RESET
 
     BET_WIN = Fore.GREEN
     BET_LOSE = Fore.RED
@@ -103,6 +105,7 @@ class LoggerSettings:
         file_level: int = logging.DEBUG,
         emoji: bool = platform.system() != "Windows",
         colored: bool = False,
+        auto_clear: bool = True,
         color_palette: ColorPalette = ColorPalette(),
     ):
         self.save = save
@@ -111,6 +114,7 @@ class LoggerSettings:
         self.file_level = file_level
         self.emoji = emoji
         self.colored = colored
+        self.auto_clear = auto_clear
         self.color_palette = color_palette
 
 
@@ -141,11 +145,26 @@ def configure_loggers(username, settings):
     if settings.save is True:
         logs_path = os.path.join(Path().absolute(), "logs")
         Path(logs_path).mkdir(parents=True, exist_ok=True)
-        logs_file = os.path.join(
-            logs_path,
-            f"{username}.{datetime.now().strftime('%Y%m%d-%H%M%S')}.log",
-        )
-        file_handler = logging.FileHandler(logs_file, "w", "utf-8")
+        if settings.auto_clear is True:
+            logs_file = os.path.join(
+                logs_path,
+                f"{username}.log",
+            )
+            file_handler = TimedRotatingFileHandler(
+                logs_file,
+                when="D",
+                interval=1,
+                backupCount=7,
+                encoding="utf-8",
+                delay=False,
+            )
+        else:
+            logs_file = os.path.join(
+                logs_path,
+                f"{username}.{datetime.now().strftime('%Y%m%d-%H%M%S')}.log",
+            )
+            file_handler = logging.FileHandler(logs_file, "w", "utf-8")
+
         file_handler.setFormatter(
             logging.Formatter(
                 fmt="%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s",
