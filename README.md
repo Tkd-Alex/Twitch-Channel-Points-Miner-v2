@@ -332,6 +332,10 @@ docker run \
     tkdalex/twitch-channel-points-miner-v2
 ```
 
+`$(pwd)` Could not work on Windows (cmd), please us the absolute path instead, like: `-v /path/of/your/cookies:/usr/src/app/cookies`.
+If you don't mount the volume for the analytics (or cookies or logs) folder, the folder will be automatically created on the Docker container, and you will lose all the data when it is stopped.
+If you don't have a cookie or It's your first time running the script, you will need to login to Twitch and start the container with `-it` args.
+
 ### Limits
 > Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
 
