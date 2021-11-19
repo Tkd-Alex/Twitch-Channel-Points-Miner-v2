@@ -36,12 +36,13 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: BUILDX_QEMU_ENV=true
 
-      - name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-          repository: tkdalex/twitch-channel-points-miner-v2
+      # File size exceeds the maximum allowed 25000 bytes
+      # - name: Docker Hub Description
+      #   uses: peter-evans/dockerhub-description@v2
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_TOKEN }}
+      #     repository: tkdalex/twitch-channel-points-miner-v2
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
