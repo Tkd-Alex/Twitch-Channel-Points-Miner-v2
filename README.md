@@ -34,6 +34,9 @@ Currently, we have a lot of PRs requests opened, but the time to test and improv
     - [Less logs](#less-logs)
     - [Final report](#final-report)
 4. 🧐 [How to use](#how-to-use)
+    - [Cloning](#by-cloning-the-repository)
+    - [pip](#pip)
+    - [Docker](#docker)
     - [Limits](#limits)
 5. 🔧 [Settings](#settings)
     - [LoggerSettings](#loggersettings)
@@ -171,23 +174,7 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 ```
 
 ## How to use:
-### Download via pip
-Via pip you can download the stable version of the project.
-
-`pip install Twitch-Channel-Points-Miner-v2`
-
-### Download via Github
-Via GitHub you can download the latest version of the project.
-1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
-2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements, make sure to have at least Python3.6. You could also try to create a _virtualenv_ and then install all the requirements
-```sh
-pip install virtualenv
-virtualenv -p python3 venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-Then create your `run.py` file start from [example.py](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/example.py).
+First of all please create a run.py file. You can just copy [example.py](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/example.py) and modify it according to your needs.
 ```python
 # -*- coding: utf-8 -*-
 
@@ -284,7 +271,70 @@ from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
 twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Blacklist example
 ```
+
+### By cloning the repository
+1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
+2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements, make sure to have at least Python3.6. You could also try to create a _virtualenv_ and then install all the requirements
+```sh
+pip install virtualenv
+virtualenv -p python3 venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
 Start mining! `python run.py` 🥳
+
+### pip
+Install the package via pip, you will find a stable version - maybe a different version from the master branch.
+- `pip install Twitch-Channel-Points-Miner-v2`
+- Exceute the run.py file `python run.py` 🥳
+
+### Docker
+
+The following file is mounted :
+
+- run.py : this is your starter script with your configuration
+
+These folders are mounted :
+
+- analytics : to save the analytics data
+- cookies : to provide login information
+- logs : to keep logs outside of container
+
+**Example using docker-compose:**
+
+```yml
+version: "3.9"
+
+services:
+  miner:
+    image: tkdalex/twitch-channel-points-miner-v2
+    tty: true
+    environment:
+      - TERM=xterm-256color
+    volumes:
+      - ./analytics:/usr/src/app/analytics
+      - ./cookies:/usr/src/app/cookies
+      - ./logs:/usr/src/app/logs
+      - ./run.py:/usr/src/app/run.py:ro
+    ports:
+      - "5000:5000"
+```
+
+Example with docker run:
+```sh
+docker run \
+    -v $(pwd)/analytics:/usr/src/app/analytics \
+    -v $(pwd)/cookies:/usr/src/app/cookies \
+    -v $(pwd)/logs:/usr/src/app/logs \
+    -v $(pwd)/run.py:/usr/src/app/run.py:ro \
+    -p 5000:5000 \
+    tkdalex/twitch-channel-points-miner-v2
+```
+
+`$(pwd)` Could not work on Windows (cmd), please us the absolute path instead, like: `-v /path/of/your/cookies:/usr/src/app/cookies`.
+If you don't mount the volume for the analytics (or cookies or logs) folder, the folder will be automatically created on the Docker container, and you will lose all the data when it is stopped.
+If you don't have a cookie or It's your first time running the script, you will need to login to Twitch and start the container with `-it` args.
 
 ### Limits
 > Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
