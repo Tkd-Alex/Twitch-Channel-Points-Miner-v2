@@ -64,6 +64,7 @@ class LoggerSettings:
         "emoji",
         "colored",
         "color_palette",
+        "auto_clear",
         "telegram",
     ]
 
@@ -75,8 +76,8 @@ class LoggerSettings:
         file_level: int = logging.DEBUG,
         emoji: bool = platform.system() != "Windows",
         colored: bool = False,
-        auto_clear: bool = True,
         color_palette: ColorPalette = ColorPalette(),
+        auto_clear: bool = True,
         telegram: Telegram or None = None,
     ):
         self.save = save
@@ -85,8 +86,8 @@ class LoggerSettings:
         self.file_level = file_level
         self.emoji = emoji
         self.colored = colored
-        self.auto_clear = auto_clear
         self.color_palette = color_palette
+        self.auto_clear = auto_clear
         self.telegram = telegram
 
 
