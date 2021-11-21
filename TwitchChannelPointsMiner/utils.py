@@ -4,11 +4,13 @@ import socket
 import time
 from copy import deepcopy
 from datetime import datetime, timezone
+from os import path
 from random import randrange
 
+import requests
 from millify import millify
 
-from TwitchChannelPointsMiner.constants import USER_AGENTS
+from TwitchChannelPointsMiner.constants import USER_AGENTS, GITHUB_url
 
 
 def _millify(input, precision=2):
@@ -154,3 +156,46 @@ def percentage(a, b):
 
 def create_chunks(lst, n):
     return [lst[i : (i + n)] for i in range(0, len(lst), n)]  # noqa: E203
+
+
+def download_file(name, fpath):
+    r = requests.get(
+        path.join(GITHUB_url, name),
+        headers={"User-Anget": get_user_agent("FIREFOX")},
+        stream=True,
+    )
+    if r.status_code == 200:
+        with open(fpath, "wb") as f:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+    return True
+
+
+def read(fname):
+    return open(path.join(path.dirname(__file__), fname), encoding="utf-8").read()
+
+
+def init2dict(content):
+    return dict(re.findall(r"""__([a-z]+)__ = "([^"]+)""", content))
+
+
+def check_versions():
+    try:
+        current_version = init2dict(read("__init__.py"))
+        current_version = (
+            current_version["version"] if "version" in current_version else "0.0.0"
+        )
+    except Exception:
+        current_version = "0.0.0"
+    try:
+        r = requests.get(
+            path.join(GITHUB_url, "TwitchChannelPointsMiner", "__init__.py")
+        )
+        github_version = init2dict(r.text)
+        github_version = (
+            github_version["version"] if "version" in github_version else "0.0.0"
+        )
+    except Exception:
+        github_version = "0.0.0"
+    return current_version, github_version

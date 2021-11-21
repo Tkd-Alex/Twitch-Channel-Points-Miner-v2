@@ -1,4 +1,4 @@
-![Twitch Channel Points Miner - v2](./assets/banner.png)
+![Twitch Channel Points Miner - v2](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/banner.png)
 <p align="center">
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
 <a href="https://www.python.org/downloads/release/python-360/"><img alt="Python3" src="https://img.shields.io/badge/built%20for-Python≥3.6-red.svg?style=flat"></a>
@@ -18,6 +18,14 @@
 
 Read more about channels point [here](https://help.twitch.tv/s/article/channel-points-guide)
 
+## 📢 Help wanted
+Currently, we have a lot of PRs requests opened, but the time to test and improve It's less and less. If you want to help the community and the project, please test the following PRs and give us feedback:
+- [Features/improvements to analytics #131](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/131)
+- [Add SMART_HIGH_ODDS strategy #172](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/172)
+- [Replace join_chat boolean with chat: ChatPresence #253](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/253)
+- [Receive updates to Telegram #254](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/254)
+- [Add stats #318](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/318)
+
 # README Contents
 1. 🤝 [Community](#community)
 2. 🚀 [Main differences from the original repository](#main-differences-from-the-original-repository)
@@ -26,6 +34,9 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
     - [Less logs](#less-logs)
     - [Final report](#final-report)
 4. 🧐 [How to use](#how-to-use)
+    - [Cloning](#by-cloning-the-repository)
+    - [pip](#pip)
+    - [Docker](#docker)
     - [Limits](#limits)
 5. 🔧 [Settings](#settings)
     - [LoggerSettings](#loggersettings)
@@ -46,11 +57,11 @@ If you have any type of issue, need help, or want to suggest a new feature, plea
 
 If you want to help on this project, please leave a star 🌟 and share it with your friends! 😎
 
-A coffee is always a gesture of LOVE ❤️
+If you want to offer me a coffee, I would be grateful ❤️
 
 <a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
-If you have any issues or you want to contribute, you are welcome! But please before read the [CONTRIBUTING.md](/CONTRIBUTING.md)
+If you have any issues or you want to contribute, you are welcome! But please before read the [CONTRIBUTING.md](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/CONTRIBUTING.md) file.
 
 ## Main differences from the original repository:
 
@@ -163,15 +174,7 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 ```
 
 ## How to use:
-1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
-2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements, make sure to have at least Python3.6. You could also try to create a virtualenv and then install all the requirements
-```sh
-pip install virtualenv
-virtualenv -p python3 venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-3. Create your `run.py` file start from [example.py](/example.py)
+First of all please create a run.py file. You can just copy [example.py](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/example.py) and modify it according to your needs.
 ```python
 # -*- coding: utf-8 -*-
 
@@ -275,7 +278,79 @@ from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
 twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Blacklist example
 ```
-4. Start mining! `python run.py`
+
+### By cloning the repository
+1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
+2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements, make sure to have at least Python3.6. You could also try to create a _virtualenv_ and then install all the requirements
+```sh
+pip install virtualenv
+virtualenv -p python3 venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+Start mining! `python run.py` 🥳
+
+### pip
+Install the package via pip, you will find a stable version - maybe a different version from the master branch.
+- `pip install Twitch-Channel-Points-Miner-v2`
+- Exceute the run.py file `python run.py` 🥳
+
+### Docker
+
+The following file is mounted :
+
+- run.py : this is your starter script with your configuration
+
+These folders are mounted :
+
+- analytics : to save the analytics data
+- cookies : to provide login information
+- logs : to keep logs outside of container
+
+**Example using docker-compose:**
+
+```yml
+version: "3.9"
+
+services:
+  miner:
+    image: tkdalex/twitch-channel-points-miner-v2
+    tty: true
+    environment:
+      - TERM=xterm-256color
+    volumes:
+      - ./analytics:/usr/src/app/analytics
+      - ./cookies:/usr/src/app/cookies
+      - ./logs:/usr/src/app/logs
+      - ./run.py:/usr/src/app/run.py:ro
+    ports:
+      - "5000:5000"
+```
+
+Example with docker run:
+```sh
+docker run \
+    -v $(pwd)/analytics:/usr/src/app/analytics \
+    -v $(pwd)/cookies:/usr/src/app/cookies \
+    -v $(pwd)/logs:/usr/src/app/logs \
+    -v $(pwd)/run.py:/usr/src/app/run.py:ro \
+    -p 5000:5000 \
+    tkdalex/twitch-channel-points-miner-v2
+```
+
+`$(pwd)` Could not work on Windows (cmd), please us the absolute path instead, like: `/path/of/your/cookies:/usr/src/app/cookies`.
+If you don't mount the volume for the analytics (or cookies or logs) folder, the folder will be automatically created on the Docker container, and you will lose all the data when it is stopped.
+If you don't have a cookie or It's your first time running the script, you will need to login to Twitch and start the container with `-it` args. If you need to run multiple containers you can bind different ports (only if you need also the analytics) and mount dirrent run.py file, like 
+```sh
+docker run --name user1-v $(pwd)/user1.py:/usr/src/app/run.py:ro -p 5001:5000 tkdalex/twitch-channel-points-miner-v2
+```
+
+```sh
+docker run --name user2-v $(pwd)/user2.py:/usr/src/app/run.py:ro -p 5002:5000 tkdalex/twitch-channel-points-miner-v2
+```
+
+About the *Docker* version; the community has always shown great interest in the Docker version of the project. Especially [@SethFalco](https://github.com/SethFalco) ([#79](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/79)), [@KamushekDev](https://github.com/KamushekDev) ([#300](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/300)), [@au-ee](https://github.com/au-ee) ([#223](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/223)) they showed their ideas. I've decided to merge the PR from [@RakSrinaNa](https://github.com/RakSrinaNa) ([#343](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/343)) because is one of the most active user of the project and the PR was the only one with a Continuous Integration (CI).
 
 ### Limits
 > Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
@@ -396,7 +471,7 @@ Telegram(
 - **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same as select LOWEST_ODDS
 - **SMART**: If the majority in percent chose an option, then follow the other users, otherwise select the option with the highest odds
 
-![Screenshot](./assets/prediction.png)
+![Screenshot](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/prediction.png)
 
 Here a concrete example:
 
@@ -453,7 +528,7 @@ If you want you can toggle the dark theme with the dedicated checkbox.
 
 | Light theme | Dark theme |
 | ----------- | ---------- |
-| ![Light theme](./assets/chart-analytics-light.png) | ![Dark theme](./assets/chart-analytics-dark.png) |
+| ![Light theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-light.png) | ![Dark theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-dark.png) |
 
 For use this feature just call the `analytics` method before start mining. Read more at: [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
 The chart will be autofreshed each `refresh` minutes. If you want to connect from one to second machine that have that webpanel you have to use `0.0.0.0` instead of `127.0.0.1`.
@@ -491,11 +566,10 @@ pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib`
 LDFLAGS="-L${PREFIX}/lib/" CFLAGS="-I${PREFIX}/include/" pip install --upgrade wheel pillow
 ```
 
-Clone this repository
+**(1 way):** Clone this repository
 `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
 
-(2 way):
-Download sources from GitHub and put it into your Termux storage
+**(2 way):** Download sources from GitHub and put it into your Termux storage
 
 Now you can enter the directory with our miner, type this command:
 `cd Twitch-Channel-Points-Miner-v2`
@@ -509,8 +583,9 @@ When you have configured it now we can rename it (optional):
 We have to also install dependences required to run miner:
 `pip install -r requirements.txt`
 
-Now when we did everything we can run miner:
-`python run.py`
+**(3 way):** `pip install Twitch-Channel-Points-Miner-v2`
+
+Now when we did everything we can run miner: `python run.py`
 
 Read more at [#92](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/92) [#76](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/76)
 
