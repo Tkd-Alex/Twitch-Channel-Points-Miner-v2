@@ -67,7 +67,7 @@ class WebSocketsPool:
         )
 
     def __start(self, index):
-        thread_ws = Thread(target=lambda: self.ws[index].run_forever())
+        thread_ws = Thread(target=self.ws[index].run_forever)
         thread_ws.daemon = True
         thread_ws.name = f"WebSocket #{self.ws[index].index}"
         thread_ws.start()
