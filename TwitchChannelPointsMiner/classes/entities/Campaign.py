@@ -34,7 +34,7 @@ class Campaign(object):
         self.start_at = datetime.strptime(dict["startAt"], "%Y-%m-%dT%H:%M:%SZ")
         self.dt_match = self.start_at < datetime.now() < self.end_at
 
-        self.drops = list(map(lambda x: Drop(x), dict["timeBasedDrops"]))
+        self.drops = list(map(Drop, dict["timeBasedDrops"]))
 
     def __repr__(self):
         return f"Campaign(id={self.id}, name={self.name}, game={self.game}, in_inventory={self.in_inventory})"
