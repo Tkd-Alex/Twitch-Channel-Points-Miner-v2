@@ -581,15 +581,17 @@ class Twitch(object):
 
     def claim_all_drops_from_inventory(self):
         inventory = self.__get_inventory()
-        if inventory not in [None, {}]:
-            if inventory["dropCampaignsInProgress"] not in [None, {}]:
-                for campaign in inventory["dropCampaignsInProgress"]:
-                    for drop_dict in campaign["timeBasedDrops"]:
-                        drop = Drop(drop_dict)
-                        drop.update(drop_dict["self"])
-                        if drop.is_claimable is True:
-                            drop.is_claimed = self.claim_drop(drop)
-                            time.sleep(random.uniform(5, 10))
+        if (
+            inventory not in [None, {}]
+            and inventory["dropCampaignsInProgress"] not in [None, {}]
+        ):
+            for campaign in inventory["dropCampaignsInProgress"]:
+                for drop_dict in campaign["timeBasedDrops"]:
+                    drop = Drop(drop_dict)
+                    drop.update(drop_dict["self"])
+                    if drop.is_claimable is True:
+                        drop.is_claimed = self.claim_drop(drop)
+                        time.sleep(random.uniform(5, 10))
 
     def sync_campaigns(self, streamers, chunk_size=3):
         campaigns_update = 0

@@ -215,11 +215,13 @@ class WebSocketsPool:
                         elif message.type == "stream-down":
                             if ws.streamers[streamer_index].is_online is True:
                                 ws.streamers[streamer_index].set_offline()
-                        elif message.type == "viewcount":
-                            if ws.streamers[streamer_index].stream_up_elapsed():
-                                ws.twitch.check_streamer_online(
-                                    ws.streamers[streamer_index]
-                                )
+                        elif (
+                            message.type == "viewcount"
+                            and ws.streamers[streamer_index].stream_up_elapsed()
+                        ):
+                            ws.twitch.check_streamer_online(
+                                ws.streamers[streamer_index]
+                            )
 
                     elif message.topic == "raid":
                         if message.type == "raid_update_v2":
