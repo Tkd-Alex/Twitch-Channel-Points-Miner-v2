@@ -8,5 +8,4 @@ class Raid(object):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.raid_id == other.raid_id
-        else:
-            return False
+        return False

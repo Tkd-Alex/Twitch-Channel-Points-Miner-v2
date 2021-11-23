@@ -111,8 +111,7 @@ class Twitch(object):
             stream = response["data"]["user"]["stream"]
             if stream is not None:
                 return stream["id"]
-            else:
-                raise StreamerIsOfflineException
+            raise StreamerIsOfflineException
 
     def get_stream_info(self, streamer):
         json_data = copy.deepcopy(GQLOperations.VideoPlayerStreamInfoOverlayChannel)
@@ -569,15 +568,14 @@ class Twitch(object):
                 response["data"]["claimDropRewards"] is None
             ):
                 return False
-            elif ("errors" in response["data"]) and (response["data"]["errors"] != []):
+            if ("errors" in response["data"]) and (response["data"]["errors"] != []):
                 return False
-            elif ("claimDropRewards" in response["data"]) and (
+            if ("claimDropRewards" in response["data"]) and (
                 response["data"]["claimDropRewards"]["status"]
                 in ["ELIGIBLE_FOR_ALL", "DROP_INSTANCE_ALREADY_CLAIMED"]
             ):
                 return True
-            else:
-                return False
+            return False
         except (ValueError, KeyError):
             return False
 

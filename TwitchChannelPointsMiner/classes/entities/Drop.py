@@ -99,5 +99,4 @@ class Drop(object):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.id == other.id
-        else:
-            return False
+        return False

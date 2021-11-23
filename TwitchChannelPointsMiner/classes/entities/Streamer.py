@@ -190,12 +190,11 @@ class Streamer(object):
         delay = self.settings.bet.delay
         if delay_mode == DelayMode.FROM_START:
             return min(delay, prediction_window_seconds)
-        elif delay_mode == DelayMode.FROM_END:
+        if delay_mode == DelayMode.FROM_END:
             return max(prediction_window_seconds - delay, 0)
-        elif delay_mode == DelayMode.PERCENTAGE:
+        if delay_mode == DelayMode.PERCENTAGE:
             return prediction_window_seconds * delay
-        else:
-            return prediction_window_seconds
+        return prediction_window_seconds
 
     # === ANALYTICS === #
     def persistent_annotations(self, event_type, event_text):

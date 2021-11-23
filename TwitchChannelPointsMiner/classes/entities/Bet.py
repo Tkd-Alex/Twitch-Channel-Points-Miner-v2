@@ -249,8 +249,7 @@ class Bet(object):
                 if compared_value <= value:
                     return False, compared_value
             return True, compared_value  # Else skip the bet
-        else:
-            return False, 0  # Default don't skip the bet
+        return False, 0  # Default don't skip the bet
 
     def calculate(self, balance: int) -> dict:
         self.decision = {"choice": None, "amount": 0, "id": None}
