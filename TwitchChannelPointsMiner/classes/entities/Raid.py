@@ -1,4 +1,4 @@
-class Raid(object):
+class Raid:
     __slots__ = ["raid_id", "target_login"]
 
     def __init__(self, raid_id, target_login):

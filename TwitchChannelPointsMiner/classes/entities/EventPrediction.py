@@ -4,7 +4,7 @@ from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.utils import _millify, float_round
 
 
-class EventPrediction(object):
+class EventPrediction:
     __slots__ = [
         "streamer",
         "event_id",

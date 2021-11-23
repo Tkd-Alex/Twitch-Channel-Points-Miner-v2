@@ -46,7 +46,7 @@ class GlobalFormatter(logging.Formatter):
 
 
 # Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
-class ColorPalette(object):
+class ColorPalette:
     STREAMER_ONLINE = Fore.RESET
     STREAMER_OFFLINE = Fore.RESET
 

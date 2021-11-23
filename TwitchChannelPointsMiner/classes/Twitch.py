@@ -33,7 +33,7 @@ from TwitchChannelPointsMiner.utils import (
 logger = logging.getLogger(__name__)
 
 
-class Twitch(object):
+class Twitch:
     __slots__ = ["cookies_file", "user_agent", "twitch_login", "running"]
 
     def __init__(self, username, user_agent, password=None):
