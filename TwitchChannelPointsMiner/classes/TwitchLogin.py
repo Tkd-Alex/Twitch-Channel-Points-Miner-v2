@@ -194,9 +194,8 @@ class TwitchLogin(object):
 
     def get_cookie_value(self, key):
         for cookie in self.cookies:
-            if cookie["name"] == key:
-                if cookie["value"] is not None:
-                    return cookie["value"]
+            if cookie["name"] == key and cookie["value"] is not None:
+                return cookie["value"]
         return None
 
     def load_cookies(self, cookies_file):
@@ -210,9 +209,8 @@ class TwitchLogin(object):
         user_id = (
             int(persistent.split("%")[0]) if persistent is not None else self.user_id
         )
-        if user_id is None:
-            if self.__set_user_id() is True:
-                return self.user_id
+        if user_id is None and self.__set_user_id() is True:
+            return self.user_id
         return user_id
 
     def __set_user_id(self):

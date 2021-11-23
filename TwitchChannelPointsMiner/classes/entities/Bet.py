@@ -245,9 +245,8 @@ class Bet(object):
             elif condition == Condition.GTE:
                 if compared_value >= value:
                     return False, compared_value
-            elif condition == Condition.LTE:
-                if compared_value <= value:
-                    return False, compared_value
+            elif condition == Condition.LTE and compared_value <= value:
+                return False, compared_value
             return True, compared_value  # Else skip the bet
         return False, 0  # Default don't skip the bet
 

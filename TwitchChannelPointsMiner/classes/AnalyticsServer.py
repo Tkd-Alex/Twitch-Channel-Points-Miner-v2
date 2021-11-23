@@ -44,12 +44,11 @@ def download_assets(assets_folder, required_files):
     logger.info(f"Downloading assets to {assets_folder}")
 
     for f in required_files:
-        if os.path.isfile(os.path.join(assets_folder, f)) is False:
-            if (
-                download_file(os.path.join("assets", f), os.path.join(assets_folder, f))
-                is True
-            ):
-                logger.info(f"Downloaded {f}")
+        if os.path.isfile(os.path.join(assets_folder, f)) is False and (
+            download_file(os.path.join("assets", f), os.path.join(assets_folder, f))
+            is True
+        ):
+            logger.info(f"Downloaded {f}")
 
 
 def check_assets():
