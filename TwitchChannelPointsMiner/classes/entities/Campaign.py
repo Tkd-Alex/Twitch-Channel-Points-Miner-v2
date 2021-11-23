@@ -54,8 +54,7 @@ class Campaign(object):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.id == other.id
-        else:
-            return False
+        return False
 
     def sync_drops(self, drops, callback):
         # Iterate all the drops from inventory

@@ -176,6 +176,5 @@ def configure_loggers(username, settings):
         root_logger.addHandler(file_handler)
         root_logger.addHandler(console_handler)
         return logs_file
-    else:
-        root_logger.addHandler(console_handler)
-        return None
+    root_logger.addHandler(console_handler)
+    return None
