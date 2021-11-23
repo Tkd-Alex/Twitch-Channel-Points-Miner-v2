@@ -20,7 +20,7 @@ from TwitchChannelPointsMiner.constants import GQLOperations
 logger = logging.getLogger(__name__)
 
 
-class TwitchLogin(object):
+class TwitchLogin:
     __slots__ = [
         "client_id",
         "token",

@@ -27,7 +27,7 @@ class Condition(Enum):
         return self.name
 
 
-class OutcomeKeys(object):
+class OutcomeKeys:
     # Real key on Bet dict ['']
     PERCENTAGE_USERS = "percentage_users"
     ODDS_PERCENTAGE = "odds_percentage"
@@ -50,7 +50,7 @@ class DelayMode(Enum):
         return self.name
 
 
-class FilterCondition(object):
+class FilterCondition:
     __slots__ = [
         "by",
         "where",
@@ -66,7 +66,7 @@ class FilterCondition(object):
         return f"FilterCondition(by={self.by.upper()}, where={self.where}, value={self.value})"
 
 
-class BetSettings(object):
+class BetSettings:
     __slots__ = [
         "strategy",
         "percentage",
@@ -115,7 +115,7 @@ class BetSettings(object):
         return f"BetSettings(strategy={self.strategy}, percentage={self.percentage}, percentage_gap={self.percentage_gap}, max_points={self.max_points}, minimum_points={self.minimum_points}, stealth_mode={self.stealth_mode})"
 
 
-class Bet(object):
+class Bet:
     __slots__ = ["outcomes", "decision", "total_users", "total_points", "settings"]
 
     def __init__(self, outcomes: list, settings: BetSettings):

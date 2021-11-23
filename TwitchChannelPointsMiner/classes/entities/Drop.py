@@ -4,7 +4,7 @@ from TwitchChannelPointsMiner.classes.Settings import Settings
 from TwitchChannelPointsMiner.utils import percentage
 
 
-class Drop(object):
+class Drop:
     __slots__ = [
         "id",
         "name",

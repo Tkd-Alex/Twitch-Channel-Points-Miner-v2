@@ -4,7 +4,7 @@ from TwitchChannelPointsMiner.classes.entities.Drop import Drop
 from TwitchChannelPointsMiner.classes.Settings import Settings
 
 
-class Campaign(object):
+class Campaign:
     __slots__ = [
         "id",
         "game",

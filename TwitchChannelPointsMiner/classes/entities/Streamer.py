@@ -15,7 +15,7 @@ from TwitchChannelPointsMiner.utils import _millify
 logger = logging.getLogger(__name__)
 
 
-class StreamerSettings(object):
+class StreamerSettings:
     __slots__ = [
         "make_predictions",
         "follow_raid",
@@ -58,7 +58,7 @@ class StreamerSettings(object):
         return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, watch_streak={self.watch_streak}, bet={self.bet}, join_chat={self.join_chat})"
 
 
-class Streamer(object):
+class Streamer:
     __slots__ = [
         "username",
         "channel_id",
