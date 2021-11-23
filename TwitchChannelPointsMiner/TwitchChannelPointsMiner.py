@@ -123,7 +123,8 @@ class TwitchChannelPointsMiner:
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
 
-    def analytics(self, host: str = "127.0.0.1", port: int = 5000, refresh: int = 5):
+    @staticmethod
+    def analytics(host: str = "127.0.0.1", port: int = 5000, refresh: int = 5):
         http_server = AnalyticsServer(host=host, port=port, refresh=refresh)
         http_server.daemon = True
         http_server.name = "Analytics Thread"
