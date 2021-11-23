@@ -269,9 +269,7 @@ class Twitch(object):
                         items = sorted(
                             items,
                             key=lambda x: x["points"],
-                            reverse=(
-                                True if prior == Priority.POINTS_DESCEDING else False
-                            ),
+                            reverse=prior == Priority.POINTS_DESCEDING,
                         )
                         streamers_watching += [item["index"] for item in items][:2]
 
