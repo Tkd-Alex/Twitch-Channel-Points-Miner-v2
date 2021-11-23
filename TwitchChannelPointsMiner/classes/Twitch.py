@@ -581,10 +581,10 @@ class Twitch(object):
 
     def claim_all_drops_from_inventory(self):
         inventory = self.__get_inventory()
-        if (
-            inventory not in [None, {}]
-            and inventory["dropCampaignsInProgress"] not in [None, {}]
-        ):
+        if inventory not in [None, {}] and inventory["dropCampaignsInProgress"] not in [
+            None,
+            {},
+        ]:
             for campaign in inventory["dropCampaignsInProgress"]:
                 for drop_dict in campaign["timeBasedDrops"]:
                     drop = Drop(drop_dict)
