@@ -173,7 +173,8 @@ def download_file(name, fpath):
 
 
 def read(fname):
-    return open(path.join(path.dirname(__file__), fname), encoding="utf-8").read()
+    with open(path.join(path.dirname(__file__), fname), encoding="utf-8") as handler:
+        return handler.read()
 
 
 def init2dict(content):
