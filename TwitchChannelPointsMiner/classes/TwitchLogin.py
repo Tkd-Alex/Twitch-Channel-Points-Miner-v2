@@ -118,17 +118,16 @@ class TwitchLogin(object):
 
                         # If the user didn't load the password from run.py we can just ask for it again.
                         break
-                    elif err_code == 1000:
+                    if err_code == 1000:
                         logger.info(
                             "Console login unavailable (CAPTCHA solving required)."
                         )
                         use_backup_flow = True
                         break
-                    else:
-                        logger.error(f"Unknown error: {login_response}")
-                        raise NotImplementedError(
-                            f"Unknown TwitchAPI error code: {err_code}"
-                        )
+                    logger.error(f"Unknown error: {login_response}")
+                    raise NotImplementedError(
+                        f"Unknown TwitchAPI error code: {err_code}"
+                    )
 
                 if "access_token" in login_response:
                     self.set_token(login_response["access_token"])
