@@ -121,8 +121,7 @@ class Twitch(object):
         if response != {}:
             if response["data"]["user"]["stream"] is None:
                 raise StreamerIsOfflineException
-            else:
-                return response["data"]["user"]
+            return response["data"]["user"]
 
     def check_streamer_online(self, streamer):
         if time.time() < streamer.offline_at + 60:
@@ -152,8 +151,7 @@ class Twitch(object):
             or json_response["data"]["user"] is None
         ):
             raise StreamerDoesNotExistException
-        else:
-            return json_response["data"]["user"]["id"]
+        return json_response["data"]["user"]["id"]
 
     def get_followers(self):
         json_data = copy.deepcopy(GQLOperations.PersonalSections)
