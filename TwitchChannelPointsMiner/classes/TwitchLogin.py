@@ -91,7 +91,7 @@ class TwitchLogin(object):
                         post_data["authy_token"] = twofa.strip()
                         continue
 
-                    elif err_code in [3022, 3023]:  # missing 2fa token
+                    if err_code in [3022, 3023]:  # missing 2fa token
                         if err_code == 3022:
                             logger.info("Login Verification code required.")
                             self.email = login_response["obscured_email"]
@@ -107,7 +107,7 @@ class TwitchLogin(object):
                         continue
 
                     # invalid password, or password not provided
-                    elif err_code in [3001, 3003]:
+                    if err_code in [3001, 3003]:
                         logger.info("Invalid username or password, please try again.")
 
                         # If the password is loaded from run.py, require the user to fix it there.
