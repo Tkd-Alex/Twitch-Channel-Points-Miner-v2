@@ -21,7 +21,12 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerDoesNotExistException,
     StreamerIsOfflineException,
 )
-from TwitchChannelPointsMiner.classes.Settings import FollowersOrder, Events, Priority, Settings
+from TwitchChannelPointsMiner.classes.Settings import (
+    Events,
+    FollowersOrder,
+    Priority,
+    Settings,
+)
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.constants import CLIENT_ID, GQLOperations
 from TwitchChannelPointsMiner.utils import (
