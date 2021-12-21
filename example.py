@@ -5,7 +5,7 @@ from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
-from TwitchChannelPointsMiner.classes.Settings import Priority, Events
+from TwitchChannelPointsMiner.classes.Settings import Priority, Events, FollowersOrder
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
@@ -83,5 +83,6 @@ twitch_miner.mine(
         "streamer-username10",
         "streamer-username11"
     ],                                 # Array of streamers (order = priority)
-    followers=False                    # Automatic download the list of your followers (unable to set custom settings for you followers list)
+    followers=False,                   # Automatic download the list of your followers
+    order=FollowersOrder.ASC           # Sort the followers list by follow date. ASC or DESC
 )

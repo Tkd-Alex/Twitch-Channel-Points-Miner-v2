@@ -145,21 +145,33 @@ class GQLOperations:
             }
         },
     }
-    PersonalSections = {
-        "operationName": "PersonalSections",
-        "variables": {
-            "input": {
-                "sectionInputs": ["FOLLOWED_SECTION"],
-                "recommendationContext": {"platform": "web"},
+    PersonalSections = (
+        {
+            "operationName": "PersonalSections",
+            "variables": {
+                "input": {
+                    "sectionInputs": ["FOLLOWED_SECTION"],
+                    "recommendationContext": {"platform": "web"},
+                },
+                "channelLogin": None,
+                "withChannelUser": False,
+                "creatorAnniversariesExperimentEnabled": False,
             },
-            "channelLogin": None,
-            "withChannelUser": False,
-            "creatorAnniversariesExperimentEnabled": False,
+            "extensions": {
+                "persistedQuery": {
+                    "version": 1,
+                    "sha256Hash": "9fbdfb00156f754c26bde81eb47436dee146655c92682328457037da1a48ed39",
+                }
+            },
         },
+    )
+    ChannelFollows = {
+        "operationName": "ChannelFollows",
+        "variables": {"limit": 100, "order": "ASC"},
         "extensions": {
             "persistedQuery": {
                 "version": 1,
-                "sha256Hash": "9fbdfb00156f754c26bde81eb47436dee146655c92682328457037da1a48ed39",
+                "sha256Hash": "4b9cb31b54b9213e5760f2f6e9e935ad09924cac2f78aac51f8a64d85f028ed0",
             }
         },
     }

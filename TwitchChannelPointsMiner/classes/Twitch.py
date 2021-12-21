@@ -21,7 +21,12 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerDoesNotExistException,
     StreamerIsOfflineException,
 )
-from TwitchChannelPointsMiner.classes.Settings import Events, Priority, Settings
+from TwitchChannelPointsMiner.classes.Settings import (
+    Events,
+    FollowersOrder,
+    Priority,
+    Settings,
+)
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.constants import CLIENT_ID, GQLOperations
 from TwitchChannelPointsMiner.utils import (
@@ -155,22 +160,28 @@ class Twitch(object):
         else:
             return json_response["data"]["user"]["id"]
 
-    def get_followers(self):
-        json_data = copy.deepcopy(GQLOperations.PersonalSections)
-        json_response = self.post_gql_request(json_data)
-        try:
-            if (
-                "data" in json_response
-                and "personalSections" in json_response["data"]
-                and json_response["data"]["personalSections"] != []
-            ):
-                return [
-                    fw["user"]["login"]
-                    for fw in json_response["data"]["personalSections"][0]["items"]
-                    if fw["user"] is not None
-                ]
-        except KeyError:
-            return []
+    def get_followers(
+        self, limit: int = 100, order: FollowersOrder = FollowersOrder.ASC
+    ):
+        json_data = copy.deepcopy(GQLOperations.ChannelFollows)
+        json_data["variables"] = {"limit": limit, "order": str(order)}
+        has_next = True
+        last_cursor = ""
+        follows = []
+        while has_next is True and last_cursor != "":
+            json_data["variables"]["cursor"] = last_cursor
+            json_response = self.post_gql_request(json_data)
+            try:
+                follows_response = json_response["data"]["user"]["follows"]
+                last_cursor = None
+                for f in follows_response["edges"]:
+                    follows.append(f["node"]["login"].lower())
+                    last_cursor = f["cursor"]
+
+                has_next = follows_response["pageInfo"]["hasNextPage"]
+            except KeyError:
+                return []
+        return follows
 
     def update_raid(self, streamer, raid):
         if streamer.raid != raid:
