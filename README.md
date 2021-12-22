@@ -266,9 +266,9 @@ twitch_miner.mine(
         "streamer-username09",
         "streamer-username10",
         "streamer-username11"
-    ],                                 # Array of streamers (order = priority)
-    followers=False,                   # Automatic download the list of your followers
-    order=FollowersOrder.ASC           # Sort the followers list by follow date. ASC or DESC
+    ],                                  # Array of streamers (order = priority)
+    followers=False,                    # Automatic download the list of your followers
+    followers_order=FollowersOrder.ASC  # Sort the followers list by follow date. ASC or DESC
 )
 ```
 You can also use all the default values except for your username obv. Short version:
@@ -276,9 +276,9 @@ You can also use all the default values except for your username obv. Short vers
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.classes.Settings import FollowersOrder
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
-twitch_miner.mine(["streamer1", "streamer2"])                                              # Array of streamers OR
-twitch_miner.mine(followers=True, order=FollowersOrder.ASC)                                # Automatic use the followers list OR
-twitch_miner.mine(["streamer1", "streamer2"], followers=True, order=FollowersOrder.DESC)   # Mixed
+twitch_miner.mine(["streamer1", "streamer2"])                                                       # Array of streamers OR
+twitch_miner.mine(followers=True, followers_order=FollowersOrder.ASC)                               # Automatic use the followers list OR
+twitch_miner.mine(["streamer1", "streamer2"], followers=True, followers_order=FollowersOrder.DESC)  # Mixed
 ```
 If you follow so many streamers on Twitch, but you don't want to mine points for all of them, you can blacklist the users with the `blacklist` keyword. [#94](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/94)
 ```python
@@ -349,7 +349,7 @@ docker run \
 
 `$(pwd)` Could not work on Windows (cmd), please us the absolute path instead, like: `/path/of/your/cookies:/usr/src/app/cookies`.
 If you don't mount the volume for the analytics (or cookies or logs) folder, the folder will be automatically created on the Docker container, and you will lose all the data when it is stopped.
-If you don't have a cookie or It's your first time running the script, you will need to login to Twitch and start the container with `-it` args. If you need to run multiple containers you can bind different ports (only if you need also the analytics) and mount dirrent run.py file, like 
+If you don't have a cookie or It's your first time running the script, you will need to login to Twitch and start the container with `-it` args. If you need to run multiple containers you can bind different ports (only if you need also the analytics) and mount dirrent run.py file, like
 ```sh
 docker run --name user1-v $(pwd)/user1.py:/usr/src/app/run.py:ro -p 5001:5000 tkdalex/twitch-channel-points-miner-v2
 ```
