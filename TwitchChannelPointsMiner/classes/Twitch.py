@@ -168,7 +168,7 @@ class Twitch(object):
         has_next = True
         last_cursor = ""
         follows = []
-        while has_next is True and last_cursor != "":
+        while has_next is True:
             json_data["variables"]["cursor"] = last_cursor
             json_response = self.post_gql_request(json_data)
             try:
