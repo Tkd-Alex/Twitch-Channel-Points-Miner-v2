@@ -6,6 +6,7 @@ from threading import Thread
 from flask import Flask, Response, cli, render_template
 
 from TwitchChannelPointsMiner.classes.Settings import Settings
+from TwitchChannelPointsMiner.utils import download_file
 
 cli.show_server_banner = lambda *_: None
 logger = logging.getLogger(__name__)
@@ -38,9 +39,38 @@ def index(refresh=5):
     )
 
 
+def download_assets(assets_folder, required_files):
+    Path(assets_folder).mkdir(parents=True, exist_ok=True)
+    logger.info(f"Downloading assets to {assets_folder}")
+
+    for f in required_files:
+        if os.path.isfile(os.path.join(assets_folder, f)) is False:
+            if (
+                download_file(os.path.join("assets", f), os.path.join(assets_folder, f))
+                is True
+            ):
+                logger.info(f"Downloaded {f}")
+
+
+def check_assets():
+    required_files = ["banner.png", "charts.html", "dark-theme.css"]
+    assets_folder = os.path.join(Path().absolute(), "assets")
+    if os.path.isdir(assets_folder) is False:
+        logger.info(f"Assets folder not found at {assets_folder}")
+        download_assets(assets_folder, required_files)
+    else:
+        for f in required_files:
+            if os.path.isfile(os.path.join(assets_folder, f)) is False:
+                logger.info(f"Missing file {f} in {assets_folder}")
+                download_assets(assets_folder, required_files)
+                break
+
+
 class AnalyticsServer(Thread):
     def __init__(self, host: str = "127.0.0.1", port: int = 5000, refresh: int = 5):
         super(AnalyticsServer, self).__init__()
+
+        check_assets()
 
         self.host = host
         self.port = port
