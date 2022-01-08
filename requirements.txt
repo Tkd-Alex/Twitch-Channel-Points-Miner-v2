@@ -1,5 +1,5 @@
 requests==2.25.1
-websocket-client==1.0.1
+websocket-client==1.2.3
 browser_cookie3==0.12.1
 pillow==8.3.2
 python-dateutil==2.8.1
