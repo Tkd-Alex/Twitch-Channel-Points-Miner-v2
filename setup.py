@@ -29,7 +29,7 @@ setuptools.setup(
         "requests==2.25.1",
         "websocket-client==1.0.1",
         "browser_cookie3==0.12.1",
-        "pillow==8.3.2",
+        "pillow==9.0.0",
         "python-dateutil==2.8.1",
         "emoji==1.2.0",
         "millify==0.1.1",
