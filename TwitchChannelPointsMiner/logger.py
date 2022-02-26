@@ -10,6 +10,7 @@ from colorama import Fore, init
 
 from TwitchChannelPointsMiner.classes.Settings import Events
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
+from TwitchChannelPointsMiner.classes.DiscordWebhook import Discord
 from TwitchChannelPointsMiner.utils import remove_emoji
 
 
@@ -66,6 +67,7 @@ class LoggerSettings:
         "color_palette",
         "auto_clear",
         "telegram",
+        "discord",
     ]
 
     def __init__(
@@ -79,6 +81,7 @@ class LoggerSettings:
         color_palette: ColorPalette = ColorPalette(),
         auto_clear: bool = True,
         telegram: Telegram or None = None,
+        discord: Discord or None = None,
     ):
         self.save = save
         self.less = less
@@ -89,6 +92,7 @@ class LoggerSettings:
         self.color_palette = color_palette
         self.auto_clear = auto_clear
         self.telegram = telegram
+        self.discord = discord
 
 
 class GlobalFormatter(logging.Formatter):
@@ -127,6 +131,20 @@ class GlobalFormatter(logging.Formatter):
             )
             if self.settings.telegram is not None and skip_telegram is False:
                 self.settings.telegram.send(record.msg, record.event)
+
+            if self.settings.colored is True:
+                record.msg = (
+                    f"{self.settings.color_palette.get(record.event)}{record.msg}"
+                )
+
+        if hasattr(record, "event"):
+            skip_discord = (
+                False
+                if hasattr(record, "skip_discord") is False
+                else True
+            )
+            if self.settings.discord is not None and skip_discord is False:
+                self.settings.discord.send(record.msg, record.event)
 
             if self.settings.colored is True:
                 record.msg = (

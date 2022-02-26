@@ -5,6 +5,7 @@ from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
+from TwitchChannelPointsMiner.classes.DiscordWebhook import Discord
 from TwitchChannelPointsMiner.classes.Settings import Priority, Events, FollowersOrder
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
@@ -35,7 +36,12 @@ twitch_miner = TwitchChannelPointsMiner(
             token="123456789:shfuihreuifheuifhiu34578347",                          # Telegram API token @BotFather
             events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, "BET_LOSE"],   # Only these events will be sent to the chat
             disable_notification=True,                                              # Revoke the notification (sound/vibration)
-        )
+        ),
+
+        discord=Discord(
+            discord_webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",  #Discord Webhook URL
+            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],               # Only these events will be sent to the chat
+        ),
     ),
     streamer_settings=StreamerSettings(
         make_predictions=True,                  # If you want to Bet / Make prediction
