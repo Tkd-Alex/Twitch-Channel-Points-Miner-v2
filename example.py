@@ -4,8 +4,9 @@ import logging
 from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
-from TwitchChannelPointsMiner.classes.Settings import Priority
 from TwitchChannelPointsMiner.classes.Chat import ChatPresence
+from TwitchChannelPointsMiner.classes.Telegram import Telegram
+from TwitchChannelPointsMiner.classes.Settings import Priority, Events, FollowersOrder
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
@@ -29,6 +30,12 @@ twitch_miner = TwitchChannelPointsMiner(
             STREAMER_online="GREEN",            # Don't worry about lower/upper case. The script will parse all the values.
             streamer_offline="red",             # Read more in README.md
             BET_wiN=Fore.MAGENTA                # Color allowed are: [BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET].
+        ),
+        telegram=Telegram(                                                          # You can omit or leave None if you don't want to receive updates on Telegram
+            chat_id=123456789,                                                      # Chat ID to send messages @GiveChatId
+            token="123456789:shfuihreuifheuifhiu34578347",                          # Telegram API token @BotFather
+            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, "BET_LOSE"],   # Only these events will be sent to the chat
+            disable_notification=True,                                              # Revoke the notification (sound/vibration)
         )
     ),
     streamer_settings=StreamerSettings(
@@ -76,6 +83,7 @@ twitch_miner.mine(
         "streamer-username09",
         "streamer-username10",
         "streamer-username11"
-    ],                                 # Array of streamers (order = priority)
-    followers=False                    # Automatic download the list of your followers (unable to set custom settings for you followers list)
+    ],                                  # Array of streamers (order = priority)
+    followers=False,                    # Automatic download the list of your followers
+    followers_order=FollowersOrder.ASC  # Sort the followers list by follow date. ASC or DESC
 )

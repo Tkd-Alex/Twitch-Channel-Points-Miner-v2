@@ -19,7 +19,7 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import (
     StreamerSettings,
 )
 from TwitchChannelPointsMiner.classes.Exceptions import StreamerDoesNotExistException
-from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
+from TwitchChannelPointsMiner.classes.Settings import FollowersOrder, Priority, Settings
 from TwitchChannelPointsMiner.classes.Twitch import Twitch
 from TwitchChannelPointsMiner.classes.WebSocketsPool import WebSocketsPool
 from TwitchChannelPointsMiner.logger import LoggerSettings, configure_loggers
@@ -112,7 +112,11 @@ class TwitchChannelPointsMiner:
 
         # Check for the latest version of the script
         current_version, github_version = check_versions()
-        if current_version != github_version:
+        if github_version == "0.0.0":
+            logger.error(
+                "Unable to detect if you have the latest version of this script"
+            )
+        elif current_version != github_version:
             logger.info(f"You are running the version {current_version} of this script")
             logger.info(f"The latest version on GitHub is: {github_version}")
 
@@ -125,10 +129,22 @@ class TwitchChannelPointsMiner:
         http_server.name = "Analytics Thread"
         http_server.start()
 
-    def mine(self, streamers: list = [], blacklist: list = [], followers=False):
+    def mine(
+        self,
+        streamers: list = [],
+        blacklist: list = [],
+        followers: bool = False,
+        followers_order: FollowersOrder = FollowersOrder.ASC,
+    ):
         self.run(streamers=streamers, blacklist=blacklist, followers=followers)
 
-    def run(self, streamers: list = [], blacklist: list = [], followers=False):
+    def run(
+        self,
+        streamers: list = [],
+        blacklist: list = [],
+        followers: bool = False,
+        followers_order: FollowersOrder = FollowersOrder.ASC,
+    ):
         if self.running:
             logger.error("You can't start multiple sessions of this instance!")
         else:
@@ -157,7 +173,7 @@ class TwitchChannelPointsMiner:
                     streamers_dict[username] = streamer
 
             if followers is True:
-                followers_array = self.twitch.get_followers()
+                followers_array = self.twitch.get_followers(order=followers_order)
                 logger.info(
                     f"Load {len(followers_array)} followers from your profile!",
                     extra={"emoji": ":clipboard:"},

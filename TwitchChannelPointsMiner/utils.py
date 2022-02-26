@@ -159,11 +159,16 @@ def create_chunks(lst, n):
 
 
 def download_file(name, fpath):
-    r = requests.get(path.join(GITHUB_url, name), stream=True)
-    with open(fpath, "wb") as f:
-        for chunk in r.iter_content(chunk_size=1024):
-            if chunk:
-                f.write(chunk)
+    r = requests.get(
+        path.join(GITHUB_url, name),
+        headers={"User-Anget": get_user_agent("FIREFOX")},
+        stream=True,
+    )
+    if r.status_code == 200:
+        with open(fpath, "wb") as f:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
     return True
 
 
@@ -176,7 +181,21 @@ def init2dict(content):
 
 
 def check_versions():
-    current_version = init2dict(read("__init__.py"))["version"]
-    r = requests.get(path.join(GITHUB_url, "TwitchChannelPointsMiner", "__init__.py"))
-    github_version = init2dict(r.text)["version"]
+    try:
+        current_version = init2dict(read("__init__.py"))
+        current_version = (
+            current_version["version"] if "version" in current_version else "0.0.0"
+        )
+    except Exception:
+        current_version = "0.0.0"
+    try:
+        r = requests.get(
+            path.join(GITHUB_url, "TwitchChannelPointsMiner", "__init__.py")
+        )
+        github_version = init2dict(r.text)
+        github_version = (
+            github_version["version"] if "version" in github_version else "0.0.0"
+        )
+    except Exception:
+        github_version = "0.0.0"
     return current_version, github_version

@@ -21,7 +21,12 @@ from TwitchChannelPointsMiner.classes.Exceptions import (
     StreamerDoesNotExistException,
     StreamerIsOfflineException,
 )
-from TwitchChannelPointsMiner.classes.Settings import Priority, Settings
+from TwitchChannelPointsMiner.classes.Settings import (
+    Events,
+    FollowersOrder,
+    Priority,
+    Settings,
+)
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
 from TwitchChannelPointsMiner.constants import CLIENT_ID, GQLOperations
 from TwitchChannelPointsMiner.utils import (
@@ -155,22 +160,28 @@ class Twitch(object):
         else:
             return json_response["data"]["user"]["id"]
 
-    def get_followers(self):
-        json_data = copy.deepcopy(GQLOperations.PersonalSections)
-        json_response = self.post_gql_request(json_data)
-        try:
-            if (
-                "data" in json_response
-                and "personalSections" in json_response["data"]
-                and json_response["data"]["personalSections"] != []
-            ):
-                return [
-                    fw["user"]["login"]
-                    for fw in json_response["data"]["personalSections"][0]["items"]
-                    if fw["user"] is not None
-                ]
-        except KeyError:
-            return []
+    def get_followers(
+        self, limit: int = 100, order: FollowersOrder = FollowersOrder.ASC
+    ):
+        json_data = copy.deepcopy(GQLOperations.ChannelFollows)
+        json_data["variables"] = {"limit": limit, "order": str(order)}
+        has_next = True
+        last_cursor = ""
+        follows = []
+        while has_next is True:
+            json_data["variables"]["cursor"] = last_cursor
+            json_response = self.post_gql_request(json_data)
+            try:
+                follows_response = json_response["data"]["user"]["follows"]
+                last_cursor = None
+                for f in follows_response["edges"]:
+                    follows.append(f["node"]["login"].lower())
+                    last_cursor = f["cursor"]
+
+                has_next = follows_response["pageInfo"]["hasNextPage"]
+            except KeyError:
+                return []
+        return follows
 
     def update_raid(self, streamer, raid):
         if streamer.raid != raid:
@@ -181,7 +192,7 @@ class Twitch(object):
 
             logger.info(
                 f"Joining raid from {streamer} to {raid.target_login}!",
-                extra={"emoji": ":performing_arts:"},
+                extra={"emoji": ":performing_arts:", "event": Events.JOIN_RAID},
             )
 
     def viewer_is_mod(self, streamer):
@@ -355,12 +366,26 @@ class Twitch(object):
                                         drop.has_preconditions_met is not False
                                         and drop.is_printable is True
                                     ):
-                                        logger.info(
-                                            f"{streamers[index]} is streaming {streamers[index].stream}"
-                                        )
-                                        logger.info(f"Campaign: {campaign}")
-                                        logger.info(f"Drop: {drop}")
-                                        logger.info(f"{drop.progress_bar()}")
+                                        drop_messages = [
+                                            f"{streamers[index]} is streaming {streamers[index].stream}",
+                                            f"Campaign: {campaign}",
+                                            f"Drop: {drop}",
+                                            f"{drop.progress_bar()}",
+                                        ]
+                                        for single_line in drop_messages:
+                                            logger.info(
+                                                single_line,
+                                                extra={
+                                                    "event": Events.DROP_STATUS,
+                                                    "skip_telegram": True,
+                                                },
+                                            )
+
+                                        if Settings.logger.telegram is not None:
+                                            Settings.logger.telegram.send(
+                                                "\n".join(drop_messages),
+                                                Events.DROP_STATUS,
+                                            )
 
                     except requests.exceptions.ConnectionError as e:
                         logger.error(f"Error while trying to send minute watched: {e}")
@@ -403,7 +428,7 @@ class Twitch(object):
             f"Going to complete bet for {event}",
             extra={
                 "emoji": ":four_leaf_clover:",
-                "color": Settings.logger.color_palette.BET_GENERAL,
+                "event": Events.BET_GENERAL,
             },
         )
         if event.status == "ACTIVE":
@@ -413,14 +438,14 @@ class Twitch(object):
                     f"Skip betting for the event {event}",
                     extra={
                         "emoji": ":pushpin:",
-                        "color": Settings.logger.color_palette.BET_FILTERS,
+                        "event": Events.BET_FILTERS,
                     },
                 )
                 logger.info(
                     f"Skip settings {event.bet.settings.filter_condition}, current value is: {compared_value}",
                     extra={
                         "emoji": ":pushpin:",
-                        "color": Settings.logger.color_palette.BET_FILTERS,
+                        "event": Events.BET_FILTERS,
                     },
                 )
             else:
@@ -429,7 +454,7 @@ class Twitch(object):
                         f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
                         extra={
                             "emoji": ":four_leaf_clover:",
-                            "color": Settings.logger.color_palette.BET_GENERAL,
+                            "event": Events.BET_GENERAL,
                         },
                     )
 
@@ -454,7 +479,7 @@ class Twitch(object):
                             f"Failed to place bet, error: {error_code}",
                             extra={
                                 "emoji": ":four_leaf_clover:",
-                                "color": Settings.logger.color_palette.BET_FAILED,
+                                "event": Events.BET_FAILED,
                             },
                         )
                 else:
@@ -462,7 +487,7 @@ class Twitch(object):
                         f"Bet won't be placed as the amount {_millify(decision['amount'])} is less than the minimum required 10",
                         extra={
                             "emoji": ":four_leaf_clover:",
-                            "color": Settings.logger.color_palette.BET_GENERAL,
+                            "event": Events.BET_GENERAL,
                         },
                     )
         else:
@@ -470,14 +495,15 @@ class Twitch(object):
                 f"Oh no! The event is not active anymore! Current status: {event.status}",
                 extra={
                     "emoji": ":disappointed_relieved:",
-                    "color": Settings.logger.color_palette.BET_FAILED,
+                    "event": Events.BET_FAILED,
                 },
             )
 
     def claim_bonus(self, streamer, claim_id):
         if Settings.logger.less is False:
             logger.info(
-                f"Claiming the bonus for {streamer}!", extra={"emoji": ":gift:"}
+                f"Claiming the bonus for {streamer}!",
+                extra={"emoji": ":gift:", "event": Events.BONUS_CLAIM},
             )
 
         json_data = copy.deepcopy(GQLOperations.ClaimCommunityPoints)
@@ -561,7 +587,9 @@ class Twitch(object):
         return campaigns
 
     def claim_drop(self, drop):
-        logger.info(f"Claim {drop}", extra={"emoji": ":package:"})
+        logger.info(
+            f"Claim {drop}", extra={"emoji": ":package:", "event": Events.DROP_CLAIM}
+        )
 
         json_data = copy.deepcopy(GQLOperations.DropsPage_ClaimDropRewards)
         json_data["variables"] = {"input": {"dropInstanceID": drop.drop_instance_id}}
