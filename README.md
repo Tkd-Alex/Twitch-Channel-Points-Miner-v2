@@ -23,7 +23,6 @@ Currently, we have a lot of PRs requests opened, but the time to test and improv
 - [Features/improvements to analytics #131](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/131)
 - [Betting strategy: Smart money #348](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/348)
 - [Add SMART_HIGH_ODDS strategy #172](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/172)
-- [Replace join_chat boolean with chat: ChatPresence #253](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/253)
 - [Add stats #318](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/318)
 
 # README Contents
