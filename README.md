@@ -348,7 +348,7 @@ docker run \
     tkdalex/twitch-channel-points-miner-v2
 ```
 
-`$(pwd)` Could not work on Windows (cmd), please us the absolute path instead, like: `/path/of/your/cookies:/usr/src/app/cookies`.
+`$(pwd)` Could not work on Windows (cmd), please use the absolute path instead, like: `/path/of/your/cookies:/usr/src/app/cookies`.
 If you don't mount the volume for the analytics (or cookies or logs) folder, the folder will be automatically created on the Docker container, and you will lose all the data when it is stopped.
 If you don't have a cookie or It's your first time running the script, you will need to login to Twitch and start the container with `-it` args. If you need to run multiple containers you can bind different ports (only if you need also the analytics) and mount dirrent run.py file, like
 ```sh
