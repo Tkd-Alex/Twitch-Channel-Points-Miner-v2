@@ -10,7 +10,7 @@ class Telegram(object):
 
     def __init__(
         self, chat_id: int, token: str, events: list, disable_notification: bool = False
-    ):Add Discord like Telegram Integrations
+    ):
         self.chat_id = chat_id
         self.telegram_api = f"https://api.telegram.org/bot{token}/sendMessage"
         self.events = [str(e) for e in events]
