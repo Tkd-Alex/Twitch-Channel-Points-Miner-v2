@@ -221,7 +221,7 @@ twitch_miner = TwitchChannelPointsMiner(
             events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, "BET_LOSE"],   # Only these events will be sent to the chat
             disable_notification=True,                                              # Revoke the notification (sound/vibration)
         ),
-       
+
         discord=Discord(
             discord_webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",  #Discord Webhook URL
             events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],               # Only these events will be sent to the chat
@@ -441,7 +441,7 @@ Telegram(
 ```
 
 #### Discord
-If you want to receive log updates on Discord initiate a new Discord class, else leave omit this parameter or set as None 
+If you want to receive log updates on Discord initiate a new Discord class, else leave omit this parameter or set as None
 1. Go to the Server you want to receive updates
 2. Click "Edit Channel"
 3. Click "Integrations"

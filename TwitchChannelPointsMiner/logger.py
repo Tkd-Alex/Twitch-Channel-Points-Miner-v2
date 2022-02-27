@@ -8,9 +8,9 @@ from pathlib import Path
 import emoji
 from colorama import Fore, init
 
+from TwitchChannelPointsMiner.classes.DiscordWebhook import Discord
 from TwitchChannelPointsMiner.classes.Settings import Events
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
-from TwitchChannelPointsMiner.classes.DiscordWebhook import Discord
 from TwitchChannelPointsMiner.utils import remove_emoji
 
 
