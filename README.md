@@ -441,8 +441,8 @@ Telegram(
 ```
 
 #### Discord
-If you want to reive log updates on Discord initiate a new Discord class, else leave omit this parameter or set as None 
-1. Go to the Server you want to recieve updates
+If you want to receive log updates on Discord initiate a new Discord class, else leave omit this parameter or set as None 
+1. Go to the Server you want to receive updates
 2. Click "Edit Channel"
 3. Click "Integrations"
 4. Click "Webhooks"
