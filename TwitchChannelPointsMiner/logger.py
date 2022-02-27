@@ -138,11 +138,7 @@ class GlobalFormatter(logging.Formatter):
                 )
 
         if hasattr(record, "event"):
-            skip_discord = (
-                False
-                if hasattr(record, "skip_discord") is False
-                else True
-            )
+            skip_discord = False if hasattr(record, "skip_discord") is False else True
             if self.settings.discord is not None and skip_discord is False:
                 self.settings.discord.send(record.msg, record.event)
 
