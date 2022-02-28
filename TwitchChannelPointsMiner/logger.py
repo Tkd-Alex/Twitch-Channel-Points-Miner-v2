@@ -132,7 +132,6 @@ class GlobalFormatter(logging.Formatter):
                     f"{self.settings.color_palette.get(record.event)}{record.msg}"
                 )
 
-        if hasattr(record, "event"):
             skip_discord = False if hasattr(record, "skip_discord") is False else True
             if self.settings.discord is not None and skip_discord is False:
                 self.settings.discord.send(record.msg, record.event)
@@ -141,6 +140,7 @@ class GlobalFormatter(logging.Formatter):
                 record.msg = (
                     f"{self.settings.color_palette.get(record.event)}{record.msg}"
                 )
+
         return super().format(record)
 
 
