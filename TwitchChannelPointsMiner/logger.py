@@ -123,11 +123,7 @@ class GlobalFormatter(logging.Formatter):
             record.msg = remove_emoji(record.msg)
 
         if hasattr(record, "event"):
-            skip_telegram = (
-                False
-                if hasattr(record, "skip_telegram") is False
-                else True
-            )
+            skip_telegram = False if hasattr(record, "skip_telegram") is False else True
             if self.settings.telegram is not None and skip_telegram is False:
                 self.settings.telegram.send(record.msg, record.event)
 
@@ -137,11 +133,7 @@ class GlobalFormatter(logging.Formatter):
                 )
 
         if hasattr(record, "event"):
-            skip_discord = (
-                False
-                if hasattr(record, "skip_discord") is False
-                else True
-            )
+            skip_discord = False if hasattr(record, "skip_discord") is False else True
             if self.settings.telegram is not None and skip_discord is False:
                 self.settings.telegram.send(record.msg, record.event)
 
