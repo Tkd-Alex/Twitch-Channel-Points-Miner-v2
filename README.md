@@ -451,7 +451,7 @@ If you want to receive log updates on Discord initiate a new Discord class, else
 7. Click on "Copy Webhook URL"
 ```python
 Discord(
-   discord_webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",
+   webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",
    events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],
 )
 ```
