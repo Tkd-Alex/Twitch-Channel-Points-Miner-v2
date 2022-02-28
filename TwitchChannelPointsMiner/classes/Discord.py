@@ -6,16 +6,16 @@ from TwitchChannelPointsMiner.classes.Settings import Events
 
 
 class Discord(object):
-    __slots__ = ["discord_webhook_api", "events"]
+    __slots__ = ["webhook_api", "events"]
 
-    def __init__(self, discord_webhook_api: str, events: list):
-        self.discord_webhook_api = discord_webhook_api
+    def __init__(self, webhook_api: str, events: list):
+        self.webhook_api = webhook_api
         self.events = [str(e) for e in events]
 
     def send(self, message: str, event: Events) -> None:
         if str(event) in self.events:
             requests.post(
-                url=self.discord_webhook_api,
+                url=self.webhook_api,
                 data={
                     "content": dedent(message),
                     "username": "Twitch Channel Points Miner",
