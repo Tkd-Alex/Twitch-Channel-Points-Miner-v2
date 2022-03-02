@@ -190,7 +190,12 @@ def check_versions():
         current_version = "0.0.0"
     try:
         r = requests.get(
-            path.join(GITHUB_url, "TwitchChannelPointsMiner", "__init__.py")
+            "/".join(
+                [
+                    s.strip("/")
+                    for s in [GITHUB_url, "TwitchChannelPointsMiner", "__init__.py"]
+                ]
+            )
         )
         github_version = init2dict(r.text)
         github_version = (
