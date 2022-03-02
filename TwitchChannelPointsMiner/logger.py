@@ -124,10 +124,12 @@ class GlobalFormatter(logging.Formatter):
 
         if hasattr(record, "event"):
             skip_telegram = False if hasattr(record, "skip_telegram") is False else True
-            skip_telegram = (
-                True if self.settings.telegram.chat_id == 123456789 else False
-            )
-            if self.settings.telegram is not None and skip_telegram is False:
+
+            if (
+                self.settings.telegram is not None
+                and skip_telegram is False
+                and self.settings.telegram.chat_id != 123456789
+            ):
                 self.settings.telegram.send(record.msg, record.event)
 
             if self.settings.colored is True:
@@ -136,13 +138,13 @@ class GlobalFormatter(logging.Formatter):
                 )
 
             skip_discord = False if hasattr(record, "skip_discord") is False else True
-            skip_discord = (
-                True
-                if self.settings.discord.webhook_api
-                == "https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J"
-                else False
-            )
-            if self.settings.discord is not None and skip_discord is False:
+
+            if (
+                self.settings.discord is not None
+                and skip_discord is False
+                and self.settings.discord.webhook_api
+                != "https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J"
+            ):
                 self.settings.discord.send(record.msg, record.event)
 
             if self.settings.colored is True:
