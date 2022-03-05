@@ -9,7 +9,7 @@ from dateutil import parser
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.entities.Message import Message
 from TwitchChannelPointsMiner.classes.entities.Raid import Raid
-from TwitchChannelPointsMiner.classes.Settings import Settings
+from TwitchChannelPointsMiner.classes.Settings import Events
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
@@ -187,13 +187,12 @@ class WebSocketsPool:
                         if message.type == "points-earned":
                             earned = message.data["point_gain"]["total_points"]
                             reason_code = message.data["point_gain"]["reason_code"]
+
                             logger.info(
                                 f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
                                 extra={
                                     "emoji": ":rocket:",
-                                    "color": Settings.logger.color_palette.get(
-                                        f"GAIN_FOR_{reason_code}"
-                                    ),
+                                    "event": Events.get(f"GAIN_FOR_{reason_code}"),
                                 },
                             )
                             ws.streamers[streamer_index].update_history(
@@ -286,7 +285,7 @@ class WebSocketsPool:
                                             f"Place the bet after: {start_after}s for: {ws.events_predictions[event_id]}",
                                             extra={
                                                 "emoji": ":alarm_clock:",
-                                                "color": Settings.logger.color_palette.BET_START,
+                                                "event": Events.BET_START,
                                             },
                                         )
                                     else:
@@ -294,7 +293,7 @@ class WebSocketsPool:
                                             f"{streamer} have only {streamer.channel_points} channel points and the minimum for bet is: {bet_settings.minimum_points}",
                                             extra={
                                                 "emoji": ":pushpin:",
-                                                "color": Settings.logger.color_palette.BET_FILTERS,
+                                                "event": Events.BET_FILTERS,
                                             },
                                         )
 
@@ -328,10 +327,13 @@ class WebSocketsPool:
                                 choice = event_prediction.bet.decision["choice"]
 
                                 logger.info(
-                                    f"{event_prediction} - Decision: {choice}: {decision['title']} ({decision['color']}) - Result: {event_prediction.result['string']}",
+                                    (
+                                        f"{event_prediction} - Decision: {choice}: {decision['title']} "
+                                        f"({decision['color']}) - Result: {event_prediction.result['string']}"
+                                    ),
                                     extra={
                                         "emoji": ":bar_chart:",
-                                        "color": Settings.logger.color_palette.get(
+                                        "event": Events.get(
                                             f"BET_{event_prediction.result['type']}"
                                         ),
                                     },
