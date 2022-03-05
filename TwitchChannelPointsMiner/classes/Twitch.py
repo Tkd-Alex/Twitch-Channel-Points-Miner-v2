@@ -378,11 +378,18 @@ class Twitch(object):
                                                 extra={
                                                     "event": Events.DROP_STATUS,
                                                     "skip_telegram": True,
+                                                    "skip_discord": True,
                                                 },
                                             )
 
                                         if Settings.logger.telegram is not None:
                                             Settings.logger.telegram.send(
+                                                "\n".join(drop_messages),
+                                                Events.DROP_STATUS,
+                                            )
+
+                                        if Settings.logger.discord is not None:
+                                            Settings.logger.discord.send(
                                                 "\n".join(drop_messages),
                                                 Events.DROP_STATUS,
                                             )
