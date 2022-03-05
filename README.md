@@ -188,6 +188,7 @@ import logging
 from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
+from TwitchChannelPointsMiner.classes.Discord import Discord
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
 from TwitchChannelPointsMiner.classes.Settings import Priority, Events, FollowersOrder
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
@@ -219,6 +220,10 @@ twitch_miner = TwitchChannelPointsMiner(
             token="123456789:shfuihreuifheuifhiu34578347",                          # Telegram API token @BotFather
             events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, "BET_LOSE"],   # Only these events will be sent to the chat
             disable_notification=True,                                              # Revoke the notification (sound/vibration)
+        ),
+        discord=Discord(
+            webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",  # Discord Webhook URL
+            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],       # Only these events will be sent to the chat
         )
     ),
     streamer_settings=StreamerSettings(
@@ -390,6 +395,7 @@ You can combine all priority but keep in mind that use `ORDER` and `POINTS_ASCEN
 | `auto_clear`      | bool            	| True 	                                                              | Create a file rotation handler with interval = 1D and backupCount = 7 [#215](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/215)                                       |
 | `color_palette`   | ColorPalette      | All messages are Fore.RESET except WIN and LOSE bet (GREEN and RED) | Create your custom color palette. Read more above.      	                                                                                                                              |
 | `telegram`        | Telegram          | None                                                                | (Optional) Receive Telegram updates for multiple events list [#233](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/233)                                                           |
+| `discord`         | Discord          | None                                                                 | (Optional) Receive Discord updates for multiple events list [#320](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/320)                                                           |
 
 #### Color Palette
 Now you can customize the color of the terminal message. We have created a default ColorPalette that provide all the message with `DEFAULT (RESET)` color and the `BET_WIN` and `BET_LOSE` message `GREEN` and `RED` respectively. You can change the colors of all `Events` enum class. The colors allowed are all the Fore color from Colorama: `BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.`
@@ -420,7 +426,7 @@ If you want to receive logs update on Telegram initiate a new Telegram class, el
 | Key                	 | Type            	| Default 	| Description                                                        |
 |----------------------- |-----------------	|---------	|------------------------------------------------------------------- |
 | `chat_id`         	 | int        	    |           | Chat ID to send messages @GiveChatId                               |
-| `token`       	     | string           |        	| Telegram API token @BotFather                                      |
+| `token`       	 | string           |        	| Telegram API token @BotFather                                      |
 | `events`   	         | list             |       	| Only these events will be sent to the chat. Array of Event. or str |
 | `disable_notification` | bool             | false   	| Revoke the notification (sound/vibration)                          |
 
@@ -433,6 +439,30 @@ Telegram(
     disable_notification=True,
 )
 ```
+
+#### Discord
+If you want to receive log updates on Discord initialize a new Discord class, else leave omit this parameter or set it as None [YT Video](https://www.youtube.com/watch?v=fKksxz2Gdnc)
+1. Go to the Server you want to receive updates
+2. Click "Edit Channel"
+3. Click "Integrations"
+4. Click "Webhooks"
+5. Click "New Webhook"
+6. Name it if you want
+7. Click on "Copy Webhook URL"
+
+
+| Key                	 | Type            	| Default 	| Description                                                        |
+|----------------------- |---------------------	|--------------	|------------------------------------------------------------------- |
+| `webhook_api`          | string        	|           	| Discord webhook URL                                                |
+| `events`   	         | list             	|       	| Only these events will be sent to the chat. Array of Event. or str |
+
+```python
+Discord(
+   webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",
+   events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],
+)
+```
+
 
 #### Events
  - `STREAMER_ONLINE`
