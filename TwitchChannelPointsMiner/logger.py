@@ -8,6 +8,7 @@ from pathlib import Path
 import emoji
 from colorama import Fore, init
 
+from TwitchChannelPointsMiner.classes.Discord import Discord
 from TwitchChannelPointsMiner.classes.Settings import Events
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
 from TwitchChannelPointsMiner.utils import remove_emoji
@@ -66,6 +67,7 @@ class LoggerSettings:
         "color_palette",
         "auto_clear",
         "telegram",
+        "discord",
     ]
 
     def __init__(
@@ -79,6 +81,7 @@ class LoggerSettings:
         color_palette: ColorPalette = ColorPalette(),
         auto_clear: bool = True,
         telegram: Telegram or None = None,
+        discord: Discord or None = None,
     ):
         self.save = save
         self.less = less
@@ -89,6 +92,7 @@ class LoggerSettings:
         self.color_palette = color_palette
         self.auto_clear = auto_clear
         self.telegram = telegram
+        self.discord = discord
 
 
 class GlobalFormatter(logging.Formatter):
@@ -119,14 +123,29 @@ class GlobalFormatter(logging.Formatter):
             record.msg = remove_emoji(record.msg)
 
         if hasattr(record, "event"):
-            skip_telegram = (
-                False
-                if hasattr(record, "skip_telegram") is False
-                or hasattr(record, "skip_telegram") is False
-                else True
-            )
-            if self.settings.telegram is not None and skip_telegram is False:
+            skip_telegram = False if hasattr(record, "skip_telegram") is False else True
+
+            if (
+                self.settings.telegram is not None
+                and skip_telegram is False
+                and self.settings.telegram.chat_id != 123456789
+            ):
                 self.settings.telegram.send(record.msg, record.event)
+
+            if self.settings.colored is True:
+                record.msg = (
+                    f"{self.settings.color_palette.get(record.event)}{record.msg}"
+                )
+
+            skip_discord = False if hasattr(record, "skip_discord") is False else True
+
+            if (
+                self.settings.discord is not None
+                and skip_discord is False
+                and self.settings.discord.webhook_api
+                != "https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J"
+            ):
+                self.settings.discord.send(record.msg, record.event)
 
             if self.settings.colored is True:
                 record.msg = (
