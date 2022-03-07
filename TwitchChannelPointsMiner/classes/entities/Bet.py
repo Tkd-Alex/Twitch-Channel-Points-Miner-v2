@@ -11,6 +11,7 @@ class Strategy(Enum):
     MOST_VOTED = auto()
     HIGH_ODDS = auto()
     PERCENTAGE = auto()
+    SMART_MONEY = auto()
     SMART = auto()
 
     def __str__(self):
@@ -268,6 +269,8 @@ class Bet(object):
             self.decision["choice"] = self.__return_choice(OutcomeKeys.ODDS)
         elif self.settings.strategy == Strategy.PERCENTAGE:
             self.decision["choice"] = self.__return_choice(OutcomeKeys.ODDS_PERCENTAGE)
+        elif self.settings.strategy == Strategy.SMART_MONEY:
+            self.decision["choice"] = self.__return_choice(OutcomeKeys.TOP_POINTS)
         elif self.settings.strategy == Strategy.SMART:
             difference = abs(
                 self.outcomes[0][OutcomeKeys.PERCENTAGE_USERS]
