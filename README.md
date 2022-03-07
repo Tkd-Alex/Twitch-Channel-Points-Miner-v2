@@ -21,9 +21,8 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
 ## 📢 Help wanted
 Currently, we have a lot of PRs requests opened, but the time to test and improve It's less and less. If you want to help the community and the project, please test the following PRs and give us feedback:
 - [Features/improvements to analytics #131](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/131)
-- [Betting strategy: Smart money #348](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/348)
 - [Add SMART_HIGH_ODDS strategy #172](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/172)
-- [Add stats #318](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/318)
+- [Add support for arbitrary filter functions #336](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/336)
 
 # README Contents
 1. 🤝 [Community](#community)
