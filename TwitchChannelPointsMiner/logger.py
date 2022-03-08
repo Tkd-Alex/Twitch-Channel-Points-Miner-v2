@@ -132,11 +132,6 @@ class GlobalFormatter(logging.Formatter):
             ):
                 self.settings.telegram.send(record.msg, record.event)
 
-            if self.settings.colored is True:
-                record.msg = (
-                    f"{self.settings.color_palette.get(record.event)}{record.msg}"
-                )
-
             skip_discord = False if hasattr(record, "skip_discord") is False else True
 
             if (
