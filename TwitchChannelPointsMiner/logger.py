@@ -219,8 +219,8 @@ def configure_loggers(username, settings):
         # Add logger handlers to the logger queue and start the process
         queue_listener = QueueListener(logger_queue,file_handler,console_handler,respect_handler_level=True)
         queue_listener.start()
-        return logs_file
+        return logs_file, queue_listener
     else:
         queue_listener = QueueListener(logger_queue,console_handler,respect_handler_level=True)
         queue_listener.start()
-        return None
+        return None, queue_listener

@@ -64,6 +64,7 @@ class TwitchChannelPointsMiner:
         "start_datetime",
         "original_streamers",
         "logs_file",
+        "queue_listener",
     ]
 
     def __init__(
@@ -108,7 +109,7 @@ class TwitchChannelPointsMiner:
         self.start_datetime = None
         self.original_streamers = []
 
-        self.logs_file = configure_loggers(self.username, logger_settings)
+        self.logs_file,self.queue_listener = configure_loggers(self.username, logger_settings)
 
         # Check for the latest version of the script
         current_version, github_version = check_versions()
@@ -347,6 +348,9 @@ class TwitchChannelPointsMiner:
                 streamer.mutex.release()
 
         self.__print_report()
+
+        # Stop the queue listener to make sure all messages have been logged
+        self.queue_listener.stop()
 
         sys.exit(0)
 
