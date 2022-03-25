@@ -123,29 +123,8 @@ class GlobalFormatter(logging.Formatter):
             record.msg = remove_emoji(record.msg)
 
         if hasattr(record, "event"):
-            skip_telegram = False if hasattr(record, "skip_telegram") is False else True
-
-            if (
-                self.settings.telegram is not None
-                and skip_telegram is False
-                and self.settings.telegram.chat_id != 123456789
-            ):
-                self.settings.telegram.send(record.msg, record.event)
-
-            if self.settings.colored is True:
-                record.msg = (
-                    f"{self.settings.color_palette.get(record.event)}{record.msg}"
-                )
-
-            skip_discord = False if hasattr(record, "skip_discord") is False else True
-
-            if (
-                self.settings.discord is not None
-                and skip_discord is False
-                and self.settings.discord.webhook_api
-                != "https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J"
-            ):
-                self.settings.discord.send(record.msg, record.event)
+            self.telegram(record)
+            self.discord(record)
 
             if self.settings.colored is True:
                 record.msg = (
@@ -153,6 +132,27 @@ class GlobalFormatter(logging.Formatter):
                 )
 
         return super().format(record)
+
+    def telegram(self, record):
+        skip_telegram = False if hasattr(record, "skip_telegram") is False else True
+
+        if (
+            self.settings.telegram is not None
+            and skip_telegram is False
+            and self.settings.telegram.chat_id != 123456789
+        ):
+            self.settings.telegram.send(record.msg, record.event)
+
+    def discord(self, record):
+        skip_discord = False if hasattr(record, "skip_discord") is False else True
+
+        if (
+            self.settings.discord is not None
+            and skip_discord is False
+            and self.settings.discord.webhook_api
+            != "https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J"
+        ):
+            self.settings.discord.send(record.msg, record.event)
 
 
 def configure_loggers(username, settings):
