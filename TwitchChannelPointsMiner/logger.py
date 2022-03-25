@@ -3,8 +3,7 @@ import os
 import platform
 import queue
 from datetime import datetime
-from logging.handlers import (QueueHandler, QueueListener,
-                              TimedRotatingFileHandler)
+from logging.handlers import QueueHandler, QueueListener, TimedRotatingFileHandler
 from pathlib import Path
 
 import emoji
