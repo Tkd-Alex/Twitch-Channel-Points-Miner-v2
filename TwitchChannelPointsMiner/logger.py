@@ -3,7 +3,8 @@ import os
 import platform
 import queue
 from datetime import datetime
-from logging.handlers import TimedRotatingFileHandler,QueueHandler,QueueListener
+from logging.handlers import (QueueHandler, QueueListener,
+                              TimedRotatingFileHandler)
 from pathlib import Path
 
 import emoji
@@ -165,7 +166,7 @@ def configure_loggers(username, settings):
     queue_handler = QueueHandler(logger_queue)
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
-    # Add the queue handler to the root logger 
+    # Add the queue handler to the root logger
     # Send log messages to another thread through the queue
     root_logger.addHandler(queue_handler)
 
@@ -215,12 +216,16 @@ def configure_loggers(username, settings):
             )
         )
         file_handler.setLevel(settings.file_level)
-        
+
         # Add logger handlers to the logger queue and start the process
-        queue_listener = QueueListener(logger_queue,file_handler,console_handler,respect_handler_level=True)
+        queue_listener = QueueListener(
+            logger_queue, file_handler, console_handler, respect_handler_level=True
+        )
         queue_listener.start()
         return logs_file, queue_listener
     else:
-        queue_listener = QueueListener(logger_queue,console_handler,respect_handler_level=True)
+        queue_listener = QueueListener(
+            logger_queue, console_handler, respect_handler_level=True
+        )
         queue_listener.start()
         return None, queue_listener
