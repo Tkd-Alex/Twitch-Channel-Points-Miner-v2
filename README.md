@@ -514,6 +514,8 @@ Allowed values for `chat` are:
 - **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same as select LOWEST_ODDS
 - **SMART_MONEY**: Select the option with the highest points placed. [#331](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/331)
 - **SMART**: If the majority in percent chose an option, then follow the other users, otherwise select the option with the highest odds
+- **KELLY**: Selects the option and bet amount based on maximum possible payout. Based on the [Kelly Criterion](https://en.wikipedia.org/wiki/Kelly_criterion#Gambling_formula).
+- **KELLY_FRACTIONAL**: Functions like **KELLY** except it places a fraction of the bet using the `percentage`. It's advised you set the percentage to 25 or 50 as it's no longer betting `Total Points * Percentage` but `Total Points * (Kelly * Percentage)`.
 
 ![Screenshot](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/prediction.png)
 
@@ -523,6 +525,8 @@ Here a concrete example:
 - **HIGH_ODDS**: The highest odd is 2.27 on **'over 7.5'** vs 1.79 on 'under 7.5'
 - **PERCENTAGE**: The highest percentage is 56% for **'under 7.5'**
 - **SMART**: Calculate the percentage based on the users. The percentages are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percentages is higher than `percentage_gap` select the highest percentage, else the highest odds.
+- **KELLY**: In this case the estimated win rate is 70% (21/30 bettors) and the payout 2.27 for side A. The optimal bet would be **46%** on **A**.
+- **KELLY_FRACTIONAL**: This bets a fraction of the optimal **KELLY** bet. If `percentage` is 50 and the **KELLY** bet is **46%**, it would bet **23%**.
 
 In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 ### FilterCondition
