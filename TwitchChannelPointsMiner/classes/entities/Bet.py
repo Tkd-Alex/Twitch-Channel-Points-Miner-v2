@@ -13,6 +13,8 @@ class Strategy(Enum):
     PERCENTAGE = auto()
     SMART_MONEY = auto()
     SMART = auto()
+    KELLY = auto()
+    KELLY_FRACTIONAL = auto()
 
     def __str__(self):
         return self.name
@@ -261,6 +263,10 @@ class Bet(object):
         else:
             return False, 0  # Default don't skip the bet
 
+    #Implementation of the Kelly criterion. Don't mess with parentheses
+    def kelly(self, index = 0) -> float:
+        return self.outcomes[index][OutcomeKeys.PERCENTAGE_USERS]*0.01 - ((1-self.outcomes[index][OutcomeKeys.PERCENTAGE_USERS]*0.01)/(self.outcomes[index][OutcomeKeys.ODDS]-1))
+
     def calculate(self, balance: int) -> dict:
         self.decision = {"choice": None, "amount": 0, "id": None}
         if self.settings.strategy == Strategy.MOST_VOTED:
@@ -271,6 +277,12 @@ class Bet(object):
             self.decision["choice"] = self.__return_choice(OutcomeKeys.ODDS_PERCENTAGE)
         elif self.settings.strategy == Strategy.SMART_MONEY:
             self.decision["choice"] = self.__return_choice(OutcomeKeys.TOP_POINTS)
+        elif self.settings.strategy == Strategy.KELLY or self.settings.strategy == Strategy.KELLY_FRACTIONAL:
+            self.decision["choice"] = (
+                "A"
+                if self.kelly() >= 0
+                else "B"
+            )
         elif self.settings.strategy == Strategy.SMART:
             difference = abs(
                 self.outcomes[0][OutcomeKeys.PERCENTAGE_USERS]
@@ -285,8 +297,15 @@ class Bet(object):
         if self.decision["choice"] is not None:
             index = char_decision_as_index(self.decision["choice"])
             self.decision["id"] = self.outcomes[index]["id"]
+            percentage = (self.settings.percentage / 100)
+            if self.settings.strategy == Strategy.KELLY:
+                percentage = abs(self.kelly(index))
+            elif self.settings.strategy == Strategy.KELLY_FRACTIONAL:
+                percentage = abs(self.kelly(index)) * (self.settings.percentage / 100)
+            #It's technically possible to get a percentage lower than 1%, this is a precaution
+            max(0.01, percentage)
             self.decision["amount"] = min(
-                int(balance * (self.settings.percentage / 100)),
+                int(balance * percentage),
                 self.settings.max_points,
             )
             if (
