@@ -265,7 +265,7 @@ class Bet(object):
 
     #Implementation of the Kelly criterion. Don't mess with parentheses
     def kelly(self, index = 0) -> float:
-        return max(0.01, self.outcomes[index][OutcomeKeys.PERCENTAGE_USERS]*0.01 - ((1-self.outcomes[index][OutcomeKeys.PERCENTAGE_USERS]*0.01)/(self.outcomes[index][OutcomeKeys.ODDS]-1)))
+        return self.outcomes[index][OutcomeKeys.PERCENTAGE_USERS]*0.01 - ((1-self.outcomes[index][OutcomeKeys.PERCENTAGE_USERS]*0.01)/(self.outcomes[index][OutcomeKeys.ODDS]-1))
 
     def calculate(self, balance: int) -> dict:
         self.decision = {"choice": None, "amount": 0, "id": None}
@@ -302,6 +302,7 @@ class Bet(object):
                 percentage = self.kelly(index)
             elif self.settings.strategy == Strategy.KELLY_FRACTIONAL:
                 percentage = self.kelly(index) * (self.settings.percentage / 100)
+            max(0.01, percentage)
             self.decision["amount"] = min(
                 int(balance * percentage),
                 self.settings.max_points,
