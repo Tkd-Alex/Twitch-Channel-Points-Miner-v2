@@ -299,9 +299,9 @@ class Bet(object):
             self.decision["id"] = self.outcomes[index]["id"]
             percentage = (self.settings.percentage / 100)
             if self.settings.strategy == Strategy.KELLY:
-                percentage = abs(self.kelly(index))
+                percentage = self.kelly(index)
             elif self.settings.strategy == Strategy.KELLY_FRACTIONAL:
-                percentage = abs(self.kelly(index)) * (self.settings.percentage / 100)
+                percentage = self.kelly(index) * (self.settings.percentage / 100)
             self.decision["amount"] = min(
                 int(balance * percentage),
                 self.settings.max_points,
