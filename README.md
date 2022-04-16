@@ -64,13 +64,13 @@ If you want to offer me a coffee, I would be grateful ❤️
 | <img src="https://dynamic-assets.coinbase.com/dbb4b4983bde81309ddab83eb598358eb44375b930b94687ebe38bc22e52c3b2125258ffb8477a5ef22e33d6bd72e32a506c391caa13af64c00e46613c3e5806/asset_icons/4113b082d21cc5fab17fc8f2d19fb996165bcce635e6900f7fc2d57c4ef33ae9.png" alt="Donate ETH" height="16" width="16"> | `0x3cc331b8AB0634CCcfa3bd57E0C625F7E886cAfa`  |
 | <img src="https://dynamic-assets.coinbase.com/d2ba1ad058b9b0eb4de5f0ccbf0e4aecb8d73d3a183dbaeabbec2b6fd77b0a636598e08467a05da7e69f39c65693f627edf7414145ee6c61e01efc831652ca0f/asset_icons/8733712db93f857c04b7c58fb35eafb3be360a183966a1e57a6e22ee5f78c96d.png" alt="Donate SOL" height="16" width="16"> | `pg8Z2VqMVskSEA77g5QqppaQjehGGCWJfVPw9n91AX1` |
 
-If you have any issues or you want to contribute, you are welcome! But please before read the [CONTRIBUTING.md](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/CONTRIBUTING.md) file.
+If you have any issues, or you want to contribute, you are welcome! But please before read the [CONTRIBUTING.md](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/CONTRIBUTING.md) file.
 
 ## Main differences from the original repository:
 
 - Improve the logging - Emoji, colors, file and soo on
 - Final report with all the data
-- Rewrite the entire code using classe instead of module with global variables
+- Rewrite the entire code using classes instead of module with global variables
 - Automatic download the follower's list and use it as input
 - Better 'Watch Streak' strategy in priority system [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)
 - Auto claim game drops from Twitch inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) Read more about game drops [here](https://help.twitch.tv/s/article/mission-based-drops)
@@ -493,8 +493,8 @@ Discord(
 Allowed values for `chat` are:
 - `ALWAYS` Join in IRC chat and never leave
 - `NEVER` Never join IRC chat
-- `ONLINE` Partecipate to IRC chat if the streamer is online (leave if offline)
-- `OFFLINE` Partecipate to IRC chat if the streamer is offline (leave if online)
+- `ONLINE` Participate to IRC chat if the streamer is online (leave if offline)
+- `OFFLINE` Participate to IRC chat if the streamer is offline (leave if online)
 
 ### BetSettings
 | Key                	| Type            	| Default 	| Description                                                                                                    	                                                                          |
@@ -561,11 +561,11 @@ Allowed values for `where` are: `GT, LT, GTE, LTE`
 Here's a concrete example. Let's suppose we have a bet that is opened with a timer of 10 minutes:
 
 - **FROM_START** with `delay=20`: The bet will be placed 20s after the bet is opened
-- **FROM_END** with `delay=20`: The bet will be placed 20s before the end of the bet (so 9mins 40s after the bet is opened)
-- **PERCENTAGE** with `delay=0.2`: The bet will be placed when the timer went down by 20% (so 2mins after the bet is opened)
+- **FROM_END** with `delay=20`: The bet will be placed 20s before the end of the bet (so 9 min 40s after the bet is opened)
+- **PERCENTAGE** with `delay=0.2`: The bet will be placed when the timer went down by 20% (so 2 min after the bet is opened)
 
-## Analytics
-We have recently introduced a little frontend where you can show with a chart you points trend. The script will spawn a Flask web-server on your machine where you can select binding address and port.
+## Analytics               
+We have recently introduced a small frontend where you can see a chart with your points trend. The script will spawn a Flask web-server on your machine where you can select binding address and port.
 The chart provides some annotation to handle the prediction and watch strike events. Usually annotation are used to notice big increase / decrease of points. If you want to can disable annotations.
 On each (x, y) points Its present a tooltip that show points, date time and reason of points gained / lost. This web page was just a funny idea, and it is not intended to use for a professional usage.
 If you want you can toggle the dark theme with the dedicated checkbox.
@@ -575,7 +575,7 @@ If you want you can toggle the dark theme with the dedicated checkbox.
 | ![Light theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-light.png) | ![Dark theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-dark.png) |
 
 For use this feature just call the `analytics` method before start mining. Read more at: [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
-The chart will be autofreshed each `refresh` minutes. If you want to connect from one to second machine that have that webpanel you have to use `0.0.0.0` instead of `127.0.0.1`. With the `days_ago` arg you can select how many days you want to show by default in your analytics graph.
+The chart will be auto refreshed each `refresh` minutes. If you want to connect from one to second machine that have that webpanel you have to use `0.0.0.0` instead of `127.0.0.1`. With the `days_ago` arg you can select how many days you want to show by default in your analytics graph.
 ```python
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
@@ -624,7 +624,7 @@ Configure your miner on your preferences by typing
 When you have configured it now we can rename it (optional):
 `mv example.py run.py`
 
-We have to also install dependences required to run miner:
+We have to also install dependencies required to run miner:
 `pip install -r requirements.txt`
 
 **(3 way):** `pip install Twitch-Channel-Points-Miner-v2`

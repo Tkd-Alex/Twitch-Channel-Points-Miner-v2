@@ -74,7 +74,7 @@ class TwitchChannelPointsMiner:
         claim_drops_startup: bool = False,
         # Settings for logging and selenium as you can see.
         priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
-        # This settings will be global shared trought Settings class
+        # These settings will be globally shared throughout the Setting class
         logger_settings: LoggerSettings = LoggerSettings(),
         # Default values for all streamers
         streamer_settings: StreamerSettings = StreamerSettings(),
