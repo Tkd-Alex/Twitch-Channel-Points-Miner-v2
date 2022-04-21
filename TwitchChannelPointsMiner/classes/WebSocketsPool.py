@@ -188,10 +188,23 @@ class WebSocketsPool:
                             earned = message.data["point_gain"]["total_points"]
                             reason_code = message.data["point_gain"]["reason_code"]
 
+                            def whatEmoji(reason_code):
+                                match reason_code:
+                                    case 'RAID':
+                                        return ':rocket:'
+                                    case 'CLAIM':
+                                        return ':moneybag:'
+                                    case 'WATCH':
+                                        return ':rocket:'
+                                    case 'WATCH_STREAK':
+                                        return ':tickets:'
+                                    case _:
+                                        return ':information_source:'
+                                                        
                             logger.info(
                                 f"+{earned} → {ws.streamers[streamer_index]} - Reason: {reason_code}.",
                                 extra={
-                                    "emoji": ":rocket:",
+                                    "emoji": whatEmoji(reason_code),
                                     "event": Events.get(f"GAIN_FOR_{reason_code}"),
                                 },
                             )
