@@ -220,7 +220,6 @@ class WebSocketsPool:
                                         return '👑 roi_louis'
                                     case _:
                                         return streamerName
-                                                        
                             logger.info(
                                 f"**{reason_code}** _(+{earned})_   =>   {whoStreamer(ws.streamers[streamer_index])}",
                                 extra={
