@@ -18,7 +18,7 @@ class Discord(object):
                 url=self.webhook_api,
                 data={
                     "content": dedent(message),
-                    "username": "Twitch Channel Points Miner",
-                    "avatar_url": "https://i.imgur.com/X9fEkhT.png",
+                    "username": "⛏️ Twitch Miner",
+                    "avatar_url": "https://img.icons8.com/external-smashingstocks-circular-smashing-stocks/260/000000/external-miner-bitcoin-blockchain-and-cryptocurrency-smashingstocks-circular-smashing-stocks.png",
                 },
             )

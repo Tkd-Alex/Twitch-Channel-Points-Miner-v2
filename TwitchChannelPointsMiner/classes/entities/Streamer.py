@@ -4,6 +4,7 @@ import os
 import time
 from datetime import datetime
 from threading import Lock
+from tokenize import String
 
 from TwitchChannelPointsMiner.classes.Chat import ChatPresence, ThreadChat
 from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings, DelayMode
@@ -23,6 +24,7 @@ class StreamerSettings(object):
         "watch_streak",
         "bet",
         "chat",
+        "custom_name",
     ]
 
     def __init__(
@@ -33,6 +35,7 @@ class StreamerSettings(object):
         watch_streak: bool = None,
         bet: BetSettings = None,
         chat: ChatPresence = None,
+        custom_name: str = "",
     ):
         self.make_predictions = make_predictions
         self.follow_raid = follow_raid
@@ -40,6 +43,7 @@ class StreamerSettings(object):
         self.watch_streak = watch_streak
         self.bet = bet
         self.chat = chat
+        self.custom_name = custom_name
 
     def default(self):
         for name in [
@@ -56,7 +60,7 @@ class StreamerSettings(object):
             self.chat = ChatPresence.ONLINE
 
     def __repr__(self):
-        return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, watch_streak={self.watch_streak}, bet={self.bet}, chat={self.chat})"
+        return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, watch_streak={self.watch_streak}, bet={self.bet}, chat={self.chat}, custom_name={self.custom_name})"
 
 
 class Streamer(object):
@@ -78,6 +82,7 @@ class Streamer(object):
         "history",
         "streamer_url",
         "mutex",
+        "started_points",
     ]
 
     def __init__(self, username, settings=None):
@@ -93,6 +98,7 @@ class Streamer(object):
         self.viewer_is_mod = False
         self.activeMultipliers = None
         self.irc_chat = None
+        self.started_points = 0
 
         self.stream = Stream()
 
@@ -107,11 +113,18 @@ class Streamer(object):
         return f"Streamer(username={self.username}, channel_id={self.channel_id}, channel_points={_millify(self.channel_points)})"
 
     def __str__(self):
-        return (
-            f"{self.username} ({_millify(self.channel_points)} points)"
-            if Settings.logger.less
-            else self.__repr__()
-        )
+        if self.settings.custom_name != "undefined":
+            return (
+                f"**{self.settings.custom_name}**  ( :coin: : {_millify(self.channel_points)} )"
+                if Settings.logger.less
+                else self.__repr__()
+            )
+        else:
+            return (
+                f"**{self.username}**  ( :coin: : {_millify(self.channel_points)} )"
+                if Settings.logger.less
+                else self.__repr__()
+            )
 
     def set_offline(self):
         if self.is_online is True:
@@ -120,26 +133,35 @@ class Streamer(object):
 
         self.toggle_chat()
 
-        logger.info(
-            f"{self} is Offline!",
-            extra={
-                "emoji": ":sleeping:",
-                "event": Events.STREAMER_OFFLINE,
-            },
-        )
+        if self.started_points == 0:
+            logger.info(
+                f"OFF   >>>   {self}",
+                extra={
+                    "emoji": "🚫",
+                    "event": Events.STREAMER_OFFLINE,
+                },
+            )
+        else :
+            logger.info(
+                f"OFF   >>>   {self}   ►  📈 Total gain :  **{_millify(self.channel_points - self.started_points)}**",
+                extra={
+                    "emoji": "🚫",
+                    "event": Events.STREAMER_OFFLINE,
+                },
+            )
 
     def set_online(self):
         if self.is_online is False:
             self.online_at = time.time()
             self.is_online = True
             self.stream.init_watch_streak()
-
         self.toggle_chat()
+        self.started_points = self.channel_points
 
         logger.info(
-            f"{self} is Online!",
+            f"GO   <<<   {self}",
             extra={
-                "emoji": ":partying_face:",
+                "emoji": "📺",
                 "event": Events.STREAMER_ONLINE,
             },
         )
