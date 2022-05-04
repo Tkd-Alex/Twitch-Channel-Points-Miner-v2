@@ -429,8 +429,7 @@ class Twitch(object):
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
-        selector_index = 0 if decision["choice"] == "A" else 1
-
+        
         logger.info(
             f"Going to complete bet for {event}",
             extra={
@@ -458,7 +457,7 @@ class Twitch(object):
             else:
                 if decision["amount"] >= 10:
                     logger.info(
-                        f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
+                        f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(decision['choice'])}",
                         extra={
                             "emoji": ":four_leaf_clover:",
                             "event": Events.BET_GENERAL,
