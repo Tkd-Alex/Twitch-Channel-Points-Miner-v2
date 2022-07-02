@@ -327,6 +327,7 @@ version: "3.9"
 services:
   miner:
     image: tkdalex/twitch-channel-points-miner-v2
+    stdin_open: true
     tty: true
     environment:
       - TERM=xterm-256color
