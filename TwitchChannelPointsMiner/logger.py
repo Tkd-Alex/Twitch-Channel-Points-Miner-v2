@@ -111,7 +111,7 @@ class GlobalFormatter(logging.Formatter):
             and record.emoji_is_present is False
         ):
             record.msg = emoji.emojize(
-                f"{record.emoji}  {record.msg.strip()}", use_aliases=True
+                f"{record.emoji}  {record.msg.strip()}", language="alias"
             )
             record.emoji_is_present = True
 
