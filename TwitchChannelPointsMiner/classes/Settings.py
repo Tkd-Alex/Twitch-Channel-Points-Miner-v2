@@ -48,3 +48,11 @@ class Events(Enum):
     @classmethod
     def get(cls, key):
         return getattr(cls, str(key)) if str(key) in dir(cls) else None
+
+class EmojisSettings:
+    def __init__(self, emoji_raid, emoji_claim, emoji_watch):
+        self.emoji_raid = emoji_raid
+        self.emoji_claim = emoji_claim
+        self.emoji_watch = emoji_watch
+    
+        print(self.emoji_raid)

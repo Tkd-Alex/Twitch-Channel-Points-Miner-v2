@@ -7,7 +7,7 @@ from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
 from TwitchChannelPointsMiner.classes.Chat import ChatPresence
 from TwitchChannelPointsMiner.classes.Discord import Discord
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
-from TwitchChannelPointsMiner.classes.Settings import Priority, Events, FollowersOrder
+from TwitchChannelPointsMiner.classes.Settings import Priority, Events, FollowersOrder, EmojisSettings
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
@@ -65,6 +65,11 @@ twitch_miner = TwitchChannelPointsMiner(
             )
         ),
         custom_name='undefined'
+    ),
+    emojis=EmojisSettings(
+        emoji_raid=':rocket:',
+        emoji_claim=':moneybag:',
+        emoji_watch=':rocket:',
     )
 )
 

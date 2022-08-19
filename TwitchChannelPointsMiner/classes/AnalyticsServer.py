@@ -9,6 +9,7 @@ import pandas as pd
 from flask import Flask, Response, cli, render_template, request
 
 from TwitchChannelPointsMiner.classes.Settings import Settings
+from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer
 from TwitchChannelPointsMiner.utils import download_file
 
 cli.show_server_banner = lambda *_: None
@@ -17,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 def streamers_available():
     path = Settings.analytics_path
+    print(Streamer)
     return [
         f
         for f in os.listdir(path)
@@ -167,7 +169,6 @@ def download_assets(assets_folder, required_files):
 
 def check_assets():
     required_files = [
-        "banner.png",
         "charts.html",
         "script.js",
         "style.css",
@@ -214,7 +215,12 @@ class AnalyticsServer(Thread):
             defaults={"refresh": refresh, "days_ago": days_ago},
             methods=["GET"],
         )
-        self.app.add_url_rule("/streamers", "streamers", streamers, methods=["GET"])
+        self.app.add_url_rule(
+            "/streamers",
+            "streamers",
+            streamers, 
+            methods=["GET"]
+        )
         self.app.add_url_rule(
             "/json/<string:streamer>", "json", read_json, methods=["GET"]
         )

@@ -9,7 +9,7 @@ from dateutil import parser
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.entities.Message import Message
 from TwitchChannelPointsMiner.classes.entities.Raid import Raid
-from TwitchChannelPointsMiner.classes.Settings import Events
+from TwitchChannelPointsMiner.classes.Settings import Events, EmojisSettings
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
@@ -220,6 +220,7 @@ class WebSocketsPool:
                                         return '👑 roi_louis'
                                     case _:
                                         return streamerName
+                                    
                             logger.info(
                                 f"**{reason_code}** _(+{earned})_   =>   {whoStreamer(ws.streamers[streamer_index])}",
                                 extra={

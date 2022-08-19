@@ -164,6 +164,7 @@ function getAllStreamersData() {
 function getStreamers() {
     $.getJSON('streamers', function (response) {
         streamersList = response;
+        console.log(response)
         sortStreamers();
         renderStreamers();
     });

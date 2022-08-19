@@ -1,0 +1,14 @@
+[
+    {
+        "streamer": "hardisk",
+        "statut": "offline"
+    },
+    {
+        "streamer": "diskdur",
+        "statut": "online"
+    },
+    {
+        "streamer": "hardisk",
+        "statut": "offline"
+    }
+]
