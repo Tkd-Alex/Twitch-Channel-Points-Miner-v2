@@ -171,13 +171,13 @@ class Bet(object):
             for index in range(0, len(self.outcomes)):
                 self.outcomes[index][OutcomeKeys.PERCENTAGE_USERS] = float_round(
                     (100 * self.outcomes[index][OutcomeKeys.TOTAL_USERS])
-                    / min(self.total_users, 1)
+                    / max(self.total_users, 1)
                 )
                 self.outcomes[index][OutcomeKeys.ODDS] = float_round(
-                    self.total_points / min(self.outcomes[index][OutcomeKeys.TOTAL_POINTS], 1)
+                    self.total_points / max(self.outcomes[index][OutcomeKeys.TOTAL_POINTS], 1)
                 )
                 self.outcomes[index][OutcomeKeys.ODDS_PERCENTAGE] = float_round(
-                    100 / min(self.outcomes[index][OutcomeKeys.ODDS], 1)
+                    100 / max(self.outcomes[index][OutcomeKeys.ODDS], 1)
                 )
 
         self.__clear_outcomes()
