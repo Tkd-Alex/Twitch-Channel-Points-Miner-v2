@@ -41,7 +41,15 @@ logger = logging.getLogger(__name__)
 
 
 class Twitch(object):
-    __slots__ = ["cookies_file", "user_agent", "twitch_login", "running", "device_id", "integrity", "integrity_expire"]
+    __slots__ = [
+        "cookies_file",
+        "user_agent",
+        "twitch_login",
+        "running",
+        "device_id",
+        "integrity",
+        "integrity_expire"
+    ]
 
     def __init__(self, username, user_agent, password=None):
         cookies_path = os.path.join(Path().absolute(), "cookies")
@@ -52,7 +60,9 @@ class Twitch(object):
             CLIENT_ID, username, self.user_agent, password=password
         )
         self.running = True
-        self.device_id = ''.join(random.choices(string.ascii_letters + string.digits, k=26))
+        self.device_id = ''.join(
+            random.choices(string.ascii_letters + string.digits, k=26)
+        )
         self.integrity = None
         self.integrity_expire = 0
 
@@ -255,7 +265,10 @@ class Twitch(object):
     # Request for Integrity Token
     # Twitch needs Authorization, Client-Id, X-Device-Id to generate JWT which is used for authorize gql requests
     def post_integrity(self):
-        if datetime.now().timestamp() * 1000 - self.integrity_expire < 0 and self.integrity is not None:
+        if (
+            datetime.now().timestamp() * 1000 - self.integrity_expire < 0
+            and self.integrity is not None
+        ):
             return self.integrity
         try:
             response = requests.post(
@@ -271,8 +284,8 @@ class Twitch(object):
             logger.debug(
                 f"Data: [], Status code: {response.status_code}, Content: {response.text}"
             )
-            self.integrity = response.json().get('token', None)
-            self.integrity_expire = response.json().get('expiration', 0)
+            self.integrity = response.json().get("token", None)
+            self.integrity_expire = response.json().get("expiration", 0)
             return self.integrity
         except requests.exceptions.RequestException as e:
             logger.error(f"Error with post_integrity: {e}")
