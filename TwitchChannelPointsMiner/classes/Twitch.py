@@ -9,7 +9,9 @@ import logging
 import os
 import random
 import re
+import string
 import time
+from datetime import datetime
 from pathlib import Path
 from secrets import token_hex
 
@@ -39,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 
 class Twitch(object):
-    __slots__ = ["cookies_file", "user_agent", "twitch_login", "running"]
+    __slots__ = ["cookies_file", "user_agent", "twitch_login", "running", "device_id", "integrity", "integrity_expire"]
 
     def __init__(self, username, user_agent, password=None):
         cookies_path = os.path.join(Path().absolute(), "cookies")
@@ -50,6 +52,9 @@ class Twitch(object):
             CLIENT_ID, username, self.user_agent, password=password
         )
         self.running = True
+        self.device_id = ''.join(random.choices(string.ascii_letters + string.digits, k=26))
+        self.integrity = None
+        self.integrity_expire = 0
 
     def login(self):
         if os.path.isfile(self.cookies_file) is False:
@@ -231,7 +236,10 @@ class Twitch(object):
                 headers={
                     "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
                     "Client-Id": CLIENT_ID,
+                    "Client-Integrity": self.post_integrity(),
+                    "Device-ID": self.device_id,
                     "User-Agent": self.user_agent,
+                    "X-Device-Id": self.device_id,
                 },
             )
             logger.debug(
@@ -243,6 +251,32 @@ class Twitch(object):
                 f"Error with GQLOperations ({json_data['operationName']}): {e}"
             )
             return {}
+
+    # Request for Integrity Token
+    # Twitch needs Authorization, Client-Id, X-Device-Id to generate JWT which is used for authorize gql requests
+    def post_integrity(self):
+        if datetime.now().timestamp() * 1000 - self.integrity_expire < 0 and self.integrity is not None:
+            return self.integrity
+        try:
+            response = requests.post(
+                GQLOperations.integrity_url,
+                json={},
+                headers={
+                    "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
+                    "Client-Id": CLIENT_ID,
+                    "User-Agent": self.user_agent,
+                    "X-Device-Id": self.device_id,
+                },
+            )
+            logger.debug(
+                f"Data: [], Status code: {response.status_code}, Content: {response.text}"
+            )
+            self.integrity = response.json().get('token', None)
+            self.integrity_expire = response.json().get('expiration', 0)
+            return self.integrity
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error with post_integrity: {e}")
+            return self.integrity
 
     def send_minute_watched_events(self, streamers, priority, chunk_size=3):
         while self.running:

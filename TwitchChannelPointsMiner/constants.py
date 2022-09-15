@@ -26,6 +26,7 @@ GITHUB_url = (
 
 class GQLOperations:
     url = "https://gql.twitch.tv/gql"
+    integrity_url = "https://gql.twitch.tv/integrity"
     WithIsStreamLiveQuery = {
         "operationName": "WithIsStreamLiveQuery",
         "extensions": {
