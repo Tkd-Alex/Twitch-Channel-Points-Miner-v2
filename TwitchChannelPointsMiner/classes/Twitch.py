@@ -275,9 +275,10 @@ class Twitch(object):
 
     # Request for Integrity Token
     # Twitch needs Authorization, Client-Id, X-Device-Id to generate JWT which is used for authorize gql requests
+    # Regenerate Integrity Token 5 minutes before expire
     def post_integrity(self):
         if (
-            datetime.now().timestamp() * 1000 - self.integrity_expire < 0
+            self.integrity_expire - datetime.now().timestamp() * 1000 > 5 * 60 * 1000
             and self.integrity is not None
         ):
             return self.integrity
