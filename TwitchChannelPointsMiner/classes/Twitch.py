@@ -49,6 +49,7 @@ class Twitch(object):
         "device_id",
         "integrity",
         "integrity_expire",
+        "client_session",
         "client_version",
         "twilight_build_id_pattern"
     ]
@@ -67,6 +68,9 @@ class Twitch(object):
         )
         self.integrity = None
         self.integrity_expire = 0
+        self.client_session = ''.join(
+            random.choices('0123456789abcdef', k=16)
+        )
         self.client_version = CLIENT_VERSION
         self.twilight_build_id_pattern = re.compile(
             r"window\.__twilightBuildID=\"([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12})\";"
@@ -253,8 +257,8 @@ class Twitch(object):
                     "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
                     "Client-Id": CLIENT_ID,
                     "Client-Integrity": self.post_integrity(),
+                    "Client-Session-Id": self.client_session,
                     "Client-Version": self.client_version,
-                    "Device-ID": self.device_id,
                     "User-Agent": self.user_agent,
                     "X-Device-Id": self.device_id,
                 },
@@ -284,6 +288,7 @@ class Twitch(object):
                 headers={
                     "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
                     "Client-Id": CLIENT_ID,
+                    "Client-Session-Id": self.client_session,
                     "Client-Version": self.update_client_version(),
                     "User-Agent": self.user_agent,
                     "X-Device-Id": self.device_id,
