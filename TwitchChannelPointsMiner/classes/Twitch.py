@@ -13,7 +13,7 @@ import string
 import time
 from datetime import datetime
 from pathlib import Path
-from secrets import token_hex
+from secrets import choice, token_hex
 
 import requests
 
@@ -63,8 +63,8 @@ class Twitch(object):
             CLIENT_ID, username, self.user_agent, password=password
         )
         self.running = True
-        self.device_id = ''.join(
-            random.choices(string.ascii_letters + string.digits, k=26)
+        self.device_id = "".join(
+            choice(string.ascii_letters + string.digits) for _ in range(32)
         )
         self.integrity = None
         self.integrity_expire = 0
