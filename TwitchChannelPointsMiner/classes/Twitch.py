@@ -30,7 +30,12 @@ from TwitchChannelPointsMiner.classes.Settings import (
     Settings,
 )
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
-from TwitchChannelPointsMiner.constants import CLIENT_ID, CLIENT_VERSION, URL, GQLOperations
+from TwitchChannelPointsMiner.constants import (
+    CLIENT_ID,
+    CLIENT_VERSION,
+    URL,
+    GQLOperations,
+)
 from TwitchChannelPointsMiner.utils import (
     _millify,
     create_chunks,
@@ -51,7 +56,7 @@ class Twitch(object):
         "integrity_expire",
         "client_session",
         "client_version",
-        "twilight_build_id_pattern"
+        "twilight_build_id_pattern",
     ]
 
     def __init__(self, username, user_agent, password=None):
