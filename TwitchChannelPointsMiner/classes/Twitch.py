@@ -261,7 +261,7 @@ class Twitch(object):
                     "Client-Id": CLIENT_ID,
                     "Client-Integrity": self.post_integrity(),
                     "Client-Session-Id": self.client_session,
-                    "Client-Version": self.client_version,
+                    "Client-Version": self.update_client_version(),
                     "User-Agent": self.user_agent,
                     "X-Device-Id": self.device_id,
                 },
