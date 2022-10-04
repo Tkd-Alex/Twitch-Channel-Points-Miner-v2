@@ -14,6 +14,7 @@ from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, Streame
 twitch_miner = TwitchChannelPointsMiner(
     username="your-twitch-username",
     password="write-your-secure-psw",           # If no password will be provided, the script will ask interactively
+    auth_token="your-auth-token-twitch-cookie", # If you are unable to login due to 2FA issues, please define this as the `auth-token` cookie in your browser where you've previously logged into twitch.
     claim_drops_startup=False,                  # If you want to auto claim all drops from Twitch inventory on the startup
     priority=[                                  # Custom priority in this case for example:
         Priority.STREAK,                        # - We want first of all to catch all watch streak from all streamers

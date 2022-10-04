@@ -34,7 +34,7 @@ class TwitchLogin(object):
         "cookies",
     ]
 
-    def __init__(self, client_id, username, user_agent, password=None):
+    def __init__(self, client_id, username, user_agent, password=None, auth_token=None):
         self.client_id = client_id
         self.token = None
         self.login_check_result = False
@@ -131,7 +131,7 @@ class TwitchLogin(object):
                         )
 
                 if "access_token" in login_response:
-                    self.set_token(login_response["access_token"])
+                    self.set_token(login_response["access_token"] or auth_token)
                     return self.check_login()
 
             if use_backup_flow:
