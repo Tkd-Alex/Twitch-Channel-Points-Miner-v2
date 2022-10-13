@@ -9,9 +9,11 @@ import logging
 import os
 import random
 import re
+import string
 import time
+from datetime import datetime
 from pathlib import Path
-from secrets import token_hex
+from secrets import choice, token_hex
 
 import requests
 
@@ -28,7 +30,12 @@ from TwitchChannelPointsMiner.classes.Settings import (
     Settings,
 )
 from TwitchChannelPointsMiner.classes.TwitchLogin import TwitchLogin
-from TwitchChannelPointsMiner.constants import CLIENT_ID, GQLOperations
+from TwitchChannelPointsMiner.constants import (
+    CLIENT_ID,
+    CLIENT_VERSION,
+    URL,
+    GQLOperations,
+)
 from TwitchChannelPointsMiner.utils import (
     _millify,
     create_chunks,
@@ -39,7 +46,18 @@ logger = logging.getLogger(__name__)
 
 
 class Twitch(object):
-    __slots__ = ["cookies_file", "user_agent", "twitch_login", "running"]
+    __slots__ = [
+        "cookies_file",
+        "user_agent",
+        "twitch_login",
+        "running",
+        "device_id",
+        "integrity",
+        "integrity_expire",
+        "client_session",
+        "client_version",
+        "twilight_build_id_pattern",
+    ]
 
     def __init__(self, username, user_agent, password=None):
         cookies_path = os.path.join(Path().absolute(), "cookies")
@@ -50,6 +68,16 @@ class Twitch(object):
             CLIENT_ID, username, self.user_agent, password=password
         )
         self.running = True
+        self.device_id = "".join(
+            choice(string.ascii_letters + string.digits) for _ in range(32)
+        )
+        self.integrity = None
+        self.integrity_expire = 0
+        self.client_session = token_hex(16)
+        self.client_version = CLIENT_VERSION
+        self.twilight_build_id_pattern = re.compile(
+            r"window\.__twilightBuildID=\"([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12})\";"
+        )
 
     def login(self):
         if os.path.isfile(self.cookies_file) is False:
@@ -231,7 +259,11 @@ class Twitch(object):
                 headers={
                     "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
                     "Client-Id": CLIENT_ID,
+                    "Client-Integrity": self.post_integrity(),
+                    "Client-Session-Id": self.client_session,
+                    "Client-Version": self.update_client_version(),
                     "User-Agent": self.user_agent,
+                    "X-Device-Id": self.device_id,
                 },
             )
             logger.debug(
@@ -243,6 +275,57 @@ class Twitch(object):
                 f"Error with GQLOperations ({json_data['operationName']}): {e}"
             )
             return {}
+
+    # Request for Integrity Token
+    # Twitch needs Authorization, Client-Id, X-Device-Id to generate JWT which is used for authorize gql requests
+    # Regenerate Integrity Token 5 minutes before expire
+    def post_integrity(self):
+        if (
+            self.integrity_expire - datetime.now().timestamp() * 1000 > 5 * 60 * 1000
+            and self.integrity is not None
+        ):
+            return self.integrity
+        try:
+            response = requests.post(
+                GQLOperations.integrity_url,
+                json={},
+                headers={
+                    "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
+                    "Client-Id": CLIENT_ID,
+                    "Client-Session-Id": self.client_session,
+                    "Client-Version": self.update_client_version(),
+                    "User-Agent": self.user_agent,
+                    "X-Device-Id": self.device_id,
+                },
+            )
+            logger.debug(
+                f"Data: [], Status code: {response.status_code}, Content: {response.text}"
+            )
+            self.integrity = response.json().get("token", None)
+            self.integrity_expire = response.json().get("expiration", 0)
+            return self.integrity
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error with post_integrity: {e}")
+            return self.integrity
+
+    def update_client_version(self):
+        try:
+            response = requests.get(URL)
+            if response.status_code != 200:
+                logger.debug(
+                    f"Error with update_client_version: {response.status_code}"
+                )
+                return self.client_version
+            matcher = re.search(self.twilight_build_id_pattern, response.text)
+            if not matcher:
+                logger.debug("Error with update_client_version: no match")
+                return self.client_version
+            self.client_version = matcher.group(1)
+            logger.debug(f"Client version: {self.client_version}")
+            return self.client_version
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error with update_client_version: {e}")
+            return self.client_version
 
     def send_minute_watched_events(self, streamers, priority, chunk_size=3):
         while self.running:
