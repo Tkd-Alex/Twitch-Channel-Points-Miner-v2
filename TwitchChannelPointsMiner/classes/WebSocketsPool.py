@@ -17,6 +17,13 @@ from TwitchChannelPointsMiner.utils import (
     internet_connection_available,
 )
 
+disableAnalytics = False
+
+try:
+    import enableAnalytics
+except ImportError:
+    disableAnalytics = True
+
 logger = logging.getLogger(__name__)
 
 
@@ -170,7 +177,7 @@ class WebSocketsPool:
 
             ws.last_message_timestamp = message.timestamp
             ws.last_message_type_channel = message.identifier
-
+         
             streamer_index = get_streamer_index(ws.streamers, message.channel_id)
             if streamer_index != -1:
                 try:
@@ -178,11 +185,13 @@ class WebSocketsPool:
                         if message.type in ["points-earned", "points-spent"]:
                             balance = message.data["balance"]["balance"]
                             ws.streamers[streamer_index].channel_points = balance
-                            ws.streamers[streamer_index].persistent_series(
-                                event_type=message.data["point_gain"]["reason_code"]
-                                if message.type == "points-earned"
-                                else "Spent"
-                            )
+                            # Analytics switch
+                            if disableAnalytics is False:
+                                ws.streamers[streamer_index].persistent_series(
+                                    event_type=message.data["point_gain"]["reason_code"]
+                                    if message.type == "points-earned"
+                                    else "Spent"
+                                )
 
                         if message.type == "points-earned":
                             earned = message.data["point_gain"]["total_points"]
@@ -198,9 +207,11 @@ class WebSocketsPool:
                             ws.streamers[streamer_index].update_history(
                                 reason_code, earned
                             )
-                            ws.streamers[streamer_index].persistent_annotations(
-                                reason_code, f"+{earned} - {reason_code}"
-                            )
+                            # Analytics switch
+                            if disableAnalytics is False:
+                                ws.streamers[streamer_index].persistent_annotations(
+                                    reason_code, f"+{earned} - {reason_code}"
+                                )
                         elif message.type == "claim-available":
                             ws.twitch.claim_bonus(
                                 ws.streamers[streamer_index],
