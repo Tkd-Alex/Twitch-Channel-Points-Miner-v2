@@ -571,6 +571,14 @@ The chart provides some annotation to handle the prediction and watch strike eve
 On each (x, y) points Its present a tooltip that show points, date time and reason of points gained / lost. This web page was just a funny idea, and it is not intended to use for a professional usage.
 If you want you can toggle the dark theme with the dedicated checkbox.
 
+### `enableAnalytics.py` file in the main directory toggles Analytics
+Disabling Analytics significantly reduces memory consumption and saves some disk space.
+
+- Remove this file if you don't need Analytics. Or rename it to something different, like `disableAnalytics.py`.
+- To enable Analytics back - just create this file again. Or rename it back to `enableAnalytics.py`.
+
+This file can be empty.
+
 | Light theme | Dark theme |
 | ----------- | ---------- |
 | ![Light theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-light.png) | ![Dark theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-dark.png) |

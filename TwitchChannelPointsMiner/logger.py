@@ -68,7 +68,7 @@ class LoggerSettings:
         "color_palette",
         "auto_clear",
         "telegram",
-        "discord",
+        "discord"
     ]
 
     def __init__(

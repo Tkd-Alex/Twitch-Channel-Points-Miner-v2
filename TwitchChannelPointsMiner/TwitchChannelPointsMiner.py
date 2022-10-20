@@ -11,7 +11,6 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
-from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
 from TwitchChannelPointsMiner.classes.Chat import ChatPresence, ThreadChat
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.entities.Streamer import (
@@ -31,6 +30,17 @@ from TwitchChannelPointsMiner.utils import (
     internet_connection_available,
     set_default_settings,
 )
+
+disableAnalytics = False
+
+try:
+    import enableAnalytics
+except ImportError:
+    disableAnalytics = True
+
+# Analytics switch
+if disableAnalytics is False:
+    from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
 
 # Suppress:
 #   - chardet.charsetprober - [feed]
@@ -79,8 +89,10 @@ class TwitchChannelPointsMiner:
         # Default values for all streamers
         streamer_settings: StreamerSettings = StreamerSettings(),
     ):
-        Settings.analytics_path = os.path.join(Path().absolute(), "analytics", username)
-        Path(Settings.analytics_path).mkdir(parents=True, exist_ok=True)
+        # Analytics switch
+        if disableAnalytics is False:
+            Settings.analytics_path = os.path.join(Path().absolute(), "analytics", username)
+            Path(Settings.analytics_path).mkdir(parents=True, exist_ok=True)
 
         self.username = username
 
@@ -126,19 +138,21 @@ class TwitchChannelPointsMiner:
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
 
-    def analytics(
-        self,
-        host: str = "127.0.0.1",
-        port: int = 5000,
-        refresh: int = 5,
-        days_ago: int = 7,
-    ):
-        http_server = AnalyticsServer(
-            host=host, port=port, refresh=refresh, days_ago=days_ago
-        )
-        http_server.daemon = True
-        http_server.name = "Analytics Thread"
-        http_server.start()
+    # Analytics switch
+    if disableAnalytics is False:
+        def analytics(
+            self,
+            host: str = "127.0.0.1",
+            port: int = 5000,
+            refresh: int = 5,
+            days_ago: int = 7,
+        ):
+            http_server = AnalyticsServer(
+                host=host, port=port, refresh=refresh, days_ago=days_ago
+            )
+            http_server.daemon = True
+            http_server.name = "Analytics Thread"
+            http_server.start()
 
     def mine(
         self,
