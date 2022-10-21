@@ -31,15 +31,15 @@ from TwitchChannelPointsMiner.utils import (
     set_default_settings,
 )
 
-disableAnalytics = False
+DISABLE_ANALYTICS = False
 
 try:
-    import enableAnalytics
+    import ENABLE_ANALYTICS
 except ImportError:
-    disableAnalytics = True
+    DISABLE_ANALYTICS = True
 
 # Analytics switch
-if disableAnalytics is False:
+if DISABLE_ANALYTICS is False:
     from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
 
 # Suppress:
@@ -90,7 +90,7 @@ class TwitchChannelPointsMiner:
         streamer_settings: StreamerSettings = StreamerSettings(),
     ):
         # Analytics switch
-        if disableAnalytics is False:
+        if DISABLE_ANALYTICS is False:
             Settings.analytics_path = os.path.join(Path().absolute(), "analytics", username)
             Path(Settings.analytics_path).mkdir(parents=True, exist_ok=True)
 
@@ -139,7 +139,7 @@ class TwitchChannelPointsMiner:
             signal.signal(sign, self.end)
 
     # Analytics switch
-    if disableAnalytics is False:
+    if DISABLE_ANALYTICS is False:
         def analytics(
             self,
             host: str = "127.0.0.1",
