@@ -62,6 +62,7 @@ class LoggerSettings:
         "save",
         "less",
         "console_level",
+        "console_username",
         "file_level",
         "emoji",
         "colored",
@@ -76,6 +77,7 @@ class LoggerSettings:
         save: bool = True,
         less: bool = False,
         console_level: int = logging.INFO,
+        console_username: bool = False,
         file_level: int = logging.DEBUG,
         emoji: bool = platform.system() != "Windows",
         colored: bool = False,
@@ -87,6 +89,7 @@ class LoggerSettings:
         self.save = save
         self.less = less
         self.console_level = console_level
+        self.console_username = console_username
         self.file_level = file_level
         self.emoji = emoji
         self.colored = colored
@@ -169,14 +172,17 @@ def configure_loggers(username, settings):
     # Send log messages to another thread through the queue
     root_logger.addHandler(queue_handler)
 
+    # Adding a username to the format based on settings
+    console_username = "" if settings.console_username is False else f"[{username}] "
+
     console_handler = logging.StreamHandler()
     console_handler.setLevel(settings.console_level)
     console_handler.setFormatter(
         GlobalFormatter(
             fmt=(
-                "%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s"
+                "%(asctime)s - %(levelname)s - [%(funcName)s]: " + console_username + "%(message)s"
                 if settings.less is False
-                else "%(asctime)s - %(message)s"
+                else "%(asctime)s - " + console_username + "%(message)s"
             ),
             datefmt=(
                 "%d/%m/%y %H:%M:%S" if settings.less is False else "%d/%m %H:%M:%S"

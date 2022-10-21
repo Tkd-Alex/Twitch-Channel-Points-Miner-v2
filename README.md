@@ -216,6 +216,7 @@ twitch_miner = TwitchChannelPointsMiner(
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info
+        console_username=False,                 # Adds a username to every console log line if True. Useful when you have many open consoles with different accounts
         file_level=logging.DEBUG,               # Level of logs - If you think the log file it's too big, use logging.INFO
         emoji=True,                             # On Windows, we have a problem printing emoji. Set to false if you have a problem
         less=False,                             # If you think that the logs are too verbose, set this to True
@@ -414,6 +415,7 @@ You can combine all priority but keep in mind that use `ORDER` and `POINTS_ASCEN
 | `save`           | bool             | True                                                              | If you want to save logs in file (suggested)                                                                                                                                            |
 | `less`           | bool             | False                                                             | Reduce the logging format and message verbosity [#10](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/10)                                                               |
 | `console_level`  | level          | logging.INFO                                                      | Level of logs in terminal - Use logging.DEBUG for more helpful messages.                                                                                                                |
+| `console_username`  | bool          | False                                                      | Adds a username to every log line in the console if True. [#602](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/602)                                                                                                                |
 | `file_level`     | level          | logging.DEBUG                                                     | Level of logs in file save - If you think the log file it's too big, use logging.INFO                                                                                                    |
 | `emoji`          | bool             | For Windows is False else True                                    | On Windows, we have a problem printing emoji. Set to false if you have a problem                                                                                                         |
 | `colored`         | bool             | True                                                                | If you want to print colored text [#45](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/45) [#82](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/82) |
