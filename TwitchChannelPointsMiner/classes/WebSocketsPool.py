@@ -17,12 +17,12 @@ from TwitchChannelPointsMiner.utils import (
     internet_connection_available,
 )
 
-disableAnalytics = False
+DISABLE_ANALYTICS = False
 
 try:
-    import enableAnalytics
+    import ENABLE_ANALYTICS
 except ImportError:
-    disableAnalytics = True
+    DISABLE_ANALYTICS = True
 
 logger = logging.getLogger(__name__)
 
@@ -186,7 +186,7 @@ class WebSocketsPool:
                             balance = message.data["balance"]["balance"]
                             ws.streamers[streamer_index].channel_points = balance
                             # Analytics switch
-                            if disableAnalytics is False:
+                            if DISABLE_ANALYTICS is False:
                                 ws.streamers[streamer_index].persistent_series(
                                     event_type=message.data["point_gain"]["reason_code"]
                                     if message.type == "points-earned"
@@ -208,7 +208,7 @@ class WebSocketsPool:
                                 reason_code, earned
                             )
                             # Analytics switch
-                            if disableAnalytics is False:
+                            if DISABLE_ANALYTICS is False:
                                 ws.streamers[streamer_index].persistent_annotations(
                                     reason_code, f"+{earned} - {reason_code}"
                                 )
