@@ -169,7 +169,7 @@ class WebSocketsPool:
 
             ws.last_message_timestamp = message.timestamp
             ws.last_message_type_channel = message.identifier
-         
+
             streamer_index = get_streamer_index(ws.streamers, message.channel_id)
             if streamer_index != -1:
                 try:
