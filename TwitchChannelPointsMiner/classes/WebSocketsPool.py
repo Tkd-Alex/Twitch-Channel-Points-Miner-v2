@@ -9,7 +9,7 @@ from dateutil import parser
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.entities.Message import Message
 from TwitchChannelPointsMiner.classes.entities.Raid import Raid
-from TwitchChannelPointsMiner.classes.Settings import Events
+from TwitchChannelPointsMiner.classes.Settings import Events, Settings
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
@@ -17,15 +17,7 @@ from TwitchChannelPointsMiner.utils import (
     internet_connection_available,
 )
 
-DISABLE_ANALYTICS = False
-
-try:
-    import ENABLE_ANALYTICS
-except ImportError:
-    DISABLE_ANALYTICS = True
-
 logger = logging.getLogger(__name__)
-
 
 class WebSocketsPool:
     __slots__ = ["ws", "twitch", "streamers", "events_predictions"]
@@ -186,7 +178,7 @@ class WebSocketsPool:
                             balance = message.data["balance"]["balance"]
                             ws.streamers[streamer_index].channel_points = balance
                             # Analytics switch
-                            if DISABLE_ANALYTICS is False:
+                            if Settings.analytics is True:
                                 ws.streamers[streamer_index].persistent_series(
                                     event_type=message.data["point_gain"]["reason_code"]
                                     if message.type == "points-earned"
@@ -208,7 +200,7 @@ class WebSocketsPool:
                                 reason_code, earned
                             )
                             # Analytics switch
-                            if DISABLE_ANALYTICS is False:
+                            if Settings.analytics is True:
                                 ws.streamers[streamer_index].persistent_annotations(
                                     reason_code, f"+{earned} - {reason_code}"
                                 )
