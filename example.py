@@ -20,7 +20,7 @@ twitch_miner = TwitchChannelPointsMiner(
         Priority.DROPS,                         # - When we don't have anymore watch streak to catch, wait until all drops are collected over the streamers
         Priority.ORDER                          # - When we have all of the drops claimed and no watch-streak available, use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
     ],
-    analytics=False,                             # Disables Analytics if False. Disabling it significantly reduces memory consumption
+    analytics=False,                            # Disables Analytics if False. Disabling it significantly reduces memory consumption
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info
