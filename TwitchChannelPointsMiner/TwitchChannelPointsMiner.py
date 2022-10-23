@@ -31,17 +31,6 @@ from TwitchChannelPointsMiner.utils import (
     set_default_settings,
 )
 
-DISABLE_ANALYTICS = False
-
-try:
-    import ENABLE_ANALYTICS
-except ImportError:
-    DISABLE_ANALYTICS = True
-
-# Analytics switch
-if DISABLE_ANALYTICS is False:
-    from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
-
 # Suppress:
 #   - chardet.charsetprober - [feed]
 #   - chardet.charsetprober - [get_confidence]
@@ -63,6 +52,7 @@ class TwitchChannelPointsMiner:
         "username",
         "twitch",
         "claim_drops_startup",
+        "analytics",
         "priority",
         "streamers",
         "events_predictions",
@@ -82,6 +72,7 @@ class TwitchChannelPointsMiner:
         username: str,
         password: str = None,
         claim_drops_startup: bool = False,
+        analytics: bool = False,
         # Settings for logging and selenium as you can see.
         priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
@@ -90,7 +81,10 @@ class TwitchChannelPointsMiner:
         streamer_settings: StreamerSettings = StreamerSettings(),
     ):
         # Analytics switch
-        if DISABLE_ANALYTICS is False:
+        Settings.analytics = analytics
+
+        if Settings.analytics is True:
+            from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
             Settings.analytics_path = os.path.join(Path().absolute(), "analytics", username)
             Path(Settings.analytics_path).mkdir(parents=True, exist_ok=True)
 
@@ -139,7 +133,7 @@ class TwitchChannelPointsMiner:
             signal.signal(sign, self.end)
 
     # Analytics switch
-    if DISABLE_ANALYTICS is False:
+    if Settings.analytics is True:
         def analytics(
             self,
             host: str = "127.0.0.1",
