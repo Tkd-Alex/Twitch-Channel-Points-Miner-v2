@@ -201,7 +201,7 @@ twitch_miner = TwitchChannelPointsMiner(
         Priority.DROPS,                         # - When we don't have anymore watch streak to catch, wait until all drops are collected over the streamers
         Priority.ORDER                          # - When we have all of the drops claimed and no watch-streak available, use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
     ],
-    analytics=False,                            # Disables Analytics if False. Disabling it significantly reduces memory consumption
+    enable_analytics=False,			# Disables Analytics if False. Disabling it significantly reduces memory consumption
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info
@@ -587,7 +587,7 @@ twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5, days_ago=7)   # A
 twitch_miner.mine(followers=True, blacklist=["user1", "user2"])
 ```
 
-### `analytics` option in `twitch_minerfile` toggles Analytics
+### `enable_analytics` option in `twitch_minerfile` toggles Analytics
 
 Disabling Analytics significantly reduces memory consumption and saves some disk space by not creating and writing `/analytics/*.json`.
 
