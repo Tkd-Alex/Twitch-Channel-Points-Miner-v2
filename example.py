@@ -20,7 +20,7 @@ twitch_miner = TwitchChannelPointsMiner(
         Priority.DROPS,                         # - When we don't have anymore watch streak to catch, wait until all drops are collected over the streamers
         Priority.ORDER                          # - When we have all of the drops claimed and no watch-streak available, use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
     ],
-    analytics=False,                            # Disables Analytics if False. Disabling it significantly reduces memory consumption
+    enable_analytics=False,                     # Disables Analytics if False. Disabling it significantly reduces memory consumption
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info
@@ -76,6 +76,8 @@ twitch_miner = TwitchChannelPointsMiner(
 # The settings priority are: settings in mine function, settings in TwitchChannelPointsMiner instance, default settings.
 # For example, if in the mine function you don't provide any value for 'make_prediction' but you have set it on TwitchChannelPointsMiner instance, the script will take the value from here.
 # If you haven't set any value even in the instance the default one will be used
+
+#twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5, days_ago=7)   # Start the Analytics web-server
 
 twitch_miner.mine(
     [

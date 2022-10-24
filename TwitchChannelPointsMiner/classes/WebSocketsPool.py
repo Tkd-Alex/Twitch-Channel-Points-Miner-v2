@@ -178,7 +178,7 @@ class WebSocketsPool:
                             balance = message.data["balance"]["balance"]
                             ws.streamers[streamer_index].channel_points = balance
                             # Analytics switch
-                            if Settings.analytics is True:
+                            if Settings.enable_analytics is True:
                                 ws.streamers[streamer_index].persistent_series(
                                     event_type=message.data["point_gain"]["reason_code"]
                                     if message.type == "points-earned"
@@ -200,7 +200,7 @@ class WebSocketsPool:
                                 reason_code, earned
                             )
                             # Analytics switch
-                            if Settings.analytics is True:
+                            if Settings.enable_analytics is True:
                                 ws.streamers[streamer_index].persistent_annotations(
                                     reason_code, f"+{earned} - {reason_code}"
                                 )
