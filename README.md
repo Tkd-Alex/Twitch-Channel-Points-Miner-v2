@@ -177,7 +177,7 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 ```
 
 ## How to use:
-First of all please create a run.py file. You can just copy [example.py](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/example.py) and modify it according to your needs.
+First of all please create a run.py file. You can just copy [example.py](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/blob/master/example.py) and modify it according to your needs.
 ```python
 # -*- coding: utf-8 -*-
 
