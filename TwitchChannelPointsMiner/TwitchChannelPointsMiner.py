@@ -52,7 +52,7 @@ class TwitchChannelPointsMiner:
         "username",
         "twitch",
         "claim_drops_startup",
-        "analytics",
+        "enable_analytics",
         "priority",
         "streamers",
         "events_predictions",
@@ -72,7 +72,7 @@ class TwitchChannelPointsMiner:
         username: str,
         password: str = None,
         claim_drops_startup: bool = False,
-        analytics: bool = False,
+        enable_analytics: bool = False,
         # Settings for logging and selenium as you can see.
         priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
@@ -81,10 +81,9 @@ class TwitchChannelPointsMiner:
         streamer_settings: StreamerSettings = StreamerSettings(),
     ):
         # Analytics switch
-        Settings.analytics = analytics
+        Settings.enable_analytics = enable_analytics
 
-        if Settings.analytics is True:
-            from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
+        if enable_analytics is True:
             Settings.analytics_path = os.path.join(Path().absolute(), "analytics", username)
             Path(Settings.analytics_path).mkdir(parents=True, exist_ok=True)
 
@@ -132,21 +131,25 @@ class TwitchChannelPointsMiner:
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
 
-    # Analytics switch
-    if Settings.analytics is True:
-        def analytics(
-            self,
-            host: str = "127.0.0.1",
-            port: int = 5000,
-            refresh: int = 5,
-            days_ago: int = 7,
-        ):
+    def analytics(
+        self,
+        host: str = "127.0.0.1",
+        port: int = 5000,
+        refresh: int = 5,
+        days_ago: int = 7,
+    ):
+        # Analytics switch
+        if Settings.enable_analytics is True:
+            from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
+            
             http_server = AnalyticsServer(
                 host=host, port=port, refresh=refresh, days_ago=days_ago
             )
             http_server.daemon = True
             http_server.name = "Analytics Thread"
             http_server.start()
+        else:
+            logger.error("Can't start analytics(), please set enable_analytics=True")
 
     def mine(
         self,
