@@ -3,7 +3,8 @@ URL = "https://www.twitch.tv"
 IRC = "irc.chat.twitch.tv"
 IRC_PORT = 6667
 WEBSOCKET = "wss://pubsub-edge.twitch.tv/v1"
-CLIENT_ID = "kd1unb4b3q4t58fwlpcbzcbnm76a8fp"
+CLIENT_ID = "kd1unb4b3q4t58fwlpcbzcbnm76a8fp" # Android App
+#CLIENT_ID = "851cqzxpb9bqu9z6galo155du" # iOS App
 DROP_ID = "c2542d6d-cd10-4532-919b-3d19f30a768b"
 CLIENT_VERSION = "32d439b2-bd5b-4e35-b82a-fae10b04da70"
 

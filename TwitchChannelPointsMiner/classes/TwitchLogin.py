@@ -57,8 +57,9 @@ class TwitchLogin(object):
             "undelete_user": False,
             "remember_me": True,
         }
-
-        use_backup_flow = False
+        # login-fix
+        #use_backup_flow = False
+        use_backup_flow = True
 
         for attempt in range(0, 25):
             password = (
@@ -118,7 +119,9 @@ class TwitchLogin(object):
 
                         # If the user didn't load the password from run.py we can just ask for it again.
                         break
-                    elif err_code == 1000:
+                    # login-fix
+                    #elif err_code == 1000:
+                    elif err_code in [1000, 5022]:
                         logger.info(
                             "Console login unavailable (CAPTCHA solving required)."
                         )
@@ -148,7 +151,7 @@ class TwitchLogin(object):
         self.session.headers.update({"Authorization": f"Bearer {self.token}"})
 
     def send_login_request(self, json_data):
-        response = self.session.post("https://passport.twitch.tv/login", json=json_data)
+        response = self.session.post("https://passport.twitch.tv/protected_login", json=json_data)
         return response.json()
 
     def login_flow_backup(self):
