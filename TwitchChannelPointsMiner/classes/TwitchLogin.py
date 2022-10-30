@@ -171,8 +171,10 @@ class TwitchLogin(object):
         if browser == "1":  # chrome
             cookie_jar = browser_cookie3.chrome(domain_name=twitch_domain)
         else:
-            cookie_jar = browser_cookie3.firefox(domain_name=twitch_domain)
+            cookie_jar = browser_cookie3.firefox(domain_name=twitch_domain)      
+        #logger.info(f"cookie_jar: {cookie_jar}")
         cookies_dict = requests.utils.dict_from_cookiejar(cookie_jar)
+        #logger.info(f"cookies_dict: {cookies_dict}")
         self.username = cookies_dict.get("login")
         return cookies_dict.get("auth-token")
 
