@@ -19,7 +19,6 @@ from TwitchChannelPointsMiner.constants import GQLOperations
 
 logger = logging.getLogger(__name__)
 
-
 class TwitchLogin(object):
     __slots__ = [
         "client_id",
@@ -32,6 +31,7 @@ class TwitchLogin(object):
         "user_id",
         "email",
         "cookies",
+        "shared_cookies"
     ]
 
     def __init__(self, client_id, username, user_agent, password=None):
@@ -48,6 +48,7 @@ class TwitchLogin(object):
         self.email = None
 
         self.cookies = []
+        self.shared_cookies = []
 
     def login_flow(self):
         logger.info("You'll have to login to Twitch!")
@@ -176,6 +177,7 @@ class TwitchLogin(object):
         cookies_dict = requests.utils.dict_from_cookiejar(cookie_jar)
         #logger.info(f"cookies_dict: {cookies_dict}")
         self.username = cookies_dict.get("login")
+        self.shared_cookies = cookies_dict
         return cookies_dict.get("auth-token")
 
     def check_login(self):
@@ -188,14 +190,19 @@ class TwitchLogin(object):
         return self.login_check_result
 
     def save_cookies(self, cookies_file):
-        cookies_dict = self.session.cookies.get_dict()
-        cookies_dict["auth-token"] = self.token
-        if "persistent" not in cookies_dict:  # saving user id cookies
-            cookies_dict["persistent"] = self.user_id
+        #cookies_dict = self.session.cookies.get_dict()
+        #print(f"cookies_dict2pickle: {cookies_dict}")
+        #cookies_dict["auth-token"] = self.token
+        #if "persistent" not in cookies_dict:  # saving user id cookies
+        #    cookies_dict["persistent"] = self.user_id
 
+        # old way saves only 'auth-token' and 'persistent'
         self.cookies = []
+        cookies_dict = self.shared_cookies
+        #print(f"cookies_dict2pickle: {cookies_dict}")
         for cookie_name, value in cookies_dict.items():
             self.cookies.append({"name": cookie_name, "value": value})
+        #print(f"cookies2pickle: {self.cookies}")
         pickle.dump(self.cookies, open(cookies_file, "wb"))
 
     def get_cookie_value(self, key):
