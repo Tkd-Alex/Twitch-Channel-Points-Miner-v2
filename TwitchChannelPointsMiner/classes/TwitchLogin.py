@@ -8,7 +8,7 @@ import logging
 import os
 import pickle
 
-import browser_cookie3
+#import browser_cookie3
 import requests
 
 from TwitchChannelPointsMiner.classes.Exceptions import (
@@ -157,18 +157,46 @@ class TwitchLogin(object):
 
     def login_flow_backup(self):
         """Backup OAuth login flow in case manual captcha solving is required"""
-        browser = input(
-            "What browser do you use? Chrome (1), Firefox (2), Other (3): "
-        ).strip()
-        if browser not in ("1", "2"):
-            logger.info("Your browser is unsupported, sorry.")
-            return None
+        from undetected_chromedriver import ChromeOptions
+        import seleniumwire.undetected_chromedriver.v2 as uc
 
-        input(
-            "Please login inside your browser of choice (NOT incognito mode) and press Enter..."
+        HEADLESS = False
+        SLEEP_TIME = 10
+
+        options = uc.ChromeOptions()
+        if HEADLESS is True:
+            options.add_argument('--headless')
+        options.add_argument('--log-level=3')
+        options.add_argument('--disable-web-security')
+        options.add_argument('--allow-running-insecure-content')
+        options.add_argument('--lang=en')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-gpu')
+        #options.add_argument("--user-agent=\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36\"")
+        #options.add_argument("--window-size=1920,1080")
+        #options.set_capability("detach", True)
+
+        driver = uc.Chrome(
+            options=options, use_subprocess=True#, executable_path=EXECUTABLE_PATH
         )
+        driver.get('https://www.twitch.tv/settings/profile')
+        cookies = pickle.load(open(self.cookies_file, "rb"))
+        for cookie in cookies:
+            driver.add_cookie(cookie)
+        driver.get('https://www.twitch.tv/settings/profile')
+
+        request = driver.wait_for_request("https://gql.twitch.tv/integrity", timeout=20)
+
+        body = request.response.body.decode("UTF-8")
+        driver.quit()
+        integrity_json = json.loads(body)
+
+        self.integrity = integrity_json.get("token", None)
+        logger.info(f"integrity: {self.integrity}")
+#################################################
         logger.info("Loading cookies saved on your computer...")
         twitch_domain = ".twitch.tv"
+        
         if browser == "1":  # chrome
             cookie_jar = browser_cookie3.chrome(domain_name=twitch_domain)
         else:
