@@ -15,6 +15,9 @@ from datetime import datetime
 from pathlib import Path
 from secrets import choice, token_hex
 
+import json
+from base64 import urlsafe_b64decode
+
 import requests
 
 from TwitchChannelPointsMiner.classes.entities.Campaign import Campaign
@@ -302,11 +305,33 @@ class Twitch(object):
                 f"Data: [], Status code: {response.status_code}, Content: {response.text}"
             )
             self.integrity = response.json().get("token", None)
+            #logger.info(f"integrity: {self.integrity}")
+            
+            if self.isBadBot(self.integrity) is True:
+                logger.error("Uh-oh, Twitch has detected this miner as a \"Bad Bot\"")
+    
             self.integrity_expire = response.json().get("expiration", 0)
+            #logger.info(f"integrity_expire: {self.integrity_expire}")
             return self.integrity
         except requests.exceptions.RequestException as e:
             logger.error(f"Error with post_integrity: {e}")
             return self.integrity
+
+    # verify the integrity token's contents for the "is_bad_bot" flag
+    def isBadBot(self, integrity):          
+        stripped_token: str = self.integrity.split('.')[2] + "=="
+        messy_json: str = urlsafe_b64decode(stripped_token.encode()).decode(errors="ignore")
+        match = re.search(r'(.+)(?<="}).+$', messy_json)
+        if match is None:
+            #raise MinerException("Unable to parse the integrity token")
+            logger.error("Unable to parse the integrity token")
+            return
+        decoded_header: JsonType = json.loads(match.group(1))
+        #logger.info(f"decoded_header: {decoded_header}")
+        if decoded_header.get("is_bad_bot", "false") != "false":
+            return True
+        else:
+            return False
 
     def update_client_version(self):
         try:
