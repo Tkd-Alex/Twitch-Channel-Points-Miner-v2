@@ -152,7 +152,7 @@ class TwitchLogin(object):
                 break
 
         if use_backup_flow:
-            self.set_token(self.login_flow_backup())
+            self.set_token(self.login_flow_backup(password))
             return self.check_login()
 
         return False
@@ -165,7 +165,7 @@ class TwitchLogin(object):
         response = self.session.post("https://passport.twitch.tv/protected_login", json=json_data)
         return response.json()
 
-    def login_flow_backup(self):
+    def login_flow_backup(self, password = None):
         """Backup OAuth Selenium login"""
         from undetected_chromedriver import ChromeOptions
         import seleniumwire.undetected_chromedriver.v2 as uc
@@ -195,7 +195,7 @@ class TwitchLogin(object):
         driver.get('https://www.twitch.tv/login')
 
         driver.find_element(By.ID, 'login-username').send_keys(self.username)
-        driver.find_element(By.ID, 'password-input').send_keys(self.password)
+        driver.find_element(By.ID, 'password-input').send_keys(password)
         sleep(0.3)
         driver.execute_script(
             'document.querySelector("#root > div > div.scrollable-area > div.simplebar-scroll-content > div > div > div > div.Layout-sc-nxg1ff-0.gZaqky > form > div > div:nth-child(3) > button > div > div").click()'
