@@ -308,7 +308,7 @@ class Twitch(object):
             #logger.info(f"integrity: {self.integrity}")
             
             if self.isBadBot(self.integrity) is True:
-                logger.error("Uh-oh, Twitch has detected this miner as a \"Bad Bot\"")
+                logger.info("Uh-oh, Twitch has detected this miner as a \"Bad Bot\". Don't worry.")
     
             self.integrity_expire = response.json().get("expiration", 0)
             #logger.info(f"integrity_expire: {self.integrity_expire}")
@@ -324,7 +324,7 @@ class Twitch(object):
         match = re.search(r'(.+)(?<="}).+$', messy_json)
         if match is None:
             #raise MinerException("Unable to parse the integrity token")
-            logger.error("Unable to parse the integrity token")
+            logger.info("Unable to parse the integrity token. Don't worry.")
             return
         decoded_header: JsonType = json.loads(match.group(1))
         #logger.info(f"decoded_header: {decoded_header}")
