@@ -207,14 +207,18 @@ class TwitchLogin(object):
         input()
 
         logger.info("Extracting cookies...")
-
         self.cookies = driver.get_cookies()
+        #print(self.cookies)
+        #driver.close()
         driver.quit()
         self.username = self.get_cookie_value("login")
+        #print(f"self.username: {self.username}")
+
+        if not self.username:
+            logger.error("Couldn't extract login, probably bad cookies.")
+            return False
 
         return self.get_cookie_value("auth-token")
-
-
 
     def check_login(self):
         if self.login_check_result:
