@@ -29,7 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
         pip install -U cryptography==3.3.2; \
      fi \
   && if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-        apt-get install python3-pandas; \
+        apt-get -y install python3-pandas; \
      fi \
   && pip install -r requirements.txt \
   && pip cache purge \
