@@ -53,12 +53,13 @@ def create_nonce(length=30) -> str:
         nonce += char
     return nonce
 
-
+# for mobile-token
 def get_user_agent(browser: str) -> str:
-    try:
+    """try:
         return USER_AGENTS[platform.system()][browser]
     except KeyError:
-        return USER_AGENTS["Linux"]["FIREFOX"]
+        return USER_AGENTS["Linux"]["FIREFOX"]"""
+    return USER_AGENTS["Android"]["App"]
 
 
 def remove_emoji(string: str) -> str:
