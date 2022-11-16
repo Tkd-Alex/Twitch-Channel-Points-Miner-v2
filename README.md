@@ -300,7 +300,7 @@ twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Blacklist exa
 ```
 
 ### By cloning the repository
-1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
+1. Clone this repository `git clone https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2`
 2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements, make sure to have at least Python3.6. You could also try to create a _virtualenv_ and then install all the requirements
 ```sh
 pip install virtualenv
@@ -311,8 +311,8 @@ pip install -r requirements.txt
 
 Start mining! `python run.py` 🥳
 
-<s>### pip
-Install the package via pip, you will find a stable version - maybe a different version from the master branch.
+### <s>pip</s> deprecated
+<s>Install the package via pip, you will find a stable version - maybe a different version from the master branch.
 - `pip install Twitch-Channel-Points-Miner-v2`
 - Exceute the run.py file `python run.py` 🥳</s>
 
