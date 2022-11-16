@@ -6,6 +6,8 @@ WORKDIR /usr/src/app
 
 COPY ./requirements.txt ./
 
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
+
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-install-recommends \
     gcc \
