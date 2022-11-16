@@ -326,7 +326,7 @@ class Twitch(object):
             #raise MinerException("Unable to parse the integrity token")
             logger.info("Unable to parse the integrity token. Don't worry.")
             return
-        decoded_header: JsonType = json.loads(match.group(1))
+        decoded_header = json.loads(match.group(1))
         #logger.info(f"decoded_header: {decoded_header}")
         if decoded_header.get("is_bad_bot", "false") != "false":
             return True
