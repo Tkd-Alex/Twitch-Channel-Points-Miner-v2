@@ -29,10 +29,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
         pip install -U cryptography==3.3.2; \
      fi \
   && if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-        pip install --index-url=https://www.piwheels.org/simple --no-cache-dir -r requirements.txt; \
-     else \
-        pip install -r requirements.txt; \
+        pip install --index-url=https://www.piwheels.org/simple -U pandas; \
      fi \
+  && pip install -r requirements.txt \
   && pip cache purge \
   && apt-get remove -y gcc rustc \
   && apt-get autoremove -y \
