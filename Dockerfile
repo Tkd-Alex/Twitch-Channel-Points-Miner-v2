@@ -8,6 +8,8 @@ COPY ./requirements.txt ./
 
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
+RUN pip install --upgrade pip
+
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-install-recommends \
     gcc \
