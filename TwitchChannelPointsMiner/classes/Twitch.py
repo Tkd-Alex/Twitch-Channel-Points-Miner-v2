@@ -67,13 +67,13 @@ class Twitch(object):
         Path(cookies_path).mkdir(parents=True, exist_ok=True)
         self.cookies_file = os.path.join(cookies_path, f"{username}.pkl")
         self.user_agent = user_agent
-        self.twitch_login = TwitchLogin(
-            CLIENT_ID, username, self.user_agent, password=password
-        )
-        self.running = True
         self.device_id = "".join(
             choice(string.ascii_letters + string.digits) for _ in range(32)
         )
+        self.twitch_login = TwitchLogin(
+            CLIENT_ID, self.device_id, username, self.user_agent, password=password
+        )
+        self.running = True
         self.integrity = None
         self.integrity_expire = 0
         self.client_session = token_hex(16)
@@ -126,9 +126,14 @@ class Twitch(object):
 
     def get_spade_url(self, streamer):
         try:
-            headers = {"User-Agent": self.user_agent}
+            # fixes AttributeError: 'NoneType' object has no attribute 'group'
+            #headers = {"User-Agent": self.user_agent}
+            from TwitchChannelPointsMiner.constants import USER_AGENTS
+            headers = {"User-Agent": USER_AGENTS["Linux"]["FIREFOX"]}
+
             main_page_request = requests.get(streamer.streamer_url, headers=headers)
             response = main_page_request.text
+            #logger.info(response)
             regex_settings = "(https://static.twitchcdn.net/config/settings.*?js)"
             settings_url = re.search(regex_settings, response).group(1)
 

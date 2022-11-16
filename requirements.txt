@@ -9,6 +9,3 @@ colorama
 flask
 irc
 pandas
-selenium
-selenium-wire
-undetected_chromedriver
