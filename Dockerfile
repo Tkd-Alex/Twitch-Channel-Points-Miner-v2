@@ -10,6 +10,8 @@ ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 RUN pip install --upgrade pip
 
+ARG TARGETPLATFORM
+
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-install-recommends \
     gcc \
@@ -26,7 +28,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
   && if [ "${BUILDX_QEMU_ENV}" = "true" ] && [ "$(getconf LONG_BIT)" = "32" ]; then \
         pip install -U cryptography==3.3.2; \
      fi \
-  && pip install -r requirements.txt \
+  && if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
+        pip install --index-url=https://www.piwheels.org/simple --no-cache-dir -r requirements.txt; \
+     else \
+        pip install -r requirements.txt; \
+     fi \
   && pip cache purge \
   && apt-get remove -y gcc rustc \
   && apt-get autoremove -y \
