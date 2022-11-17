@@ -31,7 +31,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
   && if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
         apt-get -y install python3-pandas; \
         sed -i '/pandas/d' requirements.txt; \
-        alias python=python3.7; \
+        ln -sf /usr/bin/python3.7 /usr/local/bin/python; \
      fi \
   && pip install -r requirements.txt \
   && pip cache purge \
