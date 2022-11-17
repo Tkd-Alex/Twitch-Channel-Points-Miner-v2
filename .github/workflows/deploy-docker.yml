@@ -25,7 +25,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push AMD64, ARM64
         id: docker_build
         uses: docker/build-push-action@v3.1.1
         with:
@@ -33,7 +33,7 @@ jobs:
           push: true
           tags: |
             rdavidoff/twitch-channel-points-miner-v2:latest
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64
           build-args: BUILDX_QEMU_ENV=true
 
       # File size exceeds the maximum allowed 25000 bytes
@@ -44,5 +44,20 @@ jobs:
       #     password: ${{ secrets.DOCKER_TOKEN }}
       #     repository: rdavidoff/twitch-channel-points-miner-v2
 
-      - name: Image digest
+      - name: Image digest AMD64, ARM64
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Build and push ARMv7
+        id: docker_build_armv7
+        uses: docker/build-push-action@v3.1.1
+        with:
+          context: .
+          push: true
+          tags: |
+            rdavidoff/twitch-channel-points-miner-v2:latest
+          platforms: linux/arm/v7
+          build-args: BUILDX_QEMU_ENV=true
+          dockerfile: Dockerfile.arm32v7
+
+      - name: Image digest ARMv7
+        run: echo ${{ steps.docker_build_armv7.outputs.digest }}
