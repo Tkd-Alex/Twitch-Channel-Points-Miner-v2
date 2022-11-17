@@ -67,13 +67,13 @@ class Twitch(object):
         Path(cookies_path).mkdir(parents=True, exist_ok=True)
         self.cookies_file = os.path.join(cookies_path, f"{username}.pkl")
         self.user_agent = user_agent
-        self.twitch_login = TwitchLogin(
-            CLIENT_ID, username, self.user_agent, password=password
-        )
-        self.running = True
         self.device_id = "".join(
             choice(string.ascii_letters + string.digits) for _ in range(32)
         )
+        self.twitch_login = TwitchLogin(
+            CLIENT_ID, self.device_id, username, self.user_agent, password=password
+        )
+        self.running = True
         self.integrity = None
         self.integrity_expire = 0
         self.client_session = token_hex(16)
@@ -83,7 +83,7 @@ class Twitch(object):
         )
 
     def login(self):
-        if os.path.isfile(self.cookies_file) is False:
+        if not os.path.isfile(self.cookies_file):
             if self.twitch_login.login_flow():
                 self.twitch_login.save_cookies(self.cookies_file)
         else:
@@ -126,9 +126,14 @@ class Twitch(object):
 
     def get_spade_url(self, streamer):
         try:
-            headers = {"User-Agent": self.user_agent}
+            # fixes AttributeError: 'NoneType' object has no attribute 'group'
+            #headers = {"User-Agent": self.user_agent}
+            from TwitchChannelPointsMiner.constants import USER_AGENTS
+            headers = {"User-Agent": USER_AGENTS["Linux"]["FIREFOX"]}
+
             main_page_request = requests.get(streamer.streamer_url, headers=headers)
             response = main_page_request.text
+            #logger.info(response)
             regex_settings = "(https://static.twitchcdn.net/config/settings.*?js)"
             settings_url = re.search(regex_settings, response).group(1)
 
@@ -308,7 +313,7 @@ class Twitch(object):
             #logger.info(f"integrity: {self.integrity}")
             
             if self.isBadBot(self.integrity) is True:
-                logger.error("Uh-oh, Twitch has detected this miner as a \"Bad Bot\"")
+                logger.info("Uh-oh, Twitch has detected this miner as a \"Bad Bot\". Don't worry.")
     
             self.integrity_expire = response.json().get("expiration", 0)
             #logger.info(f"integrity_expire: {self.integrity_expire}")
@@ -324,9 +329,9 @@ class Twitch(object):
         match = re.search(r'(.+)(?<="}).+$', messy_json)
         if match is None:
             #raise MinerException("Unable to parse the integrity token")
-            logger.error("Unable to parse the integrity token")
+            logger.info("Unable to parse the integrity token. Don't worry.")
             return
-        decoded_header: JsonType = json.loads(match.group(1))
+        decoded_header = json.loads(match.group(1))
         #logger.info(f"decoded_header: {decoded_header}")
         if decoded_header.get("is_bad_bot", "false") != "false":
             return True

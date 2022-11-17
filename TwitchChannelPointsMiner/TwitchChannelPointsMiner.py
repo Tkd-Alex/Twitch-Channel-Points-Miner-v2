@@ -287,6 +287,13 @@ class TwitchChannelPointsMiner:
 
             # Subscribe to community-points-user. Get update for points spent or gains
             user_id = self.twitch.twitch_login.get_user_id()
+            #print(f"!!!!!!!!!!!!!! USER_ID: {user_id}")
+            
+            # Fixes 'ERR_BADAUTH'
+            if not user_id:
+                logger.error("No user_id, exiting...")
+                self.end(0, 0)
+
             self.ws_pool.submit(
                 PubsubTopic(
                     "community-points-user-v1",

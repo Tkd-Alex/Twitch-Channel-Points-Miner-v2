@@ -18,7 +18,7 @@ from TwitchChannelPointsMiner.constants import CLIENT_ID, GQLOperations
 
 logger = logging.getLogger(__name__)
 
-def interceptor(request) -> str:
+"""def interceptor(request) -> str:
     if (
         request.method == 'POST'
         and request.url == 'https://passport.twitch.tv/protected_login'
@@ -29,11 +29,12 @@ def interceptor(request) -> str:
         data['client_id'] = CLIENT_ID
         request.body = json.dumps(data).encode('utf-8')
         del request.headers['Content-Length']
-        request.headers['Content-Length'] = str(len(request.body))
+        request.headers['Content-Length'] = str(len(request.body))"""
 
 class TwitchLogin(object):
     __slots__ = [
         "client_id",
+        "device_id",
         "token",
         "login_check_result",
         "session",
@@ -45,13 +46,14 @@ class TwitchLogin(object):
         "cookies"
     ]
 
-    def __init__(self, client_id, username, user_agent, password=None):
+    def __init__(self, client_id, device_id, username, user_agent, password=None):
         self.client_id = client_id
+        self.device_id = device_id
         self.token = None
         self.login_check_result = False
         self.session = requests.session()
         self.session.headers.update(
-            {"Client-ID": self.client_id, "User-Agent": user_agent}
+            { "Client-ID": self.client_id, "X-Device-Id": self.device_id, "User-Agent": user_agent }
         )
         self.username = username
         self.password = password
@@ -69,8 +71,8 @@ class TwitchLogin(object):
             "remember_me": True,
         }
         # login-fix
-        #use_backup_flow = False
-        use_backup_flow = True
+        use_backup_flow = False
+        #use_backup_flow = True
 
         for attempt in range(0, 25):
             password = (
@@ -131,8 +133,8 @@ class TwitchLogin(object):
                         # If the user didn't load the password from run.py we can just ask for it again.
                         break
                     # login-fix
-                    #elif err_code == 1000:
-                    elif err_code in [1000, 5022]:
+                    elif err_code == 1000:
+                    #elif err_code in [1000, 5022]:
                         logger.info(
                             "Console login unavailable (CAPTCHA solving required)."
                         )
@@ -152,7 +154,7 @@ class TwitchLogin(object):
                 break
 
         if use_backup_flow:
-            self.set_token(self.login_flow_backup())
+            self.set_token(self.login_flow_backup(password))
             return self.check_login()
 
         return False
@@ -162,11 +164,18 @@ class TwitchLogin(object):
         self.session.headers.update({"Authorization": f"Bearer {self.token}"})
 
     def send_login_request(self, json_data):
-        response = self.session.post("https://passport.twitch.tv/protected_login", json=json_data)
+        #response = self.session.post("https://passport.twitch.tv/protected_login", json=json_data)
+        response = self.session.post("https://passport.twitch.tv/login", json=json_data, headers={
+                    'Accept': 'application/vnd.twitchtv.v3+json',
+                    'Accept-Encoding': 'gzip',
+                    'Accept-Language': 'en-US',
+                    'Content-Type': 'application/json; charset=UTF-8',
+                    'Host': 'passport.twitch.tv'
+                },)
         return response.json()
 
-    def login_flow_backup(self):
-        """Backup OAuth Selenium login"""
+    def login_flow_backup(self, password = None):
+        """Backup OAuth Selenium login
         from undetected_chromedriver import ChromeOptions
         import seleniumwire.undetected_chromedriver.v2 as uc
         from selenium.webdriver.common.by import By
@@ -195,7 +204,7 @@ class TwitchLogin(object):
         driver.get('https://www.twitch.tv/login')
 
         driver.find_element(By.ID, 'login-username').send_keys(self.username)
-        driver.find_element(By.ID, 'password-input').send_keys(self.password)
+        driver.find_element(By.ID, 'password-input').send_keys(password)
         sleep(0.3)
         driver.execute_script(
             'document.querySelector("#root > div > div.scrollable-area > div.simplebar-scroll-content > div > div > div > div.Layout-sc-nxg1ff-0.gZaqky > form > div > div:nth-child(3) > button > div > div").click()'
@@ -207,14 +216,20 @@ class TwitchLogin(object):
         input()
 
         logger.info("Extracting cookies...")
-
         self.cookies = driver.get_cookies()
+        #print(self.cookies)
+        #driver.close()
         driver.quit()
         self.username = self.get_cookie_value("login")
+        #print(f"self.username: {self.username}")
 
-        return self.get_cookie_value("auth-token")
+        if not self.username:
+            logger.error("Couldn't extract login, probably bad cookies.")
+            return False
 
-
+        return self.get_cookie_value("auth-token")"""
+        logger.error("Backup login flow is not available. Use a VPN or wait a while to avoid the CAPTCHA.")
+        return False
 
     def check_login(self):
         if self.login_check_result:
@@ -226,7 +241,17 @@ class TwitchLogin(object):
         return self.login_check_result
 
     def save_cookies(self, cookies_file):
-        pickle.dump(self.cookies, open(cookies_file, "wb"))
+        #pickle.dump(self.cookies, open(cookies_file, "wb"))
+        # ^ only this line was needed with Selenium ^
+        cookies_dict = self.session.cookies.get_dict()
+        cookies_dict["auth-token"] = self.token
+        if "persistent" not in cookies_dict:  # saving user id cookies
+            cookies_dict["persistent"] = self.user_id
+
+        self.cookies = []
+        for cookie_name, value in cookies_dict.items():
+            self.cookies.append({"name": cookie_name, "value": value})
+        pickle.dump(self.cookies, open(cookies_file, "wb"))        
 
     def get_cookie_value(self, key):
         for cookie in self.cookies:

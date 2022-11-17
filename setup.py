@@ -28,7 +28,6 @@ setuptools.setup(
     install_requires=[
         "requests",
         "websocket-client",
-        "browser_cookie3",
         "pillow",
         "python-dateutil",
         "emoji",
@@ -37,7 +36,7 @@ setuptools.setup(
         "colorama",
         "flask",
         "irc",
-        "pandas",
+        "pandas"
     ],
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
