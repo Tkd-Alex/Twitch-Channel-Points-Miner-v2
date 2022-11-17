@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.11-slim-buster
 
 ARG BUILDX_QEMU_ENV
 
@@ -9,8 +9,6 @@ COPY ./requirements.txt ./
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 RUN pip install --upgrade pip
-
-ARG TARGETPLATFORM
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-install-recommends \
@@ -27,11 +25,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
     python3-dev \
   && if [ "${BUILDX_QEMU_ENV}" = "true" ] && [ "$(getconf LONG_BIT)" = "32" ]; then \
         pip install -U cryptography==3.3.2; \
-     fi \
-  && if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-        apt-get -y install python-pandas; \
-        sed -i '/pandas/d' requirements.txt; \
-        alias python=python3.7; \
      fi \
   && pip install -r requirements.txt \
   && pip cache purge \
