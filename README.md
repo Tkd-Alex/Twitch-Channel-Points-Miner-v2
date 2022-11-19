@@ -662,5 +662,15 @@ pip install Twitch-Channel-Points-Miner-v2
 
 Read more at [#92](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/92) [#76](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/76)
 
+**Note**
+If you can't install pandas, please try it:
+
+`MATHLIB="m" pip install pandas`
+
+If you can't install Cryptography, please try it:
+
+`export RUSTFLAGS=" -C lto=no" && export CARGO_BUILD_TARGET="$(rustc -vV | sed -n 's|host: ||p')" && pip install cryptography`
+
+⚠️The installation of Pandas and Cryptography takes a long time.
 ## Disclaimer
 This project comes with no guarantee or warranty. You are responsible for whatever happens from using this project. It is possible to get soft or hard banned by using this project if you are not careful. This is a personal project and is in no way affiliated with Twitch.
