@@ -628,32 +628,37 @@ Other useful info can be founded here:
 You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
 
 ## Termux
-Install the requirements
+**0. Install packages on Termux**
 ```
-pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib`
+pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib
 LDFLAGS="-L${PREFIX}/lib/" CFLAGS="-I${PREFIX}/include/" pip install --upgrade wheel pillow
 ```
 
-**(1 way):** Clone this repository
+**1. Clone this repository**
+
 `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
 
-**(2 way):** Download sources from GitHub and put it into your Termux storage
+**2. Move directory**
 
-Now you can enter the directory with our miner, type this command:
 `cd Twitch-Channel-Points-Miner-v2`
 
-Configure your miner on your preferences by typing
+**3. Configure your miner on your preferences by typing**
+
 `nano example.py`
 
-When you have configured it now we can rename it (optional):
+**4. Rename file name (optional)**
+
 `mv example.py run.py`
 
-We have to also install dependences required to run miner:
-`pip install -r requirements.txt`
+**5. Install packages**
+```
+pip install -r requirements.txt
+pip install Twitch-Channel-Points-Miner-v2
+```
 
-**(3 way):** `pip install Twitch-Channel-Points-Miner-v2`
+**6. Run miner!**
 
-Now when we did everything we can run miner: `python run.py`
+`python run.py`
 
 Read more at [#92](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/92) [#76](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/76)
 
