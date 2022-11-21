@@ -121,6 +121,10 @@ class TwitchChannelPointsMiner:
 
         # Check for the latest version of the script
         current_version, github_version = check_versions()
+
+        logger.info(f"Twitch Channel Points Miner v2-{current_version} (fork by rdavydov)")
+        logger.info("https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2")
+
         if github_version == "0.0.0":
             logger.error(
                 "Unable to detect if you have the latest version of this script"
