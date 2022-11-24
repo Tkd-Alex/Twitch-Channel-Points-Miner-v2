@@ -43,7 +43,8 @@ logging.getLogger("chardet.charsetprober").setLevel(logging.ERROR)
 logging.getLogger("requests").setLevel(logging.ERROR)
 logging.getLogger("werkzeug").setLevel(logging.ERROR)
 logging.getLogger("irc.client").setLevel(logging.ERROR)
-logging.getLogger("seleniumwire").setLevel(logging.ERROR)
+#logging.getLogger("seleniumwire").setLevel(logging.ERROR)
+logging.getLogger("websocket").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
