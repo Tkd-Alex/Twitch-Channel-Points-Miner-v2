@@ -361,16 +361,20 @@ class WebSocketsPool:
                                     )
 
                                 if event_prediction.result["type"] != "LOSE":
-                                    ws.streamers[streamer_index].persistent_annotations(
-                                        event_prediction.result["type"],
-                                        f"{ws.events_predictions[event_id].title}",
-                                    )
+                                    # Analytics switch
+                                    if Settings.enable_analytics is True:
+                                        ws.streamers[streamer_index].persistent_annotations(
+                                            event_prediction.result["type"],
+                                            f"{ws.events_predictions[event_id].title}",
+                                        )
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
-                                ws.streamers[streamer_index].persistent_annotations(
-                                    "PREDICTION_MADE",
-                                    f"Decision: {event_prediction.bet.decision['choice']} - {event_prediction.title}",
-                                )
+                                # Analytics switch
+                                if Settings.enable_analytics is True:
+                                    ws.streamers[streamer_index].persistent_annotations(
+                                        "PREDICTION_MADE",
+                                        f"Decision: {event_prediction.bet.decision['choice']} - {event_prediction.title}",
+                                    )
                 except Exception:
                     logger.error(
                         f"Exception raised for topic: {message.topic} and message: {message}",
