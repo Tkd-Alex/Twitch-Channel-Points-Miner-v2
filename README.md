@@ -273,7 +273,7 @@ twitch_miner = TwitchChannelPointsMiner(
 # For example, if in the mine function you don't provide any value for 'make_prediction' but you have set it on TwitchChannelPointsMiner instance, the script will take the value from here.
 # If you haven't set any value even in the instance the default one will be used
 
-#twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5, days_ago=7)   # Start the Analytics web-server
+#twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5, days_ago=7)   # Start the Analytics web-server (replit: host="0.0.0.0")
 
 twitch_miner.mine(
     [
@@ -399,6 +399,14 @@ Run a new Repl with the master branch:
 [![Run on Repl.it](https://replit.com/badge/github/rdavydov/Twitch-Channel-Points-Miner-v2)](https://replit.com/new/github/rdavydov/Twitch-Channel-Points-Miner-v2)
 
 Official Repl with description and added keep-alive functionality: https://replit.com/@rdavydov/Twitch-Channel-Points-Miner-v2
+
+#### Tricks to run 24/7 on Replit for free
+
+1. Enable Analytics (set `host="0.0.0.0"`)
+2. Note down the output URL (in most cases it is `https://Twitch-Channel-Points-Miner-v2.<YOUR_REPLIT_USERNAME>.repl.co`)
+3. Send an HTTP request to that URL every 5 minutes
+
+Use a service that can send HTTP requests at regular intervals, such as Uptimerobot.
 
 ### Limits
 > Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
