@@ -4,7 +4,8 @@ from random import uniform
 
 from millify import millify
 
-from TwitchChannelPointsMiner.utils import char_decision_as_index, float_round
+#from TwitchChannelPointsMiner.utils import char_decision_as_index, float_round
+from TwitchChannelPointsMiner.utils import float_round
 
 
 class Strategy(Enum):
@@ -154,33 +155,32 @@ class Bet(object):
                 top_points = outcomes[index]["top_predictors"][0]["points"]
                 self.outcomes[index][OutcomeKeys.TOP_POINTS] = top_points
 
-        self.total_users = (
-            self.outcomes[0][OutcomeKeys.TOTAL_USERS]
-            + self.outcomes[1][OutcomeKeys.TOTAL_USERS]
-        )
-        self.total_points = (
-            self.outcomes[0][OutcomeKeys.TOTAL_POINTS]
-            + self.outcomes[1][OutcomeKeys.TOTAL_POINTS]
-        )
+        # Inefficient, but otherwise outcomekeys are represented wrong
+        self.total_points = 0
+        self.total_users = 0
+        for index in range(0, len(self.outcomes)):
+            self.total_users += self.outcomes[index][OutcomeKeys.TOTAL_USERS]
+            self.total_points += self.outcomes[index][OutcomeKeys.TOTAL_POINTS]
 
         if (
             self.total_users > 0
-            and self.outcomes[0][OutcomeKeys.TOTAL_POINTS] > 0
-            and self.outcomes[1][OutcomeKeys.TOTAL_POINTS] > 0
+            and self.total_points > 0
         ):
             for index in range(0, len(self.outcomes)):
                 self.outcomes[index][OutcomeKeys.PERCENTAGE_USERS] = float_round(
-                    (100 * self.outcomes[index][OutcomeKeys.TOTAL_USERS])
-                    #/ self.total_users
-                    / max(self.total_users, 1)
+                    (100 * self.outcomes[index][OutcomeKeys.TOTAL_USERS]) / self.total_users
                 )
                 self.outcomes[index][OutcomeKeys.ODDS] = float_round(
-                    #self.total_points / self.outcomes[index][OutcomeKeys.TOTAL_POINTS]
-                    self.total_points / max(self.outcomes[index][OutcomeKeys.TOTAL_POINTS], 1)
+                    #self.total_points / max(self.outcomes[index][OutcomeKeys.TOTAL_POINTS], 1)
+                    0
+                    if self.outcomes[index][OutcomeKeys.TOTAL_POINTS] == 0
+                    else self.total_points / self.outcomes[index][OutcomeKeys.TOTAL_POINTS]
                 )
                 self.outcomes[index][OutcomeKeys.ODDS_PERCENTAGE] = float_round(
-                    #100 / self.outcomes[index][OutcomeKeys.ODDS]
-                    100 / max(self.outcomes[index][OutcomeKeys.ODDS], 1)
+                    #100 / max(self.outcomes[index][OutcomeKeys.ODDS], 1)
+                    0
+                    if self.outcomes[index][OutcomeKeys.ODDS] == 0
+                    else 100 / self.outcomes[index][OutcomeKeys.ODDS]
                 )
 
         self.__clear_outcomes()
@@ -189,7 +189,8 @@ class Bet(object):
         return f"Bet(total_users={millify(self.total_users)}, total_points={millify(self.total_points)}), decision={self.decision})\n\t\tOutcome A({self.get_outcome(0)})\n\t\tOutcome B({self.get_outcome(1)})"
 
     def get_decision(self, parsed=False):
-        decision = self.outcomes[0 if self.decision["choice"] == "A" else 1]
+        #decision = self.outcomes[0 if self.decision["choice"] == "A" else 1]
+        decision = self.outcomes[self.decision["choice"]]
         return decision if parsed is False else Bet.__parse_outcome(decision)
 
     @staticmethod
@@ -224,8 +225,15 @@ class Bet(object):
                 if key not in self.outcomes[index]:
                     self.outcomes[index][key] = 0
 
-    def __return_choice(self, key) -> str:
-        return "A" if self.outcomes[0][key] > self.outcomes[1][key] else "B"
+    '''def __return_choice(self, key) -> str:
+        return "A" if self.outcomes[0][key] > self.outcomes[1][key] else "B"'''
+
+    def __return_choice(self, key) -> int:
+        largest=0
+        for index in range(0, len(self.outcomes)):
+            if self.outcomes[index][key] > self.outcomes[largest][key]:
+                largest = index
+        return largest
 
     def skip(self) -> bool:
         if self.settings.filter_condition is not None:
@@ -244,7 +252,8 @@ class Bet(object):
                     self.outcomes[0][fixed_key] + self.outcomes[1][fixed_key]
                 )
             else:
-                outcome_index = char_decision_as_index(self.decision["choice"])
+                #outcome_index = char_decision_as_index(self.decision["choice"])
+                outcome_index = self.decision["choice"]
                 compared_value = self.outcomes[outcome_index][fixed_key]
 
             # Check if condition is satisfied
@@ -286,7 +295,8 @@ class Bet(object):
             )
 
         if self.decision["choice"] is not None:
-            index = char_decision_as_index(self.decision["choice"])
+            #index = char_decision_as_index(self.decision["choice"])
+            index = self.decision["choice"]
             self.decision["id"] = self.outcomes[index]["id"]
             self.decision["amount"] = min(
                 int(balance * (self.settings.percentage / 100)),
