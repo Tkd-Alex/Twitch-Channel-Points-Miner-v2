@@ -563,7 +563,7 @@ Here's a concrete example. Let's suppose we have a bet that is opened with a tim
 
 - **FROM_START** with `delay=20`: The bet will be placed 20s after the bet is opened
 - **FROM_END** with `delay=20`: The bet will be placed 20s before the end of the bet (so 9mins 40s after the bet is opened)
-- **PERCENTAGE** with `delay=0.2`: The bet will be placed when the timer went down by 20% (so 2mins after the bet is opened)
+- **PERCENTAGE** with `delay=20`: The bet will be placed when the timer went down by 20% (so 2mins after the bet is opened)
 
 ## Analytics
 We have recently introduced a little frontend where you can show with a chart you points trend. The script will spawn a Flask web-server on your machine where you can select binding address and port.
