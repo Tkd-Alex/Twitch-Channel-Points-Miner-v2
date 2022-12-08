@@ -196,7 +196,7 @@ class Streamer(object):
         elif delay_mode == DelayMode.FROM_END:
             return max(prediction_window_seconds - delay, 0)
         elif delay_mode == DelayMode.PERCENTAGE:
-            return prediction_window_seconds * delay
+            return prediction_window_seconds * delay / 100
         else:
             return prediction_window_seconds
 
