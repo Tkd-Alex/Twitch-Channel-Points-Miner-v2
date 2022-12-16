@@ -8,6 +8,8 @@ import logging
 import os
 import pickle
 
+import browser_cookie3
+
 import requests
 
 from TwitchChannelPointsMiner.classes.Exceptions import (
@@ -43,7 +45,8 @@ class TwitchLogin(object):
         "password",
         "user_id",
         "email",
-        "cookies"
+        "cookies",
+        "shared_cookies"
     ]
 
     def __init__(self, client_id, device_id, username, user_agent, password=None):
@@ -61,6 +64,7 @@ class TwitchLogin(object):
         self.email = None
 
         self.cookies = []
+        self.shared_cookies = []
 
     def login_flow(self):
         logger.info("You'll have to login to Twitch!")
@@ -71,8 +75,8 @@ class TwitchLogin(object):
             "remember_me": True,
         }
         # login-fix
-        use_backup_flow = False
-        #use_backup_flow = True
+        #use_backup_flow = False
+        use_backup_flow = True
 
         for attempt in range(0, 25):
             password = (
@@ -133,8 +137,8 @@ class TwitchLogin(object):
                         # If the user didn't load the password from run.py we can just ask for it again.
                         break
                     # login-fix
-                    elif err_code == 1000:
-                    #elif err_code in [1000, 5022]:
+                    #elif err_code == 1000:
+                    elif err_code in [1000, 5022, 5023, 5024]:
                         logger.info(
                             "Console login unavailable (CAPTCHA solving required)."
                         )
@@ -235,8 +239,33 @@ class TwitchLogin(object):
             return False
 
         return self.get_cookie_value("auth-token")"""
-        logger.error("Backup login flow is not available. Use a VPN or wait a while to avoid the CAPTCHA.")
-        return False
+        
+        #logger.error("Backup login flow is not available. Use a VPN or wait a while to avoid the CAPTCHA.")
+        #return False
+
+        """Backup OAuth login flow in case manual captcha solving is required"""
+        browser = input(
+            "What browser do you use? Chrome (1), Firefox (2), Other (3): "
+        ).strip()
+        if browser not in ("1", "2"):
+            logger.info("Your browser is unsupported, sorry.")
+            return None
+
+        input(
+            "Please login inside your browser of choice (NOT incognito mode) and press Enter..."
+        )
+        logger.info("Loading cookies saved on your computer...")
+        twitch_domain = ".twitch.tv"
+        if browser == "1":  # chrome
+            cookie_jar = browser_cookie3.chrome(domain_name=twitch_domain)
+        else:
+            cookie_jar = browser_cookie3.firefox(domain_name=twitch_domain)      
+        #logger.info(f"cookie_jar: {cookie_jar}")
+        cookies_dict = requests.utils.dict_from_cookiejar(cookie_jar)
+        #logger.info(f"cookies_dict: {cookies_dict}")
+        self.username = cookies_dict.get("login")
+        self.shared_cookies = cookies_dict
+        return cookies_dict.get("auth-token")        
 
     def check_login(self):
         if self.login_check_result:
@@ -248,17 +277,20 @@ class TwitchLogin(object):
         return self.login_check_result
 
     def save_cookies(self, cookies_file):
-        #pickle.dump(self.cookies, open(cookies_file, "wb"))
-        # ^ only this line was needed with Selenium ^
-        cookies_dict = self.session.cookies.get_dict()
-        cookies_dict["auth-token"] = self.token
-        if "persistent" not in cookies_dict:  # saving user id cookies
-            cookies_dict["persistent"] = self.user_id
+        #cookies_dict = self.session.cookies.get_dict()
+        #print(f"cookies_dict2pickle: {cookies_dict}")
+        #cookies_dict["auth-token"] = self.token
+        #if "persistent" not in cookies_dict:  # saving user id cookies
+        #    cookies_dict["persistent"] = self.user_id
 
+        # old way saves only 'auth-token' and 'persistent'
         self.cookies = []
+        cookies_dict = self.shared_cookies
+        #print(f"cookies_dict2pickle: {cookies_dict}")
         for cookie_name, value in cookies_dict.items():
             self.cookies.append({"name": cookie_name, "value": value})
-        pickle.dump(self.cookies, open(cookies_file, "wb"))        
+        #print(f"cookies2pickle: {self.cookies}")
+        pickle.dump(self.cookies, open(cookies_file, "wb")) 
 
     def get_cookie_value(self, key):
         for cookie in self.cookies:
