@@ -16,9 +16,16 @@ from pathlib import Path
 from secrets import choice, token_hex
 
 import json
+import pickle
+from base64 import urlsafe_b64decode
+
+from hashlib import sha256
 from base64 import urlsafe_b64decode
 
 import requests
+
+from undetected_chromedriver import ChromeOptions
+import seleniumwire.undetected_chromedriver.v2 as uc
 
 from TwitchChannelPointsMiner.classes.entities.Campaign import Campaign
 from TwitchChannelPointsMiner.classes.entities.Drop import Drop
@@ -46,6 +53,71 @@ from TwitchChannelPointsMiner.utils import (
 )
 
 logger = logging.getLogger(__name__)
+
+HEX_CHARS = '0123456789abcdef'
+difficulty_1 = 10
+subchallengeCount = 2
+platformInputs = "tp-v2-input"
+
+
+def get_time_now() -> int:
+    time_now = f'{time.time()}'
+    return int(time_now.replace('.', '')[:13])
+
+
+def random_string(k=32):
+    return ''.join(random.choices(HEX_CHARS, k=k))
+
+
+def string_to_sha256(string_to: str):
+    return sha256(string_to.encode()).hexdigest()
+
+
+def get_hash_difficulty(hash_string):
+    return 4503599627370496 / (int(f'0x{hash_string[:13]}', 16) + 1)
+
+
+def prof_work(config, _id, work_time):
+    f_list = []
+    difficulty = config['difficulty'] / config['subchallengeCount']
+    start_string = string_to_sha256(
+        platformInputs + ',\x20' + str(work_time) + ',\x20' + _id)
+    for _ in range(config['subchallengeCount']):
+        d = 1
+        while True:
+            start_string2 = string_to_sha256(str(d) + ',\x20' + start_string)
+            if (get_hash_difficulty(start_string2) >= difficulty):
+                f_list.append(d)
+                start_string = start_string2
+                break
+            d += 1
+    return {
+        'answers': f_list,
+        'finalHash': start_string
+    }
+
+
+def get_kpsdk_cd():
+    config = {
+        "platformInputs": "tp-v2-input",
+        "difficulty": 10,
+        "subchallengeCount": 2
+    }
+    t0 = time.perf_counter()
+    _id = random_string()
+    work_time = get_time_now() - 527
+    prof_of_work = prof_work(config, _id, work_time)
+    t1 = time.perf_counter_ns()
+
+    duration = round(1000 * (t1 - t0)) / 1000
+    return {
+        'answers': prof_of_work['answers'],
+        'rst': time.perf_counter_ns(),
+        'st': time.perf_counter_ns(),
+        'd': duration,
+        'id': _id,
+        'workTime': work_time,
+    }
 
 
 class Twitch(object):
@@ -127,22 +199,26 @@ class Twitch(object):
     def get_spade_url(self, streamer):
         try:
             # fixes AttributeError: 'NoneType' object has no attribute 'group'
-            #headers = {"User-Agent": self.user_agent}
+            # headers = {"User-Agent": self.user_agent}
             from TwitchChannelPointsMiner.constants import USER_AGENTS
-            headers = {"User-Agent": USER_AGENTS["Linux"]["FIREFOX"]}
+            # headers = {"User-Agent": USER_AGENTS["Linux"]["FIREFOX"]}
+            headers = {"User-Agent": USER_AGENTS["Windows"]["CHROME"]}
 
-            main_page_request = requests.get(streamer.streamer_url, headers=headers)
+            main_page_request = requests.get(
+                streamer.streamer_url, headers=headers)
             response = main_page_request.text
-            #logger.info(response)
+            # logger.info(response)
             regex_settings = "(https://static.twitchcdn.net/config/settings.*?js)"
             settings_url = re.search(regex_settings, response).group(1)
 
             settings_request = requests.get(settings_url, headers=headers)
             response = settings_request.text
             regex_spade = '"spade_url":"(.*?)"'
-            streamer.stream.spade_url = re.search(regex_spade, response).group(1)
+            streamer.stream.spade_url = re.search(
+                regex_spade, response).group(1)
         except requests.exceptions.RequestException as e:
-            logger.error(f"Something went wrong during extraction of 'spade_url': {e}")
+            logger.error(
+                f"Something went wrong during extraction of 'spade_url': {e}")
 
     def get_broadcast_id(self, streamer):
         json_data = copy.deepcopy(GQLOperations.WithIsStreamLiveQuery)
@@ -156,7 +232,8 @@ class Twitch(object):
                 raise StreamerIsOfflineException
 
     def get_stream_info(self, streamer):
-        json_data = copy.deepcopy(GQLOperations.VideoPlayerStreamInfoOverlayChannel)
+        json_data = copy.deepcopy(
+            GQLOperations.VideoPlayerStreamInfoOverlayChannel)
         json_data["variables"] = {"channel": streamer.username}
         response = self.post_gql_request(json_data)
         if response != {}:
@@ -228,7 +305,8 @@ class Twitch(object):
 
             logger.info(
                 f"Joining raid from {streamer} to {raid.target_login}!",
-                extra={"emoji": ":performing_arts:", "event": Events.JOIN_RAID},
+                extra={"emoji": ":performing_arts:",
+                       "event": Events.JOIN_RAID},
             )
 
     def viewer_is_mod(self, streamer):
@@ -294,45 +372,109 @@ class Twitch(object):
         ):
             return self.integrity
         try:
-            response = requests.post(
+            # is_bad_bot becomes true when I use headless mode.
+            HEADLESS = False
+
+            options = uc.ChromeOptions()
+            if HEADLESS is True:
+                options.add_argument('--headless')
+            options.add_argument('--log-level=3')
+            options.add_argument('--disable-web-security')
+            options.add_argument('--allow-running-insecure-content')
+            options.add_argument('--lang=en')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-gpu')
+            # options.add_argument("--user-agent=\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36\"")
+            # options.add_argument("--window-size=1920,1080")
+            # options.set_capability("detach", True)
+
+            driver = uc.Chrome(
+                options=options, use_subprocess=True  # , executable_path=EXECUTABLE_PATH
+            )
+            driver.minimize_window()
+            driver.get('https://www.twitch.tv/robots.txt')
+            cookies = pickle.load(open(self.cookies_file, "rb"))
+            for cookie in cookies:
+                driver.add_cookie(cookie)
+            driver.get('https://www.twitch.tv/settings/profile')
+
+            # Print request headers
+            # for request in driver.requests:
+            # logger.info(request.url)  # <--------------- Request url
+            # logger.info(request.headers)  # <----------- Request headers
+            # logger.info(request.response.headers)  # <-- Response headers
+
+            # Set correct user agent
+            selenium_user_agent = driver.execute_script(
+                "return navigator.userAgent;")
+
+            self.user_agent = selenium_user_agent
+
+            session = requests.Session()
+            kpsdk_cd = json.dumps(get_kpsdk_cd())
+
+            for cookie in driver.get_cookies():
+                session.cookies.set(cookie['name'], cookie['value'],
+                                    domain=cookie['domain'])
+                if cookie["name"] == "KP_UIDz":
+                    if cookie["value"] is not None:
+                        kpsdk_ct = cookie["value"]
+                    else:
+                        logger.error("Can't extract kpsdk_ct")
+
+            headers = {
+                'Accept': '*/*',
+                'Accept-Language': 'en-US,en;q=0.9,pt;q=0.8',
+                "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
+                "Client-Id": CLIENT_ID,
+                "Client-Session-Id": self.client_session,
+                "Client-Version": self.update_client_version(),
+                'Origin': 'https://www.twitch.tv',
+                'Referer': 'https://www.twitch.tv/',
+                "User-Agent": self.user_agent,
+                # "User-Agent": selenium_user_agent,
+                "X-Device-Id": self.device_id,
+                'x-kpsdk-cd': kpsdk_cd,
+                'x-kpsdk-ct': kpsdk_ct
+            }
+
+            response = session.post(
                 GQLOperations.integrity_url,
                 json={},
-                headers={
-                    "Authorization": f"OAuth {self.twitch_login.get_auth_token()}",
-                    "Client-Id": CLIENT_ID,
-                    "Client-Session-Id": self.client_session,
-                    "Client-Version": self.update_client_version(),
-                    "User-Agent": self.user_agent,
-                    "X-Device-Id": self.device_id,
-                },
+                headers=headers
             )
-            logger.debug(
-                f"Data: [], Status code: {response.status_code}, Content: {response.text}"
-            )
-            self.integrity = response.json().get("token", None)
-            #logger.info(f"integrity: {self.integrity}")
-            
+
+            driver.close()
+            driver.quit()
+
+            integrity_json = response.json()
+
+            self.integrity = integrity_json.get("token", None)
+            # logger.info(f"integrity: {self.integrity}")
+
             if self.isBadBot(self.integrity) is True:
-                logger.info("Uh-oh, Twitch has detected this miner as a \"Bad Bot\". Don't worry.")
-    
-            self.integrity_expire = response.json().get("expiration", 0)
-            #logger.info(f"integrity_expire: {self.integrity_expire}")
+                logger.error(
+                    "Uh-oh, Twitch has detected this miner as a \"Bad Bot\"")
+
+            self.integrity_expire = integrity_json.get("expiration", 0)
+            # logger.info(f"integrity_expire: {self.integrity_expire}")
             return self.integrity
         except requests.exceptions.RequestException as e:
             logger.error(f"Error with post_integrity: {e}")
             return self.integrity
 
     # verify the integrity token's contents for the "is_bad_bot" flag
-    def isBadBot(self, integrity):          
+    def isBadBot(self, integrity):
         stripped_token: str = self.integrity.split('.')[2] + "=="
-        messy_json: str = urlsafe_b64decode(stripped_token.encode()).decode(errors="ignore")
+        messy_json: str = urlsafe_b64decode(
+            stripped_token.encode()).decode(errors="ignore")
         match = re.search(r'(.+)(?<="}).+$', messy_json)
         if match is None:
-            #raise MinerException("Unable to parse the integrity token")
+            # raise MinerException("Unable to parse the integrity token")
             logger.info("Unable to parse the integrity token. Don't worry.")
             return
         decoded_header = json.loads(match.group(1))
-        #logger.info(f"decoded_header: {decoded_header}")
+        # logger.info(f"decoded_header: {decoded_header}")
         if decoded_header.get("is_bad_bot", "false") != "false":
             return True
         else:
@@ -383,11 +525,13 @@ class Twitch(object):
                         streamers_watching += streamers_index[:2]
 
                     elif (
-                        prior in [Priority.POINTS_ASCENDING, Priority.POINTS_DESCEDING]
+                        prior in [Priority.POINTS_ASCENDING,
+                                  Priority.POINTS_DESCEDING]
                         and len(streamers_watching) < 2
                     ):
                         items = [
-                            {"points": streamers[index].channel_points, "index": index}
+                            {"points": streamers[index].channel_points,
+                                "index": index}
                             for index in streamers_index
                         ]
                         items = sorted(
@@ -397,7 +541,8 @@ class Twitch(object):
                                 True if prior == Priority.POINTS_DESCEDING else False
                             ),
                         )
-                        streamers_watching += [item["index"] for item in items][:2]
+                        streamers_watching += [item["index"]
+                                               for item in items][:2]
 
                     elif prior == Priority.STREAK and len(streamers_watching) < 2:
                         """
@@ -413,7 +558,8 @@ class Twitch(object):
                                 and (
                                     streamers[index].offline_at == 0
                                     or (
-                                        (time.time() - streamers[index].offline_at)
+                                        (time.time() -
+                                         streamers[index].offline_at)
                                         // 60
                                     )
                                     > 30
@@ -439,7 +585,8 @@ class Twitch(object):
                         ]
                         streamers_with_multiplier = sorted(
                             streamers_with_multiplier,
-                            key=lambda x: streamers[x].total_points_multiplier(),
+                            key=lambda x: streamers[x].total_points_multiplier(
+                            ),
                             reverse=True,
                         )
                         streamers_watching += streamers_with_multiplier[:2]
@@ -508,10 +655,12 @@ class Twitch(object):
                                             )
 
                     except requests.exceptions.ConnectionError as e:
-                        logger.error(f"Error while trying to send minute watched: {e}")
+                        logger.error(
+                            f"Error while trying to send minute watched: {e}")
                         self.__check_connection_handler(chunk_size)
                     except requests.exceptions.Timeout as e:
-                        logger.error(f"Error while trying to send minute watched: {e}")
+                        logger.error(
+                            f"Error while trying to send minute watched: {e}")
 
                     self.__chuncked_sleep(
                         next_iteration - time.time(), chunk_size=chunk_size
@@ -520,7 +669,8 @@ class Twitch(object):
                 if streamers_watching == []:
                     self.__chuncked_sleep(60, chunk_size=chunk_size)
             except Exception:
-                logger.error("Exception raised in send minute watched", exc_info=True)
+                logger.error(
+                    "Exception raised in send minute watched", exc_info=True)
 
     # === CHANNEL POINTS / PREDICTION === #
     # Load the amount of current points for a channel, check if a bonus is available
@@ -538,11 +688,12 @@ class Twitch(object):
             streamer.activeMultipliers = community_points["activeMultipliers"]
 
             if community_points["availableClaim"] is not None:
-                self.claim_bonus(streamer, community_points["availableClaim"]["id"])
+                self.claim_bonus(
+                    streamer, community_points["availableClaim"]["id"])
 
     def make_predictions(self, event):
         decision = event.bet.calculate(event.streamer.channel_points)
-        #selector_index = 0 if decision["choice"] == "A" else 1
+        # selector_index = 0 if decision["choice"] == "A" else 1
 
         logger.info(
             f"Going to complete bet for {event}",
@@ -571,7 +722,7 @@ class Twitch(object):
             else:
                 if decision["amount"] >= 10:
                     logger.info(
-                        #f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
+                        # f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(selector_index)}",
                         f"Place {_millify(decision['amount'])} channel points on: {event.bet.get_outcome(decision['choice'])}",
                         extra={
                             "emoji": ":four_leaf_clover:",
@@ -635,7 +786,8 @@ class Twitch(object):
 
     # === CAMPAIGNS / DROPS / INVENTORY === #
     def __get_campaign_ids_from_streamer(self, streamer):
-        json_data = copy.deepcopy(GQLOperations.DropsHighlightService_AvailableDrops)
+        json_data = copy.deepcopy(
+            GQLOperations.DropsHighlightService_AvailableDrops)
         json_data["variables"] = {"channelID": streamer.channel_id}
         response = self.post_gql_request(json_data)
         try:
@@ -663,7 +815,8 @@ class Twitch(object):
         response = self.post_gql_request(GQLOperations.ViewerDropsDashboard)
         campaigns = response["data"]["currentUser"]["dropCampaigns"]
         if status is not None:
-            campaigns = list(filter(lambda x: x["status"] == status.upper(), campaigns))
+            campaigns = list(
+                filter(lambda x: x["status"] == status.upper(), campaigns))
         return campaigns
 
     def __get_campaigns_details(self, campaigns):
@@ -672,7 +825,8 @@ class Twitch(object):
         for chunk in chunks:
             json_data = []
             for campaign in chunk:
-                json_data.append(copy.deepcopy(GQLOperations.DropCampaignDetails))
+                json_data.append(copy.deepcopy(
+                    GQLOperations.DropCampaignDetails))
                 json_data[-1]["variables"] = {
                     "dropID": campaign["id"],
                     "channelLogin": f"{self.twitch_login.get_user_id()}",
@@ -703,7 +857,8 @@ class Twitch(object):
                         campaigns[i].sync_drops(
                             progress["timeBasedDrops"], self.claim_drop
                         )
-                        campaigns[i].clear_drops()  # Remove all the claimed drops
+                        # Remove all the claimed drops
+                        campaigns[i].clear_drops()
                         break
         return campaigns
 
@@ -713,7 +868,8 @@ class Twitch(object):
         )
 
         json_data = copy.deepcopy(GQLOperations.DropsPage_ClaimDropRewards)
-        json_data["variables"] = {"input": {"dropInstanceID": drop.drop_instance_id}}
+        json_data["variables"] = {
+            "input": {"dropInstanceID": drop.drop_instance_id}}
         response = self.post_gql_request(json_data)
         try:
             # response["data"]["claimDropRewards"] can be null and respose["data"]["errors"] != []

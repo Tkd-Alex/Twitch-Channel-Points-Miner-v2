@@ -10,3 +10,6 @@ flask
 irc
 pandas
 browser_cookie3
+selenium
+selenium-wire
+undetected_chromedriver

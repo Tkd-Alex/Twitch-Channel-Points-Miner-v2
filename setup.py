@@ -37,7 +37,10 @@ setuptools.setup(
         "flask",
         "irc",
         "pandas",
-        "browser_cookie3"
+        "browser_cookie3",
+        "selenium",
+        "selenium-wire",
+        "undetected_chromedriver"
     ],
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
