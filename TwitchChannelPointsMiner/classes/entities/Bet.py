@@ -8,7 +8,43 @@ from TwitchChannelPointsMiner.classes.entities.Strategy import (
     Strategy,
     StrategySettings,
 )
+#from TwitchChannelPointsMiner.utils import char_decision_as_index, float_round
 from TwitchChannelPointsMiner.utils import float_round
+
+
+class Strategy(Enum):
+    MOST_VOTED = auto()
+    HIGH_ODDS = auto()
+    PERCENTAGE = auto()
+    SMART_MONEY = auto()
+    SMART = auto()
+
+    def __str__(self):
+        return self.name
+
+
+class Condition(Enum):
+    GT = auto()
+    LT = auto()
+    GTE = auto()
+    LTE = auto()
+
+    def __str__(self):
+        return self.name
+
+
+class OutcomeKeys(object):
+    # Real key on Bet dict ['']
+    PERCENTAGE_USERS = "percentage_users"
+    ODDS_PERCENTAGE = "odds_percentage"
+    ODDS = "odds"
+    TOP_POINTS = "top_points"
+    # Real key on Bet dict [''] - Sum()
+    TOTAL_USERS = "total_users"
+    TOTAL_POINTS = "total_points"
+    # This key does not exist
+    DECISION_USERS = "decision_users"
+    DECISION_POINTS = "decision_points"
 
 
 class DelayMode(Enum):
@@ -79,8 +115,8 @@ class BetSettings(object):
     def default(self):
         self.strategy = self.strategy if self.strategy is not None else Strategy.SMART
         self.percentage = self.percentage if self.percentage is not None else 5
-        self.max_points = self.max_points if self.max_points is not None else 50000
         self.only_doubt = self.only_doubt if self.only_doubt is not None else False
+        self.max_points = self.max_points if self.max_points is not None else 50000
         self.minimum_points = (
             self.minimum_points if self.minimum_points is not None else 0
         )
@@ -129,30 +165,32 @@ class Bet(object):
                 top_points = outcomes[index]["top_predictors"][0]["points"]
                 self.outcomes[index][OutcomeKeys.TOP_POINTS] = top_points
 
-        self.total_users = (
-            self.outcomes[0][OutcomeKeys.TOTAL_USERS]
-            + self.outcomes[1][OutcomeKeys.TOTAL_USERS]
-        )
-        self.total_points = (
-            self.outcomes[0][OutcomeKeys.TOTAL_POINTS]
-            + self.outcomes[1][OutcomeKeys.TOTAL_POINTS]
-        )
+        # Inefficient, but otherwise outcomekeys are represented wrong
+        self.total_points = 0
+        self.total_users = 0
+        for index in range(0, len(self.outcomes)):
+            self.total_users += self.outcomes[index][OutcomeKeys.TOTAL_USERS]
+            self.total_points += self.outcomes[index][OutcomeKeys.TOTAL_POINTS]
 
         if (
             self.total_users > 0
-            and self.outcomes[0][OutcomeKeys.TOTAL_POINTS] > 0
-            and self.outcomes[1][OutcomeKeys.TOTAL_POINTS] > 0
+            and self.total_points > 0
         ):
             for index in range(0, len(self.outcomes)):
                 self.outcomes[index][OutcomeKeys.PERCENTAGE_USERS] = float_round(
-                    (100 * self.outcomes[index][OutcomeKeys.TOTAL_USERS])
-                    / self.total_users
+                    (100 * self.outcomes[index][OutcomeKeys.TOTAL_USERS]) / self.total_users
                 )
                 self.outcomes[index][OutcomeKeys.ODDS] = float_round(
-                    self.total_points / self.outcomes[index][OutcomeKeys.TOTAL_POINTS]
+                    #self.total_points / max(self.outcomes[index][OutcomeKeys.TOTAL_POINTS], 1)
+                    0
+                    if self.outcomes[index][OutcomeKeys.TOTAL_POINTS] == 0
+                    else self.total_points / self.outcomes[index][OutcomeKeys.TOTAL_POINTS]
                 )
                 self.outcomes[index][OutcomeKeys.ODDS_PERCENTAGE] = float_round(
-                    100 / self.outcomes[index][OutcomeKeys.ODDS]
+                    #100 / max(self.outcomes[index][OutcomeKeys.ODDS], 1)
+                    0
+                    if self.outcomes[index][OutcomeKeys.ODDS] == 0
+                    else 100 / self.outcomes[index][OutcomeKeys.ODDS]
                 )
 
         self.__clear_outcomes()
@@ -161,7 +199,8 @@ class Bet(object):
         return f"Bet(total_users={millify(self.total_users)}, total_points={millify(self.total_points)}), decision={self.decision})\n\t\tOutcome A({self.get_outcome(0)})\n\t\tOutcome B({self.get_outcome(1)})"
 
     def get_decision(self, parsed=False):
-        decision = self.outcomes[0 if self.decision["choice"] == "A" else 1]
+        #decision = self.outcomes[0 if self.decision["choice"] == "A" else 1]
+        decision = self.outcomes[self.decision["choice"]]
         return decision if parsed is False else Bet.__parse_outcome(decision)
 
     @staticmethod
