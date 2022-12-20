@@ -2,7 +2,8 @@ from enum import Enum, auto
 from importlib import import_module
 from random import uniform
 
-from TwitchChannelPointsMiner.utils import char_decision_as_index
+def char_decision_as_index(char):
+    return 0 if char == "A" else 1
 
 
 class Condition(Enum):
@@ -75,9 +76,12 @@ class Strategy(object):
                 >= self.outcomes[index][OutcomeKeys.TOP_POINTS]
             ):
                 reduce_amount = uniform(1, 5)
+                # check by
+                # grep -r --include=*.log "Bet won't be placed as the amount -[0-9] is less than the minimum required 10" .
                 self.decision["amount"] = (
                     self.outcomes[index][OutcomeKeys.TOP_POINTS] - reduce_amount
                 )
+                if self.decision["amount"] < 10: self.decision["amount"] = 10
             self.decision["amount"] = int(self.decision["amount"])
 
     def calculate(self, balance: int) -> dict:

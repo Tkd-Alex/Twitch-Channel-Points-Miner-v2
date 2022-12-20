@@ -1,8 +1,8 @@
 import logging
 
-from TwitchChannelPointsMiner.classes.entities.Strategy import OutcomeKeys, Strategy
+from TwitchChannelPointsMiner.classes.entities.Strategy import OutcomeKeys, Strategy, char_decision_as_index
 from TwitchChannelPointsMiner.classes.Settings import Settings
-from TwitchChannelPointsMiner.utils import char_decision_as_index
+
 
 logger = logging.getLogger(__name__)
 

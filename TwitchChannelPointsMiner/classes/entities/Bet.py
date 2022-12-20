@@ -12,17 +12,6 @@ from TwitchChannelPointsMiner.classes.entities.Strategy import (
 from TwitchChannelPointsMiner.utils import float_round
 
 
-class Strategy(Enum):
-    MOST_VOTED = auto()
-    HIGH_ODDS = auto()
-    PERCENTAGE = auto()
-    SMART_MONEY = auto()
-    SMART = auto()
-
-    def __str__(self):
-        return self.name
-
-
 class Condition(Enum):
     GT = auto()
     LT = auto()
@@ -31,20 +20,6 @@ class Condition(Enum):
 
     def __str__(self):
         return self.name
-
-
-class OutcomeKeys(object):
-    # Real key on Bet dict ['']
-    PERCENTAGE_USERS = "percentage_users"
-    ODDS_PERCENTAGE = "odds_percentage"
-    ODDS = "odds"
-    TOP_POINTS = "top_points"
-    # Real key on Bet dict [''] - Sum()
-    TOTAL_USERS = "total_users"
-    TOTAL_POINTS = "total_points"
-    # This key does not exist
-    DECISION_USERS = "decision_users"
-    DECISION_POINTS = "decision_points"
 
 
 class DelayMode(Enum):
