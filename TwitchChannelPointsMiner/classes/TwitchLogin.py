@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
         del request.headers['Content-Length']
         request.headers['Content-Length'] = str(len(request.body))"""
 
+
 class TwitchLogin(object):
     __slots__ = [
         "client_id",
@@ -56,7 +57,8 @@ class TwitchLogin(object):
         self.login_check_result = False
         self.session = requests.session()
         self.session.headers.update(
-            { "Client-ID": self.client_id, "X-Device-Id": self.device_id, "User-Agent": user_agent }
+            {"Client-ID": self.client_id,
+                "X-Device-Id": self.device_id, "User-Agent": user_agent}
         )
         self.username = username
         self.password = password
@@ -75,7 +77,7 @@ class TwitchLogin(object):
             "remember_me": True,
         }
         # login-fix
-        #use_backup_flow = False
+        # use_backup_flow = False
         use_backup_flow = True
 
         for attempt in range(0, 25):
@@ -93,7 +95,8 @@ class TwitchLogin(object):
                 login_response = self.send_login_request(post_data)
 
                 if "captcha_proof" in login_response:
-                    post_data["captcha"] = dict(proof=login_response["captcha_proof"])
+                    post_data["captcha"] = dict(
+                        proof=login_response["captcha_proof"])
 
                 if "error_code" in login_response:
                     err_code = login_response["error_code"]
@@ -103,7 +106,8 @@ class TwitchLogin(object):
                                 "Two factor authentication enabled, please enter token below."
                             )
                         else:
-                            logger.info("Invalid two factor token, please try again.")
+                            logger.info(
+                                "Invalid two factor token, please try again.")
 
                         twofa = input("2FA token: ")
                         post_data["authy_token"] = twofa.strip()
@@ -126,7 +130,8 @@ class TwitchLogin(object):
 
                     # invalid password, or password not provided
                     elif err_code in [3001, 3003]:
-                        logger.info("Invalid username or password, please try again.")
+                        logger.info(
+                            "Invalid username or password, please try again.")
 
                         # If the password is loaded from run.py, require the user to fix it there.
                         if self.password not in [None, ""]:
@@ -137,7 +142,7 @@ class TwitchLogin(object):
                         # If the user didn't load the password from run.py we can just ask for it again.
                         break
                     # login-fix
-                    #elif err_code == 1000:
+                    # elif err_code == 1000:
                     elif err_code in [1000, 5022, 5023, 5024]:
                         logger.info(
                             "Console login unavailable (CAPTCHA solving required)."
@@ -175,17 +180,17 @@ class TwitchLogin(object):
         self.session.headers.update({"Authorization": f"Bearer {self.token}"})
 
     def send_login_request(self, json_data):
-        #response = self.session.post("https://passport.twitch.tv/protected_login", json=json_data)
+        # response = self.session.post("https://passport.twitch.tv/protected_login", json=json_data)
         response = self.session.post("https://passport.twitch.tv/login", json=json_data, headers={
-                    'Accept': 'application/vnd.twitchtv.v3+json',
-                    'Accept-Encoding': 'gzip',
-                    'Accept-Language': 'en-US',
-                    'Content-Type': 'application/json; charset=UTF-8',
-                    'Host': 'passport.twitch.tv'
-                },)
+            'Accept': 'application/vnd.twitchtv.v3+json',
+            'Accept-Encoding': 'gzip',
+            'Accept-Language': 'en-US',
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Host': 'passport.twitch.tv'
+        },)
         return response.json()
 
-    def login_flow_backup(self, password = None):
+    def login_flow_backup(self, password=None):
         """Backup OAuth Selenium login
         from undetected_chromedriver import ChromeOptions
         import seleniumwire.undetected_chromedriver.v2 as uc
@@ -239,9 +244,9 @@ class TwitchLogin(object):
             return False
 
         return self.get_cookie_value("auth-token")"""
-        
-        #logger.error("Backup login flow is not available. Use a VPN or wait a while to avoid the CAPTCHA.")
-        #return False
+
+        # logger.error("Backup login flow is not available. Use a VPN or wait a while to avoid the CAPTCHA.")
+        # return False
 
         """Backup OAuth login flow in case manual captcha solving is required"""
         browser = input(
@@ -259,13 +264,13 @@ class TwitchLogin(object):
         if browser == "1":  # chrome
             cookie_jar = browser_cookie3.chrome(domain_name=twitch_domain)
         else:
-            cookie_jar = browser_cookie3.firefox(domain_name=twitch_domain)      
-        #logger.info(f"cookie_jar: {cookie_jar}")
+            cookie_jar = browser_cookie3.firefox(domain_name=twitch_domain)
+        # logger.info(f"cookie_jar: {cookie_jar}")
         cookies_dict = requests.utils.dict_from_cookiejar(cookie_jar)
-        #logger.info(f"cookies_dict: {cookies_dict}")
+        # logger.info(f"cookies_dict: {cookies_dict}")
         self.username = cookies_dict.get("login")
         self.shared_cookies = cookies_dict
-        return cookies_dict.get("auth-token")        
+        return cookies_dict.get("auth-token")
 
     def check_login(self):
         if self.login_check_result:
@@ -277,20 +282,20 @@ class TwitchLogin(object):
         return self.login_check_result
 
     def save_cookies(self, cookies_file):
-        #cookies_dict = self.session.cookies.get_dict()
-        #print(f"cookies_dict2pickle: {cookies_dict}")
-        #cookies_dict["auth-token"] = self.token
-        #if "persistent" not in cookies_dict:  # saving user id cookies
+        # cookies_dict = self.session.cookies.get_dict()
+        # print(f"cookies_dict2pickle: {cookies_dict}")
+        # cookies_dict["auth-token"] = self.token
+        # if "persistent" not in cookies_dict:  # saving user id cookies
         #    cookies_dict["persistent"] = self.user_id
 
         # old way saves only 'auth-token' and 'persistent'
         self.cookies = []
         cookies_dict = self.shared_cookies
-        #print(f"cookies_dict2pickle: {cookies_dict}")
+        # print(f"cookies_dict2pickle: {cookies_dict}")
         for cookie_name, value in cookies_dict.items():
             self.cookies.append({"name": cookie_name, "value": value})
-        #print(f"cookies2pickle: {self.cookies}")
-        pickle.dump(self.cookies, open(cookies_file, "wb")) 
+        # print(f"cookies2pickle: {self.cookies}")
+        pickle.dump(self.cookies, open(cookies_file, "wb"))
 
     def get_cookie_value(self, key):
         for cookie in self.cookies:
@@ -308,7 +313,8 @@ class TwitchLogin(object):
     def get_user_id(self):
         persistent = self.get_cookie_value("persistent")
         user_id = (
-            int(persistent.split("%")[0]) if persistent is not None else self.user_id
+            int(persistent.split("%")[
+                0]) if persistent is not None else self.user_id
         )
         if user_id is None:
             if self.__set_user_id() is True:
