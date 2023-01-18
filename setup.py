@@ -36,11 +36,7 @@ setuptools.setup(
         "colorama",
         "flask",
         "irc",
-        "pandas",
-        "browser_cookie3",
-        "selenium",
-        "selenium-wire",
-        "undetected_chromedriver"
+        "pandas"
     ],
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
