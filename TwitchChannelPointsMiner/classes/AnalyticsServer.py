@@ -60,7 +60,7 @@ def filter_datas(start_date, end_date, datas):
 
         datas["series"] = (
             df.drop(columns="datetime")
-            .sort_values(by="x", ascending=True)
+            .sort_values(by=["y", "x"], ascending=True)
             .to_dict("records")
         )
     else:
