@@ -85,6 +85,7 @@ var annotations = [];
 
 var streamersList = [];
 var sortBy = "Name ascending";
+var sortField = 'name';
 
 var startDate = new Date();
 startDate.setDate(startDate.getDate() - daysAgo);
@@ -104,6 +105,9 @@ $(document).ready(function () {
     $('#endDate').val(formatDate(endDate));
 
     sortBy = localStorage.getItem("sort-by");
+    if (sortBy.includes("Points")) sortField = 'points';
+    else if (sortBy.includes("Last activity")) sortField = 'last_activity';
+    else sortField = 'name';
     $('#sorting-by').text(sortBy);
     getStreamers();
 
@@ -184,12 +188,15 @@ function renderStreamers() {
 
 function sortStreamers() {
     streamersList = streamersList.sort((a, b) => {
-        return (a[sortBy.includes("Name") ? 'name' : 'points'] > b[sortBy.includes("Name") ? 'name' : 'points'] ? 1 : -1) * (sortBy.includes("ascending") ? 1 : -1);
+        return (a[sortField] > b[sortField] ? 1 : -1) * (sortBy.includes("ascending") ? 1 : -1);
     });
 }
 
 function changeSortBy(option) {
     sortBy = option.innerText.trim();
+    if (sortBy.includes("Points")) sortField = 'points'
+    else if (sortBy.includes("Last activity")) sortField = 'last_activity'
+    else sortField = 'name';
     sortStreamers();
     renderStreamers();
     $('#sorting-by').text(sortBy);

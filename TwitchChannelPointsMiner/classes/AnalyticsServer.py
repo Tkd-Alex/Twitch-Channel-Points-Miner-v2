@@ -115,6 +115,13 @@ def get_challenge_points(streamer):
     return 0
 
 
+def get_last_activity(streamer):
+    datas = read_json(streamer, return_response=False)
+    if datas != {}:
+        return datas["series"][-1]["x"]
+    return 0
+
+
 def json_all():
     return Response(
         json.dumps(
@@ -143,7 +150,7 @@ def streamers():
     return Response(
         json.dumps(
             [
-                {"name": s, "points": get_challenge_points(s)}
+                {"name": s, "points": get_challenge_points(s), "last_activity": get_last_activity(s)}
                 for s in sorted(streamers_available())
             ]
         ),
