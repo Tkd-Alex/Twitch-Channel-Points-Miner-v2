@@ -177,7 +177,11 @@ function renderStreamers() {
     $("#streamers-list").empty();
     var promised = new Promise((resolve, reject) => {
         streamersList.forEach((streamer, index, array) => {
-            $("#streamers-list").append(`<li><a onClick="changeStreamer('${streamer.name}', ${index + 1}); return false;">${streamer.name.replace(".json", "")}</a></li>`);
+            displayname = streamer.name.replace(".json", "");
+            console.log(streamer);
+            if (sortField == 'points') displayname += "&nbsp;&nbsp;<font size='-2'>" + streamer['points'] + "</font>";
+            else if (sortField == 'last_activity') displayname += "&nbsp;&nbsp;<font size='-2'>" + formatDate(streamer['last_activity']) + "</font>";
+            $("#streamers-list").append(`<li><a onClick="changeStreamer('${streamer.name}', ${index + 1}); return false;">${displayname}</a></li>`);
             if (index === array.length - 1) resolve();
         });
     });
