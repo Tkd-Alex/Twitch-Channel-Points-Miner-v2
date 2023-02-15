@@ -179,8 +179,8 @@ function renderStreamers() {
         streamersList.forEach((streamer, index, array) => {
             displayname = streamer.name.replace(".json", "");
             console.log(streamer);
-            if (sortField == 'points') displayname += "&nbsp;&nbsp;<font size='-2'>" + streamer['points'] + "</font>";
-            else if (sortField == 'last_activity') displayname += "&nbsp;&nbsp;<font size='-2'>" + formatDate(streamer['last_activity']) + "</font>";
+            if (sortField == 'points') displayname = "<font size='-2'>" + streamer['points'] + "</font>&nbsp;" + displayname;
+            else if (sortField == 'last_activity') displayname = "<font size='-2'>" + formatDate(streamer['last_activity']) + "</font>&nbsp;"+ displayname;
             $("#streamers-list").append(`<li><a onClick="changeStreamer('${streamer.name}', ${index + 1}); return false;">${displayname}</a></li>`);
             if (index === array.length - 1) resolve();
         });
