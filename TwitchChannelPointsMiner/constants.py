@@ -102,11 +102,11 @@ class GQLOperations:
     }
     Inventory = {
         "operationName": "Inventory",
-        "variables": {},
+        "variables": {"fetchRewardCampaigns": "true"},
         "extensions": {
             "persistedQuery": {
                 "version": 1,
-                "sha256Hash": "e0765ebaa8e8eeb4043cc6dfeab3eac7f682ef5f724b81367e6e55c7aef2be4c",
+                "sha256Hash": "37fea486d6179047c41d0f549088a4c3a7dd60c05c70956a1490262f532dccd9",
             }
         },
     }
