@@ -2,7 +2,7 @@ name: deploy-docker
 
 on:
   push:
-    branches: [master]
+    # branches: [master]
     tags:
       - '*'
   workflow_dispatch:
