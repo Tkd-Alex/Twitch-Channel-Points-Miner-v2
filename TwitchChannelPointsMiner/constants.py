@@ -78,7 +78,7 @@ class GQLOperations:
         "extensions": {
             "persistedQuery": {
                 "version": 1,
-                "sha256Hash": "9988086babc615a918a1e9a722ff41d98847acac822645209ac7379eecb27152",
+                "sha256Hash": "1530a003a7d374b0380b79db0be0534f30ff46e61cffa2bc0e2468a909fbc024",
             }
         },
     }
@@ -102,7 +102,7 @@ class GQLOperations:
     }
     Inventory = {
         "operationName": "Inventory",
-        "variables": {"fetchRewardCampaigns": "true"},
+        "variables": {"fetchRewardCampaigns": True},
         "extensions": {
             "persistedQuery": {
                 "version": 1,
@@ -143,7 +143,7 @@ class GQLOperations:
         "extensions": {
             "persistedQuery": {
                 "version": 1,
-                "sha256Hash": "b19ee96a0e79e3f8281c4108bc4c7b3f232266db6f96fd04a339ab393673a075",
+                "sha256Hash": "e589e213f16d9b17c6f0a8ccd18bdd6a8a6b78bc9db67a75efd43793884ff4e5",
             }
         },
     }
