@@ -69,7 +69,7 @@ class GQLOperations:
         "extensions": {
             "persistedQuery": {
                 "version": 1,
-                "sha256Hash": "2f884fa187b8fadb2a49db0adc033e636f7b6aaee6e76de1e2bba9a7baf0daf6",
+                "sha256Hash": "a455deea71bdc9015b78eb49f4acfbce8baa7ccbedd28e549bb025bd0f751930",
             }
         },
     }
