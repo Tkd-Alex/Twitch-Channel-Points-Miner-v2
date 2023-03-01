@@ -321,11 +321,6 @@ pip install -r requirements.txt
 
 Start mining! `python run.py` 🥳
 
-### <s>pip</s> deprecated
-<s>Install the package via pip, you will find a stable version - maybe a different version from the master branch.
-- `pip install Twitch-Channel-Points-Miner-v2`
-- Exceute the run.py file `python run.py` 🥳</s>
-
 ### Docker
 
 #### Docker Hub
