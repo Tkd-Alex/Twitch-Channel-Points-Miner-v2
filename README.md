@@ -41,7 +41,6 @@ Currently, we have a lot of PRs requests opened, but the time to test and improv
     - [Final report](#final-report)
 4. 🧐 [How to use](#how-to-use)
     - [Cloning](#by-cloning-the-repository)
-    - [pip](#pip)
     - [Docker](#docker)
     - [Replit](#replit)
     - [Limits](#limits)
