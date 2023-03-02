@@ -85,6 +85,7 @@ var annotations = [];
 
 var streamersList = [];
 var sortBy = "Name ascending";
+var sortField = 'name';
 
 var startDate = new Date();
 startDate.setDate(startDate.getDate() - daysAgo);
@@ -104,6 +105,9 @@ $(document).ready(function () {
     $('#endDate').val(formatDate(endDate));
 
     sortBy = localStorage.getItem("sort-by");
+    if (sortBy.includes("Points")) sortField = 'points';
+    else if (sortBy.includes("Last activity")) sortField = 'last_activity';
+    else sortField = 'name';
     $('#sorting-by').text(sortBy);
     getStreamers();
 
@@ -173,7 +177,10 @@ function renderStreamers() {
     $("#streamers-list").empty();
     var promised = new Promise((resolve, reject) => {
         streamersList.forEach((streamer, index, array) => {
-            $("#streamers-list").append(`<li><a onClick="changeStreamer('${streamer.name}', ${index + 1}); return false;">${streamer.name.replace(".json", "")}</a></li>`);
+            displayname = streamer.name.replace(".json", "");
+            if (sortField == 'points') displayname = "<font size='-2'>" + streamer['points'] + "</font>&nbsp;" + displayname;
+            else if (sortField == 'last_activity') displayname = "<font size='-2'>" + formatDate(streamer['last_activity']) + "</font>&nbsp;"+ displayname;
+            $("#streamers-list").append(`<li><a onClick="changeStreamer('${streamer.name}', ${index + 1}); return false;">${displayname}</a></li>`);
             if (index === array.length - 1) resolve();
         });
     });
@@ -184,12 +191,15 @@ function renderStreamers() {
 
 function sortStreamers() {
     streamersList = streamersList.sort((a, b) => {
-        return (a[sortBy.includes("Name") ? 'name' : 'points'] > b[sortBy.includes("Name") ? 'name' : 'points'] ? 1 : -1) * (sortBy.includes("ascending") ? 1 : -1);
+        return (a[sortField] > b[sortField] ? 1 : -1) * (sortBy.includes("ascending") ? 1 : -1);
     });
 }
 
 function changeSortBy(option) {
     sortBy = option.innerText.trim();
+    if (sortBy.includes("Points")) sortField = 'points'
+    else if (sortBy.includes("Last activity")) sortField = 'last_activity'
+    else sortField = 'name';
     sortStreamers();
     renderStreamers();
     $('#sorting-by').text(sortBy);
