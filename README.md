@@ -8,6 +8,13 @@
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
 </p>
 
+<p align="center">
+⚠️ This project is not mainted anymore, please use the updated repo at 
+https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2 
+</p>
+
+_____
+
 **Credits**
 - Main idea: https://github.com/gottagofaster236/Twitch-Channel-Points-Miner
 - ~~Bet system (Selenium): https://github.com/ClementRoyer/TwitchAutoCollect-AutoBet~~
