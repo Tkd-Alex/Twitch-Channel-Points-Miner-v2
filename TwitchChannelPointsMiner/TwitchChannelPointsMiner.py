@@ -55,6 +55,7 @@ class TwitchChannelPointsMiner:
         "twitch",
         "claim_drops_startup",
         "enable_analytics",
+        "disable_ssl_cert_verification",
         "priority",
         "streamers",
         "events_predictions",
@@ -75,6 +76,7 @@ class TwitchChannelPointsMiner:
         password: str = None,
         claim_drops_startup: bool = False,
         enable_analytics: bool = False,
+        disable_ssl_cert_verification: bool = False,
         # Settings for logging and selenium as you can see.
         priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
@@ -88,6 +90,9 @@ class TwitchChannelPointsMiner:
                 "Please edit your runner file (usually run.py) and try again.")
             logger.error("No username, exiting...")
             sys.exit(0)
+
+        # This disables certificate verification and allows the connection to proceed, but also makes it vulnerable to man-in-the-middle (MITM) attacks.
+        Settings.disable_ssl_cert_verification = disable_ssl_cert_verification
 
         # Analytics switch
         Settings.enable_analytics = enable_analytics

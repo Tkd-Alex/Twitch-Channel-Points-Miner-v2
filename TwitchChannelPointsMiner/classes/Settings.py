@@ -20,7 +20,8 @@ class FollowersOrder(Enum):
 
 # Empty object shared between class
 class Settings(object):
-    __slots__ = ["logger", "streamer_settings", "enable_analytics"]
+    __slots__ = ["logger", "streamer_settings",
+                 "enable_analytics", "disable_ssl_cert_verification"]
 
 
 class Events(Enum):

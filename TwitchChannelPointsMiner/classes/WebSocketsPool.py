@@ -19,6 +19,7 @@ from TwitchChannelPointsMiner.utils import (
 
 logger = logging.getLogger(__name__)
 
+
 class WebSocketsPool:
     __slots__ = ["ws", "twitch", "streamers", "events_predictions"]
 
@@ -51,7 +52,8 @@ class WebSocketsPool:
         if self.ws[index].is_opened is False:
             self.ws[index].pending_topics.append(topic)
         else:
-            self.ws[index].listen(topic, self.twitch.twitch_login.get_auth_token())
+            self.ws[index].listen(
+                topic, self.twitch.twitch_login.get_auth_token())
 
     def __new(self, index):
         return TwitchWebSocket(
@@ -66,7 +68,13 @@ class WebSocketsPool:
         )
 
     def __start(self, index):
-        thread_ws = Thread(target=lambda: self.ws[index].run_forever())
+        if Settings.disable_ssl_cert_verification is True:
+            import ssl
+            thread_ws = Thread(target=lambda: self.ws[index].run_forever(
+                sslopt={"cert_reqs": ssl.CERT_NONE}))
+            logger.warn("SSL certificate verification is disabled! Be aware!")
+        else:
+            thread_ws = Thread(target=lambda: self.ws[index].run_forever())
         thread_ws.daemon = True
         thread_ws.name = f"WebSocket #{self.ws[index].index}"
         thread_ws.start()
@@ -140,7 +148,8 @@ class WebSocketsPool:
 
             # Why not create a new ws on the same array index? Let's try.
             self = ws.parent_pool
-            self.ws[ws.index] = self.__new(ws.index)  # Create a new connection.
+            # Create a new connection.
+            self.ws[ws.index] = self.__new(ws.index)
 
             self.__start(ws.index)  # Start a new thread.
             time.sleep(30)
@@ -170,7 +179,8 @@ class WebSocketsPool:
             ws.last_message_timestamp = message.timestamp
             ws.last_message_type_channel = message.identifier
 
-            streamer_index = get_streamer_index(ws.streamers, message.channel_id)
+            streamer_index = get_streamer_index(
+                ws.streamers, message.channel_id)
             if streamer_index != -1:
                 try:
                     if message.topic == "community-points-user-v1":
@@ -229,7 +239,8 @@ class WebSocketsPool:
                                 message.message["raid"]["id"],
                                 message.message["raid"]["target_login"],
                             )
-                            ws.twitch.update_raid(ws.streamers[streamer_index], raid)
+                            ws.twitch.update_raid(
+                                ws.streamers[streamer_index], raid)
 
                     elif message.topic == "predictions-channel-v1":
 
@@ -382,7 +393,8 @@ class WebSocketsPool:
                     )
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
-            raise RuntimeError(f"Error while trying to listen for a topic: {response}")
+            raise RuntimeError(
+                f"Error while trying to listen for a topic: {response}")
 
         elif response["type"] == "RECONNECT":
             logger.info(f"#{ws.index} - Reconnection required")
