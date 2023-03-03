@@ -1,6 +1,5 @@
 requests
 websocket-client
-browser_cookie3
 pillow
 python-dateutil
 emoji
@@ -10,3 +9,7 @@ colorama
 flask
 irc
 pandas
+browser_cookie3
+selenium
+selenium-wire
+undetected_chromedriver

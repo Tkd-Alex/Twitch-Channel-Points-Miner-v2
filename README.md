@@ -1,11 +1,20 @@
-![Twitch Channel Points Miner - v2](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/banner.png)
+![Twitch Channel Points Miner - v2](https://raw.githubusercontent.com/rdavydov/Twitch-Channel-Points-Miner-v2/master/assets/banner.png)
 <p align="center">
-<a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
+<a href="https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/rdavydov/Twitch-Channel-Points-Miner-v2"></a>
 <a href="https://www.python.org/downloads/release/python-360/"><img alt="Python3" src="https://img.shields.io/badge/built%20for-Python≥3.6-red.svg?style=flat"></a>
-<a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pulls"><img alt="PRsWelcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"></a>
-<a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
-<a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues?q=is%3Aissue+is%3Aclosed"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
-<a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
+<a href="https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/pulls"><img alt="PRsWelcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"></a>
+<a href="https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/rdavydov/Twitch-Channel-Points-Miner-v2"></a>
+<a href="https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/issues?q=is%3Aissue+is%3Aclosed"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/rdavydov/Twitch-Channel-Points-Miner-v2"></a>
+<a href="https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/rdavydov/Twitch-Channel-Points-Miner-v2"></a>
+</p>
+
+<p align="center">
+<a href="https://hub.docker.com/r/rdavidoff/twitch-channel-points-miner-v2"><img alt="Docker Version" src="https://img.shields.io/docker/v/rdavidoff/twitch-channel-points-miner-v2?style=flat&&label=docker version"></a>
+<a href="https://hub.docker.com/r/rdavidoff/twitch-channel-points-miner-v2"><img alt="Docker Stars" src="https://img.shields.io/docker/stars/rdavidoff/twitch-channel-points-miner-v2?style=flat&color=orange"></a>
+<a href="https://hub.docker.com/r/rdavidoff/twitch-channel-points-miner-v2"><img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/rdavidoff/twitch-channel-points-miner-v2?style=flat&color=green"></a>
+<a href="https://hub.docker.com/r/rdavidoff/twitch-channel-points-miner-v2"><img alt="Docker Images Size AMD64" src="https://img.shields.io/docker/image-size/rdavidoff/twitch-channel-points-miner-v2/latest?arch=amd64&label=AMD64 image size&style=flat&color=purple"></a>
+<a href="https://hub.docker.com/r/rdavidoff/twitch-channel-points-miner-v2"><img alt="Docker Images Size ARM64" src="https://img.shields.io/docker/image-size/rdavidoff/twitch-channel-points-miner-v2/latest?arch=arm64&label=ARM64 image size&style=flat&color=pink"></a>
+<a href="https://hub.docker.com/r/rdavidoff/twitch-channel-points-miner-v2"><img alt="Docker Images Size ARMv7" src="https://img.shields.io/docker/image-size/rdavidoff/twitch-channel-points-miner-v2/latest?arch=arm&label=ARMv7 image size&style=flat&color=limegreen"></a>
 </p>
 
 <p align="center">
@@ -41,6 +50,7 @@ Currently, we have a lot of PRs requests opened, but the time to test and improv
     - [Cloning](#by-cloning-the-repository)
     - [pip](#pip)
     - [Docker](#docker)
+    - [Replit](#replit)
     - [Limits](#limits)
 5. 🔧 [Settings](#settings)
     - [LoggerSettings](#loggersettings)
@@ -63,13 +73,18 @@ If you want to help with this project, please leave a star 🌟 and share it wit
 
 If you want to offer me a coffee, I would be grateful ❤️
 
-<a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+|                                                                                                                                                                                                                                                                                                           |                                               |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+|<a href="https://www.buymeacoffee.com/davydov" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-blue.png" alt="Buy Me A Coffee (rdavydov)" height="41" width="174"></a>|<a href="https://www.buymeacoffee.com/tkdalex" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>|
+|🤝 rdavydov|🤝 Tkd-Alex|
 
 |                                                                                                                                                                                                                                                                                                           |                                               |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
-| <img src="https://dynamic-assets.coinbase.com/e785e0181f1a23a30d9476038d9be91e9f6c63959b538eabbc51a1abc8898940383291eede695c3b8dfaa1829a9b57f5a2d0a16b0523580346c6b8fab67af14b/asset_icons/b57ac673f06a4b0338a596817eb0a50ce16e2059f327dc117744449a47915cb2.png" alt="Donate BTC" height="16" width="16"> | `36GSMYngiiXYqBMnNwYwZc8n6s67LGn4V5`          |
-| <img src="https://dynamic-assets.coinbase.com/dbb4b4983bde81309ddab83eb598358eb44375b930b94687ebe38bc22e52c3b2125258ffb8477a5ef22e33d6bd72e32a506c391caa13af64c00e46613c3e5806/asset_icons/4113b082d21cc5fab17fc8f2d19fb996165bcce635e6900f7fc2d57c4ef33ae9.png" alt="Donate ETH" height="16" width="16"> | `0x3cc331b8AB0634CCcfa3bd57E0C625F7E886cAfa`  |
-| <img src="https://dynamic-assets.coinbase.com/d2ba1ad058b9b0eb4de5f0ccbf0e4aecb8d73d3a183dbaeabbec2b6fd77b0a636598e08467a05da7e69f39c65693f627edf7414145ee6c61e01efc831652ca0f/asset_icons/8733712db93f857c04b7c58fb35eafb3be360a183966a1e57a6e22ee5f78c96d.png" alt="Donate SOL" height="16" width="16"> | `pg8Z2VqMVskSEA77g5QqppaQjehGGCWJfVPw9n91AX1` |
+|<img src="https://dynamic-assets.coinbase.com/3803f30367bb3972e192cd3fdd2230cd37e6d468eab12575a859229b20f12ff9c994d2c86ccd7bf9bc258e9bd5e46c5254283182f70caf4bd02cc4f8e3890d82/asset_icons/1597d628dd19b7885433a2ac2d7de6ad196c519aeab4bfe679706aacbf1df78a.png" alt="Donate DOGE" height="16" width="16"> | `DAKzncwKkpfPCm1xVU7u2pConpXwX7HS3D` _(DOGE)_ 🤝 rdavydov|
+|<img src="https://dynamic-assets.coinbase.com/a353373ccecedb0e8b6f51ed78db22fbe0167d63d129b15963407f71392c052ae5f2ffd5fbaa6e976da86b73987a335462022f5f54ec559360683ddb8da3da96/asset_icons/a6f13081ab7468290003b49b78fc383614e113700a151a4f9794c556f5c3ca9a.png" alt="Donate XMR" height="16" width="16"> | <sub><sup>`46fzadEigE7B3kyJB6AdiccaTha3SWUdTNnE4FL6YtjCgYMASAyXGkMe1XY4iApv2VDSxBT6d8PTW3vwtNWnfu6W4g4jyJF`</sup></sub> _(XMR)_ 🤝 rdavydov|
+| <img src="https://dynamic-assets.coinbase.com/e785e0181f1a23a30d9476038d9be91e9f6c63959b538eabbc51a1abc8898940383291eede695c3b8dfaa1829a9b57f5a2d0a16b0523580346c6b8fab67af14b/asset_icons/b57ac673f06a4b0338a596817eb0a50ce16e2059f327dc117744449a47915cb2.png" alt="Donate BTC" height="16" width="16"> | `36GSMYngiiXYqBMnNwYwZc8n6s67LGn4V5` 🤝 Tkd-Alex|
+| <img src="https://dynamic-assets.coinbase.com/dbb4b4983bde81309ddab83eb598358eb44375b930b94687ebe38bc22e52c3b2125258ffb8477a5ef22e33d6bd72e32a506c391caa13af64c00e46613c3e5806/asset_icons/4113b082d21cc5fab17fc8f2d19fb996165bcce635e6900f7fc2d57c4ef33ae9.png" alt="Donate ETH" height="16" width="16"> | `0x3cc331b8AB0634CCcfa3bd57E0C625F7E886cAfa` 🤝 Tkd-Alex|
+| <img src="https://dynamic-assets.coinbase.com/d2ba1ad058b9b0eb4de5f0ccbf0e4aecb8d73d3a183dbaeabbec2b6fd77b0a636598e08467a05da7e69f39c65693f627edf7414145ee6c61e01efc831652ca0f/asset_icons/8733712db93f857c04b7c58fb35eafb3be360a183966a1e57a6e22ee5f78c96d.png" alt="Donate SOL" height="16" width="16"> | `pg8Z2VqMVskSEA77g5QqppaQjehGGCWJfVPw9n91AX1` 🤝 Tkd-Alex|
 
 If you have any issues or you want to contribute, you are welcome! But please before read the [CONTRIBUTING.md](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/CONTRIBUTING.md) file.
 
@@ -184,7 +199,7 @@ No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner
 ```
 
 ## How to use:
-First of all please create a run.py file. You can just copy [example.py](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/blob/master/example.py) and modify it according to your needs.
+First of all please create a run.py file. You can just copy [example.py](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/blob/master/example.py) and modify it according to your needs.
 ```python
 # -*- coding: utf-8 -*-
 
@@ -196,7 +211,9 @@ from TwitchChannelPointsMiner.classes.Chat import ChatPresence
 from TwitchChannelPointsMiner.classes.Discord import Discord
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
 from TwitchChannelPointsMiner.classes.Settings import Priority, Events, FollowersOrder
-from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
+from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, Condition, OutcomeKeys
+from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings, FilterCondition, DelayMode
+from TwitchChannelPointsMiner.classes.entities.Strategy import Strategy, Condition, OutcomeKeys
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
 twitch_miner = TwitchChannelPointsMiner(
@@ -208,9 +225,11 @@ twitch_miner = TwitchChannelPointsMiner(
         Priority.DROPS,                         # - When we don't have anymore watch streak to catch, wait until all drops are collected over the streamers
         Priority.ORDER                          # - When we have all of the drops claimed and no watch-streak available, use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
     ],
+    enable_analytics=False,			# Disables Analytics if False. Disabling it significantly reduces memory consumption
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info
+        console_username=False, 		# Adds a username to every console log line if True. Useful when you have many open consoles with different accounts
         file_level=logging.DEBUG,               # Level of logs - If you think the log file it's too big, use logging.INFO
         emoji=True,                             # On Windows, we have a problem printing emoji. Set to false if you have a problem
         less=False,                             # If you think that the logs are too verbose, set this to True
@@ -240,7 +259,6 @@ twitch_miner = TwitchChannelPointsMiner(
         bet=BetSettings(
             strategy=Strategy.SMART,            # Choose you strategy!
             percentage=5,                       # Place the x% of your channel points
-            percentage_gap=20,                  # Gap difference between outcomesA and outcomesB (for SMART strategy)
             max_points=50000,                   # If the x percentage of your channel points is gt bet_max_points set this value
             stealth_mode=True,                  # If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points Issue #33
             delay_mode=DelayMode.FROM_END,      # When placing a bet, we will wait until `delay` seconds before the end of the timer
@@ -250,7 +268,10 @@ twitch_miner = TwitchChannelPointsMiner(
                 by=OutcomeKeys.TOTAL_USERS,     # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
                 where=Condition.LTE,            # 'by' must be [GT, LT, GTE, LTE] than value
                 value=800
-            )
+            ),
+            strategy_settings={
+                "percentage_gap": 20            # Gap difference between outcomesA and outcomesB (for SMART stragegy)
+            }
         )
     )
 )
@@ -262,6 +283,8 @@ twitch_miner = TwitchChannelPointsMiner(
 # The settings priority are: settings in mine function, settings in TwitchChannelPointsMiner instance, default settings.
 # For example, if in the mine function you don't provide any value for 'make_prediction' but you have set it on TwitchChannelPointsMiner instance, the script will take the value from here.
 # If you haven't set any value even in the instance the default one will be used
+
+#twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5, days_ago=7)   # Start the Analytics web-server (replit: host="0.0.0.0")
 
 twitch_miner.mine(
     [
@@ -298,7 +321,7 @@ twitch_miner.mine(followers=True, blacklist=["user1", "user2"])  # Blacklist exa
 ```
 
 ### By cloning the repository
-1. Clone this repository `git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
+1. Clone this repository `git clone https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2`
 2. Install all the requirements `pip install -r requirements.txt` . If you have problems with requirements, make sure to have at least Python3.6. You could also try to create a _virtualenv_ and then install all the requirements
 ```sh
 pip install virtualenv
@@ -309,12 +332,15 @@ pip install -r requirements.txt
 
 Start mining! `python run.py` 🥳
 
-### pip
-Install the package via pip, you will find a stable version - maybe a different version from the master branch.
+### <s>pip</s> deprecated
+<s>Install the package via pip, you will find a stable version - maybe a different version from the master branch.
 - `pip install Twitch-Channel-Points-Miner-v2`
-- Exceute the run.py file `python run.py` 🥳
+- Exceute the run.py file `python run.py` 🥳</s>
 
 ### Docker
+
+#### Docker Hub
+Official Docker images are on https://hub.docker.com/r/rdavidoff/twitch-channel-points-miner-v2 for `linux/amd64`, `linux/arm64` and `linux/arm/v7`.
 
 The following file is mounted :
 
@@ -333,7 +359,7 @@ version: "3.9"
 
 services:
   miner:
-    image: tkdalex/twitch-channel-points-miner-v2
+    image: rdavidoff/twitch-channel-points-miner-v2
     stdin_open: true
     tty: true
     environment:
@@ -355,21 +381,43 @@ docker run \
     -v $(pwd)/logs:/usr/src/app/logs \
     -v $(pwd)/run.py:/usr/src/app/run.py:ro \
     -p 5000:5000 \
-    tkdalex/twitch-channel-points-miner-v2
+    rdavidoff/twitch-channel-points-miner-v2
 ```
 
 `$(pwd)` Could not work on Windows (cmd), please use the absolute path instead, like: `/path/of/your/cookies:/usr/src/app/cookies`.
+
+The correct solution for Windows lies in the correct command line: `docker run -v C:\Absolute\Path\To\Twitch-Channel-Points-Miner-v2\run.py:/usr/src/app/run.py:ro rdavidoff/twitch-channel-points-miner-v2`.
+
+`run.py` MUST be mounted as a volume (`-v`).
+
 If you don't mount the volume for the analytics (or cookies or logs) folder, the folder will be automatically created on the Docker container, and you will lose all the data when it is stopped.
-If you don't have a cookie or It's your first time running the script, you will need to login to Twitch and start the container with `-it` args. If you need to run multiple containers you can bind different ports (only if you need also the analytics) and mount dirrent run.py file, like
+
+If you don't have a cookie or it's your first time running the script, you will need to login to Twitch and start the container with `-it` args. If you need to run multiple containers you can bind different ports (only if you need also the analytics) and mount dirrent run.py file, like
+
 ```sh
-docker run --name user1-v $(pwd)/user1.py:/usr/src/app/run.py:ro -p 5001:5000 tkdalex/twitch-channel-points-miner-v2
+docker run --name user1 -v $(pwd)/user1.py:/usr/src/app/run.py:ro -p 5001:5000 rdavidoff/twitch-channel-points-miner-v2
 ```
 
 ```sh
-docker run --name user2-v $(pwd)/user2.py:/usr/src/app/run.py:ro -p 5002:5000 tkdalex/twitch-channel-points-miner-v2
+docker run --name user2 -v $(pwd)/user2.py:/usr/src/app/run.py:ro -p 5002:5000 rdavidoff/twitch-channel-points-miner-v2
 ```
 
 About the *Docker* version; the community has always shown great interest in the Docker version of the project. Especially [@SethFalco](https://github.com/SethFalco) ([#79](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/79)), [@KamushekDev](https://github.com/KamushekDev) ([#300](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/300)), [@au-ee](https://github.com/au-ee) ([#223](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/223)) they showed their ideas. I've decided to merge the PR from [@RakSrinaNa](https://github.com/RakSrinaNa) ([#343](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/343)) because is one of the most active user of the project and the PR was the only one with a Continuous Integration (CI).
+
+### Replit
+Run a new Repl with the master branch:
+
+[![Run on Repl.it](https://replit.com/badge/github/rdavydov/Twitch-Channel-Points-Miner-v2)](https://replit.com/new/github/rdavydov/Twitch-Channel-Points-Miner-v2)
+
+Official Repl with description and added keep-alive functionality: https://replit.com/@rdavydov/Twitch-Channel-Points-Miner-v2
+
+#### Tricks to run 24/7 on Replit for free
+
+1. Enable Analytics (set `host="0.0.0.0"`)
+2. Note down the output URL (in most cases it is `https://Twitch-Channel-Points-Miner-v2.<YOUR_REPLIT_USERNAME>.repl.co`)
+3. Send an HTTP request to that URL every 5 minutes
+
+Use a service that can send HTTP requests at regular intervals, such as Uptimerobot.
 
 ### Limits
 > Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
@@ -395,6 +443,7 @@ You can combine all priority but keep in mind that use `ORDER` and `POINTS_ASCEN
 | `save`          	| bool            	| True                           	                                  | If you want to save logs in file (suggested)                                         	                                                                                                  |
 | `less`          	| bool            	| False                          	                                  | Reduce the logging format and message verbosity [#10](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/10)                                                               |
 | `console_level` 	| level 	        | logging.INFO                   	                                  | Level of logs in terminal - Use logging.DEBUG for more helpful messages.             	                                                                                                  |
+| `console_username`| bool 	            | False                   	                                          | Adds a username to every log line in the console if True. [#602](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/602)|
 | `file_level`    	| level 	        | logging.DEBUG                  	                                  | Level of logs in file save - If you think the log file it's too big, use logging.INFO 	                                                                                                  |
 | `emoji`         	| bool            	| For Windows is False else True 	                                  | On Windows, we have a problem printing emoji. Set to false if you have a problem      	                                                                                                  |
 | `colored`         | bool            	| True 	                                                              | If you want to print colored text [#45](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/45) [#82](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/82) |
@@ -509,16 +558,24 @@ Allowed values for `chat` are:
 |--------------------	|-----------------	|---------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `strategy`         	| Strategy        	| SMART   	| Choose your strategy! See above for more info                                                                  	                                                                          |
 | `percentage`       	| int             	| 5       	| Place the x% of your channel points                                                                            	                                                                          |
-| `percentage_gap`   	| int             	| 20      	| Gap difference between outcomesA and outcomesB (for SMART stragegy)                                            	                                                                          |
 | `max_points`       	| int             	| 50000   	| If the x percentage of your channel points is GT bet_max_points set this value                                 	                                                                          |
 | `stealth_mode`     	| bool            	| False   	| If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points [#33](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/33)      |
-| `delay_mode` 	        | DelayMode         	| FROM_END	| Define how is calculating the waiting time before placing a bet |
-| `delay` 	        | float             	| 6     	| Value to be used to calculate bet delay depending on `delay_mode` value |
+| `delay_mode`       	| DelayMode       	| FROM_END	| Define how is calculating the waiting time before placing a bet |
+| `delay`            	| float           	| 6     	| Value to be used to calculate bet delay depending on `delay_mode` value |
+| `strategy_settings`	| dict            	| {}      	| Settings specific to strategy |
+| `only_doubt`       	| bool            	| False   	| Always bet on B (will overwrite strategy bet decision) |
+### StrategySettings
+| Strategy              | Key                   | Type              | Default       | Description   |
+|--------------------   |---------------------  |-----------------  |-----------    |------------   |
+| SMART                 | `percentage_gap`      | int               | 20            | Gap difference between outcomesA and outcomesB |
+| SMART_HIGH_ODDS       | `target_odd`          | float             | 3             | Bet that much points so the odd will be not less then `target_odd` (default 3) |
+| SMART_HIGH_ODDS       | `always_bet`          | bool              | False         | Always bet minimum 10 points for stats collecting |
 
 #### Bet strategy
 
 - **MOST_VOTED**: Select the option most voted based on users count
 - **HIGH_ODDS**: Select the option with the highest odds
+- **SMART_HIGH_ODDS**: Select the option with the highest odds if odd is not less than `target_odd`. Also prevents high bets with very high odds.
 - **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same as select LOWEST_ODDS
 - **SMART_MONEY**: Select the option with the highest points placed. [#331](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/331)
 - **SMART**: If the majority in percent chose an option, then follow the other users, otherwise select the option with the highest odds
@@ -529,10 +586,12 @@ Here a concrete example:
 
 - **MOST_VOTED**: 21 Users have select **'over 7.5'**, instead of 9 'under 7.5'
 - **HIGH_ODDS**: The highest odd is 2.27 on **'over 7.5'** vs 1.79 on 'under 7.5'
+- **SMART_HIGH_ODDS**: No bet because highest odd 2.27 is lower than default target odd (3)
+- - If `target_odd` set to 2.1 then bet will be (6888 / (2.1 - 1)) - 5437 = 824. Making final odds 2.1/1.9
 - **PERCENTAGE**: The highest percentage is 56% for **'under 7.5'**
 - **SMART**: Calculate the percentage based on the users. The percentages are: 'over 7.5': 70% and 'under 7.5': 30%. If the difference between the two percentages is higher than `percentage_gap` select the highest percentage, else the highest odds.
+- - In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 
-In this case if percentage_gap = 20 ; 70-30 = 40 > percentage_gap, so the bot will select 'over 7.5'
 ### FilterCondition
 | Key         	| Type        	| Default 	| Description                                                                      	|
 |-------------	|-------------	|---------	|----------------------------------------------------------------------------------	|
@@ -582,7 +641,7 @@ If you want you can toggle the dark theme with the dedicated checkbox.
 | ----------- | ---------- |
 | ![Light theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-light.png) | ![Dark theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-dark.png) |
 
-For use this feature just call the `analytics` method before start mining. Read more at: [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
+For use this feature just call the `analytics()` method before start mining. Read more at: [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
 The chart will be autofreshed each `refresh` minutes. If you want to connect from one to second machine that have that webpanel you have to use `0.0.0.0` instead of `127.0.0.1`. With the `days_ago` arg you can select how many days you want to show by default in your analytics graph.
 ```python
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
@@ -590,6 +649,12 @@ twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
 twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5, days_ago=7)   # Analytics web-server
 twitch_miner.mine(followers=True, blacklist=["user1", "user2"])
 ```
+
+### `enable_analytics` option in `twitch_minerfile` toggles Analytics needed for the `analytics()` method
+
+Disabling Analytics significantly reduces memory consumption and saves some disk space by not creating and writing `/analytics/*.json`.
+
+Set this option to `True` if you need Analytics. Otherwise set this option to `False` (default value).
 
 ## Migrating from an old repository (the original one):
 If you already have a `twitch-cookies.pkl` and you don't want to log in again, please create a `cookies/` folder in the current directory and then copy the .pkl file with a new name `your-twitch-username.pkl`
@@ -612,34 +677,50 @@ Other useful info can be founded here:
 You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
 
 ## Termux
-Install the requirements
+**0. Install packages to Termux**
 ```
-pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib`
+pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib
 LDFLAGS="-L${PREFIX}/lib/" CFLAGS="-I${PREFIX}/include/" pip install --upgrade wheel pillow
 ```
 
-**(1 way):** Clone this repository
-`git clone https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2`
+**1. Clone this repository**
 
-**(2 way):** Download sources from GitHub and put it into your Termux storage
+`git clone https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2`
 
-Now you can enter the directory with our miner, type this command:
+**2. Go to the miner's directory**
+
 `cd Twitch-Channel-Points-Miner-v2`
 
-Configure your miner on your preferences by typing
+**3. Configure your miner on your preferences by typing**
+
 `nano example.py`
 
-When you have configured it now we can rename it (optional):
+**4. Rename file name (optional)**
+
 `mv example.py run.py`
 
-We have to also install dependences required to run miner:
-`pip install -r requirements.txt`
+**5. Install packages**
+```
+pip install -r requirements.txt
+pip install Twitch-Channel-Points-Miner-v2
+```
 
-**(3 way):** `pip install Twitch-Channel-Points-Miner-v2`
+**6. Run miner!**
 
-Now when we did everything we can run miner: `python run.py`
+`python run.py`
 
 Read more at [#92](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/92) [#76](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/76)
+
+**Note**
+If you can't install `pandas`, please try:
+
+`MATHLIB="m" pip install pandas`
+
+If you can't install `cryptography`, please try:
+
+`export RUSTFLAGS=" -C lto=no" && export CARGO_BUILD_TARGET="$(rustc -vV | sed -n 's|host: ||p')" && pip install cryptography`
+
+⚠️ Installation of `pandas` and `cryptography` takes a long time.
 
 ## Disclaimer
 This project comes with no guarantee or warranty. You are responsible for whatever happens from using this project. It is possible to get soft or hard banned by using this project if you are not careful. This is a personal project and is in no way affiliated with Twitch.

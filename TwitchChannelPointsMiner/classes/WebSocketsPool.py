@@ -9,7 +9,7 @@ from dateutil import parser
 from TwitchChannelPointsMiner.classes.entities.EventPrediction import EventPrediction
 from TwitchChannelPointsMiner.classes.entities.Message import Message
 from TwitchChannelPointsMiner.classes.entities.Raid import Raid
-from TwitchChannelPointsMiner.classes.Settings import Events
+from TwitchChannelPointsMiner.classes.Settings import Events, Settings
 from TwitchChannelPointsMiner.classes.TwitchWebSocket import TwitchWebSocket
 from TwitchChannelPointsMiner.constants import WEBSOCKET
 from TwitchChannelPointsMiner.utils import (
@@ -18,7 +18,6 @@ from TwitchChannelPointsMiner.utils import (
 )
 
 logger = logging.getLogger(__name__)
-
 
 class WebSocketsPool:
     __slots__ = ["ws", "twitch", "streamers", "events_predictions"]
@@ -178,11 +177,13 @@ class WebSocketsPool:
                         if message.type in ["points-earned", "points-spent"]:
                             balance = message.data["balance"]["balance"]
                             ws.streamers[streamer_index].channel_points = balance
-                            ws.streamers[streamer_index].persistent_series(
-                                event_type=message.data["point_gain"]["reason_code"]
-                                if message.type == "points-earned"
-                                else "Spent"
-                            )
+                            # Analytics switch
+                            if Settings.enable_analytics is True:
+                                ws.streamers[streamer_index].persistent_series(
+                                    event_type=message.data["point_gain"]["reason_code"]
+                                    if message.type == "points-earned"
+                                    else "Spent"
+                                )
 
                         if message.type == "points-earned":
                             earned = message.data["point_gain"]["total_points"]
@@ -198,9 +199,11 @@ class WebSocketsPool:
                             ws.streamers[streamer_index].update_history(
                                 reason_code, earned
                             )
-                            ws.streamers[streamer_index].persistent_annotations(
-                                reason_code, f"+{earned} - {reason_code}"
-                            )
+                            # Analytics switch
+                            if Settings.enable_analytics is True:
+                                ws.streamers[streamer_index].persistent_annotations(
+                                    reason_code, f"+{earned} - {reason_code}"
+                                )
                         elif message.type == "claim-available":
                             ws.twitch.claim_bonus(
                                 ws.streamers[streamer_index],
@@ -358,16 +361,20 @@ class WebSocketsPool:
                                     )
 
                                 if event_prediction.result["type"] != "LOSE":
-                                    ws.streamers[streamer_index].persistent_annotations(
-                                        event_prediction.result["type"],
-                                        f"{ws.events_predictions[event_id].title}",
-                                    )
+                                    # Analytics switch
+                                    if Settings.enable_analytics is True:
+                                        ws.streamers[streamer_index].persistent_annotations(
+                                            event_prediction.result["type"],
+                                            f"{ws.events_predictions[event_id].title}",
+                                        )
                             elif message.type == "prediction-made":
                                 event_prediction.bet_confirmed = True
-                                ws.streamers[streamer_index].persistent_annotations(
-                                    "PREDICTION_MADE",
-                                    f"Decision: {event_prediction.bet.decision['choice']} - {event_prediction.title}",
-                                )
+                                # Analytics switch
+                                if Settings.enable_analytics is True:
+                                    ws.streamers[streamer_index].persistent_annotations(
+                                        "PREDICTION_MADE",
+                                        f"Decision: {event_prediction.bet.decision['choice']} - {event_prediction.title}",
+                                    )
                 except Exception:
                     logger.error(
                         f"Exception raised for topic: {message.topic} and message: {message}",

@@ -8,7 +8,8 @@ from TwitchChannelPointsMiner.classes.Chat import ChatPresence
 from TwitchChannelPointsMiner.classes.Discord import Discord
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
 from TwitchChannelPointsMiner.classes.Settings import Priority, Events, FollowersOrder
-from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
+from TwitchChannelPointsMiner.classes.entities.Bet import BetSettings, FilterCondition, DelayMode
+from TwitchChannelPointsMiner.classes.entities.Strategy import Strategy, Condition, OutcomeKeys
 from TwitchChannelPointsMiner.classes.entities.Streamer import Streamer, StreamerSettings
 
 twitch_miner = TwitchChannelPointsMiner(
@@ -20,9 +21,11 @@ twitch_miner = TwitchChannelPointsMiner(
         Priority.DROPS,                         # - When we don't have anymore watch streak to catch, wait until all drops are collected over the streamers
         Priority.ORDER                          # - When we have all of the drops claimed and no watch-streak available, use the order priority (POINTS_ASCENDING, POINTS_DESCEDING)
     ],
+    enable_analytics=False,                     # Disables Analytics if False. Disabling it significantly reduces memory consumption
     logger_settings=LoggerSettings(
         save=True,                              # If you want to save logs in a file (suggested)
         console_level=logging.INFO,             # Level of logs - use logging.DEBUG for more info
+        console_username=False,                 # Adds a username to every console log line if True. Useful when you have many open consoles with different accounts
         file_level=logging.DEBUG,               # Level of logs - If you think the log file it's too big, use logging.INFO
         emoji=True,                             # On Windows, we have a problem printing emoji. Set to false if you have a problem
         less=False,                             # If you think that the logs are too verbose, set this to True
@@ -52,7 +55,7 @@ twitch_miner = TwitchChannelPointsMiner(
         bet=BetSettings(
             strategy=Strategy.SMART,            # Choose you strategy!
             percentage=5,                       # Place the x% of your channel points
-            percentage_gap=20,                  # Gap difference between outcomesA and outcomesB (for SMART strategy)
+            only_doubt=False,                   # Will only doubt (bet on B). If set to True will overwrite strategy bet decision
             max_points=50000,                   # If the x percentage of your channel points is gt bet_max_points set this value
             stealth_mode=True,                  # If the calculated amount of channel points is GT the highest bet, place the highest value minus 1-2 points Issue #33
             delay_mode=DelayMode.FROM_END,      # When placing a bet, we will wait until `delay` seconds before the end of the timer
@@ -62,7 +65,10 @@ twitch_miner = TwitchChannelPointsMiner(
                 by=OutcomeKeys.TOTAL_USERS,     # Where apply the filter. Allowed [PERCENTAGE_USERS, ODDS_PERCENTAGE, ODDS, TOP_POINTS, TOTAL_USERS, TOTAL_POINTS]
                 where=Condition.LTE,            # 'by' must be [GT, LT, GTE, LTE] than value
                 value=800
-            )
+            ),
+            strategy_settings={
+                "percentage_gap": 20            # Gap difference between outcomesA and outcomesB (for SMART stragegy)
+            }
         )
     )
 )
@@ -74,6 +80,8 @@ twitch_miner = TwitchChannelPointsMiner(
 # The settings priority are: settings in mine function, settings in TwitchChannelPointsMiner instance, default settings.
 # For example, if in the mine function you don't provide any value for 'make_prediction' but you have set it on TwitchChannelPointsMiner instance, the script will take the value from here.
 # If you haven't set any value even in the instance the default one will be used
+
+#twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5, days_ago=7)   # Start the Analytics web-server
 
 twitch_miner.mine(
     [
