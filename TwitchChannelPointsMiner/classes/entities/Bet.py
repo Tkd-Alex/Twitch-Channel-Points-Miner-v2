@@ -1,6 +1,7 @@
 import copy
 from enum import Enum, auto
 from random import uniform
+from typing import Callable
 
 from millify import millify
 
@@ -13,6 +14,7 @@ class Strategy(Enum):
     PERCENTAGE = auto()
     SMART_MONEY = auto()
     SMART = auto()
+    DYNAMIC = auto()
 
     def __str__(self):
         return self.name
@@ -76,6 +78,7 @@ class BetSettings(object):
         "minimum_points",
         "stealth_mode",
         "filter_condition",
+        "filter_func",
         "delay",
         "delay_mode",
     ]
@@ -89,6 +92,7 @@ class BetSettings(object):
         minimum_points: int = None,
         stealth_mode: bool = None,
         filter_condition: FilterCondition = None,
+        filter_func: Callable[[list, str], str] = None,
         delay: float = None,
         delay_mode: DelayMode = None,
     ):
@@ -99,6 +103,7 @@ class BetSettings(object):
         self.minimum_points = minimum_points
         self.stealth_mode = stealth_mode
         self.filter_condition = filter_condition
+        self.filter_func = filter_func
         self.delay = delay
         self.delay_mode = delay_mode
 
@@ -224,8 +229,10 @@ class Bet(object):
     def __return_choice(self, key) -> str:
         return "A" if self.outcomes[0][key] > self.outcomes[1][key] else "B"
 
-    def skip(self) -> bool:
-        if self.settings.filter_condition is not None:
+    def skip(self, title) -> bool:
+        if self.settings.filter_func is not None:
+            return self.settings.filter_func(self.outcomes, title) == None, 0
+        elif self.settings.filter_condition is not None:
             # key == by , condition == where
             key = self.settings.filter_condition.by
             condition = self.settings.filter_condition.where
@@ -261,7 +268,7 @@ class Bet(object):
         else:
             return False, 0  # Default don't skip the bet
 
-    def calculate(self, balance: int) -> dict:
+    def calculate(self, balance: int, title: str) -> dict:
         self.decision = {"choice": None, "amount": 0, "id": None}
         if self.settings.strategy == Strategy.MOST_VOTED:
             self.decision["choice"] = self.__return_choice(OutcomeKeys.TOTAL_USERS)
@@ -281,6 +288,8 @@ class Bet(object):
                 if difference < self.settings.percentage_gap
                 else self.__return_choice(OutcomeKeys.TOTAL_USERS)
             )
+        elif self.settings.strategy == Strategy.DYNAMIC:
+            self.decision["choice"] = self.settings.filter_func(self.outcomes, title)
 
         if self.decision["choice"] is not None:
             index = char_decision_as_index(self.decision["choice"])
