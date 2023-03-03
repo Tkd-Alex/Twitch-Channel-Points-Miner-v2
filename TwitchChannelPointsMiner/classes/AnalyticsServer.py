@@ -56,11 +56,11 @@ def filter_datas(start_date, end_date, datas):
         df["datetime"] = pd.to_datetime(df.x // 1000, unit="s")
 
         df = df[(df.x >= start_date) & (df.x <= end_date)]
-        df = aggregate(df)
+
 
         datas["series"] = (
             df.drop(columns="datetime")
-            .sort_values(by=["y", "x"], ascending=True)
+            .sort_values(by=["x", "y"], ascending=True)
             .to_dict("records")
         )
     else:
