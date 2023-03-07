@@ -64,6 +64,15 @@ class GQLOperations:
             }
         },
     }
+    CommunityMomentCallout_Claim = {
+        "operationName": "CommunityMomentCallout_Claim",
+        "extensions": {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "e2d67415aead910f7f9ceb45a77b750a1e1d9622c936d832328a0689e054db62",
+            }
+        },
+    }
     DropsPage_ClaimDropRewards = {
         "operationName": "DropsPage_ClaimDropRewards",
         "extensions": {
