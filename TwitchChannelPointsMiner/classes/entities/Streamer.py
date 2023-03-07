@@ -20,6 +20,7 @@ class StreamerSettings(object):
         "make_predictions",
         "follow_raid",
         "claim_drops",
+        "claim_moments",
         "watch_streak",
         "bet",
         "chat",
@@ -30,6 +31,7 @@ class StreamerSettings(object):
         make_predictions: bool = None,
         follow_raid: bool = None,
         claim_drops: bool = None,
+        claim_moments: bool = None,
         watch_streak: bool = None,
         bet: BetSettings = None,
         chat: ChatPresence = None,
@@ -37,6 +39,7 @@ class StreamerSettings(object):
         self.make_predictions = make_predictions
         self.follow_raid = follow_raid
         self.claim_drops = claim_drops
+        self.claim_moments = claim_moments
         self.watch_streak = watch_streak
         self.bet = bet
         self.chat = chat
@@ -46,6 +49,7 @@ class StreamerSettings(object):
             "make_predictions",
             "follow_raid",
             "claim_drops",
+            "claim_moments",
             "watch_streak",
         ]:
             if getattr(self, name) is None:
@@ -56,7 +60,7 @@ class StreamerSettings(object):
             self.chat = ChatPresence.ONLINE
 
     def __repr__(self):
-        return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, watch_streak={self.watch_streak}, bet={self.bet}, chat={self.chat})"
+        return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, claim_moments={self.claim_moments}, watch_streak={self.watch_streak}, bet={self.bet}, chat={self.chat})"
 
 
 class Streamer(object):
@@ -233,7 +237,8 @@ class Streamer(object):
 
         fname = os.path.join(Settings.analytics_path, f"{self.username}.json")
         with self.mutex:
-            json_data = json.load(open(fname, "r")) if os.path.isfile(fname) else {}
+            json_data = json.load(
+                open(fname, "r")) if os.path.isfile(fname) else {}
             if key not in json_data:
                 json_data[key] = []
 
