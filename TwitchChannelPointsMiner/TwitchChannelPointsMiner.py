@@ -350,6 +350,12 @@ class TwitchChannelPointsMiner:
                                     streamer=streamer)
                     )
 
+                if streamer.settings.claim_moments is True:
+                    self.ws_pool.submit(
+                        PubsubTopic("community-moments-channel-v1",
+                                    streamer=streamer)
+                    )
+
             refresh_context = time.time()
             while self.running:
                 time.sleep(random.uniform(20, 60))
