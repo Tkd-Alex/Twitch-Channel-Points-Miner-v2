@@ -654,7 +654,8 @@ class Twitch(object):
         if Settings.logger.less is False:
             logger.info(
                 f"Claiming the moment for {streamer}!",
-                extra={"emoji": ":gift:", "event": Events.MOMENT_CLAIM},
+                extra={"emoji": ":video_camera:",
+                       "event": Events.MOMENT_CLAIM},
             )
 
         json_data = copy.deepcopy(GQLOperations.CommunityMomentCallout_Claim)
