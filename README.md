@@ -515,6 +515,7 @@ Discord(
  - `BET_FAILED`
  - `BET_START`
  - `BONUS_CLAIM`
+ - `MOMENT_CLAIM`
  - `JOIN_RAID`
  - `DROP_CLAIM`
  - `DROP_STATUS`
