@@ -242,6 +242,13 @@ class WebSocketsPool:
                             ws.twitch.update_raid(
                                 ws.streamers[streamer_index], raid)
 
+                    elif message.topic == "community-moments-channel-v1":
+                        if message.type == "active":
+                            ws.twitch.claim_moment(
+                                ws.streamers[streamer_index],
+                                message.data["moment_id"]
+                            )
+
                     elif message.topic == "predictions-channel-v1":
 
                         event_dict = message.data["event"]
