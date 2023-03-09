@@ -33,20 +33,21 @@ body:
     id: operating-system
     attributes:
       label: Operating system
-      placeholder: Windows 10
+      placeholder: Windows 11 Version 21H2 (OS Build 22000.1574)
     validations:
       required: true
   - type: input
     id: python-version
     attributes:
       label: Python version
-      placeholder: "3.10"
+      placeholder: "3.11.1"
     validations:
       required: true
   - type: input
     id: miner-version
     attributes:
       label: Miner version
+      placeholder: "1.7.7"
     validations:
       required: true
   - type: textarea
