@@ -103,6 +103,27 @@ class LoggerSettings:
         self.discord = discord
 
 
+class FileFormatter(logging.Formatter):
+    def __init__(self, *, fmt, settings: LoggerSettings, datefmt=None):
+        self.settings = settings
+        self.timezone = None
+        if settings.time_zone:
+            try:
+                self.timezone = pytz.timezone(settings.time_zone)
+                logging.info(f"File logger time zone set to: {self.timezone}")
+            except pytz.UnknownTimeZoneError:
+                logging.error(
+                    f"File logger: invalid time zone: {settings.time_zone}")
+        logging.Formatter.__init__(self, fmt=fmt, datefmt=datefmt)
+
+    def formatTime(self, record, datefmt=None):
+        if self.timezone:
+            dt = datetime.fromtimestamp(record.created, self.timezone)
+        else:
+            dt = datetime.fromtimestamp(record.created)
+        return dt.strftime(datefmt or self.default_time_format)
+
+
 class GlobalFormatter(logging.Formatter):
     def __init__(self, *, fmt, settings: LoggerSettings, datefmt=None):
         self.settings = settings
@@ -110,9 +131,11 @@ class GlobalFormatter(logging.Formatter):
         if settings.time_zone:
             try:
                 self.timezone = pytz.timezone(settings.time_zone)
-                logging.info(f"Time zone set to: {self.timezone}")
+                logging.info(
+                    f"Console logger time zone set to: {self.timezone}")
             except pytz.UnknownTimeZoneError:
-                logging.error(f"Invalid time zone: {settings.time_zone}")
+                logging.error(
+                    f"Console logger: invalid time zone: {settings.time_zone}")
         logging.Formatter.__init__(self, fmt=fmt, datefmt=datefmt)
 
     def formatTime(self, record, datefmt=None):
@@ -239,7 +262,7 @@ def configure_loggers(username, settings):
             file_handler = logging.FileHandler(logs_file, "w", "utf-8")
 
         file_handler.setFormatter(
-            GlobalFormatter(
+            FileFormatter(
                 fmt="%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s",
                 datefmt="%d/%m/%y %H:%M:%S",
                 settings=settings
