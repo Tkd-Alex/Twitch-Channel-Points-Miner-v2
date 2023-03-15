@@ -2,6 +2,7 @@ import logging
 import os
 import platform
 import queue
+import pytz
 from datetime import datetime
 from logging.handlers import QueueHandler, QueueListener, TimedRotatingFileHandler
 from pathlib import Path
@@ -63,6 +64,7 @@ class LoggerSettings:
         "less",
         "console_level",
         "console_username",
+        "time_zone",
         "file_level",
         "emoji",
         "colored",
@@ -78,6 +80,7 @@ class LoggerSettings:
         less: bool = False,
         console_level: int = logging.INFO,
         console_username: bool = False,
+        time_zone: str or None = None,
         file_level: int = logging.DEBUG,
         emoji: bool = platform.system() != "Windows",
         colored: bool = False,
@@ -90,6 +93,7 @@ class LoggerSettings:
         self.less = less
         self.console_level = console_level
         self.console_username = console_username
+        self.time_zone = time_zone
         self.file_level = file_level
         self.emoji = emoji
         self.colored = colored
@@ -102,11 +106,26 @@ class LoggerSettings:
 class GlobalFormatter(logging.Formatter):
     def __init__(self, *, fmt, settings: LoggerSettings, datefmt=None):
         self.settings = settings
+        self.timezone = None
+        if settings.time_zone:
+            try:
+                self.timezone = pytz.timezone(settings.time_zone)
+                logging.info(f"Time zone set to: {self.timezone}")
+            except pytz.UnknownTimeZoneError:
+                logging.error(f"Invalid time zone: {settings.time_zone}")
         logging.Formatter.__init__(self, fmt=fmt, datefmt=datefmt)
+
+    def formatTime(self, record, datefmt=None):
+        if self.timezone:
+            dt = datetime.fromtimestamp(record.created, self.timezone)
+        else:
+            dt = datetime.fromtimestamp(record.created)
+        return dt.strftime(datefmt or self.default_time_format)
 
     def format(self, record):
         record.emoji_is_present = (
-            record.emoji_is_present if hasattr(record, "emoji_is_present") else False
+            record.emoji_is_present if hasattr(
+                record, "emoji_is_present") else False
         )
         if (
             hasattr(record, "emoji")
@@ -138,7 +157,8 @@ class GlobalFormatter(logging.Formatter):
         return super().format(record)
 
     def telegram(self, record):
-        skip_telegram = False if hasattr(record, "skip_telegram") is False else True
+        skip_telegram = False if hasattr(
+            record, "skip_telegram") is False else True
 
         if (
             self.settings.telegram is not None
@@ -148,7 +168,8 @@ class GlobalFormatter(logging.Formatter):
             self.settings.telegram.send(record.msg, record.event)
 
     def discord(self, record):
-        skip_discord = False if hasattr(record, "skip_discord") is False else True
+        skip_discord = False if hasattr(
+            record, "skip_discord") is False else True
 
         if (
             self.settings.discord is not None
@@ -180,7 +201,8 @@ def configure_loggers(username, settings):
     console_handler.setFormatter(
         GlobalFormatter(
             fmt=(
-                "%(asctime)s - %(levelname)s - [%(funcName)s]: " + console_username + "%(message)s"
+                "%(asctime)s - %(levelname)s - [%(funcName)s]: " +
+                console_username + "%(message)s"
                 if settings.less is False
                 else "%(asctime)s - " + console_username + "%(message)s"
             ),
@@ -208,16 +230,19 @@ def configure_loggers(username, settings):
                 delay=False,
             )
         else:
+            # Getting time zone from the console_handler's formatter since they are the same
+            tz = "" if console_handler.formatter.timezone is False else console_handler.formatter.timezone
             logs_file = os.path.join(
                 logs_path,
-                f"{username}.{datetime.now().strftime('%Y%m%d-%H%M%S')}.log",
+                f"{username}.{datetime.now(tz).strftime('%Y%m%d-%H%M%S')}.log",
             )
             file_handler = logging.FileHandler(logs_file, "w", "utf-8")
 
         file_handler.setFormatter(
-            logging.Formatter(
+            GlobalFormatter(
                 fmt="%(asctime)s - %(levelname)s - %(name)s - [%(funcName)s]: %(message)s",
                 datefmt="%d/%m/%y %H:%M:%S",
+                settings=settings
             )
         )
         file_handler.setLevel(settings.file_level)

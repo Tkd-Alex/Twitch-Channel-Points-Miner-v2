@@ -36,7 +36,8 @@ setuptools.setup(
         "colorama",
         "flask",
         "irc",
-        "pandas"
+        "pandas",
+        "pytz"
     ],
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
