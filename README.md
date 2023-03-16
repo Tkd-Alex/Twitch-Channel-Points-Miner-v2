@@ -41,6 +41,8 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
 4. 🧐 [How to use](#how-to-use)
     - [Cloning](#by-cloning-the-repository)
     - [Docker](#docker)
+    	- [Docker Hub](#docker-hub)
+		- [Portainer](#portainer)
     - [Replit](#replit)
     - [Limits](#limits)
 5. 🔧 [Settings](#settings)
@@ -354,7 +356,7 @@ services:
       - "5000:5000"
 ```
 
-Example with docker run:
+**Example with docker run:**
 ```sh
 docker run \
     -v $(pwd)/analytics:/usr/src/app/analytics \
