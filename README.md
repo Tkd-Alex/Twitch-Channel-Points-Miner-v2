@@ -86,8 +86,9 @@ If you have any issues or you want to contribute, you are welcome! But please re
 - Auto claim game drops from Twitch inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21) Read more about game drops [here](https://help.twitch.tv/s/article/mission-based-drops)
 - Place the bet / make a prediction and win or lose (🍀) your channel points!
 No browser needed. [#41](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/41) ([@lay295](https://github.com/lay295))
-- Analytics chart that show the progress of your points with various annotations [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
+- Switchable analytics chart that show the progress of your points with various annotations [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
 - Join IRC Chat for increase watch-time and get StreamElements points [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47)
+- Moments claiming
 
 ## Logs feature
 ### Full logs
@@ -385,11 +386,9 @@ docker run --name user1 -v $(pwd)/user1.py:/usr/src/app/run.py:ro -p 5001:5000 r
 docker run --name user2 -v $(pwd)/user2.py:/usr/src/app/run.py:ro -p 5002:5000 rdavidoff/twitch-channel-points-miner-v2
 ```
 
-About the *Docker* version; the community has always shown great interest in the Docker version of the project. Especially [@SethFalco](https://github.com/SethFalco) ([#79](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/79)), [@KamushekDev](https://github.com/KamushekDev) ([#300](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/300)), [@au-ee](https://github.com/au-ee) ([#223](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/223)) they showed their ideas. I've decided to merge the PR from [@RakSrinaNa](https://github.com/RakSrinaNa) ([#343](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/343)) because is one of the most active user of the project and the PR was the only one with a Continuous Integration (CI).
-
 #### Portainer
 
-[Link](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/wiki/Deploy-Docker-container-in-Portainer) to the illustrated guide on how to deploy a docker container in Portainer.
+[Link](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/wiki/Deploy-Docker-container-in-Portainer) to the illustrated guide on how to deploy a Docker container in Portainer.
 
 ### Replit
 
