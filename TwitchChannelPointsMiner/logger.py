@@ -214,6 +214,7 @@ class GlobalFormatter(logging.Formatter):
         if (
             self.settings.matrix is not None
             and skip_matrix is False
+            and self.settings.matrix.access_token
             and self.settings.matrix.password
             != "..."
             and self.settings.matrix.room_id
