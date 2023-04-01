@@ -231,12 +231,14 @@ twitch_miner = TwitchChannelPointsMiner(
         telegram=Telegram(                                                          # You can omit or leave None if you don't want to receive updates on Telegram
             chat_id=123456789,                                                      # Chat ID to send messages @GiveChatId
             token="123456789:shfuihreuifheuifhiu34578347",                          # Telegram API token @BotFather
-            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, "BET_LOSE"],   # Only these events will be sent to the chat
+            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
+                    Events.BET_LOSE, Events.CHAT_MENTION],                          # Only these events will be sent to the chat
             disable_notification=True,                                              # Revoke the notification (sound/vibration)
         ),
         discord=Discord(
-            webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",  # Discord Webhook URL
-            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],       # Only these events will be sent to the chat
+            webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",	# Discord Webhook URL
+            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
+                    Events.BET_LOSE, Events.CHAT_MENTION],					# Only these events will be sent to the chat
         )
     ),
     streamer_settings=StreamerSettings(
@@ -473,7 +475,8 @@ If you want to receive logs update on Telegram initiate a new Telegram class, el
 Telegram(
     chat_id=123456789,
     token="123456789:shfuihreuifheuifhiu34578347",
-    events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, "BET_LOSE"],
+    events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
+                    Events.BET_LOSE, Events.CHAT_MENTION],
     disable_notification=True,
 )
 ```
@@ -497,7 +500,8 @@ If you want to receive log updates on Discord initialize a new Discord class, el
 ```python
 Discord(
    webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",
-   events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],
+   events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
+                    Events.BET_LOSE, Events.CHAT_MENTION],
 )
 ```
 
@@ -520,6 +524,7 @@ Discord(
  - `JOIN_RAID`
  - `DROP_CLAIM`
  - `DROP_STATUS`
+ - `CHAT_MENTION`
 
 ### StreamerSettings
 | Key                	| Type        	| Default                        	| Description                                                                                                                                          	                                                                            |
