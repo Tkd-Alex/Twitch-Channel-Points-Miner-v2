@@ -28,9 +28,6 @@ class Matrix(object):
             print("[Matrix]: Invalid password provided. Notifications will not be sent.")
 
     def send(self, message: str, event: Events) -> None:
-        if not self.access_token:
-            return
-
         if str(event) in self.events:
             requests.post(
                 url=f"https://{self.homeserver}/_matrix/client/r0/rooms/{self.room_id}/send/m.room.message?access_token={self.access_token}",
