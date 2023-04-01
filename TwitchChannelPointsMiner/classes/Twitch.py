@@ -504,6 +504,7 @@ class Twitch(object):
                                                     "event": Events.DROP_STATUS,
                                                     "skip_telegram": True,
                                                     "skip_discord": True,
+                                                    "skip_matrix": True,
                                                 },
                                             )
 
