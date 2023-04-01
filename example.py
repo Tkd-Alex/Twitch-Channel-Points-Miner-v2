@@ -50,9 +50,9 @@ twitch_miner = TwitchChannelPointsMiner(
         ),
         matrix=Matrix(
             username="twitch_miner", # Matrix username (without homeserver)
-            password="...", # Matrix password
+            password="...",          # Matrix password
             homeserver="matrix.org", # Matrix homeserver
-            room_id="..." # Room ID
+            room_id="..."            # Room ID
         )
     ),
     streamer_settings=StreamerSettings(
