@@ -6,6 +6,7 @@ from threading import Thread
 from irc.bot import SingleServerIRCBot
 
 from TwitchChannelPointsMiner.constants import IRC, IRC_PORT
+from TwitchChannelPointsMiner.classes.Settings import Events
 
 logger = logging.getLogger(__name__)
 
@@ -52,10 +53,22 @@ class ClientIRC(SingleServerIRCBot):
     """
     def on_join(self, connection, event):
         logger.info(f"Event: {event}", extra={"emoji": ":speech_balloon:"})
-
-    def on_pubmsg(self, client, message):
-        logger.info(f"Message: {message}", extra={"emoji": ":speech_balloon:"})
     """
+
+    # """
+    def on_pubmsg(self, connection, event):
+        msg = event.arguments[0]
+
+        # also self._realname
+        # if msg.startswith(f"@{self._nickname}"):
+        if f"@{self._nickname}" in msg:
+            # nickname!username@nickname.tmi.twitch.tv
+            nick = event.source.split("!", 1)[0]
+            # chan = event.target
+
+            logger.info(f"{nick} at {self.channel} wrote: {msg}", extra={
+                        "emoji": ":speech_balloon:", "event": Events.CHAT_MENTION})
+    # """
 
 
 class ThreadChat(Thread):
