@@ -35,7 +35,7 @@ class Matrix(object):
             requests.post(
                 url=f"https://{self.homeserver}/_matrix/client/r0/rooms/{self.room_id}/send/m.room.message?access_token={self.access_token}",
                 json={
-                    "body": message,
+                    "body": dedent(message),
                     "msgtype": "m.text"
                 }
             )
