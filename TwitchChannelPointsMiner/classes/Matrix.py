@@ -1,5 +1,6 @@
 from textwrap import dedent
 
+import logging
 import requests
 from urllib.parse import quote
 
@@ -26,7 +27,7 @@ class Matrix(object):
         self.access_token = body.get("access_token")
 
         if not self.access_token:
-            print("[Matrix]: Invalid password provided. Notifications will not be sent.")
+            logging.getLogger(__name__).info("Invalid Matrix password provided. Notifications will not be sent.")
 
     def send(self, message: str, event: Events) -> None:
         if str(event) in self.events:
