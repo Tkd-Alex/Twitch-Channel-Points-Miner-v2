@@ -208,7 +208,7 @@ class GlobalFormatter(logging.Formatter):
             self.settings.discord.send(record.msg, record.event)
 
     def matrix(self, record):
-        skip_discord = False if hasattr(
+        skip_matrix = False if hasattr(
             record, "skip_matrix") is False else True
 
         if (
