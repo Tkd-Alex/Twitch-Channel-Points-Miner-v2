@@ -88,6 +88,7 @@ If you have any issues or you want to contribute, you are welcome! But please re
 - Switchable analytics chart that shows the progress of your points with various annotations [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96) ✔️
 - Joining the IRC Chat to increase the watch time and get StreamElements points [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47) ✔️
 - [Moments](https://help.twitch.tv/s/article/moments) claiming [#182](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/issues/182) ✔️
+- Notifying on `@nickname` mention in the Twitch chat [#227](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/issues/227) ✔️
 
 ## Logs feature
 ### Full logs
@@ -229,7 +230,7 @@ twitch_miner = TwitchChannelPointsMiner(
             BET_wiN=Fore.MAGENTA                # Color allowed are: [BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET].
         ),
         telegram=Telegram(                                                          # You can omit or leave None if you don't want to receive updates on Telegram
-            chat_id=123456789,                                                      # Chat ID to send messages @GiveChatId
+            chat_id=123456789,                                                      # Chat ID to send messages @getmyid_bot
             token="123456789:shfuihreuifheuifhiu34578347",                          # Telegram API token @BotFather
             events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
                     Events.BET_LOSE, Events.CHAT_MENTION],                          # Only these events will be sent to the chat
@@ -459,13 +460,13 @@ ColorPalette(
 ```
 
 #### Telegram
-If you want to receive logs update on Telegram initiate a new Telegram class, else leave omit this parameter or set as None.
-1. Create a bot with [BotFather](https://t.me/botfather)
-2. Get you `chat_id` with [GiveChatId](https://t.me/GiveChatId_Bot)
+If you want to receive logs update on Telegram, initiate a new Telegram class, else omit this parameter or set as None.
+1. Create a bot with [@BotFather](https://t.me/botfather)
+2. Get you `chat_id` with [@getmyid_bot](https://t.me/getmyid_bot)
 
 | Key                	 | Type            	| Default 	| Description                                                        |
 |----------------------- |-----------------	|---------	|------------------------------------------------------------------- |
-| `chat_id`         	 | int        	    |           | Chat ID to send messages @GiveChatId                               |
+| `chat_id`         	 | int        	    |           | Chat ID to send messages @getmyid_bot                              |
 | `token`       	 | string           |        	| Telegram API token @BotFather                                      |
 | `events`   	         | list             |       	| Only these events will be sent to the chat. Array of Event. or str |
 | `disable_notification` | bool             | false   	| Revoke the notification (sound/vibration)                          |
