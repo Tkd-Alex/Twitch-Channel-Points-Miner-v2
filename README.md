@@ -394,6 +394,10 @@ docker run --name user2 -v $(pwd)/user2.py:/usr/src/app/run.py:ro -p 5002:5000 r
 
 ### Replit
 
+**NO LONGER SUPPORTED. REASONS: [#138](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/discussions/138)**
+
+*Replit repo is no longer updated and supported because this GH repo was banned by Replit. I was able to update it occasionally until 1.8.1 but now they've changed things completely. It is provided as is from now on.*
+
 Official Repl with description and added keep-alive functionality: https://replit.com/@rdavydov/Twitch-Channel-Points-Miner-v2
 
 #### Tricks to run 24/7 on Replit for free
