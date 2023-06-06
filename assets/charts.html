@@ -198,14 +198,6 @@
     }
     var refresh = parseInt("{{ refresh }}");
     var daysAgo = parseInt("{{ daysAgo }}");
-
-    $('#toggle-header').change(function () {
-        if (this.checked) {
-            $('#header').show();
-        } else {
-            $('#header').hide();
-        }
-    });  
 </script>
 <script type="text/javascript" src="{{url_for('static', filename='script.js')}}"></script>
 

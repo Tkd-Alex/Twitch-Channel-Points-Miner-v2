@@ -92,6 +92,31 @@ startDate.setDate(startDate.getDate() - daysAgo);
 var endDate = new Date();
 
 $(document).ready(function () {
+    // Retrieve the saved header visibility preference from localStorage
+    var headerVisibility = localStorage.getItem('headerVisibility');
+
+    // Set the initial header visibility based on the saved preference or default to 'visible'
+    if (headerVisibility === 'hidden') {
+        $('#toggle-header').prop('checked', false);
+        $('#header').hide();
+    } else {
+        $('#toggle-header').prop('checked', true);
+        $('#header').show();
+    }
+
+    // Handle the toggle header change event
+    $('#toggle-header').change(function () {
+        if (this.checked) {
+            $('#header').show();
+            // Save the header visibility preference as 'visible' in localStorage
+            localStorage.setItem('headerVisibility', 'visible');
+        } else {
+            $('#header').hide();
+            // Save the header visibility preference as 'hidden' in localStorage
+            localStorage.setItem('headerVisibility', 'hidden');
+        }
+    });
+
     chart.render();
 
     if (!localStorage.getItem("annotations")) localStorage.setItem("annotations", true);
@@ -179,7 +204,7 @@ function renderStreamers() {
         streamersList.forEach((streamer, index, array) => {
             displayname = streamer.name.replace(".json", "");
             if (sortField == 'points') displayname = "<font size='-2'>" + streamer['points'] + "</font>&nbsp;" + displayname;
-            else if (sortField == 'last_activity') displayname = "<font size='-2'>" + formatDate(streamer['last_activity']) + "</font>&nbsp;"+ displayname;
+            else if (sortField == 'last_activity') displayname = "<font size='-2'>" + formatDate(streamer['last_activity']) + "</font>&nbsp;" + displayname;
             $("#streamers-list").append(`<li><a onClick="changeStreamer('${streamer.name}', ${index + 1}); return false;">${displayname}</a></li>`);
             if (index === array.length - 1) resolve();
         });
