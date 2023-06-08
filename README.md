@@ -88,6 +88,7 @@ If you have any issues or you want to contribute, you are welcome! But please re
 - Switchable analytics chart that shows the progress of your points with various annotations [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96) ✔️
 - Joining the IRC Chat to increase the watch time and get StreamElements points [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47) ✔️
 - [Moments](https://help.twitch.tv/s/article/moments) claiming [#182](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/issues/182) ✔️
+- Notifying on `@nickname` mention in the Twitch chat [#227](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/issues/227) ✔️
 
 ## Logs feature
 ### Full logs
@@ -228,15 +229,17 @@ twitch_miner = TwitchChannelPointsMiner(
             streamer_offline="red",             # Read more in README.md
             BET_wiN=Fore.MAGENTA                # Color allowed are: [BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET].
         ),
-        telegram=Telegram(                                                          # You can omit or leave None if you don't want to receive updates on Telegram
-            chat_id=123456789,                                                      # Chat ID to send messages @GiveChatId
+        telegram=Telegram(                                                          # You can omit or set to None if you don't want to receive updates on Telegram
+            chat_id=123456789,                                                      # Chat ID to send messages @getmyid_bot
             token="123456789:shfuihreuifheuifhiu34578347",                          # Telegram API token @BotFather
-            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, "BET_LOSE"],   # Only these events will be sent to the chat
+            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
+                    Events.BET_LOSE, Events.CHAT_MENTION],                          # Only these events will be sent to the chat
             disable_notification=True,                                              # Revoke the notification (sound/vibration)
         ),
         discord=Discord(
             webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",  # Discord Webhook URL
-            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],       # Only these events will be sent to the chat
+            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
+                    Events.BET_LOSE, Events.CHAT_MENTION],					                         # Only these events will be sent to the chat
         ),
         matrix=Matrix(
             username="twitch_miner",                                                   # Matrix username (without homeserver)
@@ -398,6 +401,10 @@ docker run --name user2 -v $(pwd)/user2.py:/usr/src/app/run.py:ro -p 5002:5000 r
 
 ### Replit
 
+**NO LONGER SUPPORTED. REASONS: [#138](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/discussions/138)**
+
+*Replit repo is no longer updated and supported because this GH repo was banned by Replit. I was able to update it occasionally until 1.8.1 but now they've changed things completely. It is provided as is from now on.*
+
 Official Repl with description and added keep-alive functionality: https://replit.com/@rdavydov/Twitch-Channel-Points-Miner-v2
 
 #### Tricks to run 24/7 on Replit for free
@@ -464,13 +471,13 @@ ColorPalette(
 ```
 
 #### Telegram
-If you want to receive logs update on Telegram initiate a new Telegram class, else leave omit this parameter or set as None.
-1. Create a bot with [BotFather](https://t.me/botfather)
-2. Get you `chat_id` with [GiveChatId](https://t.me/GiveChatId_Bot)
+If you want to receive logs update on Telegram, initiate a new Telegram class, else omit this parameter or set as None.
+1. Create a bot with [@BotFather](https://t.me/botfather)
+2. Get you `chat_id` with [@getmyid_bot](https://t.me/getmyid_bot)
 
 | Key                	 | Type            	| Default 	| Description                                                        |
 |----------------------- |-----------------	|---------	|------------------------------------------------------------------- |
-| `chat_id`         	 | int        	    |           | Chat ID to send messages @GiveChatId                               |
+| `chat_id`         	 | int        	    |           | Chat ID to send messages @getmyid_bot                              |
 | `token`       	 | string           |        	| Telegram API token @BotFather                                      |
 | `events`   	         | list             |       	| Only these events will be sent to the chat. Array of Event. or str |
 | `disable_notification` | bool             | false   	| Revoke the notification (sound/vibration)                          |
@@ -480,7 +487,8 @@ If you want to receive logs update on Telegram initiate a new Telegram class, el
 Telegram(
     chat_id=123456789,
     token="123456789:shfuihreuifheuifhiu34578347",
-    events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, "BET_LOSE"],
+    events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
+                    Events.BET_LOSE, Events.CHAT_MENTION],
     disable_notification=True,
 )
 ```
@@ -504,7 +512,8 @@ If you want to receive log updates on Discord initialize a new Discord class, el
 ```python
 Discord(
    webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",
-   events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],
+   events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
+                    Events.BET_LOSE, Events.CHAT_MENTION],
 )
 ```
 
@@ -527,6 +536,7 @@ Discord(
  - `JOIN_RAID`
  - `DROP_CLAIM`
  - `DROP_STATUS`
+ - `CHAT_MENTION`
 
 ### StreamerSettings
 | Key                	| Type        	| Default                        	| Description                                                                                                                                          	                                                                            |
@@ -548,7 +558,7 @@ Allowed values for `chat` are:
 ### BetSettings
 | Key                	| Type            	| Default 	| Description                                                                                                    	                                                                          |
 |--------------------	|-----------------	|---------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `strategy`         	| Strategy        	| SMART   	| Choose your strategy! See above for more info                                                                  	                                                                          |
+| `strategy`         	| Strategy        	| SMART   	| Choose your strategy! See below for more info                                                                  	                                                                          |
 | `percentage`       	| int             	| 5       	| Place the x% of your channel points                                                                            	                                                                          |
 | `percentage_gap`   	| int             	| 20      	| Gap difference between outcomesA and outcomesB (for SMART stragegy)                                            	                                                                          |
 | `max_points`       	| int             	| 50000   	| If the x percentage of your channel points is GT bet_max_points set this value                                 	                                                                          |

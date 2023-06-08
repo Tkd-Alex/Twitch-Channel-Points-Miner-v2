@@ -11,12 +11,12 @@ import random
 import re
 import string
 import time
-from datetime import datetime
+# from datetime import datetime
 from pathlib import Path
 from secrets import choice, token_hex
 
-import json
-from base64 import urlsafe_b64decode
+# import json
+# from base64 import urlsafe_b64decode
 
 import requests
 
@@ -802,12 +802,15 @@ class Twitch(object):
 
                     # Going to clear array and structure. Remove all the timeBasedDrops expired or not started yet
                     for index in range(0, len(campaigns_details)):
-                        campaign = Campaign(campaigns_details[index])
-                        if campaign.dt_match is True:
-                            # Remove all the drops already claimed or with dt not matching
-                            campaign.clear_drops()
-                            if campaign.drops != []:
-                                campaigns.append(campaign)
+                        if campaigns_details[index] is not None:
+                            campaign = Campaign(campaigns_details[index])
+                            if campaign.dt_match is True:
+                                # Remove all the drops already claimed or with dt not matching
+                                campaign.clear_drops()
+                                if campaign.drops != []:
+                                    campaigns.append(campaign)
+                        else:
+                            continue
 
                 # Divide et impera :)
                 campaigns = self.__sync_campaigns(campaigns)
