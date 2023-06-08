@@ -551,7 +551,7 @@ Allowed values for `chat` are:
 ### BetSettings
 | Key                	| Type            	| Default 	| Description                                                                                                    	                                                                          |
 |--------------------	|-----------------	|---------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `strategy`         	| Strategy        	| SMART   	| Choose your strategy! See above for more info                                                                  	                                                                          |
+| `strategy`         	| Strategy        	| SMART   	| Choose your strategy! See below for more info                                                                  	                                                                          |
 | `percentage`       	| int             	| 5       	| Place the x% of your channel points                                                                            	                                                                          |
 | `percentage_gap`   	| int             	| 20      	| Gap difference between outcomesA and outcomesB (for SMART stragegy)                                            	                                                                          |
 | `max_points`       	| int             	| 50000   	| If the x percentage of your channel points is GT bet_max_points set this value                                 	                                                                          |
