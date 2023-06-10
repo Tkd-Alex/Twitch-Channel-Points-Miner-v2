@@ -54,7 +54,7 @@ twitch_miner = TwitchChannelPointsMiner(
             username="twitch_miner",                                                   # Matrix username (without homeserver)
             password="...",                                                            # Matrix password
             homeserver="matrix.org",                                                   # Matrix homeserver
-            room_id="..."                                                              # Room ID
+            room_id="...",                                                             # Room ID
             events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE], # Only these events will be sent to the chat
         )
     ),
