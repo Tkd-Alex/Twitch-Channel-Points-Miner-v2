@@ -3,6 +3,7 @@ import os
 import platform
 import queue
 import pytz
+import sys
 from datetime import datetime
 from logging.handlers import QueueHandler, QueueListener, TimedRotatingFileHandler
 from pathlib import Path
@@ -236,7 +237,7 @@ def configure_loggers(username, settings):
     # Adding a username to the format based on settings
     console_username = "" if settings.console_username is False else f"[{username}] "
 
-    console_handler = logging.StreamHandler()
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(settings.console_level)
     console_handler.setFormatter(
         GlobalFormatter(
