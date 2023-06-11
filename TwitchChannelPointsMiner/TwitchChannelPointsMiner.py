@@ -56,6 +56,7 @@ class TwitchChannelPointsMiner:
         "claim_drops_startup",
         "enable_analytics",
         "disable_ssl_cert_verification",
+        "disable_at_in_nickname",
         "priority",
         "streamers",
         "events_predictions",
@@ -77,6 +78,7 @@ class TwitchChannelPointsMiner:
         claim_drops_startup: bool = False,
         enable_analytics: bool = False,
         disable_ssl_cert_verification: bool = False,
+        disable_at_in_nickname: bool = False,
         # Settings for logging and selenium as you can see.
         priority: list = [Priority.STREAK, Priority.DROPS, Priority.ORDER],
         # This settings will be global shared trought Settings class
@@ -93,6 +95,8 @@ class TwitchChannelPointsMiner:
 
         # This disables certificate verification and allows the connection to proceed, but also makes it vulnerable to man-in-the-middle (MITM) attacks.
         Settings.disable_ssl_cert_verification = disable_ssl_cert_verification
+
+        Settings.disable_at_in_nickname = disable_at_in_nickname
 
         import socket
 

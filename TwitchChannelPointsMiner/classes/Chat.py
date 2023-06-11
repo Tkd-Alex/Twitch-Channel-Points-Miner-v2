@@ -6,7 +6,7 @@ from threading import Thread
 from irc.bot import SingleServerIRCBot
 
 from TwitchChannelPointsMiner.constants import IRC, IRC_PORT
-from TwitchChannelPointsMiner.classes.Settings import Events
+from TwitchChannelPointsMiner.classes.Settings import Events, Settings
 
 logger = logging.getLogger(__name__)
 
@@ -58,10 +58,16 @@ class ClientIRC(SingleServerIRCBot):
     # """
     def on_pubmsg(self, connection, event):
         msg = event.arguments[0]
+        mention = None
+
+        if Settings.disable_at_in_nickname is True:
+            mention = f"{self._nickname.lower()}"
+        else:
+            mention = f"@{self._nickname.lower()}"
 
         # also self._realname
         # if msg.startswith(f"@{self._nickname}"):
-        if f"@{self._nickname.lower()}" in msg.lower():
+        if mention != None and mention in msg.lower():
             # nickname!username@nickname.tmi.twitch.tv
             nick = event.source.split("!", 1)[0]
             # chan = event.target
