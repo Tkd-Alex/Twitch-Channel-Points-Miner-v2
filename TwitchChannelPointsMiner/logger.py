@@ -214,6 +214,7 @@ class GlobalFormatter(logging.Formatter):
         if (
             self.settings.matrix is not None
             and skip_matrix is False
+            and self.settings.matrix.room_id != "..."
             and self.settings.matrix.access_token
         ):
             self.settings.matrix.send(record.msg, record.event)
