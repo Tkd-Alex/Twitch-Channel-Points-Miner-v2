@@ -173,7 +173,7 @@ class Streamer(object):
         return (
             self.settings.claim_drops is True
             and self.is_online is True
-            and self.stream.drops_tags is True
+            # and self.stream.drops_tags is True
             and self.stream.campaigns_ids != []
         )
 
