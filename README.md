@@ -675,7 +675,7 @@ You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7N
 
 **0. Install packages to Termux**
 ```
-pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib
+pkg install python python-numpy git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib
 LDFLAGS="-L${PREFIX}/lib/" CFLAGS="-I${PREFIX}/include/" pip install --upgrade wheel pillow
 ```
 
@@ -710,7 +710,8 @@ Read more at [#92](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/is
 **Note**
 If you can't install `pandas`, please try:
 
-`MATHLIB="m" pip install pandas`
+```pkg install tur-repo
+pkg install python-pandas```
 
 If you can't install `cryptography`, please try:
 
