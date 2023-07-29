@@ -675,7 +675,7 @@ You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7N
 
 **0. Install packages to Termux**
 ```
-pkg install python python-numpy git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib
+pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib
 LDFLAGS="-L${PREFIX}/lib/" CFLAGS="-I${PREFIX}/include/" pip install --upgrade wheel pillow
 ```
 
