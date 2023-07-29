@@ -670,6 +670,9 @@ Other useful info can be founded here:
 You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
 
 ## Termux
+**-1. Upgrade packages
+``` pkg upgrade```
+
 **0. Install packages to Termux**
 ```
 pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib
