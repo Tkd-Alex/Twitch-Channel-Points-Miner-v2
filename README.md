@@ -660,7 +660,7 @@ If you already have a `twitch-cookies.pkl` and you don't want to log in again, p
 
 ## Windows
 Other users have find multiple problems on Windows my suggestion are:
- - Stop use Windows :stuck_out_tongue_closed_eyes:
+ - Stop using Windows :stuck_out_tongue_closed_eyes:
  - Suppress the emoji in logs with `logger_settings=LoggerSettings(emoji=False)`
 
 Other useful info can be founded here:
@@ -670,45 +670,46 @@ Other useful info can be founded here:
 You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
 
 ## Termux
-**-1. Upgrade packages**
+**1. Upgrade packages**
 ``` 
 pkg upgrade
 ```
 
-**0. Install packages to Termux**
+**2. Install packages to Termux**
 ```
 pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib binutils tur-repo
 LDFLAGS="-L${PREFIX}/lib/" CFLAGS="-I${PREFIX}/include/" pip install --upgrade wheel pillow
 ```
+Note: `pkg install tur-repo` will basically enable the [user repository](https://github.com/termux-user-repository/tur) _(Very similar to Arch AUR)_ and `python-pandas` pre-compiled package comes exactly from this repository.
 
-**0.A Install pandas**
+**3. Install pandas**
 ```
 pkg install python-pandas
 ```
 
-**1. Clone this repository**
+**4. Clone this repository**
 
 `git clone https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2`
 
-**2. Go to the miner's directory**
+**5. Go to the miner's directory**
 
 `cd Twitch-Channel-Points-Miner-v2`
 
-**3. Configure your miner on your preferences by typing**
+**6. Configure your miner on your preferences by typing**
 
 `nano example.py`
 
-**4. Rename file name (optional)**
+**7. Rename file name (optional)**
 
 `mv example.py run.py`
 
-**5. Install packages**
+**8. Install packages**
 ```
 pip install -r requirements.txt
 pip install Twitch-Channel-Points-Miner-v2
 ```
 
-**6. Run miner!**
+**9. Run the miner!**
 
 `python run.py`
 
