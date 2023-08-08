@@ -224,14 +224,19 @@ class GlobalFormatter(logging.Formatter):
             and self.settings.matrix.access_token
         ):
             self.settings.matrix.send(record.msg, record.event)
-            
+
     def pushover(self, record):
         skip_pushover = False if hasattr(
             record, "skip_pushover") is False else True
 
-        if (self.settings.pushover is not None
-            and skip_pushover is False):
+        if (
+            self.settings.pushover is not None
+            and skip_pushover is False
+            and self.settings.pushover.userkey != "YOUR-ACCOUNT-TOKEN"
+            and self.settings.pushover.token != "YOUR-APPLICATION-TOKEN"
+        ):
             self.settings.pushover.send(record.msg, record.event)
+
 
 def configure_loggers(username, settings):
     if settings.colored is True:
