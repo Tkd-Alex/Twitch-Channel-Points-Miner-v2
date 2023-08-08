@@ -15,6 +15,7 @@ from TwitchChannelPointsMiner.classes.Discord import Discord
 from TwitchChannelPointsMiner.classes.Matrix import Matrix
 from TwitchChannelPointsMiner.classes.Settings import Events
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
+from TwitchChannelPointsMiner.classes.Pushover import Pushover
 from TwitchChannelPointsMiner.utils import remove_emoji
 
 
@@ -74,7 +75,8 @@ class LoggerSettings:
         "auto_clear",
         "telegram",
         "discord",
-        "matrix"
+        "matrix",
+        "pushover"
     ]
 
     def __init__(
@@ -91,7 +93,8 @@ class LoggerSettings:
         auto_clear: bool = True,
         telegram: Telegram or None = None,
         discord: Discord or None = None,
-        matrix: Matrix or None = None
+        matrix: Matrix or None = None,
+        pushover: Pushover or None = None
     ):
         self.save = save
         self.less = less
@@ -106,6 +109,7 @@ class LoggerSettings:
         self.telegram = telegram
         self.discord = discord
         self.matrix = matrix
+        self.pushover = pushover
 
 
 class FileFormatter(logging.Formatter):
@@ -177,6 +181,7 @@ class GlobalFormatter(logging.Formatter):
             self.telegram(record)
             self.discord(record)
             self.matrix(record)
+            self.pushover(record)
 
             if self.settings.colored is True:
                 record.msg = (
@@ -219,7 +224,14 @@ class GlobalFormatter(logging.Formatter):
             and self.settings.matrix.access_token
         ):
             self.settings.matrix.send(record.msg, record.event)
+            
+    def pushover(self, record):
+        skip_pushover = False if hasattr(
+            record, "skip_pushover") is False else True
 
+        if (self.settings.pushover is not None
+            and skip_pushover is False):
+            self.settings.pushover.send(record.msg, record.event)
 
 def configure_loggers(username, settings):
     if settings.colored is True:
