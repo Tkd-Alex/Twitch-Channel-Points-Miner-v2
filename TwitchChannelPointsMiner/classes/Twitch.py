@@ -695,9 +695,14 @@ class Twitch(object):
     def __get_drops_dashboard(self, status=None):
         response = self.post_gql_request(GQLOperations.ViewerDropsDashboard)
         campaigns = response["data"]["currentUser"]["dropCampaigns"]
+
+        if campaigns is None:
+            return []  # Return an empty list if campaigns is None
+
         if status is not None:
             campaigns = list(
                 filter(lambda x: x["status"] == status.upper(), campaigns))
+
         return campaigns
 
     def __get_campaigns_details(self, campaigns):
