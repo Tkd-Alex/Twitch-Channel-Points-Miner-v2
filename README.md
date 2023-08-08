@@ -670,10 +670,20 @@ Other useful info can be founded here:
 You can also follow this [video tutorial](https://www.youtube.com/watch?v=0VkM7NOZkuA).
 
 ## Termux
+**-1. Upgrade packages**
+``` 
+pkg upgrade
+```
+
 **0. Install packages to Termux**
 ```
-pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib
+pkg install python git rust libjpeg-turbo libcrypt ndk-sysroot clang zlib binutils tur-repo
 LDFLAGS="-L${PREFIX}/lib/" CFLAGS="-I${PREFIX}/include/" pip install --upgrade wheel pillow
+```
+
+**0.A Install pandas**
+```
+pkg install python-pandas
 ```
 
 **1. Clone this repository**
@@ -705,15 +715,12 @@ pip install Twitch-Channel-Points-Miner-v2
 Read more at [#92](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/92) [#76](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/76)
 
 **Note**
-If you can't install `pandas`, please try:
-
-`MATHLIB="m" pip install pandas`
 
 If you can't install `cryptography`, please try:
 
 `export RUSTFLAGS=" -C lto=no" && export CARGO_BUILD_TARGET="$(rustc -vV | sed -n 's|host: ||p')" && pip install cryptography`
 
-⚠️ Installation of `pandas` and `cryptography` takes a long time.
+⚠️ Installation of `pandas`, `maturin` and `cryptography` takes a long time.
 
 ## Disclaimer
 This project comes with no guarantee or warranty. You are responsible for whatever happens from using this project. It is possible to get soft or hard banned by using this project if you are not careful. This is a personal project and is in no way affiliated with Twitch.
