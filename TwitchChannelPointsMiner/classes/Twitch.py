@@ -792,7 +792,12 @@ class Twitch(object):
                 # Get update from dashboard each 60minutes
                 if (
                     campaigns_update == 0
-                    or ((time.time() - campaigns_update) / 60) > 60
+                    # or ((time.time() - campaigns_update) / 60) > 60
+
+                    # TEMPORARY AUTO DROP CLAIMING FIX
+                    # 30 minutes instead of 60 minutes
+                    or ((time.time() - campaigns_update) / 30) > 30
+                    #####################################
                 ):
                     campaigns_update = time.time()
 
