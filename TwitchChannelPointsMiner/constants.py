@@ -112,6 +112,7 @@ class GQLOperations:
     Inventory = {
         "operationName": "Inventory",
         "variables": {"fetchRewardCampaigns": True},
+        # "variables": {},
         "extensions": {
             "persistedQuery": {
                 "version": 1,
@@ -130,7 +131,8 @@ class GQLOperations:
     }
     ViewerDropsDashboard = {
         "operationName": "ViewerDropsDashboard",
-        "variables": {},
+        # "variables": {},
+        "variables": {"fetchRewardCampaigns": True},
         "extensions": {
             "persistedQuery": {
                 "version": 1,
