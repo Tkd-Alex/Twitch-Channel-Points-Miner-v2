@@ -380,7 +380,7 @@ class WebSocketsPool:
                                         counter=-1,
                                     )
 
-                                if event_prediction.result["type"] != "LOSE":
+                                if event_prediction.result["type"]:
                                     # Analytics switch
                                     if Settings.enable_analytics is True:
                                         ws.streamers[
