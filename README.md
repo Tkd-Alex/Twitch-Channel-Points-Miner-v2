@@ -402,10 +402,6 @@ docker run --name user2 -v $(pwd)/user2.py:/usr/src/app/run.py:ro -p 5002:5000 r
 
 ### Replit
 
-**NO LONGER SUPPORTED. REASONS: [#138](https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2/discussions/138)**
-
-*Replit repo is no longer updated and supported because this GH repo was banned by Replit. I was able to update it occasionally until 1.8.1 but now they've changed things completely. It is provided as is from now on.*
-
 Official Repl with description and added keep-alive functionality: https://replit.com/@rdavydov/Twitch-Channel-Points-Miner-v2
 
 #### Tricks to run 24/7 on Replit for free
@@ -417,7 +413,7 @@ Official Repl with description and added keep-alive functionality: https://repli
 Use a service that can send HTTP requests at regular intervals, such as Uptimerobot.
 
 ### Limits
-> Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.
+_**Twitch has a limit - you can't watch more than two channels at one time. We take the first two streamers from the list as they have the highest priority.**_
 
 Make sure to write the streamers array in order of priority from left to right. If you use `followers=True` you can choose to download the followers sorted by follow date (ASC or DESC).
 
@@ -659,11 +655,11 @@ If you already have a `twitch-cookies.pkl` and you don't want to log in again, p
 ```
 
 ## Windows
-Other users have find multiple problems on Windows my suggestion are:
+Other users have find multiple problems on Windows. Suggestions are:
  - Stop using Windows :stuck_out_tongue_closed_eyes:
  - Suppress the emoji in logs with `logger_settings=LoggerSettings(emoji=False)`
 
-Other useful info can be founded here:
+Other useful info can be found here:
 - https://github.com/gottagofaster236/Twitch-Channel-Points-Miner/issues/31
 - https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/55
 
