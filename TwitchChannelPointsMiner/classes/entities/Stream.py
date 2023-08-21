@@ -54,7 +54,9 @@ class Stream(object):
         self.broadcast_id = broadcast_id
         self.title = title.strip()
         self.game = game
-        self.tags = tags
+        # #343 temporary workaround
+        self.tags = tags or []
+        # ------------------------
         self.viewers_count = viewers_count
 
         self.drops_tags = (
