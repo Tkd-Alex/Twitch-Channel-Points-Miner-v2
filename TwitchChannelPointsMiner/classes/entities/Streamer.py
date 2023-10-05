@@ -207,11 +207,11 @@ class Streamer(object):
     # === ANALYTICS === #
     def persistent_annotations(self, event_type, event_text):
         event_type = event_type.upper()
-        if event_type in ["WATCH_STREAK", "WIN", "PREDICTION_MADE"]:
+        if event_type in ["WATCH_STREAK", "WIN", "PREDICTION_MADE", "LOSE"]:
             primary_color = (
-                "#45c1ff"
+                "#45c1ff" #blue #45c1ff yellow #ffe045 green #36b535 red #ff4545 
                 if event_type == "WATCH_STREAK"
-                else ("#ffe045" if event_type == "PREDICTION_MADE" else "#54ff45")
+                else ("#ffe045" if event_type == "PREDICTION_MADE" else ("#36b535" if event_type == "WIN" else "#ff4545")) 
             )
             data = {
                 "borderColor": primary_color,
