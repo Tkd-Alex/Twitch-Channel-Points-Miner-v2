@@ -76,7 +76,8 @@ class LoggerSettings:
         "telegram",
         "discord",
         "matrix",
-        "pushover"
+        "pushover",
+        "username"
     ]
 
     def __init__(
@@ -94,7 +95,8 @@ class LoggerSettings:
         telegram: Telegram or None = None,
         discord: Discord or None = None,
         matrix: Matrix or None = None,
-        pushover: Pushover or None = None
+        pushover: Pushover or None = None,
+        username: str or None = None
     ):
         self.save = save
         self.less = less
@@ -110,6 +112,7 @@ class LoggerSettings:
         self.discord = discord
         self.matrix = matrix
         self.pushover = pushover
+        self.username = username
 
 
 class FileFormatter(logging.Formatter):
@@ -176,6 +179,8 @@ class GlobalFormatter(logging.Formatter):
             # With the update of Stream class, the Stream Title may contain emoji
             # Full remove using a method from utils.
             record.msg = remove_emoji(record.msg)
+
+        record.msg = self.settings.username + record.msg
 
         if hasattr(record, "event"):
             self.telegram(record)
@@ -254,15 +259,16 @@ def configure_loggers(username, settings):
     # Adding a username to the format based on settings
     console_username = "" if settings.console_username is False else f"[{username}] "
 
+    settings.username = console_username
+
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(settings.console_level)
     console_handler.setFormatter(
         GlobalFormatter(
             fmt=(
-                "%(asctime)s - %(levelname)s - [%(funcName)s]: " +
-                console_username + "%(message)s"
+                "%(asctime)s - %(levelname)s - [%(funcName)s]: %(message)s"
                 if settings.less is False
-                else "%(asctime)s - " + console_username + "%(message)s"
+                else "%(asctime)s - %(message)s"
             ),
             datefmt=(
                 "%d/%m/%y %H:%M:%S" if settings.less is False else "%d/%m %H:%M:%S"
