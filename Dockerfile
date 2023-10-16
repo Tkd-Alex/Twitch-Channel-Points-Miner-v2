@@ -20,6 +20,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
     libssl-dev \
     make \
     automake \
+    cmake \
     g++ \
     subversion \
     python3-dev \
