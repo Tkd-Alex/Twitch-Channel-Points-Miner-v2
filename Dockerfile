@@ -1,4 +1,4 @@
-FROM python:3.11-slim-buster
+FROM python:3.12
 
 ARG BUILDX_QEMU_ENV
 
@@ -12,7 +12,7 @@ RUN pip install --upgrade pip
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-install-recommends \
-    gcc-12 \
+    gcc \
     libffi-dev \
     rustc \
     zlib1g-dev \
@@ -21,7 +21,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
     make \
     automake \
     ninja-build \
-    g++-12 \
+    g++ \
     subversion \
     python3-dev \
   && if [ "${BUILDX_QEMU_ENV}" = "true" ] && [ "$(getconf LONG_BIT)" = "32" ]; then \
