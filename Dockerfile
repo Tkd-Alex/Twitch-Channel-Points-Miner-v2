@@ -12,7 +12,7 @@ RUN pip install --upgrade pip
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-install-recommends \
-    gcc=8.4.0 \
+    gcc=8.4.0-1ubuntu1~18.04 \
     libffi-dev \
     rustc \
     zlib1g-dev \
@@ -21,7 +21,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
     make \
     automake \
     ninja-build \
-    g++=8.4.0 \
+    g++=8.4.0-1ubuntu1~18.04 \
     subversion \
     python3-dev \
   && if [ "${BUILDX_QEMU_ENV}" = "true" ] && [ "$(getconf LONG_BIT)" = "32" ]; then \
