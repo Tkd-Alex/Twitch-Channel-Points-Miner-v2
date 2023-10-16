@@ -18,6 +18,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
     zlib1g-dev \
     libjpeg-dev \
     libssl-dev \
+    libblas-dev \
+    liblapack-dev \
     make \
     cmake \    
     automake \
