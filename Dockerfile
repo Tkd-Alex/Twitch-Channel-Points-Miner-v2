@@ -12,7 +12,7 @@ RUN pip install --upgrade pip
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-install-recommends \
-    gcc \
+    gcc-9 \
     libffi-dev \
     rustc \
     zlib1g-dev \
@@ -20,7 +20,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
     libssl-dev \
     make \
     automake \
-    g++ \
+    ninja-build \
+    g++-9 \
     subversion \
     python3-dev \
   && if [ "${BUILDX_QEMU_ENV}" = "true" ] && [ "$(getconf LONG_BIT)" = "32" ]; then \
