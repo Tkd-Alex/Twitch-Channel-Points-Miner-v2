@@ -19,6 +19,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
     libjpeg-dev \
     libssl-dev \
     make \
+    cmake \    
     automake \
     ninja-build \
     g++ \
