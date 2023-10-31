@@ -191,7 +191,7 @@ class TwitchChannelPointsMiner:
             from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
 
             http_server = AnalyticsServer(
-                host=host, port=port, refresh=refresh, days_ago=days_ago
+                host=host, port=port, refresh=refresh, days_ago=days_ago, username=self.username
             )
             http_server.daemon = True
             http_server.name = "Analytics Thread"

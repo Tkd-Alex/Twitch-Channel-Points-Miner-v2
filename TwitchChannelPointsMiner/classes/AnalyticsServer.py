@@ -230,6 +230,7 @@ class AnalyticsServer(Thread):
         port: int = 5000,
         refresh: int = 5,
         days_ago: int = 7,
+        username: str = None
     ):
         super(AnalyticsServer, self).__init__()
 
@@ -239,6 +240,17 @@ class AnalyticsServer(Thread):
         self.port = port
         self.refresh = refresh
         self.days_ago = days_ago
+        self.username = username
+
+        def generate_log():
+            logs_path = os.path.join(Path().absolute(), "logs")
+            log_file_path = os.path.join(logs_path, f"{username}.log")
+            try:
+                with open(log_file_path, "r") as log_file:
+                    log_content = log_file.read()
+                    return Response(log_content, status=200, mimetype="text/plain")
+            except FileNotFoundError:
+                return Response("Log file not found.", status=404, mimetype="text/plain")
 
         self.app = Flask(
             __name__,
@@ -259,6 +271,8 @@ class AnalyticsServer(Thread):
         )
         self.app.add_url_rule("/json_all", "json_all",
                               json_all, methods=["GET"])
+        self.app.add_url_rule(
+            "/log", "log", generate_log, methods=["GET"])
 
     def run(self):
         logger.info(
