@@ -123,8 +123,23 @@ $(document).ready(function () {
     if (!localStorage.getItem("dark-mode")) localStorage.setItem("dark-mode", true);
     if (!localStorage.getItem("sort-by")) localStorage.setItem("sort-by", "Name ascending");
 
+    // Restore settings from localStorage on page load
     $('#annotations').prop("checked", localStorage.getItem("annotations") === "true");
     $('#dark-mode').prop("checked", localStorage.getItem("dark-mode") === "true");
+
+    // Handle the annotation toggle click event
+    $('#annotations').click(() => {
+        var isChecked = $('#annotations').prop("checked");
+        localStorage.setItem("annotations", isChecked);
+        updateAnnotations();
+    });
+
+    // Handle the dark mode toggle click event
+    $('#dark-mode').click(() => {
+        var isChecked = $('#dark-mode').prop("checked");
+        localStorage.setItem("dark-mode", isChecked);
+        toggleDarkMode();
+    });
 
     $('#startDate').val(formatDate(startDate));
     $('#endDate').val(formatDate(endDate));
