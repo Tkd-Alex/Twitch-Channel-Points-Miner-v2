@@ -171,6 +171,14 @@ function changeStreamer(streamer, index) {
     $("li").removeClass("is-active")
     $("li").eq(index - 1).addClass('is-active');
     currentStreamer = streamer;
+
+    // Update the chart title with the current streamer's name
+    options.title.text = `${streamer.replace(".json", "")}'s channel points (dates are displayed in UTC)`;
+    chart.updateOptions(options);
+
+    // Save the selected streamer in localStorage
+    localStorage.setItem("selectedStreamer", currentStreamer);
+
     getStreamerData(streamer);
 }
 
@@ -220,12 +228,26 @@ function renderStreamers() {
             displayname = streamer.name.replace(".json", "");
             if (sortField == 'points') displayname = "<font size='-2'>" + streamer['points'] + "</font>&nbsp;" + displayname;
             else if (sortField == 'last_activity') displayname = "<font size='-2'>" + formatDate(streamer['last_activity']) + "</font>&nbsp;" + displayname;
-            $("#streamers-list").append(`<li><a onClick="changeStreamer('${streamer.name}', ${index + 1}); return false;">${displayname}</a></li>`);
+            var isActive = currentStreamer === streamer.name;
+            if (!isActive && localStorage.getItem("selectedStreamer") === streamer.name) {
+                isActive = true;
+                currentStreamer = streamer.name;
+            }
+            var activeClass = isActive ? 'is-active' : '';
+            var listItem = `<li id="streamer-${streamer.name}" class="${activeClass}"><a onClick="changeStreamer('${streamer.name}', ${index + 1}); return false;">${displayname}</a></li>`;
+            $("#streamers-list").append(listItem);
+            if (isActive) {
+                // Scroll the selected streamer into view
+                document.getElementById(`streamer-${streamer.name}`).scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
             if (index === array.length - 1) resolve();
         });
     });
     promised.then(() => {
-        changeStreamer(streamersList[0].name, 1);
+        changeStreamer(currentStreamer, streamersList.findIndex(streamer => streamer.name === currentStreamer) + 1);
     });
 }
 
