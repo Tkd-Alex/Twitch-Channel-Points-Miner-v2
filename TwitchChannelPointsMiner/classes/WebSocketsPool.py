@@ -2,7 +2,9 @@ import json
 import logging
 import random
 import time
+# import os
 from threading import Thread, Timer
+# from pathlib import Path
 
 from dateutil import parser
 
@@ -404,7 +406,25 @@ class WebSocketsPool:
                     )
 
         elif response["type"] == "RESPONSE" and len(response.get("error", "")) > 0:
-            raise RuntimeError(f"Error while trying to listen for a topic: {response}")
+            # raise RuntimeError(f"Error while trying to listen for a topic: {response}")
+            error_message = response.get("error", "")
+            logger.error(f"Error while trying to listen for a topic: {error_message}")
+            
+            # Check if the error message indicates an authentication issue (ERR_BADAUTH)
+            if "ERR_BADAUTH" in error_message:
+                # Inform the user about the potential outdated cookie file
+                username = ws.twitch.twitch_login.username
+                logger.error(f"Received the ERR_BADAUTH error, most likely you have an outdated cookie file \"cookies\\{username}.pkl\". Delete this file and try again.")
+                # Attempt to delete the outdated cookie file
+                # try:
+                #     cookie_file_path = os.path.join("cookies", f"{username}.pkl")
+                #     if os.path.exists(cookie_file_path):
+                #         os.remove(cookie_file_path)
+                #         logger.info(f"Deleted outdated cookie file for user: {username}")
+                #     else:
+                #         logger.warning(f"Cookie file not found for user: {username}")
+                # except Exception as e:
+                #     logger.error(f"Error occurred while deleting cookie file: {str(e)}")
 
         elif response["type"] == "RECONNECT":
             logger.info(f"#{ws.index} - Reconnection required")
