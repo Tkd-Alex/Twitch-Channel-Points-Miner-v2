@@ -91,36 +91,43 @@ var startDate = new Date();
 startDate.setDate(startDate.getDate() - daysAgo);
 var endDate = new Date();
 
-// Function to get the full log content
-function getFullLog() {
-    $.get("/log", function (data) {
-        // Update the log content with the full log
-        $("#log-content").text(data);
-        // Scroll to the bottom of the log content
-        $("#log-content").scrollTop($("#log-content")[0].scrollHeight);
-    });
-}
+$(document).ready(function () {
+    // Variable to keep track of whether log checkbox is checked
+    var isLogCheckboxChecked = $('#log').prop('checked');
 
-// Function to continuously update the log content
-function updateLogContent() {
-    // Get the current log content
-    var currentLogContent = $("#log-content").text();
-
-    // Fetch the updated log content
-    $.get("/log", function (data) {
-        // If the log content has changed, update the displayed log
-        if (data !== currentLogContent) {
-            // Update the log content with the new log data
+    // Function to get the full log content
+    function getFullLog() {
+        $.get("/log", function (data) {
+            // Update the log content with the full log
             $("#log-content").text(data);
             // Scroll to the bottom of the log content
             $("#log-content").scrollTop($("#log-content")[0].scrollHeight);
-        }
-        // Schedule the next update after 1 second
-        setTimeout(updateLogContent, 1000);
-    });
-}
+        });
+    }
 
-$(document).ready(function () {
+    // Function to continuously update the log content
+    function updateLogContent() {
+        if (isLogCheckboxChecked) {
+            // Get the current log content
+            var currentLogContent = $("#log-content").text();
+
+            // Fetch the updated log content
+            $.get("/log", function (data) {
+                // If the log checkbox is still checked, update the displayed log
+                if (isLogCheckboxChecked && data !== currentLogContent) {
+                    // Update the log content with the new log data
+                    $("#log-content").text(data);
+                    // Scroll to the bottom of the log content
+                    $("#log-content").scrollTop($("#log-content")[0].scrollHeight);
+                }
+                // Schedule the next update after 1 second if the log checkbox is still checked
+                if (isLogCheckboxChecked) {
+                    setTimeout(updateLogContent, 1000);
+                }
+            });
+        }
+    }
+
     // Retrieve the saved header visibility preference from localStorage
     var headerVisibility = localStorage.getItem('headerVisibility');
 
@@ -183,10 +190,33 @@ $(document).ready(function () {
     updateAnnotations();
     toggleDarkMode();
 
-    // Get the full log content when the document is ready
-    getFullLog();
-    // Start continuously updating the log content
-    updateLogContent();
+    // Retrieve log checkbox state from localStorage and update UI accordingly
+    var logCheckboxState = localStorage.getItem('logCheckboxState');
+    $('#log').prop('checked', logCheckboxState === 'true');
+    if (logCheckboxState === 'true') {
+        isLogCheckboxChecked = true;
+        $('#log-box').show();
+        // Get the full log content when the document is ready
+        getFullLog();
+        // Start continuously updating the log content
+        updateLogContent();
+    }
+
+    // Handle the log checkbox change event
+    $('#log').change(function () {
+        isLogCheckboxChecked = $(this).prop('checked');
+        localStorage.setItem('logCheckboxState', isLogCheckboxChecked);
+
+        if (isLogCheckboxChecked) {
+            $('#log-box').show();
+            getFullLog();
+            updateLogContent();
+        } else {
+            $('#log-box').hide();
+            // Clear log content when checkbox is unchecked
+            // $("#log-content").text('');
+        }
+    });
 });
 
 function formatDate(date) {
