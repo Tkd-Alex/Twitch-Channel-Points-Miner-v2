@@ -222,6 +222,7 @@ def check_assets():
                 download_assets(assets_folder, required_files)
                 break
 
+last_sent_log_index = 0
 
 class AnalyticsServer(Thread):
     def __init__(
@@ -243,12 +244,23 @@ class AnalyticsServer(Thread):
         self.username = username
 
         def generate_log():
+            global last_sent_log_index  # Use the global variable
+
+            # Get the last received log index from the client request parameters
+            last_received_index = int(request.args.get("lastIndex", last_sent_log_index))
+
             logs_path = os.path.join(Path().absolute(), "logs")
             log_file_path = os.path.join(logs_path, f"{username}.log")
             try:
                 with open(log_file_path, "r") as log_file:
                     log_content = log_file.read()
-                    return Response(log_content, status=200, mimetype="text/plain")
+
+                # Extract new log entries since the last received index
+                new_log_entries = log_content[last_received_index:]
+                last_sent_log_index = len(log_content)  # Update the last sent index
+
+                return Response(new_log_entries, status=200, mimetype="text/plain")
+
             except FileNotFoundError:
                 return Response("Log file not found.", status=404, mimetype="text/plain")
 

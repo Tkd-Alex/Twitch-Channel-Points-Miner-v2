@@ -95,35 +95,23 @@ $(document).ready(function () {
     // Variable to keep track of whether log checkbox is checked
     var isLogCheckboxChecked = $('#log').prop('checked');
 
+    // Variable to keep track of the last received log index
+    var lastReceivedLogIndex = 0;
+
     // Function to get the full log content
-    function getFullLog() {
-        $.get("/log", function (data) {
-            // Update the log content with the full log
-            $("#log-content").text(data);
-            // Scroll to the bottom of the log content
-            $("#log-content").scrollTop($("#log-content")[0].scrollHeight);
-        });
-    }
-
-    // Function to continuously update the log content
-    function updateLogContent() {
+    function getLog() {
         if (isLogCheckboxChecked) {
-            // Get the current log content
-            var currentLogContent = $("#log-content").text();
+            $.get(`/log?lastIndex=${lastReceivedLogIndex}`, function (data) {
+                // Process and display the new log entries received
+                $("#log-content").append(data);
+                // Scroll to the bottom of the log content
+                $("#log-content").scrollTop($("#log-content")[0].scrollHeight);
 
-            // Fetch the updated log content
-            $.get("/log", function (data) {
-                // If the log checkbox is still checked, update the displayed log
-                if (isLogCheckboxChecked && data !== currentLogContent) {
-                    // Update the log content with the new log data
-                    $("#log-content").text(data);
-                    // Scroll to the bottom of the log content
-                    $("#log-content").scrollTop($("#log-content")[0].scrollHeight);
-                }
-                // Schedule the next update after 1 second if the log checkbox is still checked
-                if (isLogCheckboxChecked) {
-                    setTimeout(updateLogContent, 1000);
-                }
+                // Update the last received log index
+                lastReceivedLogIndex += data.length;
+
+                // Call getLog() again after a certain interval (e.g., 1 second)
+                setTimeout(getLog, 1000);
             });
         }
     }
@@ -196,10 +184,8 @@ $(document).ready(function () {
     if (logCheckboxState === 'true') {
         isLogCheckboxChecked = true;
         $('#log-box').show();
-        // Get the full log content when the document is ready
-        getFullLog();
         // Start continuously updating the log content
-        updateLogContent();
+        getLog();
     }
 
     // Handle the log checkbox change event
@@ -209,8 +195,7 @@ $(document).ready(function () {
 
         if (isLogCheckboxChecked) {
             $('#log-box').show();
-            getFullLog();
-            updateLogContent();
+            getLog();
         } else {
             $('#log-box').hide();
             // Clear log content when checkbox is unchecked
