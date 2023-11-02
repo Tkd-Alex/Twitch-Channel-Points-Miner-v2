@@ -92,6 +92,30 @@ startDate.setDate(startDate.getDate() - daysAgo);
 var endDate = new Date();
 
 $(document).ready(function () {
+    // Variable to keep track of whether log checkbox is checked
+    var isLogCheckboxChecked = $('#log').prop('checked');
+
+    // Variable to keep track of the last received log index
+    var lastReceivedLogIndex = 0;
+
+    // Function to get the full log content
+    function getLog() {
+        if (isLogCheckboxChecked) {
+            $.get(`/log?lastIndex=${lastReceivedLogIndex}`, function (data) {
+                // Process and display the new log entries received
+                $("#log-content").append(data);
+                // Scroll to the bottom of the log content
+                $("#log-content").scrollTop($("#log-content")[0].scrollHeight);
+
+                // Update the last received log index
+                lastReceivedLogIndex += data.length;
+
+                // Call getLog() again after a certain interval (e.g., 1 second)
+                setTimeout(getLog, 1000);
+            });
+        }
+    }
+
     // Retrieve the saved header visibility preference from localStorage
     var headerVisibility = localStorage.getItem('headerVisibility');
 
@@ -153,6 +177,31 @@ $(document).ready(function () {
 
     updateAnnotations();
     toggleDarkMode();
+
+    // Retrieve log checkbox state from localStorage and update UI accordingly
+    var logCheckboxState = localStorage.getItem('logCheckboxState');
+    $('#log').prop('checked', logCheckboxState === 'true');
+    if (logCheckboxState === 'true') {
+        isLogCheckboxChecked = true;
+        $('#log-box').show();
+        // Start continuously updating the log content
+        getLog();
+    }
+
+    // Handle the log checkbox change event
+    $('#log').change(function () {
+        isLogCheckboxChecked = $(this).prop('checked');
+        localStorage.setItem('logCheckboxState', isLogCheckboxChecked);
+
+        if (isLogCheckboxChecked) {
+            $('#log-box').show();
+            getLog();
+        } else {
+            $('#log-box').hide();
+            // Clear log content when checkbox is unchecked
+            // $("#log-content").text('');
+        }
+    });
 });
 
 function formatDate(date) {

@@ -222,6 +222,7 @@ def check_assets():
                 download_assets(assets_folder, required_files)
                 break
 
+last_sent_log_index = 0
 
 class AnalyticsServer(Thread):
     def __init__(
@@ -230,6 +231,7 @@ class AnalyticsServer(Thread):
         port: int = 5000,
         refresh: int = 5,
         days_ago: int = 7,
+        username: str = None
     ):
         super(AnalyticsServer, self).__init__()
 
@@ -239,6 +241,28 @@ class AnalyticsServer(Thread):
         self.port = port
         self.refresh = refresh
         self.days_ago = days_ago
+        self.username = username
+
+        def generate_log():
+            global last_sent_log_index  # Use the global variable
+
+            # Get the last received log index from the client request parameters
+            last_received_index = int(request.args.get("lastIndex", last_sent_log_index))
+
+            logs_path = os.path.join(Path().absolute(), "logs")
+            log_file_path = os.path.join(logs_path, f"{username}.log")
+            try:
+                with open(log_file_path, "r") as log_file:
+                    log_content = log_file.read()
+
+                # Extract new log entries since the last received index
+                new_log_entries = log_content[last_received_index:]
+                last_sent_log_index = len(log_content)  # Update the last sent index
+
+                return Response(new_log_entries, status=200, mimetype="text/plain")
+
+            except FileNotFoundError:
+                return Response("Log file not found.", status=404, mimetype="text/plain")
 
         self.app = Flask(
             __name__,
@@ -259,6 +283,8 @@ class AnalyticsServer(Thread):
         )
         self.app.add_url_rule("/json_all", "json_all",
                               json_all, methods=["GET"])
+        self.app.add_url_rule(
+            "/log", "log", generate_log, methods=["GET"])
 
     def run(self):
         logger.info(

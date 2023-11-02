@@ -154,6 +154,10 @@
             </div>
             <div class="column has-text-right" style="margin: auto">
                 <label class="checkbox checkbox-label">
+                    Log
+                    <input type="checkbox" id="log">
+                </label>
+                <label class="checkbox checkbox-label">
                     Annotations
                     <input type="checkbox" checked="true" id="annotations">
                 </label>
@@ -175,6 +179,14 @@
             </div>
             <div class="column">
                 <div class="box" id="chart" style="padding: 0.30rem;"></div>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-12">
+                <div class="box" id="log-box" style="padding: 0.30rem; display: none;">
+                    <pre
+                        id="log-content">In your run.py file set save=True in logger_settings to save logs to a file.&#10;&#13;</pre>
+                </div>
             </div>
         </div>
     </div>
