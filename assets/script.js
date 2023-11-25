@@ -266,6 +266,18 @@ function getStreamers() {
     $.getJSON('streamers', function (response) {
         streamersList = response;
         sortStreamers();
+        
+        // Restore the selected streamer from localStorage on page load
+        var selectedStreamer = localStorage.getItem("selectedStreamer");
+
+        if (selectedStreamer) {
+            currentStreamer = selectedStreamer;
+        } else {
+            // If no selected streamer is found, default to the first streamer in the list
+            currentStreamer = streamersList.length > 0 ? streamersList[0].name : null;
+        }
+
+        // Ensure the selected streamer is still active and scrolled into view
         renderStreamers();
     });
 }
@@ -278,7 +290,7 @@ function renderStreamers() {
             if (sortField == 'points') displayname = "<font size='-2'>" + streamer['points'] + "</font>&nbsp;" + displayname;
             else if (sortField == 'last_activity') displayname = "<font size='-2'>" + formatDate(streamer['last_activity']) + "</font>&nbsp;" + displayname;
             var isActive = currentStreamer === streamer.name;
-            if (!isActive && localStorage.getItem("selectedStreamer") === streamer.name) {
+            if (!isActive && localStorage.getItem("selectedStreamer") === null && index === 0) {
                 isActive = true;
                 currentStreamer = streamer.name;
             }
