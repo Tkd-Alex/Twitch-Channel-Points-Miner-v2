@@ -534,6 +534,7 @@ You can use generic webhook
 ```python
 Webhook(
    endpoint="https://example.com/webhook",
+   method="GET",
    events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
                     Events.BET_LOSE, Events.CHAT_MENTION],
 )
