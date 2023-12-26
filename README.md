@@ -526,10 +526,10 @@ Discord(
 You can use generic webhook 
 
 | Key                	 | Type            	| Default 	| Description                                                        |
-|----------------------- |---------------------	|--------------	|------------------------------------------------------------------- |
-| `endpoint`          | string        	|           	|  webhook url 
-| `method`          | string        	|           	|  `POST` or `GET`                                                 |
-| `events`   	         | list             	|       	| Only these events will be sent to the chat. Array of Event. or str |
+|----------------------- |------------------|-----------|------------------------------------------------------------------- |
+| `endpoint`             | string        	|           | webhook url                                                        | 
+| `method`               | string        	|           | `POST` or `GET`                                                    |
+| `events`   	         | list             |       	| Only these events will be sent to the chat. Array of Event. or str |
 
 ```python
 Webhook(
