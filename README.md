@@ -197,7 +197,8 @@ from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
 from TwitchChannelPointsMiner.classes.Chat import ChatPresence
-from TwitchChannelPointsMiner.classes.Discord import Discord
+from TwitchChannelPointsMiner.classes.Discord import 
+from TwitchChannelPointsMiner.classes.Webhook import Webhook
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
 from TwitchChannelPointsMiner.classes.Settings import Priority, Events, FollowersOrder
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
@@ -516,6 +517,23 @@ If you want to receive log updates on Discord initialize a new Discord class, el
 ```python
 Discord(
    webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",
+   events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
+                    Events.BET_LOSE, Events.CHAT_MENTION],
+)
+```
+
+#### Generic Webhook
+You can use generic webhook 
+
+| Key                	 | Type            	| Default 	| Description                                                        |
+|----------------------- |---------------------	|--------------	|------------------------------------------------------------------- |
+| `endpoint`          | string        	|           	|  webhook url 
+| `method`          | string        	|           	|  `POST` or `GET`                                                 |
+| `events`   	         | list             	|       	| Only these events will be sent to the chat. Array of Event. or str |
+
+```python
+Webhook(
+   endpoint="https://example.com/webhook",
    events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
                     Events.BET_LOSE, Events.CHAT_MENTION],
 )

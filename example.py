@@ -6,6 +6,7 @@ from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
 from TwitchChannelPointsMiner.classes.Chat import ChatPresence
 from TwitchChannelPointsMiner.classes.Discord import Discord
+from TwitchChannelPointsMiner.classes.Webhook import Webhook
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
 from TwitchChannelPointsMiner.classes.Matrix import Matrix
 from TwitchChannelPointsMiner.classes.Pushover import Pushover
@@ -49,6 +50,12 @@ twitch_miner = TwitchChannelPointsMiner(
         ),
         discord=Discord(
             webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",  # Discord Webhook URL
+            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
+                    Events.BET_LOSE, Events.CHAT_MENTION],                                  # Only these events will be sent to the chat
+        ),
+        webhook=Webhook(
+            endpoint="https://example.com/webhook",                                                                    # Webhook URL
+            method="GET",                                                                   # GET or POST
             events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
                     Events.BET_LOSE, Events.CHAT_MENTION],                                  # Only these events will be sent to the chat
         ),

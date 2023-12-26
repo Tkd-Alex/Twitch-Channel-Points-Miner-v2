@@ -12,6 +12,7 @@ import emoji
 from colorama import Fore, init
 
 from TwitchChannelPointsMiner.classes.Discord import Discord
+from TwitchChannelPointsMiner.classes.Webhook import Webhook
 from TwitchChannelPointsMiner.classes.Matrix import Matrix
 from TwitchChannelPointsMiner.classes.Settings import Events
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
@@ -75,6 +76,7 @@ class LoggerSettings:
         "auto_clear",
         "telegram",
         "discord",
+        "webhook",
         "matrix",
         "pushover",
         "username"
@@ -94,6 +96,7 @@ class LoggerSettings:
         auto_clear: bool = True,
         telegram: Telegram or None = None,
         discord: Discord or None = None,
+        webhook: Webhook or None = None,
         matrix: Matrix or None = None,
         pushover: Pushover or None = None,
         username: str or None = None
@@ -110,6 +113,7 @@ class LoggerSettings:
         self.auto_clear = auto_clear
         self.telegram = telegram
         self.discord = discord
+        self.webhook = webhook
         self.matrix = matrix
         self.pushover = pushover
         self.username = username
@@ -185,6 +189,7 @@ class GlobalFormatter(logging.Formatter):
         if hasattr(record, "event"):
             self.telegram(record)
             self.discord(record)
+            self.webhook(record)
             self.matrix(record)
             self.pushover(record)
 
@@ -217,6 +222,16 @@ class GlobalFormatter(logging.Formatter):
             != "https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J"
         ):
             self.settings.discord.send(record.msg, record.event)
+
+    def webhook(self, record):
+        skip_webhook = False if hasattr(
+            record, "skip_webhook") is False else True
+
+        if (
+            self.settings.webhook is not None
+            and skip_webhook is False
+        ):
+            self.settings.webhook.send(record.msg, record.event)
 
     def matrix(self, record):
         skip_matrix = False if hasattr(
