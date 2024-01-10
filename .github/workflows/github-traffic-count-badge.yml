@@ -28,8 +28,8 @@ jobs:
           then
               echo "TRAFFIC_ID found"
               echo ::set-output name=GIST::${{ secrets.TRAFFIC_ID }}
-              curl https://gist.githubusercontent.com/${{ github.actor }}/${{ secrets.TRAFFIC_ID }}/raw/traffic.json > clone_before.json
-              if cat clone_before.json | grep '404: Not Found'; then
+              curl https://gist.githubusercontent.com/${{ github.actor }}/${{ secrets.TRAFFIC_ID }}/raw/traffic.json > traffic_before.json
+              if cat traffic_before.json | grep '404: Not Found'; then
                 echo "TRAFFIC_ID not valid anymore. Creating another gist..."
                 traffic_id=$(gh gist create traffic.json | awk -F / '{print $NF}')
                 echo $traffic_id | gh secret set TRAFFIC_ID
