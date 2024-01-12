@@ -230,6 +230,8 @@ class GlobalFormatter(logging.Formatter):
         if (
             self.settings.webhook is not None
             and skip_webhook is False
+            and self.settings.webhook.endpoint
+            != "https://example.com/webhook"
         ):
             self.settings.webhook.send(record.msg, record.event)
 

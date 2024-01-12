@@ -22,5 +22,4 @@ class Webhook(object):
             elif self.method.lower() == "post":
                 requests.post(url=url)
             else:
-                raise ValueError("Invalid method., use POST or GET")
-
+                raise ValueError("Invalid method, use POST or GET")
