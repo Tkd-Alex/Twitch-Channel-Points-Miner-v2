@@ -433,7 +433,7 @@ class Twitch(object):
                                     )
                                     > 30
                                 )
-                                and streamers[index].stream.minute_watched < 1
+                                and streamers[index].stream.minute_watched < 7 # fix #425
                             ):
                                 streamers_watching.append(index)
                                 if len(streamers_watching) == 2:
