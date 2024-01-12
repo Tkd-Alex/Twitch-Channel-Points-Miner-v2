@@ -57,21 +57,21 @@ twitch_miner = TwitchChannelPointsMiner(
             endpoint="https://example.com/webhook",                                                                    # Webhook URL
             method="GET",                                                                   # GET or POST
             events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE,
-                    Events.BET_LOSE, Events.CHAT_MENTION],                                  # Only these events will be sent to the chat
+                    Events.BET_LOSE, Events.CHAT_MENTION],                                  # Only these events will be sent to the endpoint
         ),
         matrix=Matrix(
             username="twitch_miner",                                                   # Matrix username (without homeserver)
             password="...",                                                            # Matrix password
             homeserver="matrix.org",                                                   # Matrix homeserver
             room_id="...",                                                             # Room ID
-            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE], # Only these events will be sent to the chat
+            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE], # Only these events will be sent
         ),
         pushover=Pushover(
-            userkey="YOUR-ACCOUNT-TOKEN",                                             # Login to https://pushover.net/, the user token is on the main page.
-            token="YOUR-APPLICATION-TOKEN",                                           # Create a application on the website, and use the token shown in your application.
+            userkey="YOUR-ACCOUNT-TOKEN",                                             # Login to https://pushover.net/, the user token is on the main page
+            token="YOUR-APPLICATION-TOKEN",                                           # Create a application on the website, and use the token shown in your application
             priority=0,                                                               # Read more about priority here: https://pushover.net/api#priority
             sound="pushover",                                                         # A list of sounds can be found here: https://pushover.net/api#sounds
-            events=[Events.CHAT_MENTION, Events.DROP_CLAIM],                          # Only these events will be sent.
+            events=[Events.CHAT_MENTION, Events.DROP_CLAIM],                          # Only these events will be sent
         )
     ),
     streamer_settings=StreamerSettings(
