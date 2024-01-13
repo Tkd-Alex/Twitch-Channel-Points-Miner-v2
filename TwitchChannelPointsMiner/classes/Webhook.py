@@ -10,6 +10,7 @@ class Webhook(object):
 
     def __init__(self, endpoint: str, method: str, events: list):
         self.endpoint = endpoint
+        self.method = method
         self.events = [str(e) for e in events]
 
     def send(self, message: str, event: Events) -> None:
