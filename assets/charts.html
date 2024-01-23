@@ -153,6 +153,7 @@
                 <input class="input" type="date" id="endDate">
             </div>
             <div class="column has-text-right" style="margin: auto">
+                <button id="auto-update-log">⏸️</button>
                 <label class="checkbox checkbox-label">
                     Log
                     <input type="checkbox" id="log">
@@ -184,8 +185,7 @@
         <div class="columns">
             <div class="column is-12">
                 <div class="box" id="log-box" style="padding: 0.30rem; display: none;">
-                    <pre
-                        id="log-content">In your run.py file set save=True in logger_settings to save logs to a file.&#10;&#13;</pre>
+                    <pre id="log-content">In your run.py file set save=True in logger_settings to save logs to a file.&#10;&#13;</pre>
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-body {
+body, .dropdown *, .input {
     background: #343E59;
     color: #fff;
 }

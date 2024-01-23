@@ -57,6 +57,14 @@ a {
 #log-content {
     text-align: left;
     white-space: pre-wrap;
-    max-height: 500px;
+    max-height: 400px;
     padding: 0;
+}
+
+#auto-update-log {
+    display: none;
+    background-color: transparent;
+    font-size: 20px;
+    padding: 0;
+    border-radius: 5px;
 }
