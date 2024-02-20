@@ -14,6 +14,14 @@ class Strategy(Enum):
     PERCENTAGE = auto()
     SMART_MONEY = auto()
     SMART = auto()
+    NUMBER_1 = auto()
+    NUMBER_2 = auto()
+    NUMBER_3 = auto()
+    NUMBER_4 = auto()
+    NUMBER_5 = auto()
+    NUMBER_6 = auto()
+    NUMBER_7 = auto()
+    NUMBER_8 = auto()
 
     def __str__(self):
         return self.name
@@ -235,6 +243,12 @@ class Bet(object):
                 largest = index
         return largest
 
+    def __return_number_choice(self, number) -> int:
+        if (len(self.outcomes) > number):
+            return number
+        else:
+            return 0
+
     def skip(self) -> bool:
         if self.settings.filter_condition is not None:
             # key == by , condition == where
@@ -283,6 +297,22 @@ class Bet(object):
             self.decision["choice"] = self.__return_choice(OutcomeKeys.ODDS_PERCENTAGE)
         elif self.settings.strategy == Strategy.SMART_MONEY:
             self.decision["choice"] = self.__return_choice(OutcomeKeys.TOP_POINTS)
+        elif self.settings.strategy == Strategy.NUMBER_1:
+            self.decision["choice"] = self.__return_number_choice(0)
+        elif self.settings.strategy == Strategy.NUMBER_2:
+            self.decision["choice"] = self.__return_number_choice(1)
+        elif self.settings.strategy == Strategy.NUMBER_3:
+            self.decision["choice"] = self.__return_number_choice(2)
+        elif self.settings.strategy == Strategy.NUMBER_4:
+            self.decision["choice"] = self.__return_number_choice(3)
+        elif self.settings.strategy == Strategy.NUMBER_5:
+            self.decision["choice"] = self.__return_number_choice(4)
+        elif self.settings.strategy == Strategy.NUMBER_6:
+            self.decision["choice"] = self.__return_number_choice(5)
+        elif self.settings.strategy == Strategy.NUMBER_7:
+            self.decision["choice"] = self.__return_number_choice(6)
+        elif self.settings.strategy == Strategy.NUMBER_8:
+            self.decision["choice"] = self.__return_number_choice(7)
         elif self.settings.strategy == Strategy.SMART:
             difference = abs(
                 self.outcomes[0][OutcomeKeys.PERCENTAGE_USERS]
