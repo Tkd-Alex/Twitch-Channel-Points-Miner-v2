@@ -252,7 +252,7 @@ class AnalyticsServer(Thread):
             logs_path = os.path.join(Path().absolute(), "logs")
             log_file_path = os.path.join(logs_path, f"{username}.log")
             try:
-                with open(log_file_path, "r") as log_file:
+                with open(log_file_path, "r", encoding="utf-8") as log_file:
                     log_content = log_file.read()
 
                 # Extract new log entries since the last received index
