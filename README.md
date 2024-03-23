@@ -8,6 +8,13 @@
 <a href="https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Tkd-Alex/Twitch-Channel-Points-Miner-v2"></a>
 </p>
 
+<p align="center">
+⚠️ This project is not mainted anymore, please use the updated repo at 
+https://github.com/rdavydov/Twitch-Channel-Points-Miner-v2 
+</p>
+
+_____
+
 **Credits**
 - Main idea: https://github.com/gottagofaster236/Twitch-Channel-Points-Miner
 - ~~Bet system (Selenium): https://github.com/ClementRoyer/TwitchAutoCollect-AutoBet~~
@@ -20,11 +27,8 @@ Read more about channels point [here](https://help.twitch.tv/s/article/channel-p
 
 ## 📢 Help wanted
 Currently, we have a lot of PRs requests opened, but the time to test and improve It's less and less. If you want to help the community and the project, please test the following PRs and give us feedback:
-- [Features/improvements to analytics #131](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/131)
-- [Betting strategy: Smart money #348](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/348)
 - [Add SMART_HIGH_ODDS strategy #172](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/172)
-- [Replace join_chat boolean with chat: ChatPresence #253](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/253)
-- [Add stats #318](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/318)
+- [Add support for arbitrary filter functions #336](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/pull/336)
 
 # README Contents
 1. 🤝 [Community](#community)
@@ -188,6 +192,8 @@ import logging
 from colorama import Fore
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner.logger import LoggerSettings, ColorPalette
+from TwitchChannelPointsMiner.classes.Chat import ChatPresence
+from TwitchChannelPointsMiner.classes.Discord import Discord
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
 from TwitchChannelPointsMiner.classes.Settings import Priority, Events, FollowersOrder
 from TwitchChannelPointsMiner.classes.entities.Bet import Strategy, BetSettings, Condition, OutcomeKeys, FilterCondition, DelayMode
@@ -219,14 +225,18 @@ twitch_miner = TwitchChannelPointsMiner(
             token="123456789:shfuihreuifheuifhiu34578347",                          # Telegram API token @BotFather
             events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, "BET_LOSE"],   # Only these events will be sent to the chat
             disable_notification=True,                                              # Revoke the notification (sound/vibration)
+        ),
+        discord=Discord(
+            webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",  # Discord Webhook URL
+            events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],       # Only these events will be sent to the chat
         )
     ),
     streamer_settings=StreamerSettings(
         make_predictions=True,                  # If you want to Bet / Make prediction
         follow_raid=True,                       # Follow raid to obtain more points
         claim_drops=True,                       # We can't filter rewards base on stream. Set to False for skip viewing counter increase and you will never obtain a drop reward from this script. Issue #21
-        watch_streak=True,                      # If a streamer go online change the priority of streamers array and catch the watch streak. Issue #11
-        join_chat=True,                         # Join irc chat to increase watch-time
+        watch_streak=True,                      # If a streamer go online change the priority of streamers array and catch the watch screak. Issue #11
+        chat=ChatPresence.ONLINE,               # Join irc chat to increase watch-time [ALWAYS, NEVER, ONLINE, OFFLINE]
         bet=BetSettings(
             strategy=Strategy.SMART,            # Choose you strategy!
             percentage=5,                       # Place the x% of your channel points
@@ -324,6 +334,7 @@ version: "3.9"
 services:
   miner:
     image: tkdalex/twitch-channel-points-miner-v2
+    stdin_open: true
     tty: true
     environment:
       - TERM=xterm-256color
@@ -347,7 +358,7 @@ docker run \
     tkdalex/twitch-channel-points-miner-v2
 ```
 
-`$(pwd)` Could not work on Windows (cmd), please us the absolute path instead, like: `/path/of/your/cookies:/usr/src/app/cookies`.
+`$(pwd)` Could not work on Windows (cmd), please use the absolute path instead, like: `/path/of/your/cookies:/usr/src/app/cookies`.
 If you don't mount the volume for the analytics (or cookies or logs) folder, the folder will be automatically created on the Docker container, and you will lose all the data when it is stopped.
 If you don't have a cookie or It's your first time running the script, you will need to login to Twitch and start the container with `-it` args. If you need to run multiple containers you can bind different ports (only if you need also the analytics) and mount dirrent run.py file, like
 ```sh
@@ -390,6 +401,7 @@ You can combine all priority but keep in mind that use `ORDER` and `POINTS_ASCEN
 | `auto_clear`      | bool            	| True 	                                                              | Create a file rotation handler with interval = 1D and backupCount = 7 [#215](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/215)                                       |
 | `color_palette`   | ColorPalette      | All messages are Fore.RESET except WIN and LOSE bet (GREEN and RED) | Create your custom color palette. Read more above.      	                                                                                                                              |
 | `telegram`        | Telegram          | None                                                                | (Optional) Receive Telegram updates for multiple events list [#233](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/233)                                                           |
+| `discord`         | Discord          | None                                                                 | (Optional) Receive Discord updates for multiple events list [#320](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/320)                                                           |
 
 #### Color Palette
 Now you can customize the color of the terminal message. We have created a default ColorPalette that provide all the message with `DEFAULT (RESET)` color and the `BET_WIN` and `BET_LOSE` message `GREEN` and `RED` respectively. You can change the colors of all `Events` enum class. The colors allowed are all the Fore color from Colorama: `BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.`
@@ -420,7 +432,7 @@ If you want to receive logs update on Telegram initiate a new Telegram class, el
 | Key                	 | Type            	| Default 	| Description                                                        |
 |----------------------- |-----------------	|---------	|------------------------------------------------------------------- |
 | `chat_id`         	 | int        	    |           | Chat ID to send messages @GiveChatId                               |
-| `token`       	     | string           |        	| Telegram API token @BotFather                                      |
+| `token`       	 | string           |        	| Telegram API token @BotFather                                      |
 | `events`   	         | list             |       	| Only these events will be sent to the chat. Array of Event. or str |
 | `disable_notification` | bool             | false   	| Revoke the notification (sound/vibration)                          |
 
@@ -433,6 +445,30 @@ Telegram(
     disable_notification=True,
 )
 ```
+
+#### Discord
+If you want to receive log updates on Discord initialize a new Discord class, else leave omit this parameter or set it as None [YT Video](https://www.youtube.com/watch?v=fKksxz2Gdnc)
+1. Go to the Server you want to receive updates
+2. Click "Edit Channel"
+3. Click "Integrations"
+4. Click "Webhooks"
+5. Click "New Webhook"
+6. Name it if you want
+7. Click on "Copy Webhook URL"
+
+
+| Key                	 | Type            	| Default 	| Description                                                        |
+|----------------------- |---------------------	|--------------	|------------------------------------------------------------------- |
+| `webhook_api`          | string        	|           	| Discord webhook URL                                                |
+| `events`   	         | list             	|       	| Only these events will be sent to the chat. Array of Event. or str |
+
+```python
+Discord(
+   webhook_api="https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J",
+   events=[Events.STREAMER_ONLINE, Events.STREAMER_OFFLINE, Events.BET_LOSE],
+)
+```
+
 
 #### Events
  - `STREAMER_ONLINE`
@@ -459,8 +495,15 @@ Telegram(
 | `follow_raid`      	| bool        	| True                           	| Choose if you want to follow raid +250 points                                                                                                        	                                                                            |
 | `claim_drops`      	| bool        	| True                           	| If this value is True, the script will increase the watch-time for the current game. With this, you can claim the drops from Twitch Inventory [#21](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/21)         |
 | `watch_streak`     	| bool        	| True                           	| Choose if you want to change a priority for these streamers and try to catch the Watch Streak event [#11](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/11)                                                   |
-| `join_chat` 	        | bool 	        | True                           	| Join IRC-Chat to appear online in chat and attempt to get StreamElements channel points and increase view-time  [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47)                                     |
 | `bet`              	| BetSettings 	|  	                                | Rules to follow for the bet                                                                                                                                                                                                       |
+| `chat` 	            | ChatPresence  | ONLINE    	                    | Join IRC-Chat to appear online in chat and attempt to get StreamElements channel points and increase view-time  [#47](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/47)                                       |
+
+Allowed values for `chat` are:
+- `ALWAYS` Join in IRC chat and never leave
+- `NEVER` Never join IRC chat
+- `ONLINE` Partecipate to IRC chat if the streamer is online (leave if offline)
+- `OFFLINE` Partecipate to IRC chat if the streamer is offline (leave if online)
+
 ### BetSettings
 | Key                	| Type            	| Default 	| Description                                                                                                    	                                                                          |
 |--------------------	|-----------------	|---------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -477,6 +520,7 @@ Telegram(
 - **MOST_VOTED**: Select the option most voted based on users count
 - **HIGH_ODDS**: Select the option with the highest odds
 - **PERCENTAGE**: Select the option with the highest percentage based on odds (It's the same that show Twitch) - Should be the same as select LOWEST_ODDS
+- **SMART_MONEY**: Select the option with the highest points placed. [#331](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/331)
 - **SMART**: If the majority in percent chose an option, then follow the other users, otherwise select the option with the highest odds
 
 ![Screenshot](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/prediction.png)
@@ -539,11 +583,11 @@ If you want you can toggle the dark theme with the dedicated checkbox.
 | ![Light theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-light.png) | ![Dark theme](https://raw.githubusercontent.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/master/assets/chart-analytics-dark.png) |
 
 For use this feature just call the `analytics` method before start mining. Read more at: [#96](https://github.com/Tkd-Alex/Twitch-Channel-Points-Miner-v2/issues/96)
-The chart will be autofreshed each `refresh` minutes. If you want to connect from one to second machine that have that webpanel you have to use `0.0.0.0` instead of `127.0.0.1`.
+The chart will be autofreshed each `refresh` minutes. If you want to connect from one to second machine that have that webpanel you have to use `0.0.0.0` instead of `127.0.0.1`. With the `days_ago` arg you can select how many days you want to show by default in your analytics graph.
 ```python
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
 twitch_miner = TwitchChannelPointsMiner("your-twitch-username")
-twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5)   # Analytics web-server
+twitch_miner.analytics(host="127.0.0.1", port=5000, refresh=5, days_ago=7)   # Analytics web-server
 twitch_miner.mine(followers=True, blacklist=["user1", "user2"])
 ```
 

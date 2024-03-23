@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 from TwitchChannelPointsMiner.classes.AnalyticsServer import AnalyticsServer
-from TwitchChannelPointsMiner.classes.Chat import ThreadChat
+from TwitchChannelPointsMiner.classes.Chat import ChatPresence, ThreadChat
 from TwitchChannelPointsMiner.classes.entities.PubsubTopic import PubsubTopic
 from TwitchChannelPointsMiner.classes.entities.Streamer import (
     Streamer,
@@ -64,6 +64,7 @@ class TwitchChannelPointsMiner:
         "start_datetime",
         "original_streamers",
         "logs_file",
+        "queue_listener",
     ]
 
     def __init__(
@@ -108,7 +109,9 @@ class TwitchChannelPointsMiner:
         self.start_datetime = None
         self.original_streamers = []
 
-        self.logs_file = configure_loggers(self.username, logger_settings)
+        self.logs_file, self.queue_listener = configure_loggers(
+            self.username, logger_settings
+        )
 
         # Check for the latest version of the script
         current_version, github_version = check_versions()
@@ -123,8 +126,16 @@ class TwitchChannelPointsMiner:
         for sign in [signal.SIGINT, signal.SIGSEGV, signal.SIGTERM]:
             signal.signal(sign, self.end)
 
-    def analytics(self, host: str = "127.0.0.1", port: int = 5000, refresh: int = 5):
-        http_server = AnalyticsServer(host=host, port=port, refresh=refresh)
+    def analytics(
+        self,
+        host: str = "127.0.0.1",
+        port: int = 5000,
+        refresh: int = 5,
+        days_ago: int = 7,
+    ):
+        http_server = AnalyticsServer(
+            host=host, port=port, refresh=refresh, days_ago=days_ago
+        )
         http_server.daemon = True
         http_server.name = "Analytics Thread"
         http_server.start()
@@ -203,7 +214,7 @@ class TwitchChannelPointsMiner:
                         streamer.settings.bet = set_default_settings(
                             streamer.settings.bet, Settings.streamer_settings.bet
                         )
-                        if streamer.settings.join_chat is True:
+                        if streamer.settings.chat != ChatPresence.NEVER:
                             streamer.irc_chat = ThreadChat(
                                 self.username,
                                 self.twitch.twitch_login.get_auth_token(),
@@ -321,7 +332,10 @@ class TwitchChannelPointsMiner:
         logger.info("CTRL+C Detected! Please wait just a moment!")
 
         for streamer in self.streamers:
-            if streamer.irc_chat is not None:
+            if (
+                streamer.irc_chat is not None
+                and streamer.settings.chat != ChatPresence.NEVER
+            ):
                 streamer.leave_chat()
                 if streamer.irc_chat.is_alive() is True:
                     streamer.irc_chat.join()
@@ -344,6 +358,9 @@ class TwitchChannelPointsMiner:
                 streamer.mutex.release()
 
         self.__print_report()
+
+        # Stop the queue listener to make sure all messages have been logged
+        self.queue_listener.stop()
 
         sys.exit(0)
 

@@ -1,13 +1,15 @@
 import logging
 import os
 import platform
+import queue
 from datetime import datetime
-from logging.handlers import TimedRotatingFileHandler
+from logging.handlers import QueueHandler, QueueListener, TimedRotatingFileHandler
 from pathlib import Path
 
 import emoji
 from colorama import Fore, init
 
+from TwitchChannelPointsMiner.classes.Discord import Discord
 from TwitchChannelPointsMiner.classes.Settings import Events
 from TwitchChannelPointsMiner.classes.Telegram import Telegram
 from TwitchChannelPointsMiner.utils import remove_emoji
@@ -66,6 +68,7 @@ class LoggerSettings:
         "color_palette",
         "auto_clear",
         "telegram",
+        "discord",
     ]
 
     def __init__(
@@ -79,6 +82,7 @@ class LoggerSettings:
         color_palette: ColorPalette = ColorPalette(),
         auto_clear: bool = True,
         telegram: Telegram or None = None,
+        discord: Discord or None = None,
     ):
         self.save = save
         self.less = less
@@ -89,6 +93,7 @@ class LoggerSettings:
         self.color_palette = color_palette
         self.auto_clear = auto_clear
         self.telegram = telegram
+        self.discord = discord
 
 
 class GlobalFormatter(logging.Formatter):
@@ -106,7 +111,7 @@ class GlobalFormatter(logging.Formatter):
             and record.emoji_is_present is False
         ):
             record.msg = emoji.emojize(
-                f"{record.emoji}  {record.msg.strip()}", use_aliases=True
+                f"{record.emoji}  {record.msg.strip()}", language="alias"
             )
             record.emoji_is_present = True
 
@@ -119,14 +124,8 @@ class GlobalFormatter(logging.Formatter):
             record.msg = remove_emoji(record.msg)
 
         if hasattr(record, "event"):
-            skip_telegram = (
-                False
-                if hasattr(record, "skip_telegram") is False
-                or hasattr(record, "skip_telegram") is False
-                else True
-            )
-            if self.settings.telegram is not None and skip_telegram is False:
-                self.settings.telegram.send(record.msg, record.event)
+            self.telegram(record)
+            self.discord(record)
 
             if self.settings.colored is True:
                 record.msg = (
@@ -135,13 +134,40 @@ class GlobalFormatter(logging.Formatter):
 
         return super().format(record)
 
+    def telegram(self, record):
+        skip_telegram = False if hasattr(record, "skip_telegram") is False else True
+
+        if (
+            self.settings.telegram is not None
+            and skip_telegram is False
+            and self.settings.telegram.chat_id != 123456789
+        ):
+            self.settings.telegram.send(record.msg, record.event)
+
+    def discord(self, record):
+        skip_discord = False if hasattr(record, "skip_discord") is False else True
+
+        if (
+            self.settings.discord is not None
+            and skip_discord is False
+            and self.settings.discord.webhook_api
+            != "https://discord.com/api/webhooks/0123456789/0a1B2c3D4e5F6g7H8i9J"
+        ):
+            self.settings.discord.send(record.msg, record.event)
+
 
 def configure_loggers(username, settings):
     if settings.colored is True:
         init(autoreset=True)
 
+    # Queue handler that will handle the logger queue
+    logger_queue = queue.Queue(-1)
+    queue_handler = QueueHandler(logger_queue)
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
+    # Add the queue handler to the root logger
+    # Send log messages to another thread through the queue
+    root_logger.addHandler(queue_handler)
 
     console_handler = logging.StreamHandler()
     console_handler.setLevel(settings.console_level)
@@ -190,9 +216,15 @@ def configure_loggers(username, settings):
         )
         file_handler.setLevel(settings.file_level)
 
-        root_logger.addHandler(file_handler)
-        root_logger.addHandler(console_handler)
-        return logs_file
+        # Add logger handlers to the logger queue and start the process
+        queue_listener = QueueListener(
+            logger_queue, file_handler, console_handler, respect_handler_level=True
+        )
+        queue_listener.start()
+        return logs_file, queue_listener
     else:
-        root_logger.addHandler(console_handler)
-        return None
+        queue_listener = QueueListener(
+            logger_queue, console_handler, respect_handler_level=True
+        )
+        queue_listener.start()
+        return None, queue_listener

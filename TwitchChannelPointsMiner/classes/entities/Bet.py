@@ -11,6 +11,7 @@ class Strategy(Enum):
     MOST_VOTED = auto()
     HIGH_ODDS = auto()
     PERCENTAGE = auto()
+    SMART_MONEY = auto()
     SMART = auto()
 
     def __str__(self):
@@ -102,14 +103,22 @@ class BetSettings(object):
         self.delay_mode = delay_mode
 
     def default(self):
-        self.strategy = self.strategy if not None else Strategy.SMART
-        self.percentage = self.percentage if not None else 5
-        self.percentage_gap = self.percentage_gap if not None else 20
-        self.max_points = self.max_points if not None else 50000
-        self.minimum_points = self.minimum_points if not None else 0
-        self.stealth_mode = self.stealth_mode if not None else False
-        self.delay = self.delay if not None else 6
-        self.delay_mode = self.delay_mode if not None else DelayMode.FROM_END
+        self.strategy = self.strategy if self.strategy is not None else Strategy.SMART
+        self.percentage = self.percentage if self.percentage is not None else 5
+        self.percentage_gap = (
+            self.percentage_gap if self.percentage_gap is not None else 20
+        )
+        self.max_points = self.max_points if self.max_points is not None else 50000
+        self.minimum_points = (
+            self.minimum_points if self.minimum_points is not None else 0
+        )
+        self.stealth_mode = (
+            self.stealth_mode if self.stealth_mode is not None else False
+        )
+        self.delay = self.delay if self.delay is not None else 6
+        self.delay_mode = (
+            self.delay_mode if self.delay_mode is not None else DelayMode.FROM_END
+        )
 
     def __repr__(self):
         return f"BetSettings(strategy={self.strategy}, percentage={self.percentage}, percentage_gap={self.percentage_gap}, max_points={self.max_points}, minimum_points={self.minimum_points}, stealth_mode={self.stealth_mode})"
@@ -260,6 +269,8 @@ class Bet(object):
             self.decision["choice"] = self.__return_choice(OutcomeKeys.ODDS)
         elif self.settings.strategy == Strategy.PERCENTAGE:
             self.decision["choice"] = self.__return_choice(OutcomeKeys.ODDS_PERCENTAGE)
+        elif self.settings.strategy == Strategy.SMART_MONEY:
+            self.decision["choice"] = self.__return_choice(OutcomeKeys.TOP_POINTS)
         elif self.settings.strategy == Strategy.SMART:
             difference = abs(
                 self.outcomes[0][OutcomeKeys.PERCENTAGE_USERS]
