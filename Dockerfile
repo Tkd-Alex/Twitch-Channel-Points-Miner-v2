@@ -1,10 +1,14 @@
-FROM python:3.8-slim-buster
+FROM python:3.12
 
 ARG BUILDX_QEMU_ENV
 
 WORKDIR /usr/src/app
 
 COPY ./requirements.txt ./
+
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
+
+RUN pip install --upgrade pip
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-install-recommends \
@@ -14,8 +18,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --fix-missing --no-ins
     zlib1g-dev \
     libjpeg-dev \
     libssl-dev \
+    libblas-dev \
+    liblapack-dev \
     make \
+    cmake \    
     automake \
+    ninja-build \
     g++ \
     subversion \
     python3-dev \

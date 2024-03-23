@@ -20,6 +20,7 @@ class StreamerSettings(object):
         "make_predictions",
         "follow_raid",
         "claim_drops",
+        "claim_moments",
         "watch_streak",
         "bet",
         "chat",
@@ -30,6 +31,7 @@ class StreamerSettings(object):
         make_predictions: bool = None,
         follow_raid: bool = None,
         claim_drops: bool = None,
+        claim_moments: bool = None,
         watch_streak: bool = None,
         bet: BetSettings = None,
         chat: ChatPresence = None,
@@ -37,6 +39,7 @@ class StreamerSettings(object):
         self.make_predictions = make_predictions
         self.follow_raid = follow_raid
         self.claim_drops = claim_drops
+        self.claim_moments = claim_moments
         self.watch_streak = watch_streak
         self.bet = bet
         self.chat = chat
@@ -46,6 +49,7 @@ class StreamerSettings(object):
             "make_predictions",
             "follow_raid",
             "claim_drops",
+            "claim_moments",
             "watch_streak",
         ]:
             if getattr(self, name) is None:
@@ -56,7 +60,7 @@ class StreamerSettings(object):
             self.chat = ChatPresence.ONLINE
 
     def __repr__(self):
-        return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, watch_streak={self.watch_streak}, bet={self.bet}, chat={self.chat})"
+        return f"BetSettings(make_predictions={self.make_predictions}, follow_raid={self.follow_raid}, claim_drops={self.claim_drops}, claim_moments={self.claim_moments}, watch_streak={self.watch_streak}, bet={self.bet}, chat={self.chat})"
 
 
 class Streamer(object):
@@ -169,7 +173,7 @@ class Streamer(object):
         return (
             self.settings.claim_drops is True
             and self.is_online is True
-            and self.stream.drops_tags is True
+            # and self.stream.drops_tags is True
             and self.stream.campaigns_ids != []
         )
 
@@ -203,11 +207,11 @@ class Streamer(object):
     # === ANALYTICS === #
     def persistent_annotations(self, event_type, event_text):
         event_type = event_type.upper()
-        if event_type in ["WATCH_STREAK", "WIN", "PREDICTION_MADE"]:
+        if event_type in ["WATCH_STREAK", "WIN", "PREDICTION_MADE", "LOSE"]:
             primary_color = (
-                "#45c1ff"
+                "#45c1ff"  # blue #45c1ff yellow #ffe045 green #36b535 red #ff4545
                 if event_type == "WATCH_STREAK"
-                else ("#ffe045" if event_type == "PREDICTION_MADE" else "#54ff45")
+                else ("#ffe045" if event_type == "PREDICTION_MADE" else ("#36b535" if event_type == "WIN" else "#ff4545"))
             )
             data = {
                 "borderColor": primary_color,
@@ -232,13 +236,20 @@ class Streamer(object):
                 data.update({"z": event_type.replace("_", " ").title()})
 
         fname = os.path.join(Settings.analytics_path, f"{self.username}.json")
-        with self.mutex:
-            json_data = json.load(open(fname, "r")) if os.path.isfile(fname) else {}
-            if key not in json_data:
-                json_data[key] = []
+        temp_fname = fname + '.temp'  # Temporary file name
 
-            json_data[key].append(data)
-            json.dump(json_data, open(fname, "w"), indent=4)
+        with self.mutex:
+            # Create and write to the temporary file
+            with open(temp_fname, "w") as temp_file:
+                json_data = json.load(
+                    open(fname, "r")) if os.path.isfile(fname) else {}
+                if key not in json_data:
+                    json_data[key] = []
+                json_data[key].append(data)
+                json.dump(json_data, temp_file, indent=4)
+
+            # Replace the original file with the temporary file
+            os.replace(temp_fname, fname)
 
     def leave_chat(self):
         if self.irc_chat is not None:
